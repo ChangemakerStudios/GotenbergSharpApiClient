@@ -1,5 +1,5 @@
-﻿using Gotenberg.App.API.Sharp.Client.Extensions;
-using Gotenberg.App.API.Sharp.Client.Helpers;
+﻿using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Gotenberg.App.API.Sharp.Client
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {
     /// <summary>
     /// C# Client for Gotenberg api

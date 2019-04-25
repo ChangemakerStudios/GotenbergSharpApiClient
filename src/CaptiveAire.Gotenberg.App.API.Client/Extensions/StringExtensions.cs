@@ -1,6 +1,6 @@
-﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+﻿// CaptiveAire.Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
-namespace Gotenberg.App.API.Sharp.Client.Extensions
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 {
     public static class StringExtensions
     {

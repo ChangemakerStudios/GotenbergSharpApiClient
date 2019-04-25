@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{14755C1F-2DD2-4DA5-93E4-45AD520BBC2A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gotenberg.App.API.Sharp.Client", "src\Gotenberg.App.API.Client\Gotenberg.App.API.Sharp.Client.csproj", "{75F783A4-9392-412F-9DFE-00EE89527C10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaptiveAire.Gotenberg.App.API.Sharp.Client", "src\CaptiveAire.Gotenberg.App.API.Client\Gotenberg.App.API.Sharp.Client.csproj", "{75F783A4-9392-412F-9DFE-00EE89527C10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,9 +30,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{75F783A4-9392-412F-9DFE-00EE89527C10} = {14755C1F-2DD2-4DA5-93E4-45AD520BBC2A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E732CE09-693A-4EB7-BC1C-34E0D4E2E19F}

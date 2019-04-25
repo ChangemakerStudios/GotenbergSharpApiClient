@@ -1,7 +1,7 @@
-﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+﻿// CaptiveAire.Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
 // ReSharper disable MemberCanBePrivate.Global
-namespace Gotenberg.App.API.Sharp.Client
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {
     /// <summary>
     /// 

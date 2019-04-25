@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <AssemblyName>CaptiveAire.Gotenberg.App.API.Sharp.Client</AssemblyName>
+    <RootNamespace>CaptiveAire.Gotenberg.App.API.Sharp.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

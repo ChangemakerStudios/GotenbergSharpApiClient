@@ -1,12 +1,12 @@
-﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+﻿// CaptiveAire.Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Gotenberg.App.API.Sharp.Client.Extensions;
 
-namespace Gotenberg.App.API.Sharp.Client.Helpers
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers
 {
     public class TimeoutHandler : DelegatingHandler
     {
