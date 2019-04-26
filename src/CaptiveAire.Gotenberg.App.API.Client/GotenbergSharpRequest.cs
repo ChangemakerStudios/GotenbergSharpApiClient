@@ -3,6 +3,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using System;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {
@@ -12,46 +13,28 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
     // ReSharper disable once ClassNeverInstantiated.Global
     public class GotenbergSharpRequest
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GotenbergSharpRequest"/> class.
         /// </summary>
-        /// <param name="contentHtml">The content HTML.</param>
+        /// <param name="content">The content.</param>
         /// <param name="dimensions">The dimensions.</param>
-        /// <param name="headerHtml">The header HTML.</param>
-        /// <param name="footerHtml">The footer HTML.</param>
-        public GotenbergSharpRequest(string contentHtml, DocumentDimensions dimensions, string headerHtml = null, string footerHtml = null)
+        public GotenbergSharpRequest(DocumentContent content, DocumentDimensions dimensions)
         {
-            HeaderHtml = headerHtml;
-            Dimensions = dimensions;
-            ContentHtml = contentHtml;
-            FooterHtml = footerHtml;
-
-            if (HeaderHtml.IsSet() && dimensions.MarginTop <= 0) dimensions.MarginTop = 1;
-            if (FooterHtml.IsSet() && dimensions.MarginBottom <= 0) dimensions.MarginBottom = 1;
+            Content = content ?? throw new ArgumentNullException(nameof(content));
+            Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions)) ;
+            
+            if (content.HeaderHtml.IsSet() && dimensions.MarginTop <= 0) dimensions.MarginTop = .38;
+            if (content.FooterHtml.IsSet() && dimensions.MarginBottom <= 0) dimensions.MarginBottom = .38; 
+            //.38 is tHe smallest value that still shows up
         }
 
         /// <summary>
-        /// Gets the header HTML.
+        /// Gets the content.
         /// </summary>
         /// <value>
-        /// The header HTML.
+        /// The content.
         /// </value>
-        public string HeaderHtml { get; }
-        /// <summary>
-        /// Gets the content HTML. This is the body of the document
-        /// </summary>
-        /// <value>
-        /// The content HTML.
-        /// </value>
-        public string ContentHtml { get; }
-        /// <summary>
-        /// Gets the footer HTML.
-        /// </summary>
-        /// <value>
-        /// The footer HTML.
-        /// </value>
-        public string FooterHtml { get;  }
+        public DocumentContent Content { get; }
 
         /// <summary>
         /// Gets the dimensions.

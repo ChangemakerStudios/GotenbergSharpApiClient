@@ -6,6 +6,7 @@
     <AssemblyName>CaptiveAire.Gotenberg.App.API.Sharp.Client</AssemblyName>
     <RootNamespace>CaptiveAire.Gotenberg.App.API.Sharp.Client</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,7 +16,6 @@
   <ItemGroup>
     <PackageReference Include="ConcurrentSet" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
 </Project>

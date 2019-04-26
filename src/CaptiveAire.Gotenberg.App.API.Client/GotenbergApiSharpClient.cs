@@ -3,9 +3,7 @@ using CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,11 +26,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 
         readonly Uri _baseUri;
         readonly HttpClient _client;
-
         const string _convertHtmlPath = "convert/html";
-        const string GotenbergDefaultFileName = "index.html"; // GotenbergApi requires this
-        const string GotenbergHeaderFileName = "header.html";
-        const string GotenbergFooterFileName = "footer.html";
 
         #endregion
 
@@ -69,44 +63,15 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         public async Task<Stream> HtmlToPdfAsync(GotenbergSharpRequest request, CancellationToken cancelToken = default)
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
-            if(request.Dimensions == null)  throw new ArgumentOutOfRangeException(nameof(request.Dimensions));
-            if(request.ContentHtml.IsNotSet())  throw new ArgumentOutOfRangeException(nameof(request.ContentHtml));
 
-            var contentHtml = new StringContent(request.ContentHtml);
-            contentHtml.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergDefaultFileName };
-            contentHtml.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-
-            StringContent headerHtml = null;
-            if (request.HeaderHtml.IsSet())
-            {
-                headerHtml = new StringContent(request.HeaderHtml);
-                headerHtml.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergHeaderFileName };
-                headerHtml.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-            }
-
-            StringContent footerHtml = null;
-            if (request.HeaderHtml.IsSet())
-            {
-                footerHtml = new StringContent(request.FooterHtml);
-                footerHtml.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergFooterFileName };
-                footerHtml.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-            }
-
-            var parts = new[] { contentHtml, headerHtml, footerHtml };
+            var documentParts = request.ToHttpContentCollection();
 
             var boundary = $"--------------------------{DateTime.Now.Ticks}";
             using (var multiForm = new MultipartFormDataContent(boundary))
             {
-                foreach (var part in parts.Where(p => p != null))
+                foreach (var part in documentParts)
                 {
                     multiForm.Add(part);
-                }
-
-                foreach (var dim in request.Dimensions.ToDictionary<string, string>())
-                {
-                    var dimensionContent = new StringContent(dim.Value);
-                    dimensionContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = dim.Key };
-                    multiForm.Add(dimensionContent);
                 }
 
                 var response = await this._client
