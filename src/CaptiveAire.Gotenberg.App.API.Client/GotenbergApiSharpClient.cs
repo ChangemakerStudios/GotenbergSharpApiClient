@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,14 +26,17 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 
         readonly Uri _baseUri;
         readonly HttpClient _client;
-
         const string _convertHtmlPath = "convert/html";
-        const string GotenbergDefaultFileName = "index.html"; // GotenbergApi requires this
 
         #endregion
 
         #region ctor
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GotenbergApiSharpClient"/> class.
+        /// </summary>
+        /// <param name="baseUri">The base URI.</param>
+        /// <param name="clientFactory">The client factory.</param>
         public GotenbergApiSharpClient(Uri baseUri,  IHttpClientFactory clientFactory = null)
         {
             _baseUri = baseUri;
@@ -61,29 +63,19 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         public async Task<Stream> HtmlToPdfAsync(GotenbergSharpRequest request, CancellationToken cancelToken = default)
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
-            if(request.Dimensions == null)  throw new ArgumentOutOfRangeException(nameof(request.Dimensions));
-            if(request.HtmlContent.IsNotSet())  throw new ArgumentOutOfRangeException(nameof(request.HtmlContent));
+
+            var documentParts = request.ToHttpContentCollection();
 
             var boundary = $"--------------------------{DateTime.Now.Ticks}";
-            var endpointUri = new Uri($"{_baseUri}{_convertHtmlPath}");
-
-            var htmlContent = new StringContent(request.HtmlContent);
-            htmlContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergDefaultFileName };
-            htmlContent.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-          
             using (var multiForm = new MultipartFormDataContent(boundary))
             {
-                multiForm.Add(htmlContent);
-
-                foreach (var dim in request.Dimensions.ToDictionary<string, string>())
+                foreach (var part in documentParts)
                 {
-                    var dimensionContent = new StringContent(dim.Value);
-                    dimensionContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = dim.Key };
-                    multiForm.Add(dimensionContent);
+                    multiForm.Add(part);
                 }
 
                 var response = await this._client
-                                         .PostAsync(endpointUri, multiForm, cancelToken)
+                                         .PostAsync(new Uri($"{_baseUri}{_convertHtmlPath}"), multiForm, cancelToken)
                                          .ConfigureAwait(false);
 
                 cancelToken.ThrowIfCancellationRequested();
