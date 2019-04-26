@@ -3,6 +3,7 @@ using CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -30,11 +31,18 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 
         const string _convertHtmlPath = "convert/html";
         const string GotenbergDefaultFileName = "index.html"; // GotenbergApi requires this
+        const string GotenbergHeaderFileName = "header.html";
+        const string GotenbergFooterFileName = "footer.html";
 
         #endregion
 
         #region ctor
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GotenbergApiSharpClient"/> class.
+        /// </summary>
+        /// <param name="baseUri">The base URI.</param>
+        /// <param name="clientFactory">The client factory.</param>
         public GotenbergApiSharpClient(Uri baseUri,  IHttpClientFactory clientFactory = null)
         {
             _baseUri = baseUri;
@@ -62,18 +70,37 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
             if(request.Dimensions == null)  throw new ArgumentOutOfRangeException(nameof(request.Dimensions));
-            if(request.HtmlContent.IsNotSet())  throw new ArgumentOutOfRangeException(nameof(request.HtmlContent));
+            if(request.ContentHtml.IsNotSet())  throw new ArgumentOutOfRangeException(nameof(request.ContentHtml));
+
+            var contentHtml = new StringContent(request.ContentHtml);
+            contentHtml.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergDefaultFileName };
+            contentHtml.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+
+            StringContent headerHtml = null;
+            if (request.HeaderHtml.IsSet())
+            {
+                headerHtml = new StringContent(request.HeaderHtml);
+                headerHtml.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergHeaderFileName };
+                headerHtml.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            }
+
+            StringContent footerHtml = null;
+            if (request.HeaderHtml.IsSet())
+            {
+                footerHtml = new StringContent(request.FooterHtml);
+                footerHtml.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergFooterFileName };
+                footerHtml.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            }
+
+            var parts = new[] { contentHtml, headerHtml, footerHtml };
 
             var boundary = $"--------------------------{DateTime.Now.Ticks}";
-            var endpointUri = new Uri($"{_baseUri}{_convertHtmlPath}");
-
-            var htmlContent = new StringContent(request.HtmlContent);
-            htmlContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = GotenbergDefaultFileName };
-            htmlContent.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-          
             using (var multiForm = new MultipartFormDataContent(boundary))
             {
-                multiForm.Add(htmlContent);
+                foreach (var part in parts.Where(p => p != null))
+                {
+                    multiForm.Add(part);
+                }
 
                 foreach (var dim in request.Dimensions.ToDictionary<string, string>())
                 {
@@ -83,7 +110,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
                 }
 
                 var response = await this._client
-                                         .PostAsync(endpointUri, multiForm, cancelToken)
+                                         .PostAsync(new Uri($"{_baseUri}{_convertHtmlPath}"), multiForm, cancelToken)
                                          .ConfigureAwait(false);
 
                 cancelToken.ThrowIfCancellationRequested();
