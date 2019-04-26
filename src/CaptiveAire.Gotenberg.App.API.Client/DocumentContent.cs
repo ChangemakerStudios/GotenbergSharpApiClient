@@ -21,6 +21,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         public DocumentContent(string bodyHtml, string footerHtml, string headerHtml = "")
         {
             if(bodyHtml.IsNotSet()) throw new ArgumentOutOfRangeException(nameof(bodyHtml));
+
             BodyHtml = bodyHtml;
             HeaderHtml = headerHtml;
             FooterHtml = footerHtml;
