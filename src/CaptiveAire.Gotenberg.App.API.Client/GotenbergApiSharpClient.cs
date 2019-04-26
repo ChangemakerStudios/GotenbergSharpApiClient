@@ -64,14 +64,12 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
 
-            var documentParts = request.ToHttpContentCollection();
-
             var boundary = $"--------------------------{DateTime.Now.Ticks}";
             using (var multiForm = new MultipartFormDataContent(boundary))
             {
-                foreach (var part in documentParts)
+                foreach (var contentItem in request.ToHttpContentCollection())
                 {
-                    multiForm.Add(part);
+                    multiForm.Add(contentItem);
                 }
 
                 var response = await this._client
