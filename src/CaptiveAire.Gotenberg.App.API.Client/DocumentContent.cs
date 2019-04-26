@@ -42,7 +42,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// The content HTML.
         /// </value>
         [MultiFormHeader(fileName: "index.html")]
-        public string BodyHtml { get; }
+        public string BodyHtml { get; private set; }
         /// <summary>
         /// Gets the footer HTML.
         /// </summary>
@@ -50,7 +50,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// The footer HTML.
         /// </value>
         [MultiFormHeader(fileName: "footer.html")]
-        public string FooterHtml { get;  }
+        public string FooterHtml { get; private set; }
 
     }
 

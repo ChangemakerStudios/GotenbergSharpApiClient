@@ -67,9 +67,9 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             var boundary = $"--------------------------{DateTime.Now.Ticks}";
             using (var multiForm = new MultipartFormDataContent(boundary))
             {
-                foreach (var contentItem in request.ToHttpContentCollection())
+                foreach (var item in request.ToHttpContentCollection())
                 {
-                    multiForm.Add(contentItem);
+                    multiForm.Add(item);
                 }
 
                 var response = await this._client

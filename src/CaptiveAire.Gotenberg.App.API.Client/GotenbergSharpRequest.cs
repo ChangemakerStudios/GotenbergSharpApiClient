@@ -43,6 +43,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// The dimensions.
         /// </value>
         public DocumentDimensions Dimensions { get; }
+       
     }
   
 }
