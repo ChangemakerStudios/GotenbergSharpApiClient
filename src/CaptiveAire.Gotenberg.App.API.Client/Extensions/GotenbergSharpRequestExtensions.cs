@@ -29,9 +29,11 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 
         static List<StringContent> ToHttpContentCollection(GotenbergSharpRequest request, Type type)
         {
+            var multiType = typeof(MultiFormHeaderAttribute);
+
             return type.GetProperties()
-                       .Where(prop => Attribute.IsDefined(prop, typeof(MultiFormHeaderAttribute)))
-                       .Select(p=> new { Prop = p , Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, typeof(MultiFormHeaderAttribute)) } )
+                       .Where(prop => Attribute.IsDefined(prop, multiType))
+                       .Select(p=> new { Prop = p , Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, multiType) } )
                        .Select(_ =>
                                {
                                    var isForDimensions = type == typeof(DocumentDimensions);
