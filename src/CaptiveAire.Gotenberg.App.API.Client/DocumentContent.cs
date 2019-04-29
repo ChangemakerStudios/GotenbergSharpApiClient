@@ -8,6 +8,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
     /// <summary>
     /// Represents the elements of a document
     /// </summary>
+    /// <remarks>The file names are a Gotenberg Api convention</remarks>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DocumentContent
     {
@@ -35,6 +36,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// </value>
         [MultiFormHeader(fileName: "header.html")]
         public string HeaderHtml { get; }
+
         /// <summary>
         /// Gets the content HTML. This is the body of the document
         /// </summary>
@@ -42,7 +44,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// The content HTML.
         /// </value>
         [MultiFormHeader(fileName: "index.html")]
-        public string BodyHtml { get; private set; }
+        public string BodyHtml { get; }
+
         /// <summary>
         /// Gets the footer HTML.
         /// </summary>
@@ -50,7 +53,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// The footer HTML.
         /// </value>
         [MultiFormHeader(fileName: "footer.html")]
-        public string FooterHtml { get; private set; }
+        public string FooterHtml { get; }
 
     }
 

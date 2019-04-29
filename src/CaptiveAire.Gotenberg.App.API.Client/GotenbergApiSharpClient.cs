@@ -60,7 +60,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <exception cref="ArgumentNullException">request</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// </exception>
-        public async Task<Stream> HtmlToPdfAsync(GotenbergSharpRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> HtmlToPdfAsync(PdfRequest request, CancellationToken cancelToken = default)
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
 

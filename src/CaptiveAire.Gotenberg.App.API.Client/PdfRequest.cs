@@ -11,14 +11,14 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
     /// 
     /// </summary>
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class GotenbergSharpRequest
+    public class PdfRequest
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="GotenbergSharpRequest"/> class.
+        /// Initializes a new instance of the <see cref="PdfRequest"/> class.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="dimensions">The dimensions.</param>
-        public GotenbergSharpRequest(DocumentContent content, DocumentDimensions dimensions)
+        public PdfRequest(DocumentContent content, DocumentDimensions dimensions)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
             Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions)) ;

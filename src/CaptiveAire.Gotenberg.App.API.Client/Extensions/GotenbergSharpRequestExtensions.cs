@@ -18,16 +18,17 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public static IEnumerable<StringContent> ToHttpContentCollection(this GotenbergSharpRequest request)
+        // ReSharper disable once ReturnTypeCanBeEnumerable.Global
+        public static IReadOnlyList<StringContent> ToHttpContentCollection(this PdfRequest request)
         {
-            var docParts = ToHttpContentCollection(request, request.Content.GetType());
-            var dimParts = ToHttpContentCollection(request, request.Dimensions.GetType());
-            docParts.AddRange(dimParts);
+            var docBody = ToHttpContentCollection(request, request.Content.GetType());
+            var dimensions = ToHttpContentCollection(request, request.Dimensions.GetType());
+            docBody.AddRange(dimensions);
 
-            return docParts;
+            return docBody.AsReadOnly();
         }
 
-        static List<StringContent> ToHttpContentCollection(GotenbergSharpRequest request, Type type)
+        static List<StringContent> ToHttpContentCollection(PdfRequest request, Type type)
         {
             var multiType = typeof(MultiFormHeaderAttribute);
 
@@ -36,14 +37,14 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
                        .Select(p=> new { Prop = p , Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, multiType) } )
                        .Select(_ =>
                                {
-                                   var isForDimensions = type == typeof(DocumentDimensions);
-                                   var fileName = isForDimensions ? null : _.Attrib.FileName;
+                                   var isForContent = type == typeof(DocumentContent);
+                                   var fileName = isForContent ? _.Attrib.FileName : null;
 
-                                   var value = _.Prop.GetValue( isForDimensions ? request.Dimensions : (object)request.Content);
+                                   var value = _.Prop.GetValue( isForContent ? request.Content :  (object)request.Dimensions);
                                    var contentItem = new StringContent(value.ToString());
                                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) {Name = _.Attrib.Name, FileName = fileName};
 
-                                   if (!isForDimensions)
+                                   if (isForContent)
                                    {
                                        contentItem.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
                                    }
