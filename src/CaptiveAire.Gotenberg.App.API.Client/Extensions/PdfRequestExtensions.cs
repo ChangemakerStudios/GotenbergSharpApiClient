@@ -11,7 +11,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
     /// <summary>
     /// 
     /// </summary>
-    public static class GotenbergSharpRequestExtensions
+    public static class PdfRequestExtensions
     {
         /// <summary>
         /// Transforms the specified request into a collection of <see cref="HttpContent" /> items
