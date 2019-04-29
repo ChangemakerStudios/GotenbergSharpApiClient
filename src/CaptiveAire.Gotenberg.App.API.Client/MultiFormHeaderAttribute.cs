@@ -18,7 +18,10 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <param name="name">The name.</param>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="mediaType"></param>
-        public MultiFormHeaderAttribute(string name = "files", string fileName = null, string contentDisposition = "form-data",string mediaType = "text/html")
+        public MultiFormHeaderAttribute(string name = "files", 
+                                        string fileName = null, 
+                                        string contentDisposition = "form-data",
+                                        string mediaType = "text/html")
         {
             ContentDisposition = contentDisposition;
             Name = name;
