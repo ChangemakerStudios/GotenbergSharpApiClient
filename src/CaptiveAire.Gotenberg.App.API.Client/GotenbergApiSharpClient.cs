@@ -27,6 +27,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         readonly Uri _baseUri;
         readonly HttpClient _client;
         const string _convertHtmlPath = "convert/html";
+        const string _mergePdfPath = "convert/merge";
 
         #endregion
 
@@ -81,6 +82,35 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
                 return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             }
         }        
+
+        /// <summary>
+        /// Merges the pdf documents in the specified request into one pdf
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
+        {
+            if (request?.Items == null) throw new ArgumentNullException(nameof(request));
+            if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
+
+            var boundary = $"--------------------------{DateTime.Now.Ticks}";
+            using (var multiForm = new MultipartFormDataContent(boundary))
+            {
+                foreach (var item in request.ToHttpContentCollection())
+                {
+                    multiForm.Add(item);
+                }
+
+                var response = await this._client
+                                         .PostAsync(new Uri($"{_baseUri}{_mergePdfPath}"), multiForm, cancelToken)
+                                         .ConfigureAwait(false);
+
+                cancelToken.ThrowIfCancellationRequested();
+                
+                return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            }
+        }      
 
         #endregion
     }
