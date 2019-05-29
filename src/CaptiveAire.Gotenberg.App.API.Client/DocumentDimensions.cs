@@ -8,6 +8,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
     /// <summary>
     ///  Represents the dimensions of the pdf document
     /// </summary>
+    /// <remarks>See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation </remarks>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DocumentDimensions
     {

@@ -19,7 +19,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// <returns></returns>
         public static IReadOnlyList<ByteArrayContent> ToHttpContentCollection(this MergeRequest request)
         {
-            return request.Items.Select(_ =>
+            return request.Items.Where(_=> _.Value != null ).Select(_ =>
                                         {
                                             var item = new ByteArrayContent(_.Value);
                                             item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = _.Key };

@@ -3,9 +3,12 @@ using CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {
@@ -73,6 +76,11 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
                     multiForm.Add(item);
                 }
 
+                foreach (var item in request.AddAssetsToHttpContentCollection())
+                {
+                    multiForm.Add(item);
+                }
+                
                 var response = await this._client
                                          .PostAsync(new Uri($"{_baseUri}{_convertHtmlPath}"), multiForm, cancelToken)
                                          .ConfigureAwait(false);

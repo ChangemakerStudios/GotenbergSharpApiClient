@@ -4,6 +4,8 @@
 
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {
@@ -37,12 +39,32 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         public DocumentContent Content { get; }
 
         /// <summary>
+        /// Gets the assets.
+        /// </summary>
+        /// <value>
+        /// The assets.
+        /// </value>
+        public Dictionary<string, byte[]> Assets { get; private set; } = new Dictionary<string, byte[]>();
+
+        /// <summary>
         /// Gets the dimensions.
         /// </summary>
         /// <value>
         /// The dimensions.
         /// </value>
         public DocumentDimensions Dimensions { get; }
+
+
+        /// <summary>
+        /// Adds the assets.
+        /// </summary>
+        /// <param name="assets">The assets.</param>
+        /// <exception cref="ArgumentNullException">assets</exception>
+        public void AddAssets(Dictionary<string, byte[]> assets)
+        {
+            Assets = assets ?? throw new ArgumentNullException(nameof(assets));
+        }
+
        
     }
   
