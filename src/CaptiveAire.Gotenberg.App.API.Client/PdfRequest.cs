@@ -5,7 +5,6 @@
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {

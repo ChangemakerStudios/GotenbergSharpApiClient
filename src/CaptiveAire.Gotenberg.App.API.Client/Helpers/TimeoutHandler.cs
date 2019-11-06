@@ -40,16 +40,15 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers
         /// <exception cref="TimeoutException">Request Timeout</exception>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancelToken)
         {
-            using (var cts = GetCancelTokenSource(request, cancelToken))
+            using var cts = GetCancelTokenSource(request, cancelToken);
+
+            try
             {
-                try
-                {
-                    return await base.SendAsync(request, cts?.Token ?? cancelToken);
-                }
-                catch (OperationCanceledException ex) when (!cancelToken.IsCancellationRequested)
-                {
-                    throw new TimeoutException("Request Timeout", ex.InnerException);
-                }
+                return await base.SendAsync(request, cts?.Token ?? cancelToken);
+            }
+            catch (OperationCanceledException ex) when (!cancelToken.IsCancellationRequested)
+            {
+                throw new TimeoutException("Request Timeout", ex.InnerException);
             }
         }
 

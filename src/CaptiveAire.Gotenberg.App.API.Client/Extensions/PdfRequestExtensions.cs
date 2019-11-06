@@ -37,20 +37,22 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// <returns></returns>
         public static IReadOnlyList<ByteArrayContent> AddAssetsToHttpContentCollection(this PdfRequest request)
         {
-            return request.Assets?.Select((item) =>
-                                         {
-                                             string contentType;
-                                             new FileExtensionContentTypeProvider().TryGetContentType(item.Key, out contentType);
+            return request.Assets?
+                          .Select(item =>
+                                  {
+                                      new FileExtensionContentTypeProvider().TryGetContentType(item.Key, out var contentType);
+                                      return new { Asset = item, ContentType = contentType };
 
-                                             return new { Asset = item, ContentType = contentType };
-                                         }).Where(_=> _.ContentType.IsSet())
-                          .Select((item) =>
+                                  })
+                          .Where(_ => _.ContentType.IsSet())
+                          .Select(item =>
                                   {
                                       var assetItem = new ByteArrayContent(item.Asset.Value);
-                                      assetItem.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") {Name = "files", FileName = item.Asset.Key};
+                                      assetItem.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = item .Asset.Key };
                                       assetItem.Headers.ContentType = new MediaTypeHeaderValue(item.ContentType);
                                       return assetItem;
-                                  }).ToList();
+                                  })
+                          .ToList();
         }
 
 

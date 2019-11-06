@@ -18,7 +18,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         /// The width of the paper.
         /// </value>
-        [MultiFormHeader(name: "paperWidth")]
+        [MultiFormHeader("paperWidth")]
         public double PaperWidth { get; set; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         /// The height of the paper.
         /// </value>
-        [MultiFormHeader(name:"paperHeight")]
+        [MultiFormHeader("paperHeight")]
         public double PaperHeight { get; set; }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         /// The margin top.
         /// </value>
-        [MultiFormHeader(name:"marginTop")]
+        [MultiFormHeader("marginTop")]
         public double MarginTop { get; set; }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         /// The margin bottom.
         /// </value>
-        [MultiFormHeader(name:"marginBottom")]
+        [MultiFormHeader("marginBottom")]
         public double MarginBottom { get; set; }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         /// The margin left.
         /// </value>
-        [MultiFormHeader(name:"marginLeft")]
+        [MultiFormHeader("marginLeft")]
         public double MarginLeft { get; set; }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         /// The margin right.
         /// </value>
-        [MultiFormHeader(name:"marginRight")]
+        [MultiFormHeader("marginRight")]
         public double MarginRight { get; set; }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <value>
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
         /// </value>
-        [MultiFormHeader(name:"landscape")]
+        [MultiFormHeader("landscape")]
         public bool Landscape { get;set; }
 
 
