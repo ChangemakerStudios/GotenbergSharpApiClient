@@ -25,8 +25,10 @@ public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollect
                     // https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory
                     // https://www.stevejgordon.co.uk/httpclientfactory-using-polly-for-transient-fault-handling
 }
+```
 
  ## Add the client to the ServiceCollection in startup.cs
+```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services) 
 {
 	//add core services then
@@ -38,8 +40,10 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 			
 	return new AutofacServiceProvider(builder.Build());
 }
+```
 
- ## inject it where you need it and use
+ ## Inject it where you need it and use
+```csharp
 public class GenerateSomePdfService
 {
 	readonly GotenbergApiSharpClient _gotenbergClient;
@@ -71,3 +75,4 @@ public class GenerateSomePdfService
 	}
 
 }
+```
