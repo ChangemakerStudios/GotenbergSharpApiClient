@@ -2,11 +2,11 @@
 
 // ReSharper disable MemberCanBePrivate.Global
 
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using System;
 using System.Collections.Generic;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
     /// <summary>
     /// 
@@ -59,6 +59,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// </summary>
         /// <param name="assets">The assets.</param>
         /// <exception cref="ArgumentNullException">assets</exception>
+        // ReSharper disable once UnusedMember.Global
         public void AddAssets(Dictionary<string, byte[]> assets)
         {
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));
@@ -66,5 +67,4 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 
        
     }
-  
 }

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
@@ -35,26 +37,31 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// <param name="request"></param>
         /// <remarks>See https://thecodingmachine.github.io/gotenberg/#html.assets </remarks>
         /// <returns></returns>
-        public static IReadOnlyList<ByteArrayContent> AddAssetsToHttpContentCollection(this PdfRequest request)
+        public static IEnumerable<ByteArrayContent> AddAssetsToHttpContentCollection(this PdfRequest request)
         {
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+
             return request.Assets?
                           .Select(item =>
                                   {
-                                      new FileExtensionContentTypeProvider().TryGetContentType(item.Key, out var contentType);
-                                      return new { Asset = item, ContentType = contentType };
+                                      contentTypeProvider.TryGetContentType(item.Key, out var contentType);
 
+                                      return new { Asset = item, ContentType = contentType };
                                   })
                           .Where(_ => _.ContentType.IsSet())
                           .Select(item =>
                                   {
                                       var assetItem = new ByteArrayContent(item.Asset.Value);
-                                      assetItem.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = item .Asset.Key };
+                                      
+                                      assetItem.Headers.ContentDisposition = 
+                                              new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = item.Asset.Key  };
+                                      
                                       assetItem.Headers.ContentType = new MediaTypeHeaderValue(item.ContentType);
+
                                       return assetItem;
                                   })
                           .ToList();
         }
-
 
         static List<StringContent> ToHttpContentCollection(PdfRequest request, Type type)
         {
@@ -70,15 +77,18 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 
                                    var value = _.Prop.GetValue( isForContent ? request.Content :  (object)request.Dimensions);
                                    var contentItem = new StringContent(value.ToString());
-                                   contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) {Name = _.Attrib.Name, FileName = fileName};
 
+                                   contentItem.Headers.ContentDisposition = 
+                                           new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = fileName };
+                                   
                                    if (isForContent)
                                    {
                                        contentItem.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
                                    }
 
                                    return contentItem;
-                               }).ToList();
+                               })
+                       .ToList();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure
 {
     /// <summary>
     /// 
@@ -17,7 +17,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <param name="contentDisposition">The content disposition.</param>
         /// <param name="name">The name.</param>
         /// <param name="fileName">Name of the file.</param>
-        /// <param name="mediaType"></param>
+        /// <param name="mediaType">The media type</param>
         public MultiFormHeaderAttribute(string name = "files", 
                                         string fileName = null, 
                                         string contentDisposition = "form-data",

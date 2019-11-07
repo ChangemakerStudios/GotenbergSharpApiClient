@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 {
@@ -17,16 +18,19 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public static IReadOnlyList<ByteArrayContent> ToHttpContentCollection(this MergeRequest request)
+        public static IEnumerable<ByteArrayContent> ToHttpContentCollection(this MergeRequest request)
         {
-            return request.Items.Where(_=> _.Value != null ).Select(_ =>
-                                        {
-                                            var item = new ByteArrayContent(_.Value);
-                                            item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = _.Key };
-                                            item.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+            return request.Items
+                          .Where(_ => _.Value != null)
+                          .Select(_ =>
+                                  {
+                                      var item = new ByteArrayContent(_.Value);
+                                      
+                                      item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = _.Key };
+                                      item.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
 
-                                            return item;
-                                        }).ToList();
+                                      return item;
+                                  }).ToList();
 
         }
     }

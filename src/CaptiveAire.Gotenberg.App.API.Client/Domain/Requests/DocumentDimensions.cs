@@ -3,7 +3,9 @@
 // ReSharper disable UnusedMember.Global
 
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
     /// <summary>
     ///  Represents the dimensions of the pdf document
@@ -74,7 +76,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// </value>
         [MultiFormHeader("landscape")]
         public bool Landscape { get;set; }
-
 
     }
 }

@@ -1,9 +1,10 @@
 ﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using System;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
     /// <summary>
     /// Represents the elements of a document
@@ -44,6 +45,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// The content HTML.
         /// </value>
         [MultiFormHeader(fileName: "index.html")]
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        // ReSharper disable once MemberCanBePrivate.Global
         public string BodyHtml { get; }
 
         /// <summary>
@@ -56,5 +59,4 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         public string FooterHtml { get; }
 
     }
-
 }

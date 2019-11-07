@@ -1,6 +1,9 @@
-﻿using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
+
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -12,22 +15,27 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
     /// C# Client for Gotenberg api
     /// </summary>
     /// <remarks>
+    ///     Gotenberg Info
     ///     https://thecodingmachine.github.io/gotenberg/
-    ///     https://github.com/thecodingmachine/gotenberg-go-client
-    ///     https://github.com/thecodingmachine/gotenberg-php-client
     ///     https://github.com/thecodingmachine/gotenberg
     ///     https://github.com/thecodingmachine/gotenberg/releases
     ///     https://twitter.com/gulnap
+    /// 
+    ///     Other clients:
+    ///     https://github.com/thecodingmachine/gotenberg-go-client
+    ///     https://github.com/thecodingmachine/gotenberg-php-client
+    ///     https://github.com/yumauri/gotenberg-js-client
     /// </remarks>
     // ReSharper disable once UnusedMember.Global
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class GotenbergApiSharpClient
     {
         #region fields
 
-        readonly HttpClient _client;
+        readonly HttpClient _innerClient;
+        
+        const string _mergePath = "merge";
         const string _convertHtmlPath = "convert/html";
-        const string _mergePdfPath = "merge";
+        const string _boundaryPrefix = "--------------------------";
 
         #endregion
 
@@ -36,11 +44,17 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="GotenbergApiSharpClient"/> class.
         /// </summary>
-        /// <param name="client"></param>
-        public GotenbergApiSharpClient(HttpClient client)
+        /// <param name="innerClient"></param>
+        public GotenbergApiSharpClient(HttpClient innerClient)
         {
-            this._client = client ?? throw new ArgumentNullException(nameof(client));
-            this._client.DefaultRequestHeaders.Add("User-Agent", nameof(GotenbergApiSharpClient));
+            this._innerClient = innerClient ?? throw new ArgumentNullException(nameof(innerClient));
+
+            if (this._innerClient.BaseAddress == null)
+            {
+                throw new ArgumentNullException(nameof(innerClient.BaseAddress), "You must set the inner client's base address");
+            }
+
+            this._innerClient.DefaultRequestHeaders.Add("User-Agent", nameof(GotenbergApiSharpClient));
         }
 
         #endregion
@@ -56,13 +70,12 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <exception cref="ArgumentNullException">request</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// </exception>
+        // ReSharper disable once UnusedMember.Global
         public async Task<Stream> HtmlToPdfAsync(PdfRequest request, CancellationToken cancelToken = default)
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
 
-            var boundary = $"--------------------------{DateTime.Now.Ticks}";
-
-            using var multiForm = new MultipartFormDataContent(boundary);
+            using var multiForm = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
            
             foreach (var item in request.ToHttpContentCollection())
             {
@@ -74,8 +87,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
                 multiForm.Add(item);
             }
 
-            var response = await this._client
-                                     .PostAsync(new Uri($"{this._client.BaseAddress}{_convertHtmlPath}"), multiForm, cancelToken)
+            var response = await this._innerClient
+                                     .PostAsync(_convertHtmlPath, multiForm, cancelToken)
                                      .ConfigureAwait(false);
 
             cancelToken.ThrowIfCancellationRequested();
@@ -89,29 +102,28 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
+        // ReSharper disable once UnusedMember.Global
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
             if (request?.Items == null) throw new ArgumentNullException(nameof(request));
             if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
 
-            var boundary = $"--------------------------{DateTime.Now.Ticks}";
-
-            using var multiForm = new MultipartFormDataContent(boundary);
+            using var multiForm = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
             
             foreach (var item in request.ToHttpContentCollection())
             {
                 multiForm.Add(item);
             }
 
-            var response = await this._client
-                                     .PostAsync(new Uri($"{this._client.BaseAddress}{_mergePdfPath}"),  multiForm, cancelToken)
+            var response = await this._innerClient
+                                     .PostAsync(_mergePath,  multiForm, cancelToken)
                                      .ConfigureAwait(false);
 
             cancelToken.ThrowIfCancellationRequested();
                 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }      
-
+ 
         #endregion
     }
 }

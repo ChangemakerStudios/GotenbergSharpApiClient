@@ -1,17 +1,18 @@
 ﻿// CaptiveAire.Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers
+namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure.Pipeline
 {
     /// <summary>
     /// 
     /// </summary>
     /// <seealso cref="System.Net.Http.DelegatingHandler" />
+    // ReSharper disable once UnusedMember.Global
     public class TimeoutHandler : DelegatingHandler
     {
         /// <summary>
@@ -29,6 +30,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Helpers
         /// <value>
         /// The default timeout.
         /// </value>
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(300);
 
         /// <summary>

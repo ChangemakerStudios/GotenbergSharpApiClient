@@ -1,23 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>8</LangVersion>
     <AssemblyName>CaptiveAire.Gotenberg.App.API.Sharp.Client</AssemblyName>
     <RootNamespace>CaptiveAire.Gotenberg.App.API.Sharp.Client</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>6.0.4</Version>
-    <VersionSuffix></VersionSuffix>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1605;1701;1702;1705;1591</NoWarn>
+  </PropertyGroup>    
+
+  <PropertyGroup Label="PackageInfo">
+    <PackageVersion>$(VersionSuffix)</PackageVersion>
+    <Version>$(VersionSuffix)</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <IncludeSymbols>True</IncludeSymbols>
+    <Authors>CaptiveAire Systems</Authors>
+    <Company>CaptiveAire Systems</Company>
+    <PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
+    <Description>A C# api client for the Gotenberg micro-service v6.x, a docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.</Description>
+    <IncludeSymbols>True</IncludeSymbols>  
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
+    <PackageIcon>gotenbergSharpClient.PNG</PackageIcon>
+    <RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>	      
+  </PropertyGroup>  
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>obj\Debug\netstandard2.0\CaptiveAire.Gotenberg.App.API.Sharp.Client.xml</DocumentationFile>
-  </PropertyGroup>
+  </PropertyGroup>  
+
+  <ItemGroup>
+    <None Include="Resources\gotenbergSharpClient.PNG" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ConcurrentSet" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\gotenbergSharpClient.PNG" />
   </ItemGroup>
 
 </Project>
