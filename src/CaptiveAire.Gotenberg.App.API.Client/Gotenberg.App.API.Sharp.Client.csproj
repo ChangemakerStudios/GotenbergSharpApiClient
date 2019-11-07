@@ -25,6 +25,7 @@
     <IncludeSymbols>True</IncludeSymbols>  
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/src/CaptiveAire.Gotenberg.App.API.Client/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
     <PackageIcon>gotenbergSharpClient.PNG</PackageIcon>
     <RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>	      
   </PropertyGroup>  
