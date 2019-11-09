@@ -8,6 +8,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 {
@@ -54,7 +55,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
                 throw new ArgumentNullException(nameof(innerClient.BaseAddress), "You must set the inner client's base address");
             }
 
-            this._innerClient.DefaultRequestHeaders.Add("User-Agent", nameof(GotenbergApiSharpClient));
+            this._innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergApiSharpClient));
         }
 
         #endregion
