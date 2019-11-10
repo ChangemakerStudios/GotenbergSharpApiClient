@@ -1,6 +1,5 @@
 ﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
 
 using System;
@@ -37,6 +36,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         const string _mergePath = "merge";
         const string _convertHtmlPath = "convert/html";
         const string _boundaryPrefix = "--------------------------";
+        const HttpCompletionOption _readResponseHeaders = HttpCompletionOption.ResponseHeadersRead;
 
         #endregion
 
@@ -77,19 +77,19 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             if(request == null)  throw new ArgumentNullException(nameof(request));
 
             using var multiForm = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
-           
-            foreach (var item in request.ToHttpContentCollection())
+            
+            foreach (var item in request.ToHttpContent())
             {
                 multiForm.Add(item);
             }
 
-            foreach (var item in request.AddAssetsToHttpContentCollection())
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _convertHtmlPath)
             {
-                multiForm.Add(item);
-            }
+                Content = multiForm
+            };
 
             var response = await this._innerClient
-                                     .PostAsync(_convertHtmlPath, multiForm, cancelToken)
+                                     .SendAsync(requestMessage,_readResponseHeaders, cancelToken)
                                      .ConfigureAwait(false);
 
             cancelToken.ThrowIfCancellationRequested();
@@ -109,17 +109,22 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             if (request?.Items == null) throw new ArgumentNullException(nameof(request));
             if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
 
-            using var multiForm = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
+            using var formContent = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
             
-            foreach (var item in request.ToHttpContentCollection())
+            foreach (var item in request.ToHttpContent())
             {
-                multiForm.Add(item);
+                formContent.Add(item);
             }
 
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _mergePath)
+            {
+                Content = formContent 
+            };
+            
             var response = await this._innerClient
-                                     .PostAsync(_mergePath,  multiForm, cancelToken)
+                                     .SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancelToken)
                                      .ConfigureAwait(false);
-
+         
             cancelToken.ThrowIfCancellationRequested();
                 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
