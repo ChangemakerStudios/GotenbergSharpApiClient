@@ -36,7 +36,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         const string _mergePath = "merge";
         const string _convertHtmlPath = "convert/html";
         const string _boundaryPrefix = "--------------------------";
-        const HttpCompletionOption _readResponseHeaders = HttpCompletionOption.ResponseHeadersRead;
+        const HttpCompletionOption _completionOption = HttpCompletionOption.ResponseContentRead;
 
         #endregion
 
@@ -89,7 +89,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             };
 
             var response = await this._innerClient
-                                     .SendAsync(requestMessage,_readResponseHeaders, cancelToken)
+                                     .SendAsync(requestMessage,_completionOption, cancelToken)
                                      .ConfigureAwait(false);
 
             cancelToken.ThrowIfCancellationRequested();
@@ -122,7 +122,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             };
             
             var response = await this._innerClient
-                                     .SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancelToken)
+                                     .SendAsync(requestMessage,_completionOption, cancelToken)
                                      .ConfigureAwait(false);
          
             cancelToken.ThrowIfCancellationRequested();
