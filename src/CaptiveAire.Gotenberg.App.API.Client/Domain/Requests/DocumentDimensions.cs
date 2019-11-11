@@ -15,11 +15,13 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// <summary>
     ///  Represents the dimensions of the pdf document
     /// </summary>
-    /// <remarks>See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation </remarks>
+    /// <remarks>
+    ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
+    /// </remarks>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DocumentDimensions
     {
-        static readonly Type attribType = typeof(MultiFormHeaderAttribute);
+        static readonly Type _attribType = typeof(MultiFormHeaderAttribute);
         
         /// <summary>
         /// Gets or sets the width of the paper.
@@ -91,8 +93,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         internal IEnumerable<StringContent> ToStringContent()
         {   
             return this.GetType().GetProperties()
-                .Where(prop => Attribute.IsDefined(prop, attribType))
-                .Select(p=> new { Prop = p , Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, attribType) } )
+                .Where(prop => Attribute.IsDefined(prop, _attribType))
+                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attribType) })
                 .Select(_ =>
                 {
                     var value = _.Prop.GetValue(this);

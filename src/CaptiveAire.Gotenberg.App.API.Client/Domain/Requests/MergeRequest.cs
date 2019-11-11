@@ -14,20 +14,24 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     public class MergeRequest
     {
         /// <summary>
+        /// Gets the request configuration containing fields that all Gotenberg endpoints accept
+        /// </summary>
+        public RequestConfiguration Config { get; set; }
+
+        /// <summary>
         /// Key = file name; value = the pdf bytes
         /// </summary>
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public Dictionary<string, byte[]> Items { get; set; } = new Dictionary<string, byte[]>();
-        
+
         /// <summary>
         /// Transforms the merge items to http content items
         /// </summary>
         /// <returns></returns>
         internal IEnumerable<ByteArrayContent> ToHttpContent()
         {
-            return this.Items
-                .Where(_ => _.Value != null)
+            var result = this.Items.Where(_ => _.Value != null)
                 .Select(_ =>
                 {
                     var item = new ByteArrayContent(_.Value);
@@ -36,6 +40,13 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 
                     return item;
                 });
+
+            if (Config != null)
+            {
+                result = result.Concat(Config.ToStringContent());
+            }
+
+            return result;
         }
     }
 }
