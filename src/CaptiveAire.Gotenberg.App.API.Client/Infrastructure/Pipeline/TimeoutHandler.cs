@@ -38,18 +38,18 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure.Pipeline
         /// Sends the asynchronous.
         /// </summary>
         /// <param name="request">The request.</param>
-        /// <param name="cancelToken">The cancel token.</param>
+        /// <param name="cancellationToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="TimeoutException">Request Timeout</exception>
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancelToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            using var cts = GetCancelTokenSource(request, cancelToken);
+            using var cts = GetCancelTokenSource(request, cancellationToken);
 
             try
             {
-                return await base.SendAsync(request, cts?.Token ?? cancelToken);
+                return await base.SendAsync(request, cts?.Token ?? cancellationToken);
             }
-            catch (OperationCanceledException ex) when (!cancelToken.IsCancellationRequested)
+            catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
             {
                 throw new TimeoutException("Request Timeout", ex.InnerException);
             }

@@ -23,15 +23,22 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="dimensions">The dimensions.</param>
-        public PdfRequest(DocumentContent content, DocumentDimensions dimensions)
+        /// <param name="config">Configuration for the request</param>
+        public PdfRequest(DocumentContent content, DocumentDimensions dimensions, RequestConfiguration config = null)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
             Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
+            Config = config;
 
             if (content.HeaderHtml.IsSet() && dimensions.MarginTop <= 0) dimensions.MarginTop = .38;
             if (content.FooterHtml.IsSet() && dimensions.MarginBottom <= 0) dimensions.MarginBottom = .38;
             //.38 is tHe smallest value that still shows up
         }
+
+        /// <summary>
+        /// Gets the request configuration containing fields that all Gotenberg endpoints accept
+        /// </summary>
+        public RequestConfiguration Config { get; set; }
 
         /// <summary>
         /// Gets the content.
@@ -75,11 +82,16 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <returns></returns>
         internal IEnumerable<HttpContent> ToHttpContent()
         {
-            return new List<HttpContent>(
-                Content.ToStringContent()
-                    .Concat(Dimensions.ToStringContent())
-                    .Concat(AddAssets())
-                );
+            var result = Content.ToStringContent()
+                .Concat(Dimensions.ToStringContent())
+                .Concat(AddAssets());
+
+            if (Config != null)
+            {
+                result = result.Concat(Config.ToStringContent());
+            }
+
+            return result;
         }
 
         IEnumerable<ByteArrayContent> AddAssets()
@@ -91,7 +103,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                 {
                     contentTypeProvider.TryGetContentType(item.Key, out var contentType);
 
-                    return new {Asset = item, ContentType = contentType};
+                    return new {Asset = item, ContentType= contentType};
                 })
                 .Where(_ => _.ContentType.IsSet())
                 .Select(item =>

@@ -17,7 +17,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DocumentContent
     {
-        static readonly Type attribType = typeof(MultiFormHeaderAttribute);
+        static readonly Type _attribType = typeof(MultiFormHeaderAttribute);
         
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentContent"/> class.
@@ -71,8 +71,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         internal IEnumerable<StringContent> ToStringContent()
         {   
             return this.GetType().GetProperties()
-                .Where(prop => Attribute.IsDefined(prop, attribType))
-                .Select(p=> new { Prop = p , Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, attribType) } )
+                .Where(prop => Attribute.IsDefined(prop, _attribType))
+                .Select(p=> new {Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attribType)})
                 .Select(_ =>
                 {
                     var value = _.Prop.GetValue(this);
