@@ -94,7 +94,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         {   
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attribType))
-                .Select(p=> new {Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attribType)})
+                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attribType) })
                 .Select(_ =>
                 {
                     var value = _.Prop.GetValue(this);

@@ -3,7 +3,9 @@
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,9 +36,12 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         readonly HttpClient _innerClient;
         
         const string _mergePath = "merge";
+        const string _mergeOfficePath = "/convert/office";
         const string _convertHtmlPath = "convert/html";
         const string _boundaryPrefix = "--------------------------";
         const HttpCompletionOption _completionOption = HttpCompletionOption.ResponseContentRead;
+        
+        readonly List<string> _allowedOfficeExtensions = new List<string>(new []{".txt",".rtf",".fodt",".doc",".docx",".odt",".xls",".xlsx",".ods",".ppt",".pptx",".odp"});
 
         #endregion
 
@@ -89,7 +94,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             };
 
             var response = await this._innerClient
-                                     .SendAsync(requestMessage,_completionOption, cancelToken)
+                                     .SendAsync(requestMessage, _completionOption, cancelToken)
                                      .ConfigureAwait(false);
 
             cancelToken.ThrowIfCancellationRequested();
@@ -106,6 +111,32 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         // ReSharper disable once UnusedMember.Global
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
+            return await DoMergeAsync(request, _mergePath, cancelToken).ConfigureAwait(false);
+        }      
+ 
+        /// <summary>
+        /// Merges the office documents in the specified request to one pdf
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        // ReSharper disable once UnusedMember.Global
+        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
+        {
+            var allowedItems = request.Items.Where(item => _allowedOfficeExtensions.Contains(new FileInfo(item.Key).Extension.ToLowerInvariant()));
+            
+            var filteredRequest = new MergeOfficeRequest { Config = request.Config };
+            
+            foreach (var allowedItem in allowedItems)
+            {
+                filteredRequest.Items.Add(allowedItem.Key, allowedItem.Value);
+            }
+            
+            return await DoMergeAsync(filteredRequest, _mergeOfficePath, cancelToken).ConfigureAwait(false);
+        }   
+        
+        async Task<Stream> DoMergeAsync(MergeRequest request, string mergePath, CancellationToken cancelToken = default)
+        {
             if (request?.Items == null) throw new ArgumentNullException(nameof(request));
             if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
 
@@ -116,20 +147,23 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
                 formContent.Add(item);
             }
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _mergePath)
-            {
-                Content = formContent 
-            };
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, mergePath)
+                                 {
+                                     Content = formContent 
+                                 };
             
             var response = await this._innerClient
-                                     .SendAsync(requestMessage,_completionOption, cancelToken)
+                                     .SendAsync(requestMessage, _completionOption, cancelToken)
                                      .ConfigureAwait(false);
          
             cancelToken.ThrowIfCancellationRequested();
                 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }      
- 
+        
+        
+        
+        
         #endregion
     }
 }

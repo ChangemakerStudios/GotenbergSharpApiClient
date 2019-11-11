@@ -13,7 +13,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MergeRequest
     {
-
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>

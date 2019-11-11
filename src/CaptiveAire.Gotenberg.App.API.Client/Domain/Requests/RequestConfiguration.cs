@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
 // ReSharper disable UnusedMember.Global
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
@@ -15,12 +14,13 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     public class RequestConfiguration
     {
         Uri _webHook;
-        static readonly Type _attribType = typeof(MultiFormHeaderAttribute);
 
         /// <summary>
         ///     If provided, the API will wait the given seconds before it considers the
         ///     conversion to be unsuccessful. If unsuccessful, it returns a 504 HTTP code.
         /// </summary>
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        // ReSharper disable once MemberCanBePrivate.Global
         public float? TimeOut { get; set; }
     
  
@@ -29,6 +29,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// the application-pdf content type to the given url. If used your requests to the API
         /// will be over before the conversions are done.
         /// </summary>
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        // ReSharper disable once MemberCanBePrivate.Global
         public Uri WebHook
         {
             get => _webHook;
@@ -41,6 +43,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <remarks>
         /// Attention: this feature does not work if the form field webHookURL is given.
         /// </remarks>
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        // ReSharper disable once MemberCanBePrivate.Global
         public string ResultFileName { get; set; }
 
         /// <summary>

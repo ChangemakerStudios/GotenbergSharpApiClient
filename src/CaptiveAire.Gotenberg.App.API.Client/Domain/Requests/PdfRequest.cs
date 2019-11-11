@@ -38,6 +38,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public RequestConfiguration Config { get; set; }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                 {
                     contentTypeProvider.TryGetContentType(item.Key, out var contentType);
 
-                    return new {Asset = item, ContentType= contentType};
+                    return new { Asset = item, ContentType= contentType };
                 })
                 .Where(_ => _.ContentType.IsSet())
                 .Select(item =>
