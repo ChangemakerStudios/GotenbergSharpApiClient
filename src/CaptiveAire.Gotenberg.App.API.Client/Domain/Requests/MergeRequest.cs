@@ -35,8 +35,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                     item.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
 
                     return item;
-                }).ToList();
-
+                });
         }
     }
 }
