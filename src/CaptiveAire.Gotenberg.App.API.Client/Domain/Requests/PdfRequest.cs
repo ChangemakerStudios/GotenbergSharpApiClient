@@ -4,7 +4,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
@@ -22,10 +26,10 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         public PdfRequest(DocumentContent content, DocumentDimensions dimensions)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
-            Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions)) ;
-            
+            Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
+
             if (content.HeaderHtml.IsSet() && dimensions.MarginTop <= 0) dimensions.MarginTop = .38;
-            if (content.FooterHtml.IsSet() && dimensions.MarginBottom <= 0) dimensions.MarginBottom = .38; 
+            if (content.FooterHtml.IsSet() && dimensions.MarginBottom <= 0) dimensions.MarginBottom = .38;
             //.38 is tHe smallest value that still shows up
         }
 
@@ -51,7 +55,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The dimensions.
         /// </value>
-        public DocumentDimensions Dimensions { get; }
+        public DocumentDimensions Dimensions { get; } 
 
 
         /// <summary>
@@ -65,6 +69,42 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));
         }
 
-       
+        /// <summary>
+        /// Transforms the instance to a list of HttpContent items
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<HttpContent> ToHttpContent()
+        {
+            return new List<HttpContent>(
+                Content.ToStringContent()
+                    .Concat(Dimensions.ToStringContent())
+                    .Concat(AddAssets())
+                );
+        }
+
+        IEnumerable<ByteArrayContent> AddAssets()
+        {
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+
+            return this.Assets
+                .Select(item =>
+                {
+                    contentTypeProvider.TryGetContentType(item.Key, out var contentType);
+
+                    return new {Asset = item, ContentType = contentType};
+                })
+                .Where(_ => _.ContentType.IsSet())
+                .Select(item =>
+                {
+                    var assetItem = new ByteArrayContent(item.Asset.Value);
+
+                    assetItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue("form-data") {Name = "files", FileName = item.Asset.Key};
+
+                    assetItem.Headers.ContentType = new MediaTypeHeaderValue(item.ContentType);
+
+                    return assetItem;
+                });
+        }
     }
 }

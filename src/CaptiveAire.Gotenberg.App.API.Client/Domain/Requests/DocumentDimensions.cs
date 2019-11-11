@@ -3,6 +3,11 @@
 // ReSharper disable UnusedMember.Global
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
@@ -14,6 +19,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DocumentDimensions
     {
+        static readonly Type attribType = typeof(MultiFormHeaderAttribute);
+        
         /// <summary>
         /// Gets or sets the width of the paper.
         /// </summary>
@@ -76,6 +83,24 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// </value>
         [MultiFormHeader("landscape")]
         public bool Landscape { get;set; }
+        
+        /// <summary>
+        /// Transforms the instance to a list of StringContent items
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<StringContent> ToStringContent()
+        {   
+            return this.GetType().GetProperties()
+                .Where(prop => Attribute.IsDefined(prop, attribType))
+                .Select(p=> new { Prop = p , Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, attribType) } )
+                .Select(_ =>
+                {
+                    var value = _.Prop.GetValue(this);
+                    var contentItem = new StringContent(value.ToString());
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name  };
 
+                    return contentItem;
+                });
+        }
     }
 }
