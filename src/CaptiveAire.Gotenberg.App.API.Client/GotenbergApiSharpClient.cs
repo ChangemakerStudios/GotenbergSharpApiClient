@@ -100,7 +100,11 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
+        /// <remarks>
+        ///     Will return a file containing the text "not found" if the container has set DISABLE_UNOCONV to 1. This disables office conversions will not work
+        /// </remarks>
         /// <returns></returns>
+        // ReSharper disable once CommentTypo
         // ReSharper disable once UnusedMember.Global
         public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
         {
@@ -117,7 +121,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         // ReSharper disable once UnusedMember.Global
-        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken)
+        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
             
