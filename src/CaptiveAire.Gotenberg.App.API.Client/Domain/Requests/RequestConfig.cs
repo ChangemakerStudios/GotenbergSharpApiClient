@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+
 // ReSharper disable UnusedMember.Global
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
@@ -11,23 +12,22 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// All endpoints accept form fields for each property
     /// </summary>
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class RequestConfiguration
+    public class RequestConfig
     {
         Uri _webHook;
 
         /// <summary>
         ///     If provided, the API will wait the given seconds before it considers the
-        ///     conversion to be unsuccessful. If unsuccessful, it returns a 504 HTTP code.
+        ///     conversion unsuccessful and return a 504 HTTP code.
         /// </summary>
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         // ReSharper disable once MemberCanBePrivate.Global
         public float? TimeOut { get; set; }
     
- 
         /// <summary>
-        /// If set the Gotenberg API will send the resulting PDF file in a POST request with
-        /// the application-pdf content type to the given url. If used your requests to the API
-        /// will be over before the conversions are done.
+        /// If set the Gotenberg API will send the resulting PDF file in a POST with
+        /// the application-pdf content type to the given url. Requests to the API
+        /// complete before the conversion is performed.
         /// </summary>
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         // ReSharper disable once MemberCanBePrivate.Global
@@ -51,34 +51,30 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// Converts the instance to a collection of http content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<StringContent> ToStringContent()
+        internal IEnumerable<HttpContent> ToHttpContent()
         {
-            var result = new List<StringContent>();
-
             if (this.TimeOut.HasValue)
             {
-                var item = new StringContent(this.TimeOut.ToString());
-                item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "waitTimeout" };
-                result.Add(item);
+                yield return CreateItem(this.TimeOut.ToString(), "waitTimeout");
             }
 
             if (this.WebHook != null)
             {
-                var item = new StringContent(this.WebHook.ToString());
-                item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "webhookURL" };
-                result.Add(item);
-
+                yield return CreateItem(this.WebHook.ToString(), "webhookURL");
             }
             
+            // ReSharper disable once InvertIf
             if (this.ResultFileName.IsSet())
             {
-                var item = new StringContent(this.ResultFileName);
-                item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "resultFilename" };
-                result.Add(item);
+                yield return CreateItem(this.ResultFileName, "resultFilename");
             }
-
-            return result;
         }
 
+        static StringContent CreateItem(string value, string fieldName)
+        {
+            var item = new StringContent(value);
+            item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = fieldName };
+            return item;
+        }
     }
 }

@@ -16,7 +16,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
-        public RequestConfiguration Config { get; set; }
+        // ReSharper disable once MemberCanBeProtected.Global
+        public RequestConfig Config { get; set; } = new RequestConfig();
 
         /// <summary>
         /// Key = file name; value = the pdf bytes
@@ -29,9 +30,9 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// Transforms the merge items to http content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<ByteArrayContent> ToHttpContent()
+        internal IEnumerable<HttpContent> ToHttpContent()
         {
-            var result = this.Items.Where(_ => _.Value != null)
+            return this.Items.Where(_ => _.Value != null)
                 .Select(_ =>
                 {
                     var item = new ByteArrayContent(_.Value);
@@ -39,14 +40,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                     item.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
 
                     return item;
-                });
-
-            if (Config != null)
-            {
-                result = result.Concat(Config.ToStringContent());
-            }
-
-            return result;
+                    
+                }).Concat(Config.ToHttpContent());
         }
     }
 }
