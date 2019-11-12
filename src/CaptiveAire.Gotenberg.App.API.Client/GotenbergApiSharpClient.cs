@@ -119,7 +119,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         // ReSharper disable once UnusedMember.Global
         public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
         {
