@@ -16,12 +16,15 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     ///  Represents the dimensions of the pdf document
     /// </summary>
     /// <remarks>
+    ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
     /// </remarks>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DocumentDimensions
     {
         static readonly Type _attribType = typeof(MultiFormHeaderAttribute);
+
+        #region Properties
         
         /// <summary>
         /// Gets or sets the width of the paper.
@@ -86,11 +89,56 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         [MultiFormHeader("landscape")]
         public bool Landscape { get;set; }
         
+        #endregion
+
+        #region public methods
+  
+        /// <summary>
+        ///     Default Google Chrome printer options
+        /// </summary>
+        /// <remarks>
+        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/7e69ec4367069df52bb61c9ee0dce241b043a257/internal/pkg/printer/chrome.go#L47
+        /// </remarks>
+        /// <returns></returns>
+        public static DocumentDimensions ToChromeDefaults()
+        {
+            return new DocumentDimensions { 
+                PaperWidth = 8.27, 
+                PaperHeight = 11.7,
+                Landscape = false,
+                MarginTop = 1,
+                MarginBottom = 1,
+                MarginLeft = 1,
+                MarginRight = 1
+            };
+        }
+        
+        /// <summary>
+        /// Defaults used for CaptiveAire deliverables
+        /// </summary>
+        /// <returns></returns>
+        public static DocumentDimensions ToDeliverableDefault()
+        {
+            return new DocumentDimensions { 
+                PaperWidth = 8.26, 
+                PaperHeight = 11.69,
+                Landscape = false,
+                MarginTop = 0,
+                MarginBottom = .5,  
+                MarginLeft = 0,
+                MarginRight = 0
+            };
+        }
+
+        #endregion
+        
+        #region internal method
+        
         /// <summary>
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<StringContent> ToStringContent()
+        internal IEnumerable<HttpContent> ToHttpContent()
         {   
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attribType))
@@ -104,5 +152,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                     return contentItem;
                 });
         }
+        
+        #endregion
+        
     }
 }

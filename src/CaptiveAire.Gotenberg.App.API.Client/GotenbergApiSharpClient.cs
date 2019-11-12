@@ -5,7 +5,6 @@ using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,16 +34,14 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
 
         readonly HttpClient _innerClient;
         
-        const string _mergePath = "merge";
-        const string _mergeOfficePath = "/convert/office";
+        const string _mergePdfPath = "merge";
+        const string _mergeOfficePath = "convert/office";
         const string _convertHtmlPath = "convert/html";
+        const string _urlConvertPath = "convert/url";
         const string _boundaryPrefix = "--------------------------";
-        const HttpCompletionOption _completionOption = HttpCompletionOption.ResponseContentRead;
         
-        readonly List<string> _allowedOfficeExtensions = new List<string>(new []{".txt",".rtf",".fodt",".doc",".docx",".odt",".xls",".xlsx",".ods",".ppt",".pptx",".odp"});
-
         #endregion
-
+        
         #region ctor
 
         /// <summary>
@@ -80,26 +77,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         public async Task<Stream> HtmlToPdfAsync(PdfRequest request, CancellationToken cancelToken = default)
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
-
-            using var multiForm = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
             
-            foreach (var item in request.ToHttpContent())
-            {
-                multiForm.Add(item);
-            }
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _convertHtmlPath)
-            {
-                Content = multiForm
-            };
-
-            var response = await this._innerClient
-                                     .SendAsync(requestMessage, _completionOption, cancelToken)
-                                     .ConfigureAwait(false);
-
-            cancelToken.ThrowIfCancellationRequested();
-
-            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            return await ExecuteRequest(request.ToHttpContent(), _convertHtmlPath, cancelToken).ConfigureAwait(false);
         }        
 
         /// <summary>
@@ -111,7 +90,9 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         // ReSharper disable once UnusedMember.Global
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
-            return await DoMergeAsync(request, _mergePath, cancelToken).ConfigureAwait(false);
+            if(request == null) throw new ArgumentNullException(nameof(request));
+
+            return await DoMergeAsync(request, _mergePdfPath, cancelToken).ConfigureAwait(false);
         }      
  
         /// <summary>
@@ -119,51 +100,71 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
+        /// <remarks>
+        ///     Will return a file containing the text "not found" if the container has set DISABLE_UNOCONV to 1. This disables office conversions will not work
+        /// </remarks>
         /// <returns></returns>
+        // ReSharper disable once CommentTypo
         // ReSharper disable once UnusedMember.Global
         public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
         {
-            var allowedItems = request.Items.Where(item => _allowedOfficeExtensions.Contains(new FileInfo(item.Key).Extension.ToLowerInvariant()));
+            if(request == null) throw new ArgumentNullException(nameof(request));
+             
+            return await DoMergeAsync(request.FilterByExtension(), _mergeOfficePath, cancelToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        // ReSharper disable once UnusedMember.Global
+        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
+        {
+            if(request == null) throw new ArgumentNullException(nameof(request));
             
-            var filteredRequest = new MergeOfficeRequest { Config = request.Config };
-            
-            foreach (var allowedItem in allowedItems)
-            {
-                filteredRequest.Items.Add(allowedItem.Key, allowedItem.Value);
-            }
-            
-            return await DoMergeAsync(filteredRequest, _mergeOfficePath, cancelToken).ConfigureAwait(false);
-        }   
+            return await ExecuteRequest(request.ToHttpContent(), _urlConvertPath, cancelToken).ConfigureAwait(false);
+        }
         
-        async Task<Stream> DoMergeAsync(MergeRequest request, string mergePath, CancellationToken cancelToken = default)
+        #endregion
+
+        #region private helpers
+
+        async Task<Stream> DoMergeAsync(MergeRequest request, string pathForMerge, CancellationToken cancelToken = default)
         {
             if (request?.Items == null) throw new ArgumentNullException(nameof(request));
             if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
 
+            return await ExecuteRequest(request.ToHttpContent(), pathForMerge, cancelToken).ConfigureAwait(false);
+        }
+
+        async Task<Stream> ExecuteRequest(IEnumerable<HttpContent> contentItems, string apiPath, CancellationToken cancelToken = default)
+        {
             using var formContent = new MultipartFormDataContent($"{_boundaryPrefix}{DateTime.Now.Ticks}");
             
-            foreach (var item in request.ToHttpContent())
+            foreach (var item in contentItems)
             {
                 formContent.Add(item);
             }
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, mergePath)
-                                 {
-                                     Content = formContent 
-                                 };
+            
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, apiPath)
+            {
+                Content = formContent 
+            };
             
             var response = await this._innerClient
-                                     .SendAsync(requestMessage, _completionOption, cancelToken)
-                                     .ConfigureAwait(false);
+                .SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancelToken)
+                .ConfigureAwait(false);
          
             cancelToken.ThrowIfCancellationRequested();
                 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        }      
-        
-        
+        }
+
         
         
         #endregion
     }
+    
 }

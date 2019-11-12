@@ -26,7 +26,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <param name="headerHtml">The header HTML.</param>
         /// <param name="footerHtml">The footer HTML.</param>
         /// <exception cref="ArgumentOutOfRangeException">bodyHtml</exception>
-        public DocumentContent(string bodyHtml, string footerHtml, string headerHtml = "")
+        public DocumentContent(string bodyHtml, string footerHtml = "", string headerHtml = "")
         {
             if(bodyHtml.IsNotSet()) throw new ArgumentOutOfRangeException(nameof(bodyHtml));
 
@@ -68,7 +68,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<StringContent> ToStringContent()
+        internal IEnumerable<HttpContent> ToHttpContent()
         {   
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attribType))
