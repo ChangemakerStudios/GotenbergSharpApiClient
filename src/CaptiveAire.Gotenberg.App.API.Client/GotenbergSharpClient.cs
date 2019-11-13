@@ -69,6 +69,19 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         }        
 
         /// <summary>
+        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
+        {
+            if(request == null) throw new ArgumentNullException(nameof(request));
+            
+            return await ExecuteRequest(request.ToHttpContent(),Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
+        }
+        
+        /// <summary>
         /// Merges the pdf documents in the specified request into one pdf
         /// </summary>
         /// <param name="request"></param>
@@ -95,19 +108,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
             if(request == null) throw new ArgumentNullException(nameof(request));
              
             return await DoMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <returns></returns>
-        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteRequest(request.ToHttpContent(),Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
         }
         
         #endregion
