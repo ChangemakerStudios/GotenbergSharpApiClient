@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure.Pipeline
 {
@@ -12,7 +13,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure.Pipeline
     /// 
     /// </summary>
     /// <seealso cref="System.Net.Http.DelegatingHandler" />
-    // ReSharper disable once UnusedMember.Global
+    [UsedImplicitly]
     public class TimeoutHandler : DelegatingHandler
     {
         /// <summary>
@@ -30,8 +31,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure.Pipeline
         /// <value>
         /// The default timeout.
         /// </value>
-        // ReSharper disable once MemberCanBePrivate.Global
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
+        [UsedImplicitly]
         public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(300);
 
         /// <summary>

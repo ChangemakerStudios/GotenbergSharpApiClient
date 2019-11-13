@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class MergeRequest
     {
         /// <summary>
@@ -22,9 +23,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Key = file name; value = the pdf bytes
         /// </summary>
-        // ReSharper disable once MemberCanBePrivate.Global
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-        public Dictionary<string, byte[]> Items { get; set; } = new Dictionary<string, byte[]>();
+        public Dictionary<string, byte[]> Items { get; [UsedImplicitly] set; } = new Dictionary<string, byte[]>();
 
         /// <summary>
         /// Transforms the merge items to http content items
@@ -36,8 +35,13 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                 .Select(_ =>
                 {
                     var item = new ByteArrayContent(_.Value);
-                    item.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "files", FileName = _.Key };
-                    item.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+
+                    item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
+                        Name = Constants.Gotenberg.FormFieldNames.Files,
+                        FileName = _.Key
+                    };
+
+                    item.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
 
                     return item;
                     
