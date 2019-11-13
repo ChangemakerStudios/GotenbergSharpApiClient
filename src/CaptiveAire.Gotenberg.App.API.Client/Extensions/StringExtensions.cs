@@ -7,7 +7,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
     /// </summary>
     public static class StringExtensions
     {
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Determines whether this instance is set with a non null/non whitespace value.
         /// </summary>

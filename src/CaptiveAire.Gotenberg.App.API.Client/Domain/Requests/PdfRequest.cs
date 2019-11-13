@@ -1,7 +1,5 @@
 ﻿// CaptiveAire.Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
 
-// ReSharper disable MemberCanBePrivate.Global
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +11,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// <summary>
     /// 
     /// </summary>
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class PdfRequest
     {
         /// <summary>
@@ -34,7 +31,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public RequestConfig Config { get; set; } = new RequestConfig();
 
         /// <summary>
@@ -66,7 +62,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// </summary>
         /// <param name="assets">The assets.</param>
         /// <exception cref="ArgumentNullException">assets</exception>
-        // ReSharper disable once UnusedMember.Global
         public void AddAssets(Dictionary<string, byte[]> assets)
         {
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));

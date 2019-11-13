@@ -45,10 +45,11 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure
             {
                 public const string Files          =   "files";
                 public const string WaitTimeout    =   "waitTimeout";
-                public const string WebhookURL     =   "webhookURL";
-                public const string WebhookTimeout =   "webhookURLTimeout";
                 public const string ResultFilename =   "resultFilename";
                 public const string RemoteURL      =   "remoteURL";
+                
+                public const string WebhookURL     =   "webhookURL";
+                public const string WebhookTimeout =   "webhookURLTimeout";
                 public const string ChromeRpccBufferSize = "googleChromeRpccBufferSize";
                 
                 public static class Dims

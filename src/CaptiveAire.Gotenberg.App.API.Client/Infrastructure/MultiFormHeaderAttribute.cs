@@ -18,14 +18,14 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure
         /// <param name="name">The name.</param>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="mediaType">The media type</param>
-        public MultiFormHeaderAttribute(string name = "files", 
+        public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files, 
                                         string fileName = null, 
-                                        string contentDisposition = "form-data",
-                                        string mediaType = "text/html")
+                                        string contentDisposition = Constants.Http.Disposition.Types.FormData,
+                                        string mediaType = Constants.Http.MediaTypes.TextHtml)
         {
-            ContentDisposition = contentDisposition;
             Name = name;
             FileName = fileName;
+            ContentDisposition = contentDisposition;
             MediaType = mediaType;
         }
 

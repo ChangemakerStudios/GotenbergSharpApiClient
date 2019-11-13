@@ -8,7 +8,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
     /// <summary>
     /// 
     /// </summary>
-    // ReSharper disable once UnusedMember.Global
     public static class IntExtensions
     {
         const int alphabetLength = 26;
@@ -23,8 +22,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// </remarks>
         /// <param name="sortNumber"></param>
         /// <returns></returns>
-        // ReSharper disable once UnusedMember.Global
-        public static string ToAlphabeticallySortableName(this int sortNumber)
+         public static string ToAlphabeticallySortableName(this int sortNumber)
         {
             if(sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
 

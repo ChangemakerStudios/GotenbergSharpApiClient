@@ -11,7 +11,6 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
     {
         const string TimeoutPropertyKey = "RequestTimeout";
 
-        // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// Sets the timeout.
         /// </summary>
