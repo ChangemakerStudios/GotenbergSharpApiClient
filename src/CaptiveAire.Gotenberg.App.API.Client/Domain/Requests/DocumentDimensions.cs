@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
@@ -18,7 +19,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// </remarks>
     public class DocumentDimensions
     {
-        static readonly Type _attribType = typeof(MultiFormHeaderAttribute);
+        static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
         #region Properties
         
@@ -28,6 +29,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The width of the paper.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PaperWidth)]
         public double PaperWidth { get; set; }
 
@@ -37,6 +39,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The height of the paper.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PaperHeight)]
         public double PaperHeight { get; set; }
 
@@ -46,6 +49,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The margin top.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginTop)]
         public double MarginTop { get; set; }
 
@@ -55,6 +59,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The margin bottom.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginBottom)]
         public double MarginBottom { get; set; }
 
@@ -64,6 +69,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The margin left.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginLeft)]
         public double MarginLeft { get; set; }
 
@@ -73,6 +79,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The margin right.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginRight)]
         public double MarginRight { get; set; }
 
@@ -82,6 +89,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Landscape)]
         public bool Landscape { get; set; }
         
@@ -113,6 +121,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// Defaults used for CaptiveAire deliverables
         /// </summary>
         /// <returns></returns>
+        [UsedImplicitly]
         public static DocumentDimensions ToDeliverableDefault()
         {
             return new DocumentDimensions { 
@@ -137,8 +146,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         internal IEnumerable<HttpContent> ToHttpContent()
         {   
             return this.GetType().GetProperties()
-                .Where(prop => Attribute.IsDefined(prop, _attribType))
-                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attribType) })
+                .Where(prop => Attribute.IsDefined(prop, _attributeType))
+                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(_ =>
                 {
                     var value = _.Prop.GetValue(this);

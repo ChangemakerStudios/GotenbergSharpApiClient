@@ -2,12 +2,14 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 {
     /// <summary>
     /// 
     /// </summary>
+    [UsedImplicitly]
     public static class IntExtensions
     {
         const int alphabetLength = 26;
@@ -22,7 +24,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// </remarks>
         /// <param name="sortNumber"></param>
         /// <returns></returns>
-         public static string ToAlphabeticallySortableName(this int sortNumber)
+        [UsedImplicitly]
+        public static string ToAlphabeticallySortableName(this int sortNumber)
         {
             if(sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
 

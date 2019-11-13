@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 {
-    internal static class AssetExtensions
+    static class AssetExtensions
     {
         static readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
        

@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
@@ -16,7 +17,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
      public class DocumentContent
     {
-        static readonly Type _attribType = typeof(MultiFormHeaderAttribute);
+        static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
         
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentContent"/> class.
@@ -49,6 +50,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The content HTML.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Index)] 
         public string BodyHtml { get; }
 
@@ -68,8 +70,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         internal IEnumerable<HttpContent> ToHttpContent()
         {   
             return this.GetType().GetProperties()
-                .Where(prop => Attribute.IsDefined(prop, _attribType))
-                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attribType) })
+                .Where(prop => Attribute.IsDefined(prop, _attributeType))
+                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(_ =>
                 {
                     var value = _.Prop.GetValue(this);

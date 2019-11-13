@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
@@ -31,6 +32,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
+        [UsedImplicitly]
         public RequestConfig Config { get; set; } = new RequestConfig();
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The content.
         /// </value>
+        [UsedImplicitly]
         public DocumentContent Content { get; }
 
         /// <summary>
@@ -47,6 +50,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The dimensions.
         /// </value>
+        [UsedImplicitly]
         public DocumentDimensions Dimensions { get; }
         
         /// <summary>
@@ -55,6 +59,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <value>
         /// The assets.
         /// </value>
+        [UsedImplicitly]
         public Dictionary<string, byte[]> Assets { get; set; } = new Dictionary<string, byte[]>();
      
         /// <summary>
@@ -62,6 +67,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// </summary>
         /// <param name="assets">The assets.</param>
         /// <exception cref="ArgumentNullException">assets</exception>
+        [UsedImplicitly]
         public void AddAssets(Dictionary<string, byte[]> assets)
         {
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));

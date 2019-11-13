@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
@@ -16,12 +17,13 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
+        // ReSharper disable once MemberCanBeProtected.Global
         public RequestConfig Config { get; set; } = new RequestConfig();
 
         /// <summary>
         /// Key = file name; value = the pdf bytes
         /// </summary>
-        public Dictionary<string, byte[]> Items { get; set; } = new Dictionary<string, byte[]>();
+        public Dictionary<string, byte[]> Items { get; [UsedImplicitly] set; } = new Dictionary<string, byte[]>();
 
         /// <summary>
         /// Transforms the merge items to http content items

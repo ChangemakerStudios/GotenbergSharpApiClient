@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using JetBrains.Annotations;
 using Microsoft.Net.Http.Headers;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
@@ -26,6 +27,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
     ///     https://github.com/thecodingmachine/gotenberg-php-client
     ///     https://github.com/yumauri/gotenberg-js-client
     /// </remarks>
+    [UsedImplicitly]
     public class GotenbergSharpClient
     {
         readonly HttpClient _innerClient; 
@@ -61,6 +63,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <exception cref="ArgumentNullException">request</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// </exception>
+        [UsedImplicitly]
         public async Task<Stream> HtmlToPdfAsync(PdfRequest request, CancellationToken cancelToken = default)
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
@@ -74,6 +77,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
+        [UsedImplicitly]
         public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
@@ -87,6 +91,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
+        [UsedImplicitly]
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
@@ -103,6 +108,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         ///     Will return a file containing the text "not found" if the container has set DISABLE_UNOCONV to 1. This disables office conversions will not work
         /// </remarks>
         /// <returns></returns>
+        [UsedImplicitly]
         public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));

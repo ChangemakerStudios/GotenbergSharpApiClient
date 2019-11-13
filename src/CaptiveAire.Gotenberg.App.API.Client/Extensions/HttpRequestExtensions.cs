@@ -2,6 +2,7 @@
 
 using System;
 using System.Net.Http;
+using JetBrains.Annotations;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 {
@@ -17,6 +18,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
         /// <param name="request">The request.</param>
         /// <param name="timeout">The timeout.</param>
         /// <exception cref="ArgumentOutOfRangeException">request</exception>
+        [UsedImplicitly]
         public static void SetTimeout(this HttpRequestMessage request, TimeSpan? timeout)
         {
             if(request == null) throw new ArgumentOutOfRangeException(nameof(request));
