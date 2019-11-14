@@ -151,11 +151,14 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                 .Select(_ =>
                 {
                     var value =  _.Prop.GetValue(this);
+
+                    if (value == null) return null;
+
                     var contentItem =new StringContent(value.ToString());
                     contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name  };
 
                     return contentItem;
-                });
+                }).Where(item=> item != null);
         }
         
         #endregion

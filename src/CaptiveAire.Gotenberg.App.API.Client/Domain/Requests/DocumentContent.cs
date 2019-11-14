@@ -22,16 +22,12 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// Initializes a new instance of the <see cref="DocumentContent{TValue}"/>
         /// </summary>
         /// <param name="bodyHtml">The body HTML.</param>
-        /// <param name="headerHtml">The header HTML.</param>
-        /// <param name="footerHtml">The footer HTML.</param>
         /// <exception cref="ArgumentOutOfRangeException">bodyHtml</exception>
-        public DocumentContent(TValue bodyHtml, TValue footerHtml, TValue headerHtml)
+        public DocumentContent(TValue bodyHtml)
         {
             if(bodyHtml.Equals(default(TValue))) throw new ArgumentOutOfRangeException(nameof(bodyHtml));
 
             BodyHtml = bodyHtml;
-            HeaderHtml = headerHtml;
-            FooterHtml = footerHtml;
         }
 
         /// <summary>
@@ -41,7 +37,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// The header HTML.
         /// </value>
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Header)]
-        public TValue HeaderHtml { get; }
+        public TValue HeaderHtml { get; set; }
 
         /// <summary>
         /// Gets the content HTML. This is the body of the document
@@ -51,7 +47,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// </value>
         [UsedImplicitly]
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Index)] 
-        public TValue BodyHtml { get; }
+        public TValue BodyHtml { get; set; }
 
         /// <summary>
         /// Gets the footer HTML.
@@ -60,32 +56,31 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// The footer HTML.
         /// </value>
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Footer)]
-        public TValue FooterHtml { get; }
+        public TValue FooterHtml { get; set; }
 
         /// <summary>
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-
-        //    internal static IEnumerable<HttpContent> ToHttpContent<TValue>(this Dictionary<string, TValue> assets, Func<TValue,HttpContent> converter)
-
-        internal IEnumerable<HttpContent> ToHttpContent(Func<TValue,HttpContent> converter)
+        internal IEnumerable<HttpContent> ToHttpContent(Func<TValue, HttpContent> converter)
         {   
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
                 .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(_ =>
                 {
-                    var value = (TValue)_.Prop.GetValue(this);
-                    var contentItem = converter(value);
+                    var value = _.Prop.GetValue(this);
 
-                    contentItem.Headers.ContentDisposition = 
-                        new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = _.Attrib.FileName };
-
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
+                    if (value == null) return null;
                     
-                    return contentItem;
-                });
+                    var contentItem = converter((TValue) value);
+                        contentItem.Headers.ContentDisposition = 
+                                new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = _.Attrib.FileName };
+                        contentItem.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
+                    
+                        return contentItem;
+
+                }).Where(item=> item !=null);
         }
         
     }

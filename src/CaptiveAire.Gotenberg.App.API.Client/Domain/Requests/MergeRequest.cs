@@ -13,7 +13,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public class MergeRequest<TValue> where TValue: class
+    public class MergeRequest<TAssetValue> where TAssetValue: class
     {
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
@@ -24,13 +24,13 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <summary>
         /// Key = file name; value = the pdf bytes
         /// </summary>
-        public Dictionary<string, TValue> Items { get; [UsedImplicitly] set; } = new Dictionary<string, TValue>();
+        public DocumentAssets<TAssetValue> Items { get; [UsedImplicitly] set; } = new DocumentAssets<TAssetValue>();
 
         /// <summary>
         /// Transforms the merge items to http content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent(Func<TValue,HttpContent> converter)
+        internal IEnumerable<HttpContent> ToHttpContent(Func<TAssetValue,HttpContent> converter)
         {
             return this.Items.Where(_ => _.Value != null)
                 .Select(_ =>

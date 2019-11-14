@@ -78,31 +78,37 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
         /// Converts the specified request to a PDF document.
         /// </summary>
         /// <param name="request">The request.</param>
+        /// <param name="assetConverter"></param>
         /// <param name="cancelToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">request</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// </exception>
         [UsedImplicitly]
-        public async Task<Stream> HtmlToPdfAsync(PdfRequest<Stream> request, CancellationToken cancelToken = default)
+        public async Task<Stream> HtmlToPdfAsync<TAsset>(PdfRequest<Stream, TAsset> request, Func<TAsset, HttpContent> assetConverter, CancellationToken cancelToken = default)  where TAsset:class
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteRequest(request.ToHttpContent(value => new StreamContent(value)), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
+            if(assetConverter == null) throw new ArgumentNullException(nameof(request));
+
+            var content = request.ToHttpContent(value => new StreamContent(value), assetConverter);
+            return await ExecuteRequest(content, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
         }        
 
-        public async Task<Stream> HtmlToPdfAsync(PdfRequest<byte[]> request, CancellationToken cancelToken = default)
+        public async Task<Stream> HtmlToPdfAsync<TAsset>(PdfRequest<byte[], TAsset> request, Func<TAsset, HttpContent> assetConverter, CancellationToken cancelToken = default) where TAsset:class
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteRequest(request.ToHttpContent(value => new ByteArrayContent(value)), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
+            if(assetConverter == null) throw new ArgumentNullException(nameof(request));
+
+            var content = request.ToHttpContent(value => new ByteArrayContent(value), assetConverter);
+            return await ExecuteRequest(content, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
         }
 
-        public async Task<Stream> HtmlToPdfAsync(PdfRequest<string> request, CancellationToken cancelToken = default)
+        public async Task<Stream> HtmlToPdfAsync<TAsset>(PdfRequest<string, TAsset> request, Func<TAsset, HttpContent> assetConverter, CancellationToken cancelToken = default) where TAsset:class
         {
             if(request == null)  throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteRequest(request.ToHttpContent(value => new StringContent(value)), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
+
+            var content = request.ToHttpContent(value => new StringContent(value), assetConverter);
+            return await ExecuteRequest(content, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
         }
 
         #endregion
