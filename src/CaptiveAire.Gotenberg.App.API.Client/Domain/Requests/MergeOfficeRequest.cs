@@ -5,20 +5,20 @@ using System.Linq;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
 {
-    public class MergeOfficeRequest : MergeRequest
+    public class MergeOfficeRequest<TValue> : MergeRequest<TValue> where TValue: class
     {
-        static readonly string[] _allowedExtensions = {".txt",".rtf",".fodt",".doc",".docx",".odt",".xls",".xlsx",".ods",".ppt",".pptx",".odp"};
+        readonly string[] _allowedExtensions = {".txt",".rtf",".fodt",".doc",".docx",".odt",".xls",".xlsx",".ods",".ppt",".pptx",".odp"};
 
         /// <summary>
         /// Creates an instance where the items are filtered against a list of extensions Gotenberg supports.
         /// </summary>
         /// <remarks>See the list of supported extensions here: https://thecodingmachine.github.io/gotenberg/#office.basic</remarks>
         /// <returns></returns>
-        public MergeOfficeRequest FilterByExtension()
+        public MergeOfficeRequest<TValue> FilterByExtension()
         {
             var allowedItems = this.Items.Where(item => _allowedExtensions.Contains(new FileInfo(item.Key).Extension.ToLowerInvariant()));
             
-            var filteredRequest = new MergeOfficeRequest { Config = this.Config };
+            var filteredRequest = new MergeOfficeRequest<TValue> { Config = this.Config };
             
             foreach (var item in allowedItems)
             {

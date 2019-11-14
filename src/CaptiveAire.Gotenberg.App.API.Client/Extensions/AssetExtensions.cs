@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -7,11 +8,11 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
 {
-    static class AssetExtensions
+    internal static class AssetExtensions
     {
         static readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
        
-        internal static IEnumerable<HttpContent> ToHttpContent(this Dictionary<string, byte[]> assets)
+        internal static IEnumerable<HttpContent> ToHttpContent<TValue>(this Dictionary<string, TValue> assets, Func<TValue,HttpContent> converter)
         {
             return assets.Select(item =>
                 {
@@ -22,7 +23,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
                 .Where(_ => _.MediaType.IsSet())
                 .Select(item =>
                 {
-                    var asset = new ByteArrayContent(item.Asset.Value);
+                    var asset = converter(item.Asset.Value);
                     
                     asset.Headers.ContentDisposition =
                         new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {

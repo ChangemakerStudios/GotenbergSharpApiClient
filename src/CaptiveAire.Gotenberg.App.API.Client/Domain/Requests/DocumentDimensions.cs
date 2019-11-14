@@ -150,8 +150,8 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
                 .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(_ =>
                 {
-                    var value = _.Prop.GetValue(this);
-                    var contentItem = new StringContent(value.ToString());
+                    var value =  _.Prop.GetValue(this);
+                    var contentItem =new StringContent(value.ToString());
                     contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name  };
 
                     return contentItem;

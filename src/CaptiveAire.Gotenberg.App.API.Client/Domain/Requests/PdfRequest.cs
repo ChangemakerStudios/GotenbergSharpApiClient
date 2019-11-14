@@ -12,22 +12,18 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
     /// <summary>
     /// 
     /// </summary>
-    public class PdfRequest
+    public class PdfRequest<TValue> where TValue: class
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PdfRequest"/> class.
+        /// Initializes a new instance of the <see cref="PdfRequest{TValue}"/>
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="dimensions">The dimensions.</param>
-        public PdfRequest(DocumentContent content, DocumentDimensions dimensions)
+        public PdfRequest(DocumentContent<TValue> content, DocumentDimensions dimensions)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
             Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
-            
-            if (content.HeaderHtml.IsSet() && dimensions.MarginTop <= 0) dimensions.MarginTop = .38;
-            if (content.FooterHtml.IsSet() && dimensions.MarginBottom <= 0) dimensions.MarginBottom = .38;
-            //.38 is tHe smallest value that still shows up
-        }
+          }
 
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
@@ -42,7 +38,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// The content.
         /// </value>
         [UsedImplicitly]
-        public DocumentContent Content { get; }
+        public DocumentContent<TValue> Content { get; }
 
         /// <summary>
         /// Gets the dimensions.
@@ -60,7 +56,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// The assets.
         /// </value>
         [UsedImplicitly]
-        public Dictionary<string, byte[]> Assets { get; set; } = new Dictionary<string, byte[]>();
+        public Dictionary<string, TValue> Assets { get; set; } = new Dictionary<string, TValue>();
      
         /// <summary>
         /// Adds the assets.
@@ -68,7 +64,7 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// <param name="assets">The assets.</param>
         /// <exception cref="ArgumentNullException">assets</exception>
         [UsedImplicitly]
-        public void AddAssets(Dictionary<string, byte[]> assets)
+        public void AddAssets(Dictionary<string, TValue> assets)
         {
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));
         }
@@ -77,12 +73,12 @@ namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        internal IEnumerable<HttpContent> ToHttpContent(Func<TValue,HttpContent> converter)
         {
-            return Content.ToHttpContent()
-                .Concat(Dimensions.ToHttpContent())
-                .Concat(Assets.ToHttpContent())
-                .Concat(Config.ToHttpContent());
+            return Content.ToHttpContent(converter)
+                .Concat(Assets.ToHttpContent(converter))
+                .Concat(Config.ToHttpContent())
+                .Concat(Dimensions.ToHttpContent());
         }
 
     }
