@@ -1,13 +1,13 @@
-﻿// CaptiveAire.Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Extensions;
 using JetBrains.Annotations;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure.Pipeline
+namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
     /// <summary>
     /// 

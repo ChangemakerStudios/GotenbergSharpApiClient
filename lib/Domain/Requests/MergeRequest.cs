@@ -1,13 +1,13 @@
-﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
     /// A request to merge the specified items into one pdf file
