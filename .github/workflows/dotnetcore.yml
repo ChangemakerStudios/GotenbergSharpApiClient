@@ -16,8 +16,8 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.0.100
-      - name: Build with dotnet
+      - name: Build & Pack
         run: >-
-          dotnet pack 
+          dotnet build 
           --configuration Release
           --version-suffix "$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)"
