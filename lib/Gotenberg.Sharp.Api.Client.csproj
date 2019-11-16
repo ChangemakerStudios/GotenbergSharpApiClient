@@ -26,7 +26,7 @@
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/lib/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
-    <PackageIcon>gotenbergSharpClient.png</PackageIcon>
+    <PackageIcon>gotenbergSharpClient.PNG</PackageIcon>
     <RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>	      
   </PropertyGroup>    
 
@@ -41,7 +41,7 @@
   </ItemGroup> 
 
   <ItemGroup>
-    <Resource Include="Resources\gotenbergSharpClient.png" />
+    <Resource Include="Resources\gotenbergSharpClient.PNG" />
   </ItemGroup>
 
 </Project>
