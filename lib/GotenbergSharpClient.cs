@@ -1,6 +1,4 @@
-﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
-
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests;
+﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
 using System;
 using System.Collections.Generic;
@@ -8,11 +6,12 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.Net.Http.Headers;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client
+namespace Gotenberg.Sharp.API.Client
 {
     /// <summary>
     /// C# Client for Gotenberg api
