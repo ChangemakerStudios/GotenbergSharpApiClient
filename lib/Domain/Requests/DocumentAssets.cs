@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public class DocumentAssets<TValue>: Dictionary<string, TValue>
     {
