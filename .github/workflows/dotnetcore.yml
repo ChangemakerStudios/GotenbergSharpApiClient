@@ -19,8 +19,9 @@ jobs:
           args: /github/workspace /nofetch /exec /bin/sh /execargs "-c \"echo $GitVersion_FullSemVer > /github/workspace/version.txt\""
 
       - name: Build
+        working-directory: ./out
         run: >-
-          dotnet build -o /github/workspace/out
+          dotnet build -o ./out
           --configuration Release   
           --version-suffix "$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)"
 
