@@ -37,6 +37,6 @@ jobs:
 
       - name: Push generated package to GitHub registry
         run: >-
-          nuget push ./GotenbergSharpApiClient/GotenbergSharpApiClient/lib/bin/Release/*.nupkg
+          nuget push ./lib/bin/Release/*.nupkg
           -Source "GitHub" 
           -SkipDuplicate
