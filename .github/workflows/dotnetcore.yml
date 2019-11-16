@@ -41,5 +41,5 @@ jobs:
 
       - name: Push generated package to GitHub registry
         run: >-
-          nuget push ./lib/bin/Release/*.nupkg
+          nuget push .\lib\bin\Release\*.nupkg
           -Source "GitHub"
