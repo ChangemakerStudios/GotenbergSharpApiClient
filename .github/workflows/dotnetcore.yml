@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v1
@@ -13,19 +13,22 @@ jobs:
         with:
           dotnet-version: 3.0.100
 
-      - name: Get Git Version
-        uses: docker://gittools/gitversion:5.0.2-beta1-27-linux-centos-7-netcoreapp2.2
+      - name: Generate build number
+        uses: einaregilsson/build-number@v1
         with:
-          args: /github/workspace /nofetch /exec /bin/sh /execargs "-c \"echo $GitVersion_FullSemVer > /github/workspace/version.txt\""
+          token: ${{secrets.github_token}}
+
+      - name: Print new build number
+        run: echo Build number is $BUILD_NUMBER
 
       - name: Build
         run: >-
           dotnet build
           --configuration Release   
-          --version-suffix "$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)"
+          --version-suffix "1.0.$BUILD_NUMBER"
 
-      - name: Install nuget
-        run: sudo apt-get install nuget
+      - name: Install NuGet client
+        uses: warrenbuckley/Setup-Nuget@v1
 
       - name: Add private GitHub registry to NuGet
         run: >-
