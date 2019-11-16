@@ -20,7 +20,7 @@ jobs:
 
       - name: Build
         run: >-
-          dotnet build -o out
+          dotnet build -o /github/workspace/out
           --configuration Release   
           --version-suffix "$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)"
 
