@@ -22,7 +22,7 @@ jobs:
         run: >-
           dotnet build -o out
           --configuration Release          
-          --version-prefix "$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)"
+          /p:Version=$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)
 
       - name: Install nuget
         run: sudo apt-get install nuget
