@@ -4,14 +4,20 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.0.100
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
+      - uses: actions/checkout@v1
+      - name: Get Git Version
+        uses: docker://gittools/gitversion:5.0.2-beta1-27-linux-centos-7-netcoreapp2.2
+        with:
+          args: /github/workspace /nofetch /exec /bin/sh /execargs "-c \"echo $GitVersion_FullSemVer > /github/workspace/version.txt\""
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.0.100
+      - name: Build with dotnet
+        run: >-
+          dotnet pack 
+          --configuration Release
+          --version $(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)
