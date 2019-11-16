@@ -1,4 +1,4 @@
-name: .NET Core
+name: Nuget Build & Pack
 
 on: [push]
 
@@ -20,4 +20,4 @@ jobs:
         run: >-
           dotnet pack 
           --configuration Release
-          --version $(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)
+          --version-suffix "$(cat /home/runner/work/GotenbergSharpApiClient/GotenbergSharpApiClient/version.txt)"
