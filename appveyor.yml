@@ -6,5 +6,4 @@ before_build:
   - dotnet restore
 
 after_build:
-  - dotnet pack  .\lib\GotenburgSharpApiClient.csproj --configuration %CONFIGURATION% --version-suffix %APPVEYOR_BUILD_VERSION%
   - appveyor PushArtifact .\lib\bin\%CONFIGURATION%\GotenburgSharpApiClient.%APPVEYOR_BUILD_VERSION%.symbols.nupkg
