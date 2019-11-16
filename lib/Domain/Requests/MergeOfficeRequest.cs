@@ -1,9 +1,9 @@
-// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
 using System.IO;
 using System.Linq;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public class MergeOfficeRequest<TValue> : MergeRequest<TValue> where TValue: class
     {

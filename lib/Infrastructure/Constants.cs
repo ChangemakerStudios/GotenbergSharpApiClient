@@ -1,4 +1,4 @@
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure
+namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
     public static class Constants
     {

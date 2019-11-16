@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Extensions
+namespace Gotenberg.Sharp.API.Client.Extensions
 {
     internal static class AssetExtensions
     {

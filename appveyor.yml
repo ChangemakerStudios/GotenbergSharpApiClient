@@ -1,0 +1,9 @@
+os: Visual Studio 2019
+
+configuration: Release
+
+before_build:
+  - dotnet restore
+
+after_build:
+  - appveyor PushArtifact .\lib\bin\%CONFIGURATION%\GotenburgSharpApiClient.%APPVEYOR_BUILD_VERSION%.symbols.nupkg

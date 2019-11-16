@@ -1,8 +1,8 @@
-﻿// Gotenberg.App.API.Sharp.Client - Copyright (c) 2019 CaptiveAire
+﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
 using System;
 
-namespace CaptiveAire.Gotenberg.App.API.Sharp.Client.Infrastructure
+namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
     /// <summary>
     /// 
