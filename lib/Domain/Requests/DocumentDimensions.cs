@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
     /// </remarks>
-    public class DocumentDimensions
+    public sealed class DocumentDimensions
     {
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 

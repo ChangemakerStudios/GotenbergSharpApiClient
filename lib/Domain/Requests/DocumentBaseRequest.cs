@@ -12,18 +12,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// Represents the elements of a document
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
-     public class DocumentContent<TValue>
+    public abstract class DocumentBaseRequest<TValue> where TValue : class
     {
+        readonly Func<TValue, HttpContent> _converter;
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentContent{TValue}"/>
+        /// Initializes a new instance of the <see cref="DocumentBaseRequest{TValue}"/>
         /// </summary>
+        /// <param name="converter"></param>
         /// <param name="bodyHtml"></param>
-        public DocumentContent(TValue bodyHtml)
+        protected DocumentBaseRequest(Func<TValue,HttpContent> converter, TValue bodyHtml)
         {
-            if (bodyHtml.Equals(default(TValue))) throw new ArgumentOutOfRangeException(nameof(bodyHtml));
+            _converter = converter ?? throw new ArgumentNullException(nameof(converter));
 
+            if (bodyHtml.Equals(default(TValue))) throw new ArgumentOutOfRangeException(nameof(bodyHtml)); 
             BodyHtml = bodyHtml;
         }
 
@@ -34,7 +37,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The header HTML.
         /// </value>
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Header)]
-        public TValue HeaderHtml { get; }
+        public TValue HeaderHtml { get; set; }
 
         /// <summary>
         /// Gets the content HTML. This is the body of the document
@@ -53,13 +56,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The footer HTML.
         /// </value>
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Footer)]
-        public TValue FooterHtml { get; }
+        public TValue FooterHtml { get; set; }
 
         /// <summary>
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent(Func<TValue, HttpContent> converter)
+        internal IEnumerable<HttpContent> ToHttpContent()
         {
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
@@ -70,12 +73,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
                     if (value == null) return null;
 
-                    var contentItem = converter((TValue)value);
-                    contentItem.Headers.ContentDisposition =
-                            new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = _.Attrib.FileName };
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
+                    var item = _converter((TValue)value);
 
-                    return contentItem;
+                    item.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
+                    item.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = _.Attrib.FileName };
+
+                    return item;
 
                 }).Where(item => item != null);
         }

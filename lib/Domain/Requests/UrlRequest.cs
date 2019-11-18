@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// 
     /// </summary>
-    public class UrlPdfRequest
+    public sealed class UrlRequest
     {
         [UsedImplicitly]
         public Uri Url { get; set; }

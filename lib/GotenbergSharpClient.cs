@@ -52,9 +52,7 @@ namespace Gotenberg.Sharp.API.Client
         #endregion
 
         #region api methods
-        
-        #region UrlToPdf
-        
+
         /// <summary>
         /// For remote URL conversions. Works just like <see><cref>HtmlToPDf</cref></see>
         /// </summary>
@@ -62,157 +60,55 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         [UsedImplicitly]
-        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
             
             return await ExecuteRequest(request.ToHttpContent(),Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
         }
-
-        #endregion
-
-        #region HtmlToPdf
-
+        
         /// <summary>
-        /// Converts the specified request to a PDF document.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <param name="assetConverter"></param>
-        /// <param name="cancelToken">The cancel token.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">request</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// </exception>
-        [UsedImplicitly]
-        public async Task<Stream> HtmlToPdfAsync<TAsset>(PdfRequest<Stream, TAsset> request, Func<TAsset, HttpContent> assetConverter, CancellationToken cancelToken = default)  where TAsset:class
-        {
-            if(request == null)  throw new ArgumentNullException(nameof(request));
-            if(assetConverter == null) throw new ArgumentNullException(nameof(request));
-
-            var content = request.ToHttpContent(value => new StreamContent(value), assetConverter);
-            return await ExecuteRequest(content, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
-        }        
-
-        public async Task<Stream> HtmlToPdfAsync<TAsset>(PdfRequest<byte[], TAsset> request, Func<TAsset, HttpContent> assetConverter, CancellationToken cancelToken = default) where TAsset:class
-        {
-            if(request == null)  throw new ArgumentNullException(nameof(request));
-            if(assetConverter == null) throw new ArgumentNullException(nameof(request));
-
-            var content = request.ToHttpContent(value => new ByteArrayContent(value), assetConverter);
-            return await ExecuteRequest(content, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
-        }
-
-        public async Task<Stream> HtmlToPdfAsync<TAsset>(PdfRequest<string, TAsset> request, Func<TAsset, HttpContent> assetConverter, CancellationToken cancelToken = default) where TAsset:class
-        {
-            if(request == null)  throw new ArgumentNullException(nameof(request));
-
-            var content = request.ToHttpContent(value => new StringContent(value), assetConverter);
-            return await ExecuteRequest(content, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
-        }
-
-        #endregion
-
-        #region Pdf Merges
-    
-        /// <summary>
-        /// Merges the pdf documents in the specified request into one pdf
+        ///    Converts the specified request to a PDF document.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
+        /// <typeparam name="TContent"></typeparam>
+        /// <typeparam name="TAsset"></typeparam>
         /// <returns></returns>
-        [UsedImplicitly]
-        public async Task<Stream> MergePdfsAsync(MergeRequest<Stream> request, CancellationToken cancelToken = default)
+        /// <exception cref="ArgumentNullException"></exception>
+        public async Task<Stream> HtmlToPdfAsync<TContent, TAsset>(PdfBaseRequest<TContent, TAsset> request, CancellationToken cancelToken = default) where TContent : class where TAsset : class
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return await ExecuteMergeAsync(request,
-                Constants.Gotenberg.ApiPaths.MergePdf,
-                value=> new StreamContent(value), 
-                cancelToken).ConfigureAwait(false);
-        }      
-        
-        public async Task<Stream> MergePdfsAsync(MergeRequest<byte[]> request, CancellationToken cancelToken = default)
+            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
+        }
+
+        public async Task<Stream> MergePdfsAsync<TAsset>(MergeBaseRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-
-            return await ExecuteMergeAsync(request,
-                Constants.Gotenberg.ApiPaths.MergePdf,
-                content=> new ByteArrayContent(content), 
-                cancelToken).ConfigureAwait(false);
-        }    
-        
-        public async Task<Stream> MergePdfsAsync(MergeRequest<string> request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-
-            return await ExecuteMergeAsync(request,
-                Constants.Gotenberg.ApiPaths.MergePdf,
-                content=> new StringContent(content), 
-                cancelToken).ConfigureAwait(false);
-        }    
-        
-        #endregion
-
-        #region Office Merges
-
-        /// <summary>
-        /// Merges the office documents in the specified request to one pdf
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <remarks>
-        ///     Will return a file containing the text "not found" if the container has set DISABLE_UNOCONV to 1. This disables office conversions will not work
-        /// </remarks>
-        /// <returns></returns>
-        [UsedImplicitly]
-        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest<Stream> request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteMergeAsync(request, 
-                Constants.Gotenberg.ApiPaths.MergeOffice,
-                value => new StreamContent(value), 
-                cancelToken).ConfigureAwait(false);
+            if (request == null) throw new ArgumentNullException(nameof(request)); 
+            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
         
-        [UsedImplicitly]
-        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest<string> request, CancellationToken cancelToken = default)
+        public async Task<Stream> MergeOfficePdfsAsync<TAsset>(MergeOfficeRequestBase<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-
-            return await ExecuteMergeAsync(request,
-                Constants.Gotenberg.ApiPaths.MergeOffice,
-                value => new StringContent(value),
-                cancelToken).ConfigureAwait(false);
+            if (request == null) throw new ArgumentNullException(nameof(request)); 
+            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
-        
-        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest<byte[]> request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-
-            return await ExecuteMergeAsync(request, 
-                Constants.Gotenberg.ApiPaths.MergeOffice,
-                    value => new ByteArrayContent(value), 
-                cancelToken).ConfigureAwait(false);
-        }
-        
-        #endregion
-        
-        #endregion
-
-        #region execs
-        
+   
         async Task<Stream> ExecuteMergeAsync<TValue>(
-            MergeRequest<TValue> request, 
-            string pathForMerge, 
-            Func<TValue,HttpContent> converter,
+            MergeBaseRequest<TValue> baseRequest,
+            string mergePath,
             CancellationToken cancelToken = default) where TValue: class
         {
-            if (request?.Items == null) throw new ArgumentNullException(nameof(request));
-            if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
+            if (baseRequest?.Assets == null) throw new ArgumentNullException(nameof(baseRequest));
+            if (baseRequest.Assets.Count == 0) throw new ArgumentOutOfRangeException(nameof(baseRequest.Assets));
 
-            return await ExecuteRequest(request.ToHttpContent(converter), pathForMerge, cancelToken).ConfigureAwait(false);
+            return await ExecuteRequest(baseRequest.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
         }
+        
+        #endregion
+       
+        #region exec
 
         async Task<Stream> ExecuteRequest(IEnumerable<HttpContent> contentItems, string apiPath, CancellationToken cancelToken = default)
         {
@@ -236,10 +132,9 @@ namespace Gotenberg.Sharp.API.Client
                 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
-
         
+        #endregion      
         
-        #endregion
     }
     
 }

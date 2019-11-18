@@ -9,7 +9,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
     /// </summary>
     /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Property)]
-    public class MultiFormHeaderAttribute : Attribute
+    public sealed class MultiFormHeaderAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiFormHeaderAttribute"/> class.

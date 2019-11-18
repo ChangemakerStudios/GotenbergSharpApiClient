@@ -10,11 +10,17 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public class MergeRequest<TAssetValue> where TAssetValue: class
+    public abstract class MergeBaseRequest<TAsset> where TAsset : class
     {
+        readonly Func<TAsset, HttpContent> _converter;
+
+        protected MergeBaseRequest(Func<TAsset, HttpContent> converter)
+            => _converter = converter;
+       
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
@@ -22,20 +28,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public RequestConfig Config { get; set; } = new RequestConfig();
 
         /// <summary>
-        /// Key = file name; value = the pdf bytes
+        /// Key = file name; value = the document content
         /// </summary>
-        public DocumentAssets<TAssetValue> Items { get; [UsedImplicitly] set; } = new DocumentAssets<TAssetValue>();
+        public AssetBaseRequest<TAsset> Assets { get; [UsedImplicitly] set; }
 
         /// <summary>
         /// Transforms the merge items to http content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent(Func<TAssetValue,HttpContent> converter)
+        public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Items.Where(_ => _.Value != null)
+            return this.Assets.Where(_ => _.Value != null)
                 .Select(_ =>
                 {
-                    var item = converter(_.Value);
+                    var item = _converter(_.Value);
                     
                     item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
                         Name = Constants.Gotenberg.FormFieldNames.Files,

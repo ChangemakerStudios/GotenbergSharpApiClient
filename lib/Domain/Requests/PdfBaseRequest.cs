@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using Gotenberg.Sharp.API.Client.Extensions;
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
@@ -12,19 +11,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// 
     /// </summary>
-    public class PdfRequest<TContentValue,TAssetValue> where TContentValue: class where TAssetValue: class
+    public abstract class PdfBaseRequest<TDocument, TAsset> where TDocument : class where TAsset : class
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PdfRequest{TValue, TAssetValue}"/>
+        /// Initializes a new instance of the <see cref="PdfBaseRequest{TContent,TAsset}"/>
         /// </summary>
-        /// <param name="content">The content.</param>
+        /// <param name="base">The content.</param>
         /// <param name="dimensions">The dimensions.</param>
-        public PdfRequest(DocumentContent<TContentValue> content, DocumentDimensions dimensions)
+        protected PdfBaseRequest(DocumentBaseRequest<TDocument> @base, DocumentDimensions dimensions = null)
         {
-            Content = content ?? throw new ArgumentNullException(nameof(content));
-            Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
-          }
-
+            Base = @base ?? throw new ArgumentNullException(nameof(@base));
+            Dimensions = dimensions ?? DocumentDimensions.ToChromeDefaults();
+        }
+ 
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
@@ -38,7 +37,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The content.
         /// </value>
         [UsedImplicitly]
-        public DocumentContent<TContentValue> Content { get; }
+        public DocumentBaseRequest<TDocument> Base { get; }
 
         /// <summary>
         /// Gets the dimensions.
@@ -47,7 +46,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The dimensions.
         /// </value>
         [UsedImplicitly]
-        public DocumentDimensions Dimensions { get; }
+        public DocumentDimensions Dimensions { get; set; }
         
         /// <summary>
         /// Gets the assets.
@@ -56,18 +55,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The assets.
         /// </value>
         [UsedImplicitly]
-        public DocumentAssets<TAssetValue> Assets { get; set; } = new DocumentAssets<TAssetValue>();
-     
+        public AssetBaseRequest<TAsset> Assets { get; set; }
+        
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent(Func<TContentValue, HttpContent> contentConverter, Func<TAssetValue, HttpContent> assetConverter)
+        internal IEnumerable<HttpContent> ToHttpContent()
         {
-            return Content.ToHttpContent(contentConverter)
-                .Concat(Assets.ToHttpContent(assetConverter))
+            return Base.ToHttpContent()
+                .Concat(Assets.ToHttpContent())
                 .Concat(Config.ToHttpContent())
                 .Concat(Dimensions.ToHttpContent());
+
         }
 
     }
