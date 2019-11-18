@@ -77,7 +77,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [UsedImplicitly]
-        public async Task<Stream> HtmlToPdfAsync<TContent, TAsset>(PdfBaseRequest<TContent, TAsset> request, CancellationToken cancelToken = default) where TContent : class where TAsset : class
+        public async Task<Stream> HtmlToPdfAsync<TContent, TAsset>(PdfRequest<TContent, TAsset> request, CancellationToken cancelToken = default) where TContent : class where TAsset : class
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -93,7 +93,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [UsedImplicitly]
-        public async Task<Stream> MergePdfsAsync<TAsset>(MergeBaseRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
+        public async Task<Stream> MergePdfsAsync<TAsset>(MergeRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
         {
             if (request == null) throw new ArgumentNullException(nameof(request)); 
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
@@ -108,14 +108,14 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [UsedImplicitly]
-        public async Task<Stream> MergeOfficeDocsAsync<TAsset>(MergeOfficeRequestBase<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
+        public async Task<Stream> MergeOfficeDocsAsync<TAsset>(MergeOfficeRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
         {
             if (request == null) throw new ArgumentNullException(nameof(request)); 
             return await ExecuteMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
         }
    
         async Task<Stream> ExecuteMergeAsync<TValue>(
-            MergeBaseRequest<TValue> request,
+            MergeRequest<TValue> request,
             string mergePath,
             CancellationToken cancelToken = default) where TValue: class
         {

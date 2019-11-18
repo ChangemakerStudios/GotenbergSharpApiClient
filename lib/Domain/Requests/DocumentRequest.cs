@@ -13,17 +13,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
     [UsedImplicitly]
-    public abstract class DocumentBaseRequest<TValue> where TValue : class
+    public abstract class DocumentRequest<TValue> where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentBaseRequest{TValue}"/>
+        /// Initializes a new instance of the <see cref="DocumentRequest{TValue}"/>
         /// </summary>
         /// <param name="converter"></param>
         /// <param name="bodyHtml"></param>
-        protected DocumentBaseRequest(Func<TValue,HttpContent> converter, TValue bodyHtml)
+        protected DocumentRequest(Func<TValue,HttpContent> converter, TValue bodyHtml)
         {
             _converter = converter ?? throw new ArgumentNullException(nameof(converter));
             BodyHtml = bodyHtml ?? throw new ArgumentNullException(nameof(bodyHtml));;

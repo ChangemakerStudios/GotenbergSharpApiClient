@@ -14,11 +14,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public abstract class MergeBaseRequest<TAsset> where TAsset : class
+    public abstract class MergeRequest<TAsset> where TAsset : class
     {
         readonly Func<TAsset, HttpContent> _converter;
 
-        protected MergeBaseRequest(Func<TAsset, HttpContent> converter)
+        protected MergeRequest(Func<TAsset, HttpContent> converter)
             => _converter = converter;
        
         /// <summary>
@@ -30,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <summary>
         /// Key = file name; value = the document content
         /// </summary>
-        public AssetBaseRequest<TAsset> Assets { get; [UsedImplicitly] set; }
+        public AssetRequest<TAsset> Assets { get; [UsedImplicitly] set; }
 
         /// <summary>
         /// Transforms the merge items to http content items

@@ -11,12 +11,12 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public abstract class AssetBaseRequest<TValue> : Dictionary<string, TValue> where TValue : class
+    public abstract class AssetRequest<TValue> : Dictionary<string, TValue> where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
         readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
 
-        protected AssetBaseRequest([NotNull] Func<TValue, HttpContent> converter)
+        protected AssetRequest([NotNull] Func<TValue, HttpContent> converter)
             => _converter = converter ?? throw new ArgumentNullException(nameof(converter));
 
         [UsedImplicitly]
