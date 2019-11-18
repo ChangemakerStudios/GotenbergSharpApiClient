@@ -25,8 +25,8 @@ jobs:
       - name: Build
         run: >-
           dotnet build
-          --configuration Release   
-          --version-suffix "1.0.${{ steps.buildnumber.outputs.build_number }}"
+          -p:Version=1.0.${{ steps.buildnumber.outputs.build_number }}        
+          --configuration Release
 
       - name: Install NuGet client
         uses: warrenbuckley/Setup-Nuget@v1
