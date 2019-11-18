@@ -19,7 +19,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         protected AssetBaseRequest([NotNull] Func<TValue, HttpContent> converter)
             => _converter = converter ?? throw new ArgumentNullException(nameof(converter));
 
-        public IEnumerable<HttpContent> ToHttpContent()
+        [UsedImplicitly]
+        public void AddRange([NotNull] IEnumerable<KeyValuePair<string, TValue>> items)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            foreach (var item in items)
+            {
+                this.Add(item.Key, item.Value);
+            }
+        }
+        
+        internal IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Select(item =>
                 {

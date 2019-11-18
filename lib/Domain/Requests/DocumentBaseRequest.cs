@@ -12,6 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// Represents the elements of a document
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
+    [UsedImplicitly]
     public abstract class DocumentBaseRequest<TValue> where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
@@ -25,9 +26,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         protected DocumentBaseRequest(Func<TValue,HttpContent> converter, TValue bodyHtml)
         {
             _converter = converter ?? throw new ArgumentNullException(nameof(converter));
-
-            if (bodyHtml.Equals(default(TValue))) throw new ArgumentOutOfRangeException(nameof(bodyHtml)); 
-            BodyHtml = bodyHtml;
+            BodyHtml = bodyHtml ?? throw new ArgumentNullException(nameof(bodyHtml));;
         }
 
         /// <summary>
@@ -36,6 +35,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The header HTML.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Header)]
         public TValue HeaderHtml { get; set; }
 
@@ -55,6 +55,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The footer HTML.
         /// </value>
+        [UsedImplicitly]
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Footer)]
         public TValue FooterHtml { get; set; }
 

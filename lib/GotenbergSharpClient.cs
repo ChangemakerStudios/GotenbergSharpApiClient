@@ -64,7 +64,7 @@ namespace Gotenberg.Sharp.API.Client
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
             
-            return await ExecuteRequest(request.ToHttpContent(),Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
+            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
         }
         
         /// <summary>
@@ -76,6 +76,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <typeparam name="TAsset"></typeparam>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
+        [UsedImplicitly]
         public async Task<Stream> HtmlToPdfAsync<TContent, TAsset>(PdfBaseRequest<TContent, TAsset> request, CancellationToken cancelToken = default) where TContent : class where TAsset : class
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
@@ -83,27 +84,45 @@ namespace Gotenberg.Sharp.API.Client
             return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Merges items specified by the request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <typeparam name="TAsset"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [UsedImplicitly]
         public async Task<Stream> MergePdfsAsync<TAsset>(MergeBaseRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
         {
             if (request == null) throw new ArgumentNullException(nameof(request)); 
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
         
-        public async Task<Stream> MergeOfficePdfsAsync<TAsset>(MergeOfficeRequestBase<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
+        /// <summary>
+        /// Merges the office items specified by the request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <typeparam name="TAsset"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [UsedImplicitly]
+        public async Task<Stream> MergeOfficeDocsAsync<TAsset>(MergeOfficeRequestBase<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
         {
             if (request == null) throw new ArgumentNullException(nameof(request)); 
-            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
+            return await ExecuteMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
         }
    
         async Task<Stream> ExecuteMergeAsync<TValue>(
-            MergeBaseRequest<TValue> baseRequest,
+            MergeBaseRequest<TValue> request,
             string mergePath,
             CancellationToken cancelToken = default) where TValue: class
         {
-            if (baseRequest?.Assets == null) throw new ArgumentNullException(nameof(baseRequest));
-            if (baseRequest.Assets.Count == 0) throw new ArgumentOutOfRangeException(nameof(baseRequest.Assets));
+            if (request?.Assets == null) throw new ArgumentNullException(nameof(request));
+            if (request.Assets.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Assets));
 
-            return await ExecuteRequest(baseRequest.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
+            return await ExecuteRequest(request.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
         }
         
         #endregion

@@ -20,17 +20,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         /// <remarks>See the list of supported extensions here: https://thecodingmachine.github.io/gotenberg/#office.basic</remarks>
         /// <returns></returns>
-        internal MergeOfficeRequestBase<TValue> FilterByExtension<TBase>()
-            where TBase : MergeOfficeRequestBase<TValue>, new()
+        internal MergeOfficeRequestBase<TValue> FilterByExtension<TInstance>()
+            where TInstance : MergeOfficeRequestBase<TValue>, new()
         {
             var allowedItems = this.Assets.Where(item => AllowedExtensions.Contains(new FileInfo(item.Key).Extension.ToLowerInvariant()));
 
-            var filteredRequest = new TBase { Config = this.Config };
-
-            foreach (var item in allowedItems)
-            {
-                filteredRequest.Assets.Add(item.Key, item.Value);
-            }
+            var filteredRequest = new TInstance { Config = this.Config };
+            
+            filteredRequest.Assets.AddRange(allowedItems);
 
             return filteredRequest;
         }

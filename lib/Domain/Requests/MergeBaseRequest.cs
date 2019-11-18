@@ -36,7 +36,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Transforms the merge items to http content items
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<HttpContent> ToHttpContent()
+        internal IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.Where(_ => _.Value != null)
                 .Select(_ =>

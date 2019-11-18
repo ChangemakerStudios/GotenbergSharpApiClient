@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using JetBrains.Annotations;
@@ -61,13 +62,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             return Content.ToHttpContent()
                 .Concat(Assets.ToHttpContent())
                 .Concat(Config.ToHttpContent())
                 .Concat(Dimensions.ToHttpContent());
-
         }
 
     }
