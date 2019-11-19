@@ -16,21 +16,23 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Merge
     /// </summary>
     public abstract class MergeRequest<TAsset> : IConvertToHttpContent where TAsset : class
     {
-        protected readonly Func<TAsset, HttpContent> Converter;
+        readonly Func<TAsset, HttpContent> _converter;
 
         internal MergeRequest(Func<TAsset, HttpContent> converter)
-            => Converter = converter;
+            => _converter = converter;
        
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
         // ReSharper disable once MemberCanBeProtected.Global
+        [UsedImplicitly]
         public RequestConfig Config { get; set; } = new RequestConfig();
 
         /// <summary>
         /// Key = file name; value = the document content
         /// </summary>
-        public AssetRequest<TAsset> Assets { get; set; }
+        [UsedImplicitly]
+        public AssetRequest<TAsset> Items { get; set; }
 
         /// <summary>
         /// Transforms the merge items to http content items
@@ -38,10 +40,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Merge
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Assets.Where(_ => _.Value != null)
+            return this.Items.Where(_ => _.Value != null)
                 .Select(_ =>
                 {
-                    var item = Converter(_.Value);
+                    var item = _converter(_.Value);
                     
                     item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
                         Name = Constants.Gotenberg.FormFieldNames.Files,

@@ -111,8 +111,8 @@ namespace Gotenberg.Sharp.API.Client
             string mergePath,
             CancellationToken cancelToken = default) where TValue: class
         {
-            if (request?.Assets == null) throw new ArgumentNullException(nameof(request));
-            if (request.Assets.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Assets));
+            if (request?.Items == null) throw new ArgumentNullException(nameof(request));
+            if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
 
             return await ExecuteRequest(request.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
         }

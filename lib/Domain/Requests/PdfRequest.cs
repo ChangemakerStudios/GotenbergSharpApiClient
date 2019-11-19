@@ -64,10 +64,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
 
-        internal PdfRequest<TDocument> AddAssets(IConvertToHttpContent assets)
+        internal void AddAssets(IConvertToHttpContent assets)
         {
             this._assets = assets;
-            return this;
         }
         
     }
