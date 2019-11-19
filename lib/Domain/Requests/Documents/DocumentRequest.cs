@@ -6,14 +6,14 @@ using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Documents
 {
     /// <summary>
     /// Represents the elements of a document
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
     [UsedImplicitly]
-    public abstract class DocumentRequest<TValue> where TValue : class
+    public abstract class DocumentRequest<TValue> : IConvertToHttpContent where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
@@ -23,10 +23,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         /// <param name="converter"></param>
         /// <param name="bodyHtml"></param>
-        protected DocumentRequest(Func<TValue,HttpContent> converter, TValue bodyHtml)
+        protected DocumentRequest(Func<TValue, HttpContent> converter, TValue bodyHtml)
         {
             _converter = converter ?? throw new ArgumentNullException(nameof(converter));
-            BodyHtml = bodyHtml ?? throw new ArgumentNullException(nameof(bodyHtml));;
+            BodyHtml = bodyHtml ?? throw new ArgumentNullException(nameof(bodyHtml));
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))

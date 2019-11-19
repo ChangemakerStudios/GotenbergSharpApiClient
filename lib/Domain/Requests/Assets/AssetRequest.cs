@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +8,17 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Assets
 {
-    public abstract class AssetRequest<TValue> : Dictionary<string, TValue> where TValue : class
+    public abstract class AssetRequest<TValue>: Dictionary<string, TValue>, IConvertToHttpContent where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
         readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
 
-        protected AssetRequest([NotNull] Func<TValue, HttpContent> converter)
-            => _converter = converter ?? throw new ArgumentNullException(nameof(converter));
+        protected AssetRequest(Func<TValue, HttpContent> converter)
+        {
+            _converter = converter ?? throw new ArgumentNullException(nameof(converter));
+        }
 
         [UsedImplicitly]
         public void AddRange([NotNull] IEnumerable<KeyValuePair<string, TValue>> items)
@@ -29,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             }
         }
         
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Select(item =>
                 {
@@ -51,5 +52,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     return asset;
                 });
         }
+       
     }
 }

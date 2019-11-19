@@ -42,4 +42,7 @@
     <Resource Include="Resources\gotenbergSharpClient.PNG" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\Requests\Assets\" />
+  </ItemGroup>
 </Project>

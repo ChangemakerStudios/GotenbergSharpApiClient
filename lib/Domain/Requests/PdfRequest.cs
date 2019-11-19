@@ -2,24 +2,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Documents;
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
-    /// 
+    /// Represents a Gotenberg Api html conversion request
     /// </summary>
-    public abstract class PdfRequest<TDocument, TAsset> where TDocument : class where TAsset : class
+    public class PdfRequest<TDocument>: IConvertToHttpContent where TDocument : class
     {
+        IConvertToHttpContent _assets;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="PdfRequest{TDocument,TAsset}"/>
+        /// Initializes a new instance of the <see cref="PdfRequest{TDocument}"/>
         /// </summary>
         /// <param name="content"></param>
         /// <param name="dimensions">The dimensions.</param>
-        protected PdfRequest(DocumentRequest<TDocument> content, DocumentDimensions dimensions = null)
+        internal PdfRequest(DocumentRequest<TDocument> content, DocumentDimensions dimensions = null)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
             Dimensions = dimensions ?? DocumentDimensions.ToChromeDefaults();
@@ -48,29 +50,26 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </value>
         [UsedImplicitly]
         public DocumentDimensions Dimensions { get; set; }
-        
-        /// <summary>
-        /// Gets the assets.
-        /// </summary>
-        /// <value>
-        /// The assets.
-        /// </value>
-        [UsedImplicitly]
-        public AssetRequest<TAsset> Assets { get; set; }
-        
+
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
         /// <returns></returns>
         /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return Content.ToHttpContent()
-                .Concat(Assets.ToHttpContent())
                 .Concat(Config.ToHttpContent())
-                .Concat(Dimensions.ToHttpContent());
+                .Concat(Dimensions.ToHttpContent())
+                .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
 
+        internal PdfRequest<TDocument> AddAssets(IConvertToHttpContent assets)
+        {
+            this._assets = assets;
+            return this;
+        }
+        
     }
+   
 }
