@@ -81,19 +81,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             if (this.TimeOut.HasValue)
             {
-                yield return CreateItem(this.TimeOut.ToString(),  Constants.Gotenberg.FormFieldNames.WaitTimeout);
+                yield return CreateItem(this.TimeOut,  Constants.Gotenberg.FormFieldNames.WaitTimeout);
             }
 
             if (this.WebHook != null)
             {
-                yield return CreateItem(this.WebHook.ToString(),  Constants.Gotenberg.FormFieldNames.WebhookURL);
+                yield return CreateItem(this.WebHook,  Constants.Gotenberg.FormFieldNames.WebhookURL);
 
                 if (this.WebHookTimeOut.HasValue)
                 {
-                    yield return CreateItem(this.WebHookTimeOut.ToString(),  Constants.Gotenberg.FormFieldNames.WebhookTimeout);
+                    yield return CreateItem(this.WebHookTimeOut,  Constants.Gotenberg.FormFieldNames.WebhookTimeout);
                 }
             }
-          
+
             if (this.ResultFileName.IsSet())
             {
                 yield return CreateItem(this.ResultFileName,  Constants.Gotenberg.FormFieldNames.ResultFilename);
@@ -101,13 +101,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
             if (ChromeRpccBufferSize.HasValue)
             {
-                yield return CreateItem(this.ChromeRpccBufferSize.ToString(),  Constants.Gotenberg.FormFieldNames.ChromeRpccBufferSize);
+                yield return CreateItem(this.ChromeRpccBufferSize,  Constants.Gotenberg.FormFieldNames.ChromeRpccBufferSize);
             }
         }
 
-        static StringContent CreateItem(string value, string fieldName)
+        static StringContent CreateItem<T>(T value, string fieldName)
         {
-            var item = new StringContent(value);
+            var item = new StringContent(value.ToString());
             item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) { Name = fieldName };
             return item;
         }
