@@ -2,9 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Documents;
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
@@ -12,7 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// Represents a Gotenberg Api html conversion request
     /// </summary>
-    public class PdfRequest<TDocument>: IConvertToHttpContent where TDocument : class
+    public class PdfRequest<TDocument>: IConversionRequest where TDocument : class
     {
         IConvertToHttpContent _assets;
 
@@ -40,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The content.
         /// </value>
         [UsedImplicitly]
-        public DocumentRequest<TDocument> Content { get; }
+        public IConvertToHttpContent Content { get; }
 
         /// <summary>
         /// Gets the dimensions.
@@ -50,6 +50,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </value>
         [UsedImplicitly]
         public DocumentDimensions Dimensions { get; set; }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [UsedImplicitly]
+        public void AddAssets(IConvertToHttpContent assets)
+        {
+            _assets = assets;
+        }
 
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
@@ -64,11 +71,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
 
-        internal void AddAssets(IConvertToHttpContent assets)
-        {
-            this._assets = assets;
-        }
-        
     }
-   
+
 }

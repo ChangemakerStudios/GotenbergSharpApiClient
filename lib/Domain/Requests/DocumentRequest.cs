@@ -6,14 +6,14 @@ using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Documents
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
     /// Represents the elements of a document
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
     [UsedImplicitly]
-    public abstract class DocumentRequest<TValue> : IConvertToHttpContent where TValue : class
+    public class DocumentRequest<TValue> : IConvertToHttpContent where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
@@ -23,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Documents
         /// </summary>
         /// <param name="converter"></param>
         /// <param name="bodyHtml"></param>
-        protected DocumentRequest(Func<TValue, HttpContent> converter, TValue bodyHtml)
+        internal DocumentRequest(Func<TValue, HttpContent> converter, TValue bodyHtml)
         {
             _converter = converter ?? throw new ArgumentNullException(nameof(converter));
             BodyHtml = bodyHtml ?? throw new ArgumentNullException(nameof(bodyHtml));

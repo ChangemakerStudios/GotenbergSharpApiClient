@@ -8,14 +8,14 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Assets
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public abstract class AssetRequest<TValue>: Dictionary<string, TValue>, IConvertToHttpContent where TValue : class
+    public class AssetRequest<TValue>: Dictionary<string, TValue>, IConvertToHttpContent where TValue : class
     {
         readonly Func<TValue, HttpContent> _converter;
         readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
 
-        protected AssetRequest(Func<TValue, HttpContent> converter)
+        internal AssetRequest(Func<TValue, HttpContent> converter)
         {
             _converter = converter ?? throw new ArgumentNullException(nameof(converter));
         }

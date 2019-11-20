@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Documents
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
     ///  Represents the dimensions of the pdf document
@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Documents
     ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
     /// </remarks>
-    public sealed class DocumentDimensions
+    public sealed class DocumentDimensions : IConvertToHttpContent
     {
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
@@ -135,15 +135,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Documents
             };
         }
 
-        #endregion
-        
-        #region internal method
-        
         /// <summary>
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {   
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))

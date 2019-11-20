@@ -5,16 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Assets;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Merge
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public abstract class MergeRequest<TAsset> : IConvertToHttpContent where TAsset : class
+    public class MergeRequest<TAsset> : IMergeRequest where TAsset : class
     {
         readonly Func<TAsset, HttpContent> _converter;
 
@@ -32,7 +31,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Merge
         /// Key = file name; value = the document content
         /// </summary>
         [UsedImplicitly]
-        public AssetRequest<TAsset> Items { get; set; }
+        public Dictionary<string, TAsset> Items { get; set; }
+
+        /// <summary>
+        /// Gets the count of items
+        /// </summary>
+        [UsedImplicitly]
+        public int Count => this.Items?.Count ?? 0;
 
         /// <summary>
         /// Transforms the merge items to http content items

@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// All endpoints accept form fields for each property
     /// </summary>
-    public sealed class RequestConfig
+    public sealed class RequestConfig : IConvertToHttpContent
     {
         Uri _webHook;
       
@@ -79,7 +79,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Converts the instance to a collection of http content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             if (this.TimeOut.HasValue)
             {
