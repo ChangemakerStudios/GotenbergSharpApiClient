@@ -39,7 +39,7 @@ async Task BuildPdf()
 						<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
 						<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 						<body>
-							<h1>Hello world. Here's a Mandala</h1>    
+							<h1>Hello world</h1>    
 								<img src=""mandala.png""> 
 							<h3>Powered by Gotenberg</h3>	
 						</body>
