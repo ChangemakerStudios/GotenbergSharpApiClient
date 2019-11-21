@@ -12,7 +12,7 @@
 PM> Install-Package Gotenberg.Sharp.Api.Client
 ```
 
-*Startup Gotenberg Docker Instance:*
+*Start up Gotenberg Docker Instance:*
 
 ```powershell
 docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
@@ -26,11 +26,9 @@ public async Task<string> BuildPdf()
 {
     var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var imageBytes = await GetImageBytes();
-
     var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
         .WithDimensions(DocumentDimensions.ToChromeDefaults())
-        .WithAssets(new Dictionary<string, byte[]> {{"mandala.png", imageBytes}});
+        .WithAssets(new Dictionary<string, byte[]> {{"mandala.png", await GetImageBytes()}});
 
     var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build());
 
@@ -57,9 +55,9 @@ private string GetBody()
 				<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 				<body>
-					<h1>Hello world</h1>    
-						<img src=""mandala.png""> 
-					<h3>Powered by Gotenberg</h3>	
+					<h1>Hello world</h1>
+						<img src=""mandala.png"">
+					<h3>Powered by Gotenberg</h3>
 				</body>
 			</html>";
 }
