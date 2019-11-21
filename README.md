@@ -6,6 +6,9 @@ Gotenberg is a Docker-powered stateless API for converting HTML, Markdown and Of
 ```csharp
 async Task BuildPdf()
 {
+	//docker pull thecodingmachine/gotenberg:latest 
+	//docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
+
 	var innerClient = new HttpClient() {
 		BaseAddress = new Uri("http://localhost:3000")
 	};
