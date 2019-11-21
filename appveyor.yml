@@ -1,6 +1,21 @@
-os: Visual Studio 2019
+version: 0.9.{build}
+
+image: Visual Studio 2019
 
 configuration: Release
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  version_prefix: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+build:
+  verbosity: minimal
 
 build:
   project: .\lib\Gotenberg.Sharp.Api.Client.csproj
@@ -9,5 +24,5 @@ before_build:
   - dotnet restore .\lib\Gotenberg.Sharp.Api.Client.csproj
 
 after_build:
-  - dotnet pack .\lib\Gotenberg.Sharp.Api.Client.csproj --no-restore --configuration %CONFIGURATION% --version-suffix %APPVEYOR_BUILD_VERSION%
+  - dotnet pack .\lib\Gotenberg.Sharp.Api.Client.csproj --no-restore --configuration %CONFIGURATION%
   - appveyor PushArtifact .\lib\bin\%CONFIGURATION%\Gotenberg.Sharp.Api.Client.%APPVEYOR_BUILD_VERSION%.symbols.nupkg
