@@ -2,7 +2,8 @@
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh/branch/master?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient/branch/master)
 
-.NET C# Client for interacting with the [Gotenberg](https://thecodingmachine.github.io/gotenberg) API >= v6.0. [Gotenberg](https://thecodingmachine.github.io/gotenberg) is a Docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.
+.NET C# Client for interacting with the [Gotenberg](https://thecodingmachine.github.io/gotenberg) API version 6.0 (or above).
+[Gotenberg](https://thecodingmachine.github.io/gotenberg) is a Docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.
 
 ## Quick start
 
