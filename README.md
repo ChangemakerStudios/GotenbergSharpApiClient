@@ -1,8 +1,13 @@
 # GotenbergSharpApiClient
-C# Client for interacting with the Gotenberg API >= v6.0 https://thecodingmachine.github.io/gotenberg
-Gotenberg is a Docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.
 
-## Quick start: Html to PDF conversion with embedded assets
+[![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh/branch/master?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient/branch/master)
+
+.NET C# Client for interacting with the fantastic [Gotenberg](https://thecodingmachine.github.io/gotenberg) API >= v6.0. [Gotenberg](https://thecodingmachine.github.io/gotenberg) is a Docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.
+
+## Quick start
+
+##### Html to PDF conversion with embedded assets
+
 ```csharp
 async Task BuildPdf()
 {
@@ -50,20 +55,19 @@ async Task BuildPdf()
 		 return @"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
 	}
 }
-
-
-
 ```
 
-## Recommended usage for .NetCore app: make an IServiceCollection extension.
-```csharp
+## How to use in a .NET Core App
 
+##### Add an IServiceCollection extension:
+
+```csharp
 public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollection services, InnerClientSettings settings) where TClient: class 
  {
      if(settings == null) throw new ArgumentNullException(nameof(settings));
      if(settings.GetApiBaseUriFunc == null) throw new ArgumentException(nameof(settings.GetApiBaseUriFunc));
 
-     return services.AddHttpClient(settings.ClientName) 
+     return services.AddHttpClient(settings.ClientName)
                     .ConfigureHttpClient((sp, client) =>
                                          {
                                              client.Timeout = settings.Timeout;
@@ -72,7 +76,6 @@ public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollect
                     .AddTypedClient<TClient>()
                     .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
                     .SetHandlerLifetime(settings.HandlerLifeTime);
-                    
                     //Also recommended: add a Polly Retry policy using https://www.nuget.org/packages/Polly
                     //See: 
                     // https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory
@@ -80,22 +83,20 @@ public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollect
 }
 ```
 
- ## Add the client to the ServiceCollection in startup.cs
+##### Add the client to the ServiceCollection in your Startup.cs:
+
 ```csharp
-public IServiceProvider ConfigureServices(IServiceCollection services) 
+public IServiceProvider ConfigureServices(IServiceCollection services)
 {
 	//add core services then
 	services.AddTypedApiClient<GotenbergApiSharpClient>(CreateGotenbergClientSettings());
 
-	//more setup then build the container and add it to your DI Container
-	var builder = new ContainerBuilder();
-        builder.Populate(services);
-			
-	return new AutofacServiceProvider(builder.Build());
+	return builder.Build();
 }
 ```
 
- ## Inject it where you need it and use
+##### Inject it where you need it:
+
 ```csharp
 public class GenerateSomePdfService
 {

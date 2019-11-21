@@ -23,4 +23,4 @@ before_build:
 
 after_build:
   - dotnet pack .\lib\Gotenberg.Sharp.Api.Client.csproj --no-restore --configuration %CONFIGURATION%
-  - appveyor PushArtifact .\lib\bin\%CONFIGURATION%\Gotenberg.Sharp.Api.Client.%APPVEYOR_BUILD_VERSION%.symbols.nupkg
+  - appveyor PushArtifact .\lib\bin\%CONFIGURATION%\Gotenberg.Sharp.Api.Client.%APPVEYOR_BUILD_VERSION%.nupkg
