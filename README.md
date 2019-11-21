@@ -5,9 +5,15 @@
 .NET C# Client for interacting with the [Gotenberg](https://thecodingmachine.github.io/gotenberg) API version 6.0 (or above).
 [Gotenberg](https://thecodingmachine.github.io/gotenberg) is a Docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.
 
-## Quick start
+## Getting started
+*Install the Gotenberg.Sharp.Api.Client package from Visual Studio's NuGet console:*
 
-##### Html to PDF conversion with embedded assets
+```powershell
+PM> Install-Package Gotenberg.Sharp.Api.Client
+```
+
+## Usage
+*Html to PDF conversion with embedded assets:*
 
 ```csharp
 async Task BuildPdf()
@@ -58,9 +64,8 @@ async Task BuildPdf()
 }
 ```
 
-## How to use in a .NET Core App
-
-##### Add an IServiceCollection extension:
+## Usage in .NET Core App
+*Add an IServiceCollection extension:*
 
 ```csharp
 public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollection services, InnerClientSettings settings) where TClient: class 
@@ -84,7 +89,7 @@ public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollect
 }
 ```
 
-##### Add the client to the ServiceCollection in your Startup.cs:
+*Add the client to the ServiceCollection in your Startup.cs:*
 
 ```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -96,7 +101,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 }
 ```
 
-##### Inject it where you need it:
+*Inject it where you need it:*
 
 ```csharp
 public class GenerateSomePdfService
