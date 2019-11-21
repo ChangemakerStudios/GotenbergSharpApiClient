@@ -45,7 +45,7 @@ public async Task<string> BuildPdf()
 private async Task<byte[]> GetImageBytes()
 {
     return await new HttpClient().GetByteArrayAsync(
-        "https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/Mandala4b.png");
+        "https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/ColorMandala1.png");
 }
 
 private string GetBody()
