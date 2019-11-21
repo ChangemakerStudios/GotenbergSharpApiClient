@@ -5,7 +5,6 @@
     <LangVersion>8</LangVersion>
     <AssemblyName>Gotenberg.Sharp.API.Client</AssemblyName>
     <RootNamespace>Gotenberg.Sharp.API.Client</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup>
