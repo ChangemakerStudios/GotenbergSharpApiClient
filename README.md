@@ -32,7 +32,7 @@ public async Task<string> BuildPdf()
         .WithDimensions(DocumentDimensions.ToChromeDefaults())
         .WithAssets(new Dictionary<string, byte[]> {{"mandala.png", imageBytes}});
 
-    var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build()).ConfigureAwait(false);
+    var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build());
 
     var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
 
