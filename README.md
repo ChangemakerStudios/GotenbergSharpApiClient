@@ -12,55 +12,62 @@
 PM> Install-Package Gotenberg.Sharp.Api.Client
 ```
 
+*Startup Gotenberg Docker Instance:*
+
+```powershell
+docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
+```
+
 ## Usage
 *Html to PDF conversion with embedded assets:*
 
 ```csharp
-async Task BuildPdf()
+public async Task<string> BuildPdf()
 {
-	//docker pull thecodingmachine/gotenberg:latest 
-	//docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
+    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var innerClient = new HttpClient() { BaseAddress = new Uri("http://localhost:3000") };
-	
-	var sharpClient = new GotenbergSharpClient(innerClient);
-	
-	var imageBytes = await GetImageBytes(innerClient).ConfigureAwait(false);
+    var imageBytes = await GetImageBytes();
 
-	var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
-						 .WithDimensions(DocumentDimensions.ToDeliverableDefault())
-						 .WithAssets(new Dictionary<string, byte[]>() { { "mandala.png", imageBytes } });
+    var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
+        .WithDimensions(DocumentDimensions.ToChromeDefaults())
+        .WithAssets(new Dictionary<string, byte[]> {{"mandala.png", imageBytes}});
 
-	var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build()).ConfigureAwait(false);
+    var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build()).ConfigureAwait(false);
 
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
-	using (var destinationStream = File.Create(outPath))
-	{
-		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
-	}
+    var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
 
-	async Task<byte[]> GetImageBytes(HttpClient client)
-	{
-		return await client.GetByteArrayAsync("https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/Mandala4b.png");
-	}
+    using (var destinationStream = File.Create(outPath))
+    {
+        await response.CopyToAsync(destinationStream);
+    }
 
-	string GetBody()
-	{
-		return @"<!doctype html>
-					<html lang=""en"">
-						<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
-						<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
-						<body>
-							<h1>Hello world</h1>    
-								<img src=""mandala.png""> 
-							<h3>Powered by Gotenberg</h3>	
-						</body>
-					</html>";
-	}
-	
-	string GetFooter(){
-		 return @"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
-	}
+    return outPath;
+}
+
+private async Task<byte[]> GetImageBytes()
+{
+    return await new HttpClient().GetByteArrayAsync(
+        "https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/Mandala4b.png");
+}
+
+private string GetBody()
+{
+    return @"<!doctype html>
+			<html lang=""en"">
+				<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
+				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
+				<body>
+					<h1>Hello world</h1>    
+						<img src=""mandala.png""> 
+					<h3>Powered by Gotenberg</h3>	
+				</body>
+			</html>";
+}
+
+private string GetFooter()
+{
+    return
+        @"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
 }
 ```
 

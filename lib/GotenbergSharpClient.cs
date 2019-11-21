@@ -29,9 +29,19 @@ namespace Gotenberg.Sharp.API.Client
     [UsedImplicitly]
     public class GotenbergSharpClient
     {
-        readonly HttpClient _innerClient; 
- 
+        readonly HttpClient _innerClient;
+
         #region ctor
+
+        public GotenbergSharpClient(string address)
+            : this(new Uri(address))
+        {
+        }
+
+        public GotenbergSharpClient(Uri address)
+            : this(new HttpClient() { BaseAddress = address })
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GotenbergSharpClient"/> class.
@@ -139,9 +149,6 @@ namespace Gotenberg.Sharp.API.Client
             return await ExecuteRequest(request.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
         }
 
-
-        #endregion      
-        
+        #endregion
     }
-    
 }

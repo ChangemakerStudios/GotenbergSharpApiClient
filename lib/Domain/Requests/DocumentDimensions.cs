@@ -118,7 +118,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         }
         
         /// <summary>
-        /// Defaults used for CaptiveAire deliverables
+        /// Defaults used for deliverables
         /// </summary>
         /// <returns></returns>
         [UsedImplicitly]
