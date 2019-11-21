@@ -41,5 +41,4 @@
   <ItemGroup>
     <Resource Include="Resources\gotenbergSharpClient.PNG" />
   </ItemGroup>
-
 </Project>

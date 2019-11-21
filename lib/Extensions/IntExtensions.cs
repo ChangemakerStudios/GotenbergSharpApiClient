@@ -19,7 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// Returns a-z for the first 26 (0-25); then za - zz for the next; zza - zzz, etc.
         /// </summary>
         /// <remarks>
-        ///     Useful for merging pdfs. Gotenberg merges them alphabetically by file name
+        ///     Useful for merging Pdfs. Gotenberg merges them alphabetically by file name
         ///     https://thecodingmachine.github.io/gotenberg/#merge
         /// </remarks>
         /// <param name="sortNumber"></param>

@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// 
     /// </summary>
-    public class UrlPdfRequest
+    public sealed class UrlRequest : IConvertToHttpContent
     {
         [UsedImplicitly]
         public Uri Url { get; set; }
@@ -22,7 +22,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         [UsedImplicitly]
         public RequestConfig Config { get; set; } = new RequestConfig();
         
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             if(!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");
             

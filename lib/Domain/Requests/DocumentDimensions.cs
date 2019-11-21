@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
     /// </remarks>
-    public class DocumentDimensions
+    public sealed class DocumentDimensions : IConvertToHttpContent
     {
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
@@ -135,27 +135,26 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             };
         }
 
-        #endregion
-        
-        #region internal method
-        
         /// <summary>
         /// Transforms the instance to a list of StringContent items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {   
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
                 .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(_ =>
                 {
-                    var value = _.Prop.GetValue(this);
-                    var contentItem = new StringContent(value.ToString());
+                    var value =  _.Prop.GetValue(this);
+
+                    if (value == null) return null;
+
+                    var contentItem =new StringContent(value.ToString());
                     contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name  };
 
                     return contentItem;
-                });
+                }).Where(item=> item != null);
         }
         
         #endregion

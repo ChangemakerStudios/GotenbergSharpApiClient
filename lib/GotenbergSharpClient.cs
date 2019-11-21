@@ -54,78 +54,59 @@ namespace Gotenberg.Sharp.API.Client
         #region api methods
 
         /// <summary>
-        /// Converts the specified request to a PDF document.
+        /// For remote URL conversions. Works just like <see><cref>HtmlToPDf</cref></see>
         /// </summary>
-        /// <param name="request">The request.</param>
-        /// <param name="cancelToken">The cancel token.</param>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">request</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// </exception>
         [UsedImplicitly]
-        public async Task<Stream> HtmlToPdfAsync(PdfRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
         {
-            if(request == null)  throw new ArgumentNullException(nameof(request));
+            if(request == null) throw new ArgumentNullException(nameof(request));
             
+            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
+        }
+        
+        
+        /// <summary>
+        ///    Converts the specified request to a PDF document.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [UsedImplicitly]
+        public async Task<Stream> HtmlToPdfAsync(IConversionRequest request, CancellationToken cancelToken = default)  
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
             return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
-        }        
+        }
 
         /// <summary>
-        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
+        /// Merges items specified by the request
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         [UsedImplicitly]
-        public async Task<Stream> UrlToPdf(UrlPdfRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> MergePdfsAsync(IMergeRequest request, CancellationToken cancelToken = default)  
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteRequest(request.ToHttpContent(),Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
+            if (request == null) throw new ArgumentNullException(nameof(request)); 
+            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
-        
-        /// <summary>
-        /// Merges the pdf documents in the specified request into one pdf
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <returns></returns>
-        [UsedImplicitly]
-        public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
 
-            return await DoMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
-        }      
- 
-        /// <summary>
-        /// Merges the office documents in the specified request to one pdf
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <remarks>
-        ///     Will return a file containing the text "not found" if the container has set DISABLE_UNOCONV to 1. This disables office conversions will not work
-        /// </remarks>
-        /// <returns></returns>
-        [UsedImplicitly]
-        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-             
-            return await DoMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
-        }
-        
+        //[UsedImplicitly]
+       // public async Task<Stream> MergeOfficeDocsAsync<TAsset>(MergeOfficeRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
+       // {
+       //     if (request == null) throw new ArgumentNullException(nameof(request)); 
+       //     return await ExecuteMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
+       // }
+   
         #endregion
-
-        #region private helpers
-
-        async Task<Stream> DoMergeAsync(MergeRequest request, string pathForMerge, CancellationToken cancelToken = default)
-        {
-            if (request?.Items == null) throw new ArgumentNullException(nameof(request));
-            if (request.Items.Count == 0) throw new ArgumentOutOfRangeException(nameof(request.Items));
-
-            return await ExecuteRequest(request.ToHttpContent(), pathForMerge, cancelToken).ConfigureAwait(false);
-        }
+       
+        #region exec
 
         async Task<Stream> ExecuteRequest(IEnumerable<HttpContent> contentItems, string apiPath, CancellationToken cancelToken = default)
         {
@@ -149,10 +130,18 @@ namespace Gotenberg.Sharp.API.Client
                 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
+        
+        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken = default)  
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request.Count == 0) throw new ArgumentException(nameof(request));
 
+            return await ExecuteRequest(request.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
+        }
+
+
+        #endregion      
         
-        
-        #endregion
     }
     
 }

@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// All endpoints accept form fields for each property
     /// </summary>
-    public class RequestConfig
+    public sealed class RequestConfig : IConvertToHttpContent
     {
         Uri _webHook;
       
@@ -73,11 +73,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         #endregion
 
+        #region ToHttpContent
+        
         /// <summary>
         /// Converts the instance to a collection of http content items
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             if (this.TimeOut.HasValue)
             {
@@ -111,5 +113,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) { Name = fieldName };
             return item;
         }
+        
+        #endregion
     }
 }

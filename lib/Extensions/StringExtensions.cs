@@ -1,5 +1,7 @@
 ﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
+using JetBrains.Annotations;
+
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     /// <summary>
@@ -23,6 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <returns>
         ///   <c>true</c> if [is not set] [the specified value]; otherwise, <c>false</c>.
         /// </returns>
+        [UsedImplicitly]
         public static bool IsNotSet(this string value) => string.IsNullOrWhiteSpace(value);
     }
 }
