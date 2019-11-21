@@ -11,13 +11,14 @@ async Task BuildPdf()
 
 	var innerClient = new HttpClient() { BaseAddress = new Uri("http://localhost:3000") };
 	
+	var sharpClient = new GotenbergSharpClient(innerClient);
+	
 	var imageBytes = await GetImageBytes(innerClient).ConfigureAwait(false);
 
 	var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
 						 .WithDimensions(DocumentDimensions.ToDeliverableDefault())
 						 .WithAssets(new Dictionary<string, byte[]>() { { "mandala.png", imageBytes } });
 
-	var sharpClient = new GotenbergSharpClient(innerClient);
 	var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build()).ConfigureAwait(false);
 
 	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
