@@ -15,10 +15,8 @@ dotnet_csproj:
   informational_version: '{version}'
 
 build:
-  verbosity: minimal
-
-build:
   project: .\lib\Gotenberg.Sharp.Api.Client.csproj
+  verbosity: minimal  
 
 before_build:
   - dotnet restore .\lib\Gotenberg.Sharp.Api.Client.csproj
