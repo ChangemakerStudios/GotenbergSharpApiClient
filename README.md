@@ -2,6 +2,59 @@
 C# Client for interacting with the Gotenberg API >= v6.0 https://thecodingmachine.github.io/gotenberg
 Gotenberg is a Docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.
 
+## Quick start: Html to PDF conversion with embedded assets
+```csharp
+async Task BuildPdf()
+{
+	//docker pull thecodingmachine/gotenberg:latest 
+	//docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
+
+	var innerClient = new HttpClient() { BaseAddress = new Uri("http://localhost:3000") };
+	
+	var sharpClient = new GotenbergSharpClient(innerClient);
+	
+	var imageBytes = await GetImageBytes(innerClient).ConfigureAwait(false);
+
+	var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
+						 .WithDimensions(DocumentDimensions.ToDeliverableDefault())
+						 .WithAssets(new Dictionary<string, byte[]>() { { "mandala.png", imageBytes } });
+
+	var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build()).ConfigureAwait(false);
+
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
+	using (var destinationStream = File.Create(outPath))
+	{
+		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
+	}
+
+	async Task<byte[]> GetImageBytes(HttpClient client)
+	{
+		return await client.GetByteArrayAsync("https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/Mandala4b.png");
+	}
+
+	string GetBody()
+	{
+		return @"<!doctype html>
+					<html lang=""en"">
+						<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
+						<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
+						<body>
+							<h1>Hello world</h1>    
+								<img src=""mandala.png""> 
+							<h3>Powered by Gotenberg</h3>	
+						</body>
+					</html>";
+	}
+	
+	string GetFooter(){
+		 return @"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
+	}
+}
+
+
+
+```
+
 ## Recommended usage for .NetCore app: make an IServiceCollection extension.
 ```csharp
 
