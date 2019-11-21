@@ -11,10 +11,10 @@ namespace Gotenberg.Sharp.API.Client
 {
     public class HtmlConversionBuilder
     {
-        [CanBeNull] IConversionRequest _request;
-        DocumentDimensions _dimensions;
         RequestConfig _config;
-
+        IConversionRequest _request;
+        DocumentDimensions _dimensions;
+        
         #region constructors
 
         public HtmlConversionBuilder([NotNull] Stream body, Stream header = null, Stream footer = null) =>
@@ -71,7 +71,6 @@ namespace Gotenberg.Sharp.API.Client
         public HtmlConversionBuilder WithDimensions(DocumentDimensions dims)
         {
             _dimensions = dims;
-
             return this;
         }
 
@@ -89,7 +88,6 @@ namespace Gotenberg.Sharp.API.Client
         public HtmlConversionBuilder ConfigureWith(RequestConfig customConfig)
         {
             _config = customConfig;
-
             return this;
         }
 
