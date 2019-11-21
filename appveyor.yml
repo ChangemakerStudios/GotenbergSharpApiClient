@@ -3,11 +3,11 @@ os: Visual Studio 2019
 configuration: Release
 
 build:
-  project: GotenburgSharpApiClient.sln
+  project: .\lib\Gotenberg.Sharp.Api.Client.csproj
 
 before_build:
-  - dotnet restore
+  - dotnet restore .\lib\Gotenberg.Sharp.Api.Client.csproj
 
 after_build:
-  - dotnet pack  .\lib\Gotenberg.Sharp.Api.Client.csproj --configuration %CONFIGURATION% --version-suffix %APPVEYOR_BUILD_VERSION%
+  - dotnet pack .\lib\Gotenberg.Sharp.Api.Client.csproj --no-restore --configuration %CONFIGURATION% --version-suffix %APPVEYOR_BUILD_VERSION%
   - appveyor PushArtifact .\lib\bin\%CONFIGURATION%\Gotenberg.Sharp.Api.Client.%APPVEYOR_BUILD_VERSION%.symbols.nupkg
