@@ -107,12 +107,23 @@ namespace Gotenberg.Sharp.API.Client
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
 
-        //[UsedImplicitly]
-       // public async Task<Stream> MergeOfficeDocsAsync<TAsset>(MergeOfficeRequest<TAsset> request, CancellationToken cancelToken = default) where TAsset: class
-       // {
-       //     if (request == null) throw new ArgumentNullException(nameof(request)); 
-       //     return await ExecuteMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
-       // }
+        /// <summary>
+        ///     Converts one or more office documents into one merged pdf.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>
+        ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
+        ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf containing the text. {"message":"Not Found"}
+        /// </remarks>
+       [UsedImplicitly]
+        public async Task<Stream> MergeOfficeDocsAsync(IMergeOfficeRequest request, CancellationToken cancelToken = default)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request)); 
+            return await ExecuteMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
+        }
    
         #endregion
        

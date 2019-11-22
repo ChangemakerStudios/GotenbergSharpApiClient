@@ -67,7 +67,7 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public IMergeRequest Build() => this._request;
 
-        void CreateAndSetRequest<TAsset>(Func<TAsset,HttpContent> converter, Dictionary<string, TAsset> items) where TAsset: class
+        protected virtual void CreateAndSetRequest<TAsset>(Func<TAsset,HttpContent> converter, Dictionary<string, TAsset> items) where TAsset: class
         {
             this._request = new MergeRequest<TAsset>(converter) { Items = items ?? new Dictionary<string, TAsset>() };
         }
