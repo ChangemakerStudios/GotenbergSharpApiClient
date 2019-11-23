@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Extensions;
@@ -14,6 +15,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     public sealed class RequestConfig : IConvertToHttpContent
     {
         Uri _webHook;
+        float? _timeOut;
       
         #region Basic settings
 
@@ -23,7 +25,34 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         ///     the container's DEFAULT_WAIT_TIMEOUT environment variable
         /// </summary>
         [UsedImplicitly]
-        public float? TimeOut { get; set; }
+        public float? TimeOut
+        {
+            get => _timeOut;
+            set => _timeOut = value < 1800 ? value: throw new InvalidDataException($"{nameof(TimeOut)} must be less than 1800");
+        }
+
+        /// <summary>
+        ///     The default Google Chrome rpcc buffer size may also be overridden per request
+        ///     See the rpcc buffer size section. https://thecodingmachine.github.io/gotenberg/#html.rpcc_buffer_size
+        ///     Sample value: 1048576 for 1 MB. The hard limit is 100 MB and is defined by Google Chrome itself.
+        ///     Using this property will override the container environment variable, DEFAULT_GOOGLE_CHROME_RPCC_BUFFER_SIZE for a given request
+        /// </summary>
+        /// <remarks>
+        ///     Use If/when the Gotenberg API returns a 400 response with the message "increase the Google Chrome rpcc buffer size"
+        /// </remarks>
+        [UsedImplicitly]
+        public int? ChromeRpccBufferSize { get; set; }
+
+        
+        /// <summary>
+        /// If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is used.
+        /// </summary>
+        /// <remarks>
+        /// Attention: this feature does not work if the form field webHookURL is given.
+        /// </remarks>
+        // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
+        [UsedImplicitly]
+        public string ResultFileName { get; set; }        
     
         /// <summary>
         /// If set the Gotenberg API will send the resulting PDF file in a POST with
@@ -38,38 +67,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         }
 
         /// <summary>
-        /// If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is used.
-        /// </summary>
-        /// <remarks>
-        /// Attention: this feature does not work if the form field webHookURL is given.
-        /// </remarks>
-        // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
-        [UsedImplicitly]
-        public string ResultFileName { get; set; }        
-
-        #endregion
-
-        #region Advanced
-
-        
-        /// <summary>
         ///  By default, the API will wait 10 seconds before it considers the sending of the resulting PDF to be unsuccessful.
         ///  On a per request basis, this property can override the container environment variable, DEFAULT_WEBHOOK_URL_TIMEOUT
         /// </summary>
         [UsedImplicitly]
         public float? WebHookTimeOut { get; set; }
-
-        /// <summary>
-        ///     The default Google Chrome rpcc buffer size may also be overridden per request
-        ///     See the rpcc buffer size section. https://thecodingmachine.github.io/gotenberg/#html.rpcc_buffer_size
-        ///     Sample value: 1048576 for 1 MB. The hard limit is 100 MB and is defined by Google Chrome itself.
-        ///     Using this property will override the container environment variable, DEFAULT_GOOGLE_CHROME_RPCC_BUFFER_SIZE for a given request
-        /// </summary>
-        /// <remarks>
-        ///     Use If/when the Gotenberg API returns a 400 response with the message "increase the Google Chrome rpcc buffer size"
-        /// </remarks>
-        [UsedImplicitly]
-        public int? ChromeRpccBufferSize { get; set; }
 
         #endregion
 

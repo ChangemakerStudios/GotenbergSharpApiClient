@@ -9,12 +9,16 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client
 {
-    public class HtmlConversionBuilder
+   public class HtmlConversionBuilder
     {
-        RequestConfig _config;
-        IConversionRequest _request;
-        DocumentDimensions _dimensions;
+        #region private/internal fields
         
+        IConversionRequest _request;
+        internal DocumentDimensions DimensionInstance { get; private set; } = new DocumentDimensions();
+        internal RequestConfig ConfigInstance { get; private set; } = new RequestConfig();
+        
+        #endregion
+
         #region constructors
 
         public HtmlConversionBuilder([NotNull] Stream body, Stream header = null, Stream footer = null) =>
@@ -27,73 +31,63 @@ namespace Gotenberg.Sharp.API.Client
                 InitRequest(value => new StringContent(value), body, header, footer);
 
         #endregion
+        
+        #region builder props
+        
+        [UsedImplicitly]
+        public DimensionBuilder SetDimensions { get; internal set; } 
+        
+        [UsedImplicitly]
+        public ConfigBuilder CustomizeRequest { get; internal set; }
 
-        #region assets
+        #endregion
+        
+        #region "with" methods accepting instances
+
+        [UsedImplicitly]
+        public HtmlConversionBuilder WithDimensions(DocumentDimensions instance)
+        {
+            this.DimensionInstance = instance ?? DocumentDimensions.ToChromeDefaults();
+            return this;
+        }
+
+        [UsedImplicitly]
+        public HtmlConversionBuilder WithCustomRequestConfig(RequestConfig instance)
+        {
+            this.ConfigInstance = instance;
+            return this;
+        }
 
         /// <summary>
         /// You can send additional files. For instance: images, fonts, stylesheets and so on.
         /// The only requirement is to make sure that their paths are on the same level as the index.html file.
         /// Reference the asset file name in your html. The specified items can be null to allow passing in conditional assets
         /// </summary>
-        /// <param name="items"></param>
+        /// <param name="instance"></param>
         /// <returns></returns>
         [UsedImplicitly]
-        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, byte[]> items)
+        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, byte[]> instance)
         {
-            SetAssets(items, value => new ByteArrayContent(value));
+            SetAssets(instance, value => new ByteArrayContent(value));
             return this;
         }
 
         [UsedImplicitly]
-        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, Stream> items)
+        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, Stream> instance)
         {
-            SetAssets(items, value => new StreamContent(value));
+            SetAssets(instance, value => new StreamContent(value));
             return this;
         }
 
         [UsedImplicitly]
-        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, string> items)
+        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, string> instance)
         {
-            SetAssets(items, value => new StringContent(value));
+            SetAssets(instance, value => new StringContent(value));
             return this;
         }
-
+        
         #endregion
-
-        #region dims
-
-        /// <summary>
-        /// If you do not call this, your request will use the default chrome dimensions
-        /// </summary>
-        /// <param name="dims"></param>
-        /// <returns></returns>
-        [UsedImplicitly]
-        public HtmlConversionBuilder WithDimensions(DocumentDimensions dims)
-        {
-            _dimensions = dims;
-            return this;
-        }
-
-        #endregion
-
-        #region configuration
-
-        /// <summary>
-        ///  Configures individual requests, overriding container level settings that define defaults
-        ///  In most cases the defaults are fine and there's no need to provide a custom configuration.   
-        /// </summary>
-        /// <param name="customConfig"></param>
-        /// <returns></returns>
-        [UsedImplicitly]
-        public HtmlConversionBuilder ConfigureWith(RequestConfig customConfig)
-        {
-            _config = customConfig;
-            return this;
-        }
-
-        #endregion
-
-        #region public build
+        
         /// <summary>
         /// Builds the request
         /// </summary>
@@ -101,18 +95,19 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public IConversionRequest Build()
         {
-            this._request.Dimensions = _dimensions ?? DocumentDimensions.ToChromeDefaults();
-            this._request.Config = _config ?? new RequestConfig();
+            this._request.Dimensions = this.DimensionInstance ?? DocumentDimensions.ToChromeDefaults();
+            this._request.Config = this.ConfigInstance;
 
             return this._request;
         }
 
-        #endregion
-
-        #region private helpers
+        #region helpers
 
         void InitRequest<TContent>(Func<TContent, HttpContent> converter, TContent body, TContent header, TContent footer) where TContent : class
         {
+            this.SetDimensions = new DimensionBuilder(this);
+            this.CustomizeRequest = new ConfigBuilder(this);
+            
             var content = new DocumentRequest<TContent>(converter, body) { HeaderHtml = header, FooterHtml = footer };
             _request = new PdfRequest<TContent>(content);
         }
@@ -127,7 +122,7 @@ namespace Gotenberg.Sharp.API.Client
             
             _request.AddAssets(assets);
         }
-
+        
         #endregion
 
     }

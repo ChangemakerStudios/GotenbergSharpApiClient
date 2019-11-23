@@ -33,13 +33,15 @@ namespace Gotenberg.Sharp.API.Client
 
         #region ctor
 
+        /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(string address)
             : this(new Uri(address))
         {
         }
 
+        /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(Uri address)
-            : this(new HttpClient() { BaseAddress = address })
+            : this(new HttpClient { BaseAddress = address })
         {
         }
 
@@ -119,10 +121,10 @@ namespace Gotenberg.Sharp.API.Client
         ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf containing the text. {"message":"Not Found"}
         /// </remarks>
        [UsedImplicitly]
-        public async Task<Stream> MergeOfficeDocsAsync(IMergeOfficeRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> MergeOfficeDocsAsync(IMergeRequest request, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request)); 
-            return await ExecuteMergeAsync(request.FilterByExtension(), Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
+            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
         }
    
         #endregion
