@@ -18,19 +18,9 @@ namespace Gotenberg.Sharp.API.Client
         internal RequestConfig ConfigInstance { get; private set; } = new RequestConfig();
         
         #endregion
-
-        #region constructors
-
-        public HtmlConversionBuilder([NotNull] Stream body, Stream header = null, Stream footer = null) =>
-                InitRequest(value => new StreamContent(value), body, header, footer);
-
-        public HtmlConversionBuilder([NotNull] byte[] body, byte[] header = null, byte[] footer = null) =>
-                InitRequest(value => new ByteArrayContent(value), body, header, footer);
-
-        public HtmlConversionBuilder([NotNull] string body, string header = null, string footer = null) =>
-                InitRequest(value => new StringContent(value), body, header, footer);
-
-        #endregion
+        
+        public HtmlConversionBuilder([NotNull] ContentItem body, ContentItem header = null, ContentItem footer = null) =>
+                InitRequest(body, header, footer);
         
         #region builder props
         
@@ -66,23 +56,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="instance"></param>
         /// <returns></returns>
         [UsedImplicitly]
-        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, byte[]> instance)
+        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, ContentItem> instance)
         {
-            SetAssets(instance, value => new ByteArrayContent(value));
-            return this;
-        }
-
-        [UsedImplicitly]
-        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, Stream> instance)
-        {
-            SetAssets(instance, value => new StreamContent(value));
-            return this;
-        }
-
-        [UsedImplicitly]
-        public HtmlConversionBuilder WithAssets([CanBeNull] Dictionary<string, string> instance)
-        {
-            SetAssets(instance, value => new StringContent(value));
+            SetAssets(instance);
             return this;
         }
         
@@ -103,22 +79,22 @@ namespace Gotenberg.Sharp.API.Client
 
         #region helpers
 
-        void InitRequest<TContent>(Func<TContent, HttpContent> converter, TContent body, TContent header, TContent footer) where TContent : class
+        void InitRequest(ContentItem body, ContentItem header, ContentItem footer) 
         {
             this.SetDimensions = new DimensionBuilder(this);
             this.CustomizeRequest = new ConfigBuilder(this);
             
-            var content = new DocumentRequest<TContent>(converter, body) { HeaderHtml = header, FooterHtml = footer };
-            _request = new PdfRequest<TContent>(content);
+            var content = new DocumentRequest(body) { Header = header, Footer = footer };
+            _request = new PdfRequest(content);
         }
 
-        void SetAssets<TAsset>([CanBeNull] Dictionary<string, TAsset> items, Func<TAsset, HttpContent> converter) where TAsset : class
+        void SetAssets([CanBeNull] Dictionary<string, ContentItem> items)
         {
             if (items?.Any(_ => new FileInfo(_.Key).Extension.IsNotSet() || _.Key.Contains(@"/")) ?? false)
                 throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
 
-            var assets = new AssetRequest<TAsset>(converter);
-            assets.AddRange(items ?? Enumerable.Empty<KeyValuePair<string, TAsset>>());
+            var assets = new AssetRequest();
+            assets.AddRange(items ?? Enumerable.Empty<KeyValuePair<string, ContentItem>>());
             
             _request.AddAssets(assets);
         }

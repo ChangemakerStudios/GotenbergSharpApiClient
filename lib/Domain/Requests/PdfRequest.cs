@@ -12,16 +12,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// Represents a Gotenberg Api html conversion request
     /// </summary>
-    public class PdfRequest<TDocument>: IConversionRequest where TDocument : class
+    public class PdfRequest: IConversionRequest 
     {
         IConvertToHttpContent _assets;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PdfRequest{TDocument}"/>
+        /// Initializes a new instance of the <see cref="PdfRequest"/>
         /// </summary>
         /// <param name="content"></param>
         /// <param name="dimensions">The dimensions.</param>
-        internal PdfRequest(DocumentRequest<TDocument> content, DocumentDimensions dimensions = null)
+        internal PdfRequest(DocumentRequest content, DocumentDimensions dimensions = null)
         {
             Content = content ?? throw new ArgumentNullException(nameof(content));
             Dimensions = dimensions ?? DocumentDimensions.ToChromeDefaults();
@@ -40,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The content.
         /// </value>
         [UsedImplicitly]
-        public IConvertToHttpContent Content { get; }
+        public IConvertToHttpContent Content { get; set; }
 
         /// <summary>
         /// Gets the dimensions.

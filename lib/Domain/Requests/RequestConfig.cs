@@ -16,6 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         Uri _webHook;
         float? _timeOut;
+        const string _dispositionType = Constants.Http.Disposition.Types.FormData;
       
         #region Basic settings
 
@@ -112,7 +113,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         static StringContent CreateItem<T>(T value, string fieldName)
         {
             var item = new StringContent(value.ToString());
-            item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) { Name = fieldName };
+            item.Headers.ContentDisposition = new ContentDispositionHeaderValue(_dispositionType) { Name = fieldName };
             return item;
         }
         

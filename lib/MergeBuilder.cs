@@ -16,35 +16,13 @@ namespace Gotenberg.Sharp.API.Client
         IMergeRequest _request;
 
         [UsedImplicitly]
-        public MergeBuilder(Dictionary<string, Stream> items) => 
-                CreateAndSetRequest(value => new StreamContent(value), items);
-
-        [UsedImplicitly]
-        public MergeBuilder(Dictionary<string, byte[]> items) => 
-                CreateAndSetRequest(value => new ByteArrayContent(value), items);
-
-        [UsedImplicitly]
-        public MergeBuilder(Dictionary<string,string> items)
-            => CreateAndSetRequest(value => new StringContent(value), items);
+        public MergeBuilder(Dictionary<string, ContentItem> items) => CreateAndSetRequest(items);
  
         [UsedImplicitly]
-        public MergeBuilder(IEnumerable<KeyValuePair<string, string>> items) 
-                : this(new Dictionary<string, string>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
+        public MergeBuilder(IEnumerable<KeyValuePair<string, ContentItem>> items) 
+                : this(new Dictionary<string, ContentItem>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
         {
         }
-
-        [UsedImplicitly]
-        public MergeBuilder(IEnumerable<KeyValuePair<string, Stream>> items) 
-                : this(new Dictionary<string, Stream>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
-        {
-        }
-
-         [UsedImplicitly]
-        public MergeBuilder(IEnumerable<KeyValuePair<string, byte[]>> items) 
-                : this(new Dictionary<string, byte[]>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
-        {
-        }
-
 
         /// <summary>
         ///  Configures individual requests, overriding container level settings that define defaults
@@ -67,9 +45,9 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public IMergeRequest Build() => this._request;
 
-        void CreateAndSetRequest<TAsset>(Func<TAsset,HttpContent> converter, Dictionary<string, TAsset> items) where TAsset: class
+        void CreateAndSetRequest(Dictionary<string, ContentItem> items) 
         {
-            this._request = new MergeRequest<TAsset>(converter) { Items = items ?? new Dictionary<string, TAsset>() };
+            this._request = new MergeRequest() { Items = items ?? new Dictionary<string, ContentItem>() };
         }
     }
 

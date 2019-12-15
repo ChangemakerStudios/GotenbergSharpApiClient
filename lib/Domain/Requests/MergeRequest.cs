@@ -13,13 +13,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public class MergeRequest<TAsset> : IMergeRequest where TAsset : class
+    public class MergeRequest : IMergeRequest
     {
-        readonly Func<TAsset, HttpContent> _converter;
-
-        internal MergeRequest(Func<TAsset, HttpContent> converter)
-            => _converter = converter;
-       
+        
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
@@ -31,7 +27,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Key = file name; value = the document content
         /// </summary>
         [UsedImplicitly]
-        public Dictionary<string, TAsset> Items { get; set; }
+        public Dictionary<string, ContentItem> Items { get; set; }
 
         /// <summary>
         /// Gets the count of items
@@ -48,7 +44,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return this.Items.Where(_ => _.Value != null)
                 .Select(_ =>
                 {
-                    var item = _converter(_.Value);
+                    var item = _.Value.ToHttpContent();
                     
                     item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
                         Name = Constants.Gotenberg.FormFieldNames.Files,
