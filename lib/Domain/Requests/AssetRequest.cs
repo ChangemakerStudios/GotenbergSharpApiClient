@@ -34,13 +34,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 .Where(_ => _.MediaType.IsSet())
                 .Select(item =>
                 {
-                    var asset = item.Asset.Value.ToHttpContent();
+                    var asset = item.Asset.Value.ToHttpContentItem();
+
                     asset.Headers.ContentDisposition =
                         new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData)
                         {
                             Name = Constants.Gotenberg.FormFieldNames.Files,
                             FileName = item.Asset.Key
                         };
+
                     asset.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
 
                     return asset;

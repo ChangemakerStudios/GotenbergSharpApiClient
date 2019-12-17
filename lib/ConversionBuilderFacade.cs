@@ -8,7 +8,6 @@ namespace Gotenberg.Sharp.API.Client
 {
     public class ConversionBuilderFacade
     {
-        readonly PdfRequest _request; 
         protected DocumentRequest Content { get; set; }
         protected AssetRequest Assets { get; set; }
         protected DocumentDimensions Dims { get; set; }
@@ -17,7 +16,6 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public ConversionBuilderFacade()
         {
-            _request = new PdfRequest();
             Content = new DocumentRequest();
             Assets = new AssetRequest();
             Dims = new DocumentDimensions();
@@ -36,12 +34,10 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public IConversionRequest Build()
         {
-            this._request.Content = this.Content;
-            this._request.Dimensions = this.Dims;
-            this._request.Config = this.Config;
-            if(this.Assets.Any()) this._request.AddAssets(this.Assets);
+            var request = new PdfRequest { Content = this.Content, Dimensions = this.Dims, Config = this.Config };
+            if(this.Assets.Any()) request.AddAssets(this.Assets);
             
-            return this._request;
+            return request;
         }
     
     }

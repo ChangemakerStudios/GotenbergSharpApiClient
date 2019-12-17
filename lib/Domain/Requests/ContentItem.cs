@@ -16,7 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public ContentItem(string item) => this._stringItem = item;
         public ContentItem(Stream item) => this._streamItem = item;
 
-        public HttpContent ToHttpContent() => Convert(this);
+        public HttpContent ToHttpContentItem() => Convert(this);
 
         static HttpContent Convert(ContentItem c) 
         {

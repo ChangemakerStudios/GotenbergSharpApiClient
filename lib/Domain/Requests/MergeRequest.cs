@@ -43,7 +43,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return this.Items.Where(_ => _.Value != null)
                 .Select(_ =>
                 {
-                    var item = _.Value.ToHttpContent();
+                    var item = _.Value.ToHttpContentItem();
                     
                     item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
                         Name = Constants.Gotenberg.FormFieldNames.Files,

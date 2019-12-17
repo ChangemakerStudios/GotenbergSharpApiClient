@@ -22,17 +22,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PdfRequest"/>
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="dimensions">The dimensions.</param>
-        internal PdfRequest(DocumentRequest content, DocumentDimensions dimensions = null)
-        {
-            Content = content ?? throw new ArgumentNullException(nameof(content));
-            Dimensions = dimensions ?? DocumentDimensions.ToChromeDefaults();
-        }
- 
-        /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
         [UsedImplicitly]
@@ -55,13 +44,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </value>
         [UsedImplicitly]
         public DocumentDimensions Dimensions { get; set; }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
+      
         [UsedImplicitly]
-        public void AddAssets(IConvertToHttpContent assets)
-        {
-            _assets = assets;
-        }
+        public void AddAssets(IConvertToHttpContent assets) => _assets = assets;
 
         /// <summary>
         /// Transforms the instance to a list of HttpContent items

@@ -36,7 +36,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     var value = (ContentItem)_.Prop.GetValue(this);
                     if (value == null) return null;
 
-                    var item = value.ToHttpContent();
+                    var item = value.ToHttpContentItem();
                     item.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
                     item.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = _.Attrib.FileName };
 
