@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using JetBrains.Annotations;
 
@@ -31,7 +29,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="customConfig"></param>
         /// <returns></returns>
         [UsedImplicitly]
-        public MergeBuilder ConfigureWith(RequestConfig customConfig)
+        public MergeBuilder ConfigureWith(HttpMessageConfig customConfig)
         {
             this._request.Config = customConfig;
 
@@ -47,7 +45,7 @@ namespace Gotenberg.Sharp.API.Client
 
         void CreateAndSetRequest(Dictionary<string, ContentItem> items) 
         {
-            this._request = new MergeRequest() { Items = items ?? new Dictionary<string, ContentItem>() };
+            this._request = new MergeRequest { Items = items ?? new Dictionary<string, ContentItem>() };
         }
     }
 

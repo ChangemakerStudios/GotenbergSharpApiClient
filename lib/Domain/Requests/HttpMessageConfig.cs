@@ -12,7 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// All endpoints accept form fields for each property
     /// </summary>
-    public sealed class RequestConfig : IConvertToHttpContent
+    public sealed class HttpMessageConfig : IConvertToHttpContent
     {
         Uri _webHook;
         float? _timeOut;

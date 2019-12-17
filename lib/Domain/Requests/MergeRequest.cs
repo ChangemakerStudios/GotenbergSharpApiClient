@@ -1,6 +1,5 @@
 ﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -21,7 +20,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         // ReSharper disable once MemberCanBeProtected.Global
         [UsedImplicitly]
-        public RequestConfig Config { get; set; } = new RequestConfig();
+        public HttpMessageConfig Config { get; set; } = new HttpMessageConfig();
 
         /// <summary>
         /// Key = file name; value = the document content

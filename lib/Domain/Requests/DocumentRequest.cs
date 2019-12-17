@@ -17,17 +17,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
-        public DocumentRequest(ContentItem body) =>                
-            this.Body = body ?? throw new ArgumentNullException(nameof(body));
-
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Header)]
-        public ContentItem Header { get; set; }
+        public ContentItem Header { [UsedImplicitly] get; set; }
             
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Index)] 
-        public ContentItem Body { get; }
+        public ContentItem Body { [UsedImplicitly] get; set; }
             
         [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Footer)]
-        public ContentItem Footer { get; set; }
+        public ContentItem Footer { [UsedImplicitly] get; set; }
             
         public IEnumerable<HttpContent> ToHttpContent()
         {
@@ -47,7 +44,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
                 }).Where(item => item != null);
         }
-
-
+        
     }
 }

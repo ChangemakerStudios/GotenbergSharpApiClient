@@ -1,9 +1,11 @@
 using System.IO;
 using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Extensions;
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+    [UsedImplicitly]
     public class ContentItem
     {
         readonly byte[] _bytes;

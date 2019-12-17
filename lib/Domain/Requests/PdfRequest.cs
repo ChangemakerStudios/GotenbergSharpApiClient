@@ -16,6 +16,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         IConvertToHttpContent _assets;
 
+        public PdfRequest()
+        {
+            
+        }
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="PdfRequest"/>
         /// </summary>
@@ -31,7 +36,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
         [UsedImplicitly]
-        public RequestConfig Config { get; set; } = new RequestConfig();
+        public HttpMessageConfig Config { get; set; } = new HttpMessageConfig();
 
         /// <summary>
         /// Gets the content.

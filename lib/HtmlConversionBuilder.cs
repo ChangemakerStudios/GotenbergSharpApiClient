@@ -1,8 +1,8 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using JetBrains.Annotations;
@@ -15,7 +15,7 @@ namespace Gotenberg.Sharp.API.Client
         
         IConversionRequest _request;
         internal DocumentDimensions DimensionInstance { get; private set; } = new DocumentDimensions();
-        internal RequestConfig ConfigInstance { get; private set; } = new RequestConfig();
+        internal HttpMessageConfig ConfigInstance { get; private set; } = new HttpMessageConfig();
         
         #endregion
         
@@ -42,7 +42,7 @@ namespace Gotenberg.Sharp.API.Client
         }
 
         [UsedImplicitly]
-        public HtmlConversionBuilder WithCustomRequestConfig(RequestConfig instance)
+        public HtmlConversionBuilder WithCustomRequestConfig(HttpMessageConfig instance)
         {
             this.ConfigInstance = instance;
             return this;
@@ -104,4 +104,5 @@ namespace Gotenberg.Sharp.API.Client
     }
   
 }
+*/
 
