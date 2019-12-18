@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.Net.Http.Headers;
@@ -76,7 +77,7 @@ namespace Gotenberg.Sharp.API.Client
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
             
-            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken).ConfigureAwait(false);
+            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
         }
         
         
@@ -131,7 +132,7 @@ namespace Gotenberg.Sharp.API.Client
        
         #region exec
 
-        async Task<Stream> ExecuteRequest(IEnumerable<HttpContent> contentItems, string apiPath, CancellationToken cancelToken = default)
+        async Task<Stream> ExecuteRequest(IEnumerable<HttpContent> contentItems, string apiPath, CancellationToken cancelToken = default, KeyValuePair<string,string> remoteUrlHeader = default)
         {
             using var formContent = new MultipartFormDataContent($"{Constants.Http.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
             
@@ -144,6 +145,12 @@ namespace Gotenberg.Sharp.API.Client
             {
                 Content = formContent 
             };
+
+            if (remoteUrlHeader.Key.IsSet())
+            {
+                var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteUrlHeader.Key.Trim()}";
+                requestMessage.Headers.Add(name, remoteUrlHeader.Value);
+            }
             
             var response = await this._innerClient
                 .SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancelToken)

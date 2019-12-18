@@ -22,6 +22,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         [UsedImplicitly]
         public HttpMessageConfig Config { get; set; } = new HttpMessageConfig();
         
+        [UsedImplicitly]
+        public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
+        
         public IEnumerable<HttpContent> ToHttpContent()
         {
             if(!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");
