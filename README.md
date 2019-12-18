@@ -33,7 +33,7 @@ public async Task<string> BuildPdf()
 					   .Dimensions.MarginLeft(.5)
 					   .Dimensions.MarginRight(.5)
 					   .Document.AddAsset("mandala.png", await GetImageBytes());
-					   //Dims: Sets chrome's default dims and then over-rites margin left/right
+					   //Dims: Sets chrome's default dims and then over-writes margin left/right
 
 	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
 
