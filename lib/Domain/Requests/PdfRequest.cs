@@ -12,13 +12,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// </summary>
     public class PdfRequest: IConversionRequest 
     {
-        IConvertToHttpContent _assets;
+        AssetRequest _assets;
         
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
         [UsedImplicitly]
-        public HttpMessageConfig Config { get; set; } = new HttpMessageConfig();
+        public HttpMessageConfig Config { get; set; }
 
         /// <summary>
         /// Gets the content.
@@ -27,7 +27,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The content.
         /// </value>
         [UsedImplicitly]
-        public IConvertToHttpContent Content { get; set; }
+        public DocumentRequest Content { get; set; }
 
         /// <summary>
         /// Gets the dimensions.
@@ -39,8 +39,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public DocumentDimensions Dimensions { get; set; }
       
         [UsedImplicitly]
-        public void AddAssets(IConvertToHttpContent assets) => _assets = assets;
+        public void AddAssets(AssetRequest assets)
+        {
+            this._assets ??= new AssetRequest();
+            this._assets.AddRange(assets);
+        }
 
+        [UsedImplicitly]
+        public void AddAsset(string name, ContentItem value)
+        {
+            this._assets ??= new AssetRequest();
+            this._assets.Add(name, value);
+        }
+        
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
@@ -49,9 +60,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return Content.ToHttpContent()
-                .Concat(Config.ToHttpContent())
-                .Concat(Dimensions.ToHttpContent())
-                .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
+                          .Concat(Dimensions.ToHttpContent())
+                          .Concat(Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>())
+                          .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
 
     }

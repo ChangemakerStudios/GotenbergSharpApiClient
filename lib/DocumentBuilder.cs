@@ -12,11 +12,10 @@ namespace Gotenberg.Sharp.API.Client
 {
     public class DocumentBuilder : ConversionBuilderFacade
     {
-        public DocumentBuilder(DocumentRequest documentContent, AssetRequest assets, DocumentDimensions dims)
+        public DocumentBuilder(PdfRequest request)
         {
-            this.Content = documentContent;
-            this.Assets = assets;
-            this.Dims = dims;
+            this.Request = request;
+            this.Request.Content ??= new DocumentRequest();
         }
 
         #region body
@@ -24,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public DocumentBuilder WithBody(ContentItem body)
         {
-            this.Content.Body = body;
+            this.Request.Content.Body = body;
             return this;
         }
 
@@ -44,7 +43,7 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public DocumentBuilder WithHeader(ContentItem header)
         {
-            this.Content.Header = header;
+            this.Request.Content.Header = header;
             return this;
         }
         
@@ -64,7 +63,7 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public DocumentBuilder WithFooter(ContentItem footer)
         {
-            this.Content.Footer = footer;
+            this.Request.Content.Footer = footer;
             return this;
         }
         
@@ -88,7 +87,8 @@ namespace Gotenberg.Sharp.API.Client
             {
                 throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
             }
-            this.Assets.Add(name, value);
+            
+            this.Request.AddAsset(name, value);
             
             return this;
         }
@@ -148,24 +148,16 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public DocumentBuilder WithDimensions(DocumentDimensions dims)
         {
-            this.Dims = dims;
-            return this;
-        }
-        
-        [UsedImplicitly]
-        public DocumentBuilder WithChromeDefaultDimensions()
-        {
-            this.Dims = DocumentDimensions.ToChromeDefaults();
+            this.Request.Dimensions = dims;
             return this;
         }
 
         [UsedImplicitly]
-        public DocumentBuilder WithDeliverableDefaultDimensions()
-        {
-            this.Dims = DocumentDimensions.ToDeliverableDefault();
-            return this;
-        }
-        
+        public DocumentBuilder WithChromeDefaultDimensions() => WithDimensions(DocumentDimensions.ToChromeDefaults());
+
+        [UsedImplicitly]
+        public DocumentBuilder WithDeliverableDefaultDimensions() => WithDimensions(DocumentDimensions.ToDeliverableDefault());
+
         #endregion
 
     }

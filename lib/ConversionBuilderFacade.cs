@@ -1,6 +1,6 @@
 // Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
 
-using System.Linq;
+using System;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using JetBrains.Annotations;
 
@@ -8,36 +8,27 @@ namespace Gotenberg.Sharp.API.Client
 {
     public class ConversionBuilderFacade
     {
-        protected DocumentRequest Content { get; set; }
-        protected AssetRequest Assets { get; set; }
-        protected DocumentDimensions Dims { get; set; }
-        protected HttpMessageConfig Config { get; set; }
-        
-        [UsedImplicitly]
-        public ConversionBuilderFacade()
-        {
-            Content = new DocumentRequest();
-            Assets = new AssetRequest();
-            Dims = new DocumentDimensions();
-            Config = new HttpMessageConfig();
-        }
+        protected PdfRequest Request { get; set; }
 
         [UsedImplicitly]
-        public DocumentBuilder Document=> new DocumentBuilder(this.Content, this.Assets, this.Dims);
+        public ConversionBuilderFacade() => Request = new PdfRequest();
 
         [UsedImplicitly]
-        public DimensionBuilder Dimensions => new DimensionBuilder(Dims);
+        public DocumentBuilder Document=> new DocumentBuilder(Request);
+
+        [UsedImplicitly]
+        public DimensionBuilder Dimensions => new DimensionBuilder(Request);
         
         [UsedImplicitly]
-        public ConfigBuilder ConfigureRequest => new ConfigBuilder(Config);
+        public ConfigBuilder ConfigureRequest => new ConfigBuilder(Request);
         
         [UsedImplicitly]
         public IConversionRequest Build()
         {
-            var request = new PdfRequest { Content = this.Content, Dimensions = this.Dims, Config = this.Config };
-            if(this.Assets.Any()) request.AddAssets(this.Assets);
+             if(this.Request.Content == null) throw new NullReferenceException("Request.Content is null");
+             this.Request.Dimensions ??= DocumentDimensions.ToChromeDefaults();
             
-            return request;
+            return Request;
         }
     
     }

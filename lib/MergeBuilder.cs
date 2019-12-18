@@ -1,6 +1,5 @@
 ﻿// Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
 
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client
 {
     public class MergeBuilder
     {
-        IMergeRequest _request;
+            readonly IMergeRequest _request;
 
         [UsedImplicitly]
         public MergeBuilder(Dictionary<string, ContentItem> items) => 
@@ -62,7 +61,6 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         [UsedImplicitly]
         public IMergeRequest Build() => this._request;
-
      
     }
 
