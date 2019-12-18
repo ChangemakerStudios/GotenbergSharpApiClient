@@ -21,60 +21,60 @@ namespace Gotenberg.Sharp.API.Client
         #region body
         
         [UsedImplicitly]
-        public DocumentBuilder WithBody(ContentItem body)
+        public DocumentBuilder AddBody(ContentItem body)
         {
             this.Request.Content.Body = body;
             return this;
         }
 
         [UsedImplicitly]
-        public DocumentBuilder WithBody(string body) => WithBody(new ContentItem(body));
+        public DocumentBuilder AddBody(string body) => AddBody(new ContentItem(body));
 
         [UsedImplicitly]
-        public DocumentBuilder WithBody(byte[] body) => WithBody(new ContentItem(body));
+        public DocumentBuilder AddBody(byte[] body) => AddBody(new ContentItem(body));
 
         [UsedImplicitly]
-        public DocumentBuilder WithBody(Stream body) => WithBody(new ContentItem(body));
+        public DocumentBuilder AddBody(Stream body) => AddBody(new ContentItem(body));
 
         #endregion
 
         #region header
         
         [UsedImplicitly]
-        public DocumentBuilder WithHeader(ContentItem header)
+        public DocumentBuilder AddHeader(ContentItem header)
         {
             this.Request.Content.Header = header;
             return this;
         }
         
         [UsedImplicitly]
-        public DocumentBuilder WithHeader(string body) => WithHeader(new ContentItem(body));
+        public DocumentBuilder AddHeader(string body) => AddHeader(new ContentItem(body));
 
         [UsedImplicitly]
-        public DocumentBuilder WithHeader(byte[] body) => WithHeader(new ContentItem(body));
+        public DocumentBuilder AddHeader(byte[] body) => AddHeader(new ContentItem(body));
 
         [UsedImplicitly]
-        public DocumentBuilder WithHeader(Stream body) => WithHeader(new ContentItem(body));
+        public DocumentBuilder AddHeader(Stream body) => AddHeader(new ContentItem(body));
 
         #endregion
         
         #region footer
         
         [UsedImplicitly]
-        public DocumentBuilder WithFooter(ContentItem footer)
+        public DocumentBuilder AddFooter(ContentItem footer)
         {
             this.Request.Content.Footer = footer;
             return this;
         }
         
         [UsedImplicitly]
-        public DocumentBuilder WithFooter(string body) => WithFooter(new ContentItem(body));
+        public DocumentBuilder AddFooter(string body) => AddFooter(new ContentItem(body));
 
         [UsedImplicitly]
-        public DocumentBuilder WithFooter(byte[] body) =>  WithFooter(new ContentItem(body));
+        public DocumentBuilder AddFooter(byte[] body) =>  AddFooter(new ContentItem(body));
 
         [UsedImplicitly]
-        public DocumentBuilder WithFooter(Stream body) =>  WithFooter(new ContentItem(body));
+        public DocumentBuilder AddFooter(Stream body) =>  AddFooter(new ContentItem(body));
         
         #endregion
 
@@ -146,17 +146,17 @@ namespace Gotenberg.Sharp.API.Client
         #region dimension instance
       
         [UsedImplicitly]
-        public DocumentBuilder WithDimensions(DocumentDimensions dims)
+        public DocumentBuilder SetDimensions(DocumentDimensions dims)
         {
             this.Request.Dimensions = dims;
             return this;
         }
 
         [UsedImplicitly]
-        public DocumentBuilder WithChromeDefaultDimensions() => WithDimensions(DocumentDimensions.ToChromeDefaults());
+        public DocumentBuilder SetChromeDimensions() => SetDimensions(DocumentDimensions.ToChromeDefaults());
 
         [UsedImplicitly]
-        public DocumentBuilder WithDeliverableDefaultDimensions() => WithDimensions(DocumentDimensions.ToDeliverableDefault());
+        public DocumentBuilder SetDeliverableDimensions() => SetDimensions(DocumentDimensions.ToDeliverableDefault());
 
         #endregion
 
