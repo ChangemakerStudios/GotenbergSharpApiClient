@@ -23,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client
         }
 
         [UsedImplicitly]
-        public DocumentBuilder Document=> new DocumentBuilder(this.Content, this.Assets);
+        public DocumentBuilder Document=> new DocumentBuilder(this.Content, this.Assets, this.Dims);
 
         [UsedImplicitly]
         public DimensionBuilder Dimensions => new DimensionBuilder(Dims);

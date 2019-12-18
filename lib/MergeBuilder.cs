@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using JetBrains.Annotations;
@@ -14,8 +15,27 @@ namespace Gotenberg.Sharp.API.Client
         IMergeRequest _request;
 
         [UsedImplicitly]
-        public MergeBuilder(Dictionary<string, ContentItem> items) => CreateAndSetRequest(items);
- 
+        public MergeBuilder(Dictionary<string, ContentItem> items) => 
+                this._request = new MergeRequest { Items = items ?? new Dictionary<string, ContentItem>() };
+
+        [UsedImplicitly]
+        public MergeBuilder(Dictionary<string, string> items) 
+                : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
+        {
+        }
+        
+        [UsedImplicitly]
+        public MergeBuilder(Dictionary<string, byte[]> items) 
+                : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
+        {
+        }
+                
+        [UsedImplicitly]
+        public MergeBuilder(Dictionary<string, Stream> items) 
+                : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
+        {
+        }
+        
         [UsedImplicitly]
         public MergeBuilder(IEnumerable<KeyValuePair<string, ContentItem>> items) 
                 : this(new Dictionary<string, ContentItem>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
@@ -43,10 +63,7 @@ namespace Gotenberg.Sharp.API.Client
         [UsedImplicitly]
         public IMergeRequest Build() => this._request;
 
-        void CreateAndSetRequest(Dictionary<string, ContentItem> items) 
-        {
-            this._request = new MergeRequest { Items = items ?? new Dictionary<string, ContentItem>() };
-        }
+     
     }
 
 }

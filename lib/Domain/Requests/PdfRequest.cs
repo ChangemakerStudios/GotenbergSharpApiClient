@@ -1,8 +1,6 @@
 ﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using JetBrains.Annotations;
@@ -15,11 +13,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     public class PdfRequest: IConversionRequest 
     {
         IConvertToHttpContent _assets;
-
-        public PdfRequest()
-        {
-            
-        }
         
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
