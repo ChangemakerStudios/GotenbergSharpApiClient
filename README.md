@@ -24,22 +24,24 @@ docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1
 ```csharp
 public async Task<string> BuildPdf()
 {
-    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
-        .WithDimensions(DocumentDimensions.ToChromeDefaults())
-        .WithAssets(new Dictionary<string, byte[]> {{"mandala.png", await GetImageBytes()}});
+	var builder = new ConversionBuilderFacade().Document
+					   .WithBody(GetBody())
+					   .WithFooter(GetFooter())
+					   .WithChromeDefaultDimensions()
+					   .AddAsset("mandala.png", await GetImageBytes());
 
-    var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build());
+	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
 
-    var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
 
-    using (var destinationStream = File.Create(outPath))
-    {
-        await response.CopyToAsync(destinationStream);
-    }
+	using (var destinationStream = File.Create(outPath))
+	{
+		await response.CopyToAsync(destinationStream);
+	}
 
-    return outPath;
+	return outPath;
 }
 
 private async Task<byte[]> GetImageBytes()

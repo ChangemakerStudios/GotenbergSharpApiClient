@@ -145,9 +145,24 @@ namespace Gotenberg.Sharp.API.Client
         
         #region dimension instance
       
+        [UsedImplicitly]
         public DocumentBuilder WithDimensions(DocumentDimensions dims)
         {
             this.Dims = dims;
+            return this;
+        }
+        
+        [UsedImplicitly]
+        public DocumentBuilder WithChromeDefaultDimensions()
+        {
+            this.Dims = DocumentDimensions.ToChromeDefaults();
+            return this;
+        }
+
+        [UsedImplicitly]
+        public DocumentBuilder WithDeliverableDefaultDimensions()
+        {
+            this.Dims = DocumentDimensions.ToDeliverableDefault();
             return this;
         }
         
