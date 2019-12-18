@@ -27,14 +27,17 @@ public async Task<string> BuildPdf()
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new ConversionBuilderFacade().Document
-					   .WithBody(GetBody())
-					   .WithFooter(GetFooter())
-					   .WithChromeDefaultDimensions()
-					   .AddAsset("mandala.png", await GetImageBytes());
+					   .AddBody(GetBody())
+					   .AddFooter(GetFooter())
+ 				 	   .SetChromeDimensions()
+					   .Dimensions.MarginLeft(.5)
+					   .Dimensions.MarginRight(.5)
+					   .Document.AddAsset("mandala.png", await GetImageBytes());
+					   //Dims: Sets chrome's default dims and then over-rites margin left/right
 
 	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
 
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg10.pdf";
 
 	using (var destinationStream = File.Create(outPath))
 	{
@@ -66,8 +69,8 @@ private string GetBody()
 
 private string GetFooter()
 {
-    return
-        @"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
+	return
+		@"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
 }
 ```
 
