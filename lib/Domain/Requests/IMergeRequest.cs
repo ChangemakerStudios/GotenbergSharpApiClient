@@ -6,9 +6,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         int Count { get; }
     }
-
-    public interface IMergeOfficeRequest : IMergeRequest
-    {
-        IMergeOfficeRequest FilterByExtension();
-    }
+   
 }

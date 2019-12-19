@@ -29,9 +29,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The width of the paper.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PaperWidth)]
-        public double PaperWidth { get; set; }
+        public double PaperWidth { [UsedImplicitly] get; set; }
 
         /// <summary>
         /// Gets or sets the height of the paper.
@@ -39,9 +38,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The height of the paper.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PaperHeight)]
-        public double PaperHeight { get; set; }
+        public double PaperHeight { [UsedImplicitly] get; set; }
 
         /// <summary>
         /// Gets or sets the margin top.
@@ -49,9 +47,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The margin top.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginTop)]
-        public double MarginTop { get; set; }
+        public double MarginTop { [UsedImplicitly] get; set; }
+
 
         /// <summary>
         /// Gets or sets the margin bottom.
@@ -59,9 +57,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The margin bottom.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginBottom)]
-        public double MarginBottom { get; set; }
+        public double MarginBottom { [UsedImplicitly] get; set; }
+
 
         /// <summary>
         /// Gets or sets the margin left.
@@ -69,9 +67,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The margin left.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginLeft)]
-        public double MarginLeft { get; set; }
+        public double MarginLeft  { [UsedImplicitly] get; set; }
+
 
         /// <summary>
         /// Gets or sets the margin right.
@@ -79,9 +77,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The margin right.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginRight)]
-        public double MarginRight { get; set; }
+        public double MarginRight { [UsedImplicitly] get; set; }
+
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="DocumentDimensions"/> is landscape.
@@ -89,9 +87,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
         /// </value>
-        [UsedImplicitly]
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Landscape)]
-        public bool Landscape { get; set; }
+        public bool Landscape { [UsedImplicitly] get; set; }
         
         #endregion
 
@@ -121,7 +118,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Defaults used for deliverables
         /// </summary>
         /// <returns></returns>
-        [UsedImplicitly]
         public static DocumentDimensions ToDeliverableDefault()
         {
             return new DocumentDimensions { 

@@ -9,8 +9,9 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
-    /// 
+    /// For URL to PDF conversions
     /// </summary>
+  
     public sealed class UrlRequest : IConvertToHttpContent
     {
         [UsedImplicitly]
@@ -20,7 +21,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public DocumentDimensions Dimensions { get; set; } = DocumentDimensions.ToChromeDefaults();
 
         [UsedImplicitly]
-        public RequestConfig Config { get; set; } = new RequestConfig();
+        public HttpMessageConfig Config { get; set; } = new HttpMessageConfig();
+        
+        [UsedImplicitly]
+        public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
         
         public IEnumerable<HttpContent> ToHttpContent()
         {

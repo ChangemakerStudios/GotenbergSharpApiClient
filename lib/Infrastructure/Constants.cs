@@ -62,7 +62,15 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                     public const string MarginRight  =  "marginRight";
                     public const string Landscape    =  "landscape";
                 }
+            }
+
+            //See https://github.com/thecodingmachine/gotenberg-go-client/releases/tag/v7.0.0
+            public static class CustomRemoteHeaders
+            {
+                public const string RemoteUrlKeyPrefix = "Gotenberg-Remoteurl-";
                 
+                // ReSharper disable once UnusedMember.Global
+                public const string WebhookHeaderKeyPrefix = "Gotenberg-Webhookurl-";
             }
         }
 

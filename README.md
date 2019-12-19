@@ -24,33 +24,38 @@ docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1
 ```csharp
 public async Task<string> BuildPdf()
 {
-    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var requestBuilder = new HtmlConversionBuilder(GetBody(), footer: GetFooter())
-        .WithDimensions(DocumentDimensions.ToChromeDefaults())
-        .WithAssets(new Dictionary<string, byte[]> {{"mandala.png", await GetImageBytes()}});
+	var builder = new PdfRequestBuilder().Document
+					   .AddBody(GetBody())
+					   .AddFooter(GetFooter())
+					   .SetChromeDimensionDefaults()
+					   .Dimensions.MarginLeft(.5)
+					   .Dimensions.MarginRight(.5)
+					   .Document.AddAsset("mandala.png", await GetImageBytes());
+	//Dims: Sets chrome's default dims and then over-writes margin left/right
 
-    var response = await sharpClient.HtmlToPdfAsync(requestBuilder.Build());
+	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
 
-    var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
 
-    using (var destinationStream = File.Create(outPath))
-    {
-        await response.CopyToAsync(destinationStream);
-    }
+	using (var destinationStream = File.Create(outPath))
+	{
+		await response.CopyToAsync(destinationStream);
+	}
 
-    return outPath;
+	return outPath;
 }
 
 private async Task<byte[]> GetImageBytes()
 {
-    return await new HttpClient().GetByteArrayAsync(
-        "https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/ColorMandala1.png");
+	return await new HttpClient().GetByteArrayAsync(
+		"https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/ColorMandala1.png");
 }
 
 private string GetBody()
 {
-    return @"<!doctype html>
+	return @"<!doctype html>
 			<html lang=""en"">
 				<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
@@ -64,8 +69,8 @@ private string GetBody()
 
 private string GetFooter()
 {
-    return
-        @"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
+	return
+		@"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
 }
 ```
 

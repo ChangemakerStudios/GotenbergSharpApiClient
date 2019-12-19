@@ -1,8 +1,6 @@
 ﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using JetBrains.Annotations;
@@ -12,26 +10,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// Represents a Gotenberg Api html conversion request
     /// </summary>
-    public class PdfRequest<TDocument>: IConversionRequest where TDocument : class
+    public sealed class PdfRequest: IConversionRequest 
     {
-        IConvertToHttpContent _assets;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PdfRequest{TDocument}"/>
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="dimensions">The dimensions.</param>
-        internal PdfRequest(DocumentRequest<TDocument> content, DocumentDimensions dimensions = null)
-        {
-            Content = content ?? throw new ArgumentNullException(nameof(content));
-            Dimensions = dimensions ?? DocumentDimensions.ToChromeDefaults();
-        }
- 
+        AssetRequest _assets;
+        
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
-        [UsedImplicitly]
-        public RequestConfig Config { get; set; } = new RequestConfig();
+        public HttpMessageConfig Config { get; set; }
 
         /// <summary>
         /// Gets the content.
@@ -39,8 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The content.
         /// </value>
-        [UsedImplicitly]
-        public IConvertToHttpContent Content { get; }
+        public DocumentRequest Content { get; set; }
 
         /// <summary>
         /// Gets the dimensions.
@@ -48,16 +33,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The dimensions.
         /// </value>
-        [UsedImplicitly]
         public DocumentDimensions Dimensions { get; set; }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
+      
         [UsedImplicitly]
-        public void AddAssets(IConvertToHttpContent assets)
+        public void AddAssets(AssetRequest assets)
         {
-            _assets = assets;
+            this._assets ??= new AssetRequest();
+            this._assets.AddRange(assets);
         }
 
+        public void AddAsset(string name, ContentItem value)
+        {
+            this._assets ??= new AssetRequest();
+            this._assets.Add(name, value);
+        }
+        
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
@@ -66,9 +56,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return Content.ToHttpContent()
-                .Concat(Config.ToHttpContent())
-                .Concat(Dimensions.ToHttpContent())
-                .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
+                          .Concat(Dimensions.ToHttpContent())
+                          .Concat(Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>())
+                          .Concat(_assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
 
     }

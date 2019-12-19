@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Extensions;
@@ -11,9 +12,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// All endpoints accept form fields for each property
     /// </summary>
-    public sealed class RequestConfig : IConvertToHttpContent
+    public sealed class HttpMessageConfig : IConvertToHttpContent
     {
         Uri _webHook;
+        float? _timeOut;
+        const string _dispositionType = Constants.Http.Disposition.Types.FormData;
       
         #region Basic settings
 
@@ -22,42 +25,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         ///     conversion unsuccessful and return a 504 HTTP code. This overrides the
         ///     the container's DEFAULT_WAIT_TIMEOUT environment variable
         /// </summary>
-        [UsedImplicitly]
-        public float? TimeOut { get; set; }
-    
-        /// <summary>
-        /// If set the Gotenberg API will send the resulting PDF file in a POST with
-        /// the application-pdf content type to the given url. Requests to the API
-        /// complete before the conversion is performed.
-        /// </summary>
-        [UsedImplicitly]
-        public Uri WebHook
+       
+        public float? TimeOut
         {
-            get => _webHook;
-            [UsedImplicitly] set => _webHook = value?.IsAbsoluteUri ?? false ? value : throw new ArgumentException("WebHook url must be absolute");
+            get => _timeOut;
+            set => _timeOut = value < 1800 ? value: throw new InvalidDataException($"{nameof(TimeOut)} must be less than 1800");
         }
-
-        /// <summary>
-        /// If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is used.
-        /// </summary>
-        /// <remarks>
-        /// Attention: this feature does not work if the form field webHookURL is given.
-        /// </remarks>
-        // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
-        [UsedImplicitly]
-        public string ResultFileName { get; set; }        
-
-        #endregion
-
-        #region Advanced
-
-        
-        /// <summary>
-        ///  By default, the API will wait 10 seconds before it considers the sending of the resulting PDF to be unsuccessful.
-        ///  On a per request basis, this property can override the container environment variable, DEFAULT_WEBHOOK_URL_TIMEOUT
-        /// </summary>
-        [UsedImplicitly]
-        public float? WebHookTimeOut { get; set; }
 
         /// <summary>
         ///     The default Google Chrome rpcc buffer size may also be overridden per request
@@ -68,8 +41,34 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <remarks>
         ///     Use If/when the Gotenberg API returns a 400 response with the message "increase the Google Chrome rpcc buffer size"
         /// </remarks>
-        [UsedImplicitly]
         public int? ChromeRpccBufferSize { get; set; }
+
+        
+        /// <summary>
+        /// If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is used.
+        /// </summary>
+        /// <remarks>
+        /// Attention: this feature does not work if the form field webHookURL is given.
+        /// </remarks>
+        // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
+        public string ResultFileName { get; set; }        
+    
+        /// <summary>
+        /// If set the Gotenberg API will send the resulting PDF file in a POST with
+        /// the application-pdf content type to the given url. Requests to the API
+        /// complete before the conversion is performed.
+        /// </summary>
+        public Uri WebHook
+        {
+            get => _webHook;
+            [UsedImplicitly] set => _webHook = value?.IsAbsoluteUri ?? false ? value : throw new ArgumentException("WebHook url must be absolute");
+        }
+
+        /// <summary>
+        ///  By default, the API will wait 10 seconds before it considers the sending of the resulting PDF to be unsuccessful.
+        ///  On a per request basis, this property can override the container environment variable, DEFAULT_WEBHOOK_URL_TIMEOUT
+        /// </summary>
+        public float? WebHookTimeOut { get; set; }
 
         #endregion
 
@@ -110,7 +109,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         static StringContent CreateItem<T>(T value, string fieldName)
         {
             var item = new StringContent(value.ToString());
-            item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) { Name = fieldName };
+            item.Headers.ContentDisposition = new ContentDispositionHeaderValue(_dispositionType) { Name = fieldName };
             return item;
         }
         

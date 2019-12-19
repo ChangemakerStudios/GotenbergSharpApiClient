@@ -4,6 +4,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public interface IConfigureRequests
     {
-        RequestConfig Config { get; set; }
+        HttpMessageConfig Config { get; set; }
     }
 }
