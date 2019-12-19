@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client
 {
-    public class ConfigBuilder : ConversionBuilderFacade
+    public sealed class ConfigBuilder : PdfRequestBuilder
     {
         public ConfigBuilder(PdfRequest request)
         {
@@ -15,21 +15,21 @@ namespace Gotenberg.Sharp.API.Client
             this.Request.Config ??= new HttpMessageConfig();
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder TimeOut(float value)
         {
             this.Request.Config.TimeOut = value;
             return this;
        }
         
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder ChromeRpccBufferSize(int value)
         {
             this.Request.Config.ChromeRpccBufferSize = value;
             return this;
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder ResultFileName(string value)
         {
             if(value.IsNotSet()) throw new ArgumentException("ResultFileName was null || empty");
@@ -37,7 +37,7 @@ namespace Gotenberg.Sharp.API.Client
             return this;
         }
         
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder WebHook(string value)
         {
             if(value.IsNotSet()) throw new ArgumentException("WebHook was null || empty");
@@ -46,7 +46,7 @@ namespace Gotenberg.Sharp.API.Client
             return this;
         }
         
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder WebHook(Uri value)
         {
             if(value == null) throw new ArgumentNullException(nameof(value));
@@ -55,7 +55,7 @@ namespace Gotenberg.Sharp.API.Client
             return this;
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder WebHookTimeOut(float value)
         {
             this.Request.Config.WebHookTimeOut = value;

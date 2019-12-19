@@ -26,18 +26,18 @@ public async Task<string> BuildPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var builder = new ConversionBuilderFacade().Document
+	var builder = new PdfRequestBuilder().Document
 					   .AddBody(GetBody())
 					   .AddFooter(GetFooter())
- 				 	   .SetChromeDimensions()
+					   .SetChromeDimensionDefaults()
 					   .Dimensions.MarginLeft(.5)
 					   .Dimensions.MarginRight(.5)
 					   .Document.AddAsset("mandala.png", await GetImageBytes());
-					   //Dims: Sets chrome's default dims and then over-writes margin left/right
+	//Dims: Sets chrome's default dims and then over-writes margin left/right
 
 	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
 
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg10.pdf";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Gotenberg.pdf";
 
 	using (var destinationStream = File.Create(outPath))
 	{
@@ -49,13 +49,13 @@ public async Task<string> BuildPdf()
 
 private async Task<byte[]> GetImageBytes()
 {
-    return await new HttpClient().GetByteArrayAsync(
-        "https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/ColorMandala1.png");
+	return await new HttpClient().GetByteArrayAsync(
+		"https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/ColorMandala1.png");
 }
 
 private string GetBody()
 {
-    return @"<!doctype html>
+	return @"<!doctype html>
 			<html lang=""en"">
 				<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  

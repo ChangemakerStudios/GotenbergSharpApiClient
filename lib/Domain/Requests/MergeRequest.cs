@@ -5,33 +5,29 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public class MergeRequest : IMergeRequest
+    public sealed class MergeRequest : IMergeRequest
     {
         
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
         // ReSharper disable once MemberCanBeProtected.Global
-        [UsedImplicitly]
         public HttpMessageConfig Config { get; set; } = new HttpMessageConfig();
 
         /// <summary>
         /// Key = file name; value = the document content
         /// </summary>
-        [UsedImplicitly]
         public Dictionary<string, ContentItem> Items { get; set; }
 
         /// <summary>
         /// Gets the count of items
         /// </summary>
-        [UsedImplicitly]
         public int Count => this.Items?.Count ?? 0;
 
         /// <summary>

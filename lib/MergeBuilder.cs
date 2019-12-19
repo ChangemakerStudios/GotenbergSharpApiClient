@@ -9,33 +9,34 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client
 {
+    [PublicAPI]
     public class MergeBuilder
     {
-            readonly IMergeRequest _request;
+        readonly IMergeRequest _request;
 
-        [UsedImplicitly]
+        [PublicAPI]
         public MergeBuilder(Dictionary<string, ContentItem> items) => 
                 this._request = new MergeRequest { Items = items ?? new Dictionary<string, ContentItem>() };
 
-        [UsedImplicitly]
+        [PublicAPI]
         public MergeBuilder(Dictionary<string, string> items) 
                 : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
         {
         }
         
-        [UsedImplicitly]
+        [PublicAPI]
         public MergeBuilder(Dictionary<string, byte[]> items) 
                 : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
         {
         }
                 
-        [UsedImplicitly]
+        [PublicAPI]
         public MergeBuilder(Dictionary<string, Stream> items) 
                 : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
         {
         }
         
-        [UsedImplicitly]
+        [PublicAPI]
         public MergeBuilder(IEnumerable<KeyValuePair<string, ContentItem>> items) 
                 : this(new Dictionary<string, ContentItem>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
         {
@@ -47,7 +48,7 @@ namespace Gotenberg.Sharp.API.Client
         /// </summary>
         /// <param name="customConfig"></param>
         /// <returns></returns>
-        [UsedImplicitly]
+        [PublicAPI]
         public MergeBuilder ConfigureWith(HttpMessageConfig customConfig)
         {
             this._request.Config = customConfig;
@@ -59,7 +60,7 @@ namespace Gotenberg.Sharp.API.Client
         /// Builds the merge request
         /// </summary>
         /// <returns></returns>
-        [UsedImplicitly]
+        [PublicAPI]
         public IMergeRequest Build() => this._request;
      
     }

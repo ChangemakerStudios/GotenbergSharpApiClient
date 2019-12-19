@@ -68,6 +68,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             public static class CustomRemoteHeaders
             {
                 public const string RemoteUrlKeyPrefix = "Gotenberg-Remoteurl-";
+                
+                // ReSharper disable once UnusedMember.Global
                 public const string WebhookHeaderKeyPrefix = "Gotenberg-Webhookurl-";
             }
         }

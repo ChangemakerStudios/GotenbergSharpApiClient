@@ -10,14 +10,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// Represents a Gotenberg Api html conversion request
     /// </summary>
-    public class PdfRequest: IConversionRequest 
+    public sealed class PdfRequest: IConversionRequest 
     {
         AssetRequest _assets;
         
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
-        [UsedImplicitly]
         public HttpMessageConfig Config { get; set; }
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The content.
         /// </value>
-        [UsedImplicitly]
         public DocumentRequest Content { get; set; }
 
         /// <summary>
@@ -35,7 +33,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <value>
         /// The dimensions.
         /// </value>
-        [UsedImplicitly]
         public DocumentDimensions Dimensions { get; set; }
       
         [UsedImplicitly]
@@ -45,7 +42,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             this._assets.AddRange(assets);
         }
 
-        [UsedImplicitly]
         public void AddAsset(string name, ContentItem value)
         {
             this._assets ??= new AssetRequest();

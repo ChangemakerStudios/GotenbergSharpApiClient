@@ -27,12 +27,12 @@ namespace Gotenberg.Sharp.API.Client
     ///     https://github.com/thecodingmachine/gotenberg-php-client
     ///     https://github.com/yumauri/gotenberg-js-client
     /// </remarks>
-    [UsedImplicitly]
+    [PublicAPI]
     public class GotenbergSharpClient
     {
         readonly HttpClient _innerClient;
 
-        #region ctor
+        #region ctors
 
         /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(string address)
@@ -50,6 +50,7 @@ namespace Gotenberg.Sharp.API.Client
         /// Initializes a new instance of the <see cref="GotenbergSharpClient"/> class.
         /// </summary>
         /// <param name="innerClient"></param>
+        [PublicAPI]
         public GotenbergSharpClient(HttpClient innerClient)
         {
             this._innerClient = innerClient ?? throw new ArgumentNullException(nameof(innerClient));
@@ -72,14 +73,10 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-        [UsedImplicitly]
+     
+        [PublicAPI]
         public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
-        {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-            
-            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
-        }
-        
+            => await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
         
         /// <summary>
         ///    Converts the specified request to a PDF document.
@@ -88,13 +85,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        [UsedImplicitly]
+        [PublicAPI]
         public async Task<Stream> HtmlToPdfAsync(IConversionRequest request, CancellationToken cancelToken = default)  
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-
-            return await ExecuteRequest(request.ToHttpContent(), Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
-        }
+            =>  await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
 
         /// <summary>
         /// Merges items specified by the request
@@ -103,10 +96,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        [UsedImplicitly]
+        [PublicAPI]
         public async Task<Stream> MergePdfsAsync(IMergeRequest request, CancellationToken cancelToken = default)  
         {
-            if (request == null) throw new ArgumentNullException(nameof(request)); 
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
 
@@ -121,10 +113,9 @@ namespace Gotenberg.Sharp.API.Client
         ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
         ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf containing the text. {"message":"Not Found"}
         /// </remarks>
-       [UsedImplicitly]
+        [PublicAPI]
         public async Task<Stream> MergeOfficeDocsAsync(IMergeRequest request, CancellationToken cancelToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request)); 
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
         }
    
@@ -132,11 +123,11 @@ namespace Gotenberg.Sharp.API.Client
        
         #region exec
 
-        async Task<Stream> ExecuteRequest(IEnumerable<HttpContent> contentItems, string apiPath, CancellationToken cancelToken = default, KeyValuePair<string,string> remoteUrlHeader = default)
+        async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, CancellationToken cancelToken = default, KeyValuePair<string,string> remoteUrlHeader = default)
         {
             using var formContent = new MultipartFormDataContent($"{Constants.Http.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
             
-            foreach (var item in contentItems)
+            foreach (var item in request.ToHttpContent())
             {
                 formContent.Add(item);
             }
@@ -166,7 +157,7 @@ namespace Gotenberg.Sharp.API.Client
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (request.Count == 0) throw new ArgumentException(nameof(request));
 
-            return await ExecuteRequest(request.ToHttpContent(), mergePath, cancelToken).ConfigureAwait(false);
+            return await ExecuteRequest(request, mergePath, cancelToken).ConfigureAwait(false);
         }
 
         #endregion

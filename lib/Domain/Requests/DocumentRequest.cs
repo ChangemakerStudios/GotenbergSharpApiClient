@@ -12,8 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// Represents the elements of a document
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
-    [UsedImplicitly]
-    public class DocumentRequest : IConvertToHttpContent 
+    public sealed class DocumentRequest : IConvertToHttpContent 
     {
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 

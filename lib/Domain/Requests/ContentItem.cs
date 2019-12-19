@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     [UsedImplicitly]
-    public class ContentItem
+    public sealed class ContentItem
     {
         readonly byte[] _bytes;
         readonly string _stringItem;

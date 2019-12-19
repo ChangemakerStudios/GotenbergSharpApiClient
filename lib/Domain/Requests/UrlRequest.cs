@@ -9,8 +9,9 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
-    /// 
+    /// For URL to PDF conversions
     /// </summary>
+  
     public sealed class UrlRequest : IConvertToHttpContent
     {
         [UsedImplicitly]

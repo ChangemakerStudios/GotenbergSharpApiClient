@@ -25,7 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         ///     conversion unsuccessful and return a 504 HTTP code. This overrides the
         ///     the container's DEFAULT_WAIT_TIMEOUT environment variable
         /// </summary>
-        [UsedImplicitly]
+       
         public float? TimeOut
         {
             get => _timeOut;
@@ -41,7 +41,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <remarks>
         ///     Use If/when the Gotenberg API returns a 400 response with the message "increase the Google Chrome rpcc buffer size"
         /// </remarks>
-        [UsedImplicitly]
         public int? ChromeRpccBufferSize { get; set; }
 
         
@@ -52,7 +51,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Attention: this feature does not work if the form field webHookURL is given.
         /// </remarks>
         // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
-        [UsedImplicitly]
         public string ResultFileName { get; set; }        
     
         /// <summary>
@@ -60,7 +58,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// the application-pdf content type to the given url. Requests to the API
         /// complete before the conversion is performed.
         /// </summary>
-        [UsedImplicitly]
         public Uri WebHook
         {
             get => _webHook;
@@ -71,7 +68,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         ///  By default, the API will wait 10 seconds before it considers the sending of the resulting PDF to be unsuccessful.
         ///  On a per request basis, this property can override the container environment variable, DEFAULT_WEBHOOK_URL_TIMEOUT
         /// </summary>
-        [UsedImplicitly]
         public float? WebHookTimeOut { get; set; }
 
         #endregion

@@ -6,23 +6,24 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client
 {
-    public class ConversionBuilderFacade
+    [PublicAPI]
+    public class PdfRequestBuilder
     {
         protected PdfRequest Request { get; set; }
 
-        [UsedImplicitly]
-        public ConversionBuilderFacade() => Request = new PdfRequest();
+        [PublicAPI]
+        public PdfRequestBuilder() => Request = new PdfRequest();
 
-        [UsedImplicitly]
+        [PublicAPI]
         public DocumentBuilder Document=> new DocumentBuilder(Request);
 
-        [UsedImplicitly]
+        [PublicAPI]
         public DimensionBuilder Dimensions => new DimensionBuilder(Request);
         
-        [UsedImplicitly]
+        [PublicAPI]
         public ConfigBuilder ConfigureRequest => new ConfigBuilder(Request);
         
-        [UsedImplicitly]
+        [PublicAPI]
         public IConversionRequest Build()
         {
              if(this.Request.Content == null) throw new NullReferenceException("Request.Content is null");

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public class AssetRequest: Dictionary<string, ContentItem>, IConvertToHttpContent 
+    public sealed class AssetRequest: Dictionary<string, ContentItem>, IConvertToHttpContent 
     {
         readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
       
