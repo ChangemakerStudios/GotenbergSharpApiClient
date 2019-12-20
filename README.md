@@ -27,12 +27,12 @@ public async Task<string> BuildPdf()
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new PdfRequestBuilder().Document
-					   .AddBody(GetBody())
-					   .AddFooter(GetFooter())
-					   .SetChromeDimensionDefaults()
-					   .Dimensions.MarginLeft(.5)
-					   .Dimensions.MarginRight(.5)
-					   .Document.AddAsset("mandala.png", await GetImageBytes());
+			    .AddBody(GetBody())
+			    .AddFooter(GetFooter())
+			    .SetChromeDimensionDefaults()
+			    .Dimensions.MarginLeft(.5)
+			    .Dimensions.MarginRight(.5)
+			    .Document.AddAsset("mandala.png", await GetImageBytes());
 	//Dims: Sets chrome's default dims and then over-writes margin left/right
 
 	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
@@ -61,7 +61,7 @@ private string GetBody()
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 				<body>
 					<h1>Hello world</h1>
-						<img src=""mandala.png"">
+					<img src=""mandala.png"">
 					<h3>Powered by Gotenberg</h3>
 				</body>
 			</html>";
