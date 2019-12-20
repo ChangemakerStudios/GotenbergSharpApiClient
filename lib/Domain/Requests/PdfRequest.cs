@@ -1,6 +1,7 @@
 ﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using JetBrains.Annotations;
@@ -42,12 +43,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             this._assets.AddRange(assets);
         }
 
+        [UsedImplicitly]
         public void AddAsset(string name, ContentItem value)
         {
             this._assets ??= new AssetRequest();
             this._assets.Add(name, value);
         }
         
+        [UsedImplicitly]
+        public void AddAsset(string name, string value) => AddAsset(name, new ContentItem(value));
+        [UsedImplicitly]
+        public void AddAsset(string name, byte[] value) => AddAsset(name, new ContentItem(value));
+        [UsedImplicitly]
+        public void AddAsset(string name, Stream value) => AddAsset(name, new ContentItem(value));
+
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
