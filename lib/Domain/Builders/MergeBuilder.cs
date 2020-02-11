@@ -7,7 +7,7 @@ using System.Linq;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client
+namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     [PublicAPI]
     public class MergeBuilder
@@ -49,7 +49,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="customConfig"></param>
         /// <returns></returns>
         [PublicAPI]
-        public MergeBuilder ConfigureWith(HttpMessageConfig customConfig)
+        public MergeBuilder ConfigureWith(RequestConfig customConfig)
         {
             this._request.Config = customConfig;
 

@@ -3,7 +3,7 @@
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client
+namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public class DimensionBuilder : PdfRequestBuilder
     {

@@ -93,7 +93,6 @@ public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollect
                     .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
                     .SetHandlerLifetime(settings.HandlerLifeTime);
                     //Also recommended: add a Polly Retry policy using https://www.nuget.org/packages/Polly
-                    //See: 
                     // https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory
                     // https://www.stevejgordon.co.uk/httpclientfactory-using-polly-for-transient-fault-handling
 }
@@ -111,7 +110,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 }
 ```
 
-*Inject it where you need it:*
+*Inject it where you need it: (Code needs to be updated for breaking changes)*
 
 ```csharp
 public class GenerateSomePdfService

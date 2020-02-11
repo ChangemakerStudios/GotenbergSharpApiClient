@@ -5,14 +5,14 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client
+namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public sealed class ConfigBuilder : PdfRequestBuilder
     {
         public ConfigBuilder(PdfRequest request)
         {
             this.Request = request;
-            this.Request.Config ??= new HttpMessageConfig();
+            this.Request.Config ??= new RequestConfig();
         }
 
         [PublicAPI]
