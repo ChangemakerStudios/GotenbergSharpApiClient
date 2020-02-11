@@ -49,7 +49,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         /// <param name="customConfig"></param>
         /// <returns></returns>
         [PublicAPI]
-        public MergeBuilder ConfigureWith(HttpMessageConfig customConfig)
+        public MergeBuilder ConfigureWith(RequestConfig customConfig)
         {
             this._request.Config = customConfig;
 

@@ -18,7 +18,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <summary>
         /// Gets the request configuration containing fields that all Gotenberg endpoints accept
         /// </summary>
-        public HttpMessageConfig Config { get; set; }
+        public RequestConfig Config { get; set; }
 
         /// <summary>
         /// Gets the content.

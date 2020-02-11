@@ -12,7 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public ConfigBuilder(PdfRequest request)
         {
             this.Request = request;
-            this.Request.Config ??= new HttpMessageConfig();
+            this.Request.Config ??= new RequestConfig();
         }
 
         [PublicAPI]
