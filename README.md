@@ -37,7 +37,7 @@ public async Task<string> BuildPdf()
 
 	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
 
-	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "/" : @"\";
+	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
 	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}Gotenberg.pdf";
 
 	using (var destinationStream = File.Create(outPath))
