@@ -15,7 +15,7 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 *Start up Gotenberg Docker Instance:*
 
 ```powershell
-docker run --name gotenbee -e DEFAULTWAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
+docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
 ```
 
 ## Usage
