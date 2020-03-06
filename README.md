@@ -122,25 +122,20 @@ public class GenerateSomePdfService
 		_gotenbergClient = gotenbergClient;
 	}
 
-	public async Task<Stream> MakePdf(string htmlContent, string footer, CancellationToken cancelToken = default)
+	public async Task<Stream> MakePdf(string body, string footer, CancellationToken cancelToken = default)
 	{
+		//Without using the builder:
 		var dims = new DocumentDimensions { PaperWidth = 8.26, PaperHeight = 11.69, Landscape = false, MarginBottom = .38 };
 
-		var content = new DocumentContent(htmlContent, footer);
-		var request = new PdfRequest(content, dims);
+		var content = new DocumentRequest
+		{
+			Body = new ContentItem(body),
+			Footer = new ContentItem(footer)
+		};
+
+		var request = new PdfRequest { Content = content, Dimensions = dims };
 
 		return await this._gotenbergClient.HtmlToPdfAsync(request, cancelToken).ConfigureAwait(false);
-	}
-
-	public async Task<Stream> MergePdfs(IEnumerable<byte[]> toMerge, CancellationToken cancelToken = default)
-	{
-		var request = new MergeRequest();
-		foreach (var item in toMerge.SelectWithIndex())
-		{
-			request.Items.Add(KeyValuePair.Create($"{item.Index.ToAlphabeticallySortableName()}.pdf", item.Value));
-		}
-
-		return await this._gotenbergClient.MergePdfsAsync(request, cancelToken).ConfigureAwait(false);
 	}
 
 }
