@@ -43,7 +43,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </remarks>
         public int? ChromeRpccBufferSize { get; set; }
 
-        
+        /// <summary>
+        ///     If provided, the API will return a pdf containing the pages in the specified range.
+        /// </summary>
+        /// <remarks>
+        ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
+        ///     This may move...
+        /// </remarks>
+        public string PageRanges { get; set; }
+       
         /// <summary>
         /// If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is used.
         /// </summary>
@@ -93,6 +101,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 {
                     yield return CreateItem(this.WebHookTimeOut,  Constants.Gotenberg.FormFieldNames.WebhookTimeout);
                 }
+            }
+
+            if (this.PageRanges.IsSet())
+            {
+                yield return CreateItem(this.PageRanges,  Constants.Gotenberg.FormFieldNames.PageRanges);
             }
 
             if (this.ResultFileName.IsSet())

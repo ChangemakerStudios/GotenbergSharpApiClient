@@ -48,12 +48,14 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 public const string ResultFilename =   "resultFilename";
                 public const string RemoteURL      =   "remoteURL";
                 
+                public const string PageRanges     =   "pageRanges";   
                 public const string WebhookURL     =   "webhookURL";
                 public const string WebhookTimeout =   "webhookURLTimeout";
                 public const string ChromeRpccBufferSize = "googleChromeRpccBufferSize";
                 
                 public static class Dims
                 {
+                    public const string Scale        =  "scale";
                     public const string PaperWidth   =  "paperWidth";
                     public const string PaperHeight  =  "paperHeight";
                     public const string MarginTop    =  "marginTop";

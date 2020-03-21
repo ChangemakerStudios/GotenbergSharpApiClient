@@ -30,6 +30,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
+        public ConfigBuilder PageRanges(string value)
+        {
+            this.Request.Config.PageRanges = value;
+            return this;
+        }
+
+        [PublicAPI]
         public ConfigBuilder ResultFileName(string value)
         {
             if(value.IsNotSet()) throw new ArgumentException("ResultFileName was null || empty");

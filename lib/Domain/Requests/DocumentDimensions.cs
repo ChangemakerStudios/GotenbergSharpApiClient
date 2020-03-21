@@ -22,6 +22,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
         #region Properties
+
+        /// <summary>
+        /// Gets or sets the scale. Defaults to 1.0
+        /// </summary>
+        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Scale)]
+        public double Scale { [UsedImplicitly] get; set; } = 1.0;
         
         /// <summary>
         /// Gets or sets the width of the paper.
