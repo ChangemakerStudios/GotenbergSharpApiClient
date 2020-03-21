@@ -14,6 +14,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
         
         [PublicAPI]
+        public DimensionBuilder SetScale(double scale)
+        {
+            this.Request.Dimensions.Scale = scale;
+            return this;
+        }
+
+        
+        [PublicAPI]
         public DimensionBuilder PaperWidth(double width)
         {
             this.Request.Dimensions.PaperWidth = width;

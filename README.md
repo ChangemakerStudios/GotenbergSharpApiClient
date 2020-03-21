@@ -27,12 +27,13 @@ public async Task<string> BuildPdf()
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new PdfRequestBuilder().Document
-			    .AddBody(GetBody())
-			    .AddFooter(GetFooter())
-			    .SetChromeDimensionDefaults()
-			    .Dimensions.MarginLeft(.5)
-			    .Dimensions.MarginRight(.5)
-			    .Document.AddAsset("mandala.png", await GetImageBytes());
+				.AddBody(GetBody())
+				.AddFooter(GetFooter())
+				.SetChromeDimensionDefaults()
+				.Dimensions.SetScale(.85)
+				.Dimensions.MarginLeft(.5)
+				.Dimensions.MarginRight(.5)
+				.Document.AddAsset("ear-on-beach.jpg", await GetImageBytes());
 	//Dims: Sets chrome's default dims and then over-writes margin left/right
 
 	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
@@ -48,30 +49,42 @@ public async Task<string> BuildPdf()
 	return outPath;
 }
 
-private async Task<byte[]> GetImageBytes()
+async Task<byte[]> GetImageBytes()
 {
 	return await new HttpClient().GetByteArrayAsync(
-		"https://bjc.berkeley.edu/~bh/bjc/bjc-r/img/2-complexity/Mandala_img/ColorMandala1.png");
+		"http://4.bp.blogspot.com/-jdRdVRheb74/UlLHPkWs99I/AAAAAAAAAJc/lbJEG0KwfgI/s1600/bill-brandt-31.jpg");
 }
 
-private string GetBody()
+string GetBody()
 {
 	return @"<!doctype html>
 			<html lang=""en"">
-				<style> h1, h3{ text-align: center; } img { display: block; margin-left: auto;margin-right: auto; width: 88%;}  </style>
+    			<style>
+					body { max-width: 700px;  margin: auto;}
+					h1, h3{ text-align: center; } 
+					figure { width:548px; height:600px; } 
+					figure img { border: 10px solid #000; } 
+					figcaption { text-align: right; font-size: 10pt; } 
+					figcaption > a:link, a:visited { color: black; }
+				</style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 				<body>
 					<h1>Hello world</h1>
-					<img src=""mandala.png"">
+					<div>
+						<figure>
+						    <img src=""ear-on-beach.jpg"">
+        	                <figcaption>Photo by <a href=""https://www.moma.org/artists/740"">Bill Brandt</a>.</figcaption>
+						 </figure>   
+					</div>
 					<h3>Powered by Gotenberg</h3>
 				</body>
 			</html>";
 }
 
-private string GetFooter()
+string GetFooter()
 {
 	return
-		@"<html><head><style>body { font-size: 8rem;margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
+		@"<html><head><style>body { font-size: 8rem; font-family: Roboto,""Helvetica Neue"",Arial,sans-serif; margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
 }
 ```
 

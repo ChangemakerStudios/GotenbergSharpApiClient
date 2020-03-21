@@ -54,6 +54,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 
                 public static class Dims
                 {
+                    public const string Scale        =  "scale";
                     public const string PaperWidth   =  "paperWidth";
                     public const string PaperHeight  =  "paperHeight";
                     public const string MarginTop    =  "marginTop";
