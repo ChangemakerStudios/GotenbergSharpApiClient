@@ -1,21 +1,24 @@
 // Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
 
+using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Extensions;
+
+using JetBrains.Annotations;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
-using JetBrains.Annotations;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public class DocumentBuilder : PdfRequestBuilder
     {
-        public DocumentBuilder(PdfRequest request)
+        public DocumentBuilder(ContentRequest request)
         {
             this.Request = request;
-            this.Request.Content ??= new DocumentRequest();
+            this.Request.Content ??= new Document();
         }
 
         #region body
@@ -120,15 +123,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
         [PublicAPI]
         public DocumentBuilder AddAssets(Dictionary<string, string> assets) =>
-                AddAssets(assets?.ToDictionary(_ => _.Key, _ => new ContentItem(_.Value)) ?? throw new ArgumentException("Assets can not be null"));
+                AddAssets(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
 
         [PublicAPI]
         public DocumentBuilder AddAssets(Dictionary<string, byte[]> assets) =>
-                AddAssets(assets?.ToDictionary(_ => _.Key, _ => new ContentItem(_.Value)) ?? throw new ArgumentException("Assets can not be null"));
+                AddAssets(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
 
         [PublicAPI]
         public DocumentBuilder AddAssets(Dictionary<string, Stream> assets) =>
-                AddAssets(assets?.ToDictionary(_ => _.Key, _ => new ContentItem(_.Value)) ?? throw new ArgumentException("Assets can not be null"));
+                AddAssets(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
       
         #endregion
         
@@ -136,19 +139,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         
         [PublicAPI]
         public DocumentBuilder AddAssets(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
-                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(_ => _.Key, _ => _.Value) ?? throw new ArgumentException("Assets can not be null")));
+                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ?? throw new ArgumentException("Assets can not be null")));
         
         [PublicAPI]
         public DocumentBuilder AddAssets(IEnumerable<KeyValuePair<string, string>> assets) =>
-                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(_ => _.Key, _ => new ContentItem(_.Value)) ?? throw new ArgumentException("Assets can not be null")));
+                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
 
         [PublicAPI]
         public DocumentBuilder AddAssets(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
-                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(_ => _.Key, _ => new ContentItem(_.Value)) ?? throw new ArgumentException("Assets can not be null")));
+                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
 
         [PublicAPI]
         public DocumentBuilder AddAssets(IEnumerable<KeyValuePair<string, Stream>> assets) =>
-                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(_ => _.Key, _ => new ContentItem(_.Value)) ?? throw new ArgumentException("Assets can not be null")));
+                AddAssets(new Dictionary<string, ContentItem>(assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
 
         #endregion
         
@@ -157,17 +160,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         #region dimension instance
         
         [PublicAPI]
-        public DocumentBuilder SetDimensions(DocumentDimensions dims)
+        public DocumentBuilder SetDimensions(Dimensions dims)
         {
             this.Request.Dimensions = dims;
             return this;
         }
 
         [PublicAPI]
-        public DocumentBuilder SetChromeDimensionDefaults() => SetDimensions(DocumentDimensions.ToChromeDefaults());
+        public DocumentBuilder SetChromeDimensionDefaults() => SetDimensions(Requests.Content.Dimensions.ToChromeDefaults());
 
         [PublicAPI]
-        public DocumentBuilder SetDeliverableDimensionDefaults() => SetDimensions(DocumentDimensions.ToDeliverableDefault());
+        public DocumentBuilder SetDeliverableDimensionDefaults() => SetDimensions(Requests.Content.Dimensions.ToDeliverableDefault());
 
         #endregion
 

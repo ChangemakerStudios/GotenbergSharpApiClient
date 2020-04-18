@@ -6,13 +6,13 @@ using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
 {
     /// <summary>
     /// Represents the elements of a document
     /// </summary>
     /// <remarks>The file names are a Gotenberg Api convention</remarks>
-    public sealed class DocumentRequest : IConvertToHttpContent 
+    public sealed class Document : IConvertToHttpContent 
     {
         readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
@@ -30,16 +30,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
                 .Select(p => new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
-                .Select(_ =>
+                .Select(item =>
                 {
-                    var value = (ContentItem)_.Prop.GetValue(this);
+                    var value = (ContentItem)item.Prop.GetValue(this);
                     if (value == null) return null;
 
-                    var item = value.ToHttpContentItem();
-                    item.Headers.ContentType = new MediaTypeHeaderValue(_.Attrib.MediaType);
-                    item.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name, FileName = _.Attrib.FileName };
+                    var contentItem = value.ToHttpContentItem();
+                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(item.Attrib.MediaType);
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name, FileName = item.Attrib.FileName };
 
-                    return item;
+                    return contentItem;
 
                 }).Where(item => item != null);
         }

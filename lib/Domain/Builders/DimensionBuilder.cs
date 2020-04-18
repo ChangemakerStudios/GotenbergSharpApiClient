@@ -1,16 +1,18 @@
 // Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public class DimensionBuilder : PdfRequestBuilder
     {
-        public DimensionBuilder(PdfRequest request)
+        public DimensionBuilder(ContentRequest request)
         {
             this.Request = request;
-            this.Request.Dimensions ??= new DocumentDimensions();
+            this.Request.Dimensions ??= new Dimensions();
         }
         
         [PublicAPI]

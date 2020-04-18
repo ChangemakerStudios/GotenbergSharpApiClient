@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
@@ -31,7 +32,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     contentTypeProvider.TryGetContentType(item.Key, out var contentType);
                     return new {Asset = item, MediaType = contentType};
                 })
-                .Where(_ => _.MediaType.IsSet())
+                .Where(i => i.MediaType.IsSet())
                 .Select(item =>
                 {
                     var asset = item.Asset.Value.ToHttpContentItem();

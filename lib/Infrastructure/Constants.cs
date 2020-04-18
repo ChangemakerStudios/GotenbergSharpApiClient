@@ -32,6 +32,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 public const string MergeOffice = "convert/office";
                 public const string ConvertHtml = "convert/html";
                 public const string UrlConvert = "convert/url";
+                public const string MarkdownConvert = "convert/markdown";
             }
             
             public static class FileNames

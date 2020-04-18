@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
@@ -13,6 +14,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
     public class MergeBuilder
     {
         readonly IMergeRequest _request;
+
+        protected MergeBuilder()
+        {
+        }
 
         [PublicAPI]
         public MergeBuilder(Dictionary<string, ContentItem> items) => 
@@ -38,7 +43,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         
         [PublicAPI]
         public MergeBuilder(IEnumerable<KeyValuePair<string, ContentItem>> items) 
-                : this(new Dictionary<string, ContentItem>( items?.ToDictionary(_=> _.Key, _=> _.Value ) ?? throw new InvalidOperationException() ))
+                : this(new Dictionary<string, ContentItem>( items?.ToDictionary(i=> i.Key, i=> i.Value ) ?? throw new InvalidOperationException() ))
         {
         }
 

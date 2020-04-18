@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
@@ -11,15 +12,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// A request to merge the specified items into one pdf file
     /// </summary>
-    public sealed class MergeRequest : IMergeRequest
+    public class MergeRequest : RequestBase, IMergeRequest
     {
-        
-        /// <summary>
-        /// Gets the request configuration containing fields that all Gotenberg endpoints accept
-        /// </summary>
-        // ReSharper disable once MemberCanBeProtected.Global
-        public RequestConfig Config { get; set; } = new RequestConfig();
-
         /// <summary>
         /// Key = file name; value = the document content
         /// </summary>
@@ -36,21 +30,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Items.Where(_ => _.Value != null)
-                .Select(_ =>
+            return this.Items.Where(item => item.Value != null)
+                .Select(item =>
                 {
-                    var item = _.Value.ToHttpContentItem();
+                    var contentItem = item.Value.ToHttpContentItem();
                     
-                    item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
                         Name = Constants.Gotenberg.FormFieldNames.Files,
-                        FileName = _.Key
+                        FileName = item.Key
                     };
 
-                    item.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
+                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
 
-                    return item;
+                    return contentItem;
                     
-                }).Concat(Config.ToHttpContent());
+                }).Concat(Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
     }
 }

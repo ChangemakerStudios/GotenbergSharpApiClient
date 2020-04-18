@@ -9,7 +9,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public sealed class ConfigBuilder : PdfRequestBuilder
     {
-        public ConfigBuilder(PdfRequest request)
+        public ConfigBuilder(ContentRequest request)
         {
             this.Request = request;
             this.Request.Config ??= new RequestConfig();
@@ -28,7 +28,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             this.Request.Config.ChromeRpccBufferSize = value;
             return this;
         }
-
+        
         [PublicAPI]
         public ConfigBuilder PageRanges(string value)
         {

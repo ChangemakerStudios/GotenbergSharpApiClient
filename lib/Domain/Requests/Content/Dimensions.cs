@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
 {
     /// <summary>
     ///  Represents the dimensions of the pdf document
@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
     /// </remarks>
-    public sealed class DocumentDimensions : IConvertToHttpContent
+    public sealed class Dimensions : IConvertToHttpContent
     {
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
@@ -88,7 +88,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="DocumentDimensions"/> is landscape.
+        /// Gets or sets a value indicating whether this <see cref="Dimensions"/> is landscape.
         /// </summary>
         /// <value>
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
@@ -107,9 +107,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         ///     Source: https://github.com/thecodingmachine/gotenberg/blob/7e69ec4367069df52bb61c9ee0dce241b043a257/internal/pkg/printer/chrome.go#L47
         /// </remarks>
         /// <returns></returns>
-        public static DocumentDimensions ToChromeDefaults()
+        public static Dimensions ToChromeDefaults()
         {
-            return new DocumentDimensions { 
+            return new Dimensions { 
                 PaperWidth = 8.27, 
                 PaperHeight = 11.7,
                 Landscape = false,
@@ -124,9 +124,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Defaults used for deliverables
         /// </summary>
         /// <returns></returns>
-        public static DocumentDimensions ToDeliverableDefault()
+        public static Dimensions ToDeliverableDefault()
         {
-            return new DocumentDimensions { 
+            return new Dimensions { 
                 PaperWidth = 8.26, 
                 PaperHeight = 11.69,
                 Landscape = false,
@@ -146,14 +146,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
                 .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
-                .Select(_ =>
+                .Select(item =>
                 {
-                    var value =  _.Prop.GetValue(this);
+                    var value =  item.Prop.GetValue(this);
 
                     if (value == null) return null;
 
                     var contentItem =new StringContent(value.ToString());
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name  };
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name  };
 
                     return contentItem;
                 }).Where(item=> item != null);

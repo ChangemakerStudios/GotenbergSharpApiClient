@@ -3,7 +3,7 @@ using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Extensions;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
 {
     [UsedImplicitly]
     public sealed class ContentItem
