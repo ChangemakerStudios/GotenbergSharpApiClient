@@ -12,19 +12,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// Represents a Gotenberg Api conversion request for HTML or Markdown to pdf
     /// </summary>
     /// <remarks>
-    ///     For Markdown conversions your Content.Body must contain HTML that references a markdown file 
-    ///     using the Go template function toHTML within the body element. This function will convert a given markdown file to HTML.
+    ///     For Markdown conversions your Content.Body must contain HTML that references one or more markdown files
+    ///     using the Go template function 'toHTML' within the body element. Chrome uses the function to convert the contents a given markdown file to HTML.
     ///     See example here: https://thecodingmachine.github.io/gotenberg/#markdown.basic
     /// </remarks>
-    public class ContentRequest : ResourceRequest
+    public class ContentRequest : ResourceRequest, IConvertToHttpContent
     {
+        public ContentRequest(): this(false){}
+
         public ContentRequest(bool forMarkdown = false) => this.ContainsMarkdown = forMarkdown;
 
         public bool ContainsMarkdown { get; }
 
         public Document Content { get; set; }
 
-        protected AssetRequest Assets { get; set; }
+        AssetRequest Assets { get; set; }
 
         public void AddAssets(AssetRequest assets)
         {
@@ -43,12 +45,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         /// <returns></returns>
         /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
-        public override IEnumerable<HttpContent> ToHttpContent()
+        public IEnumerable<HttpContent> ToHttpContent()
         {
             if (Content?.Body == null) throw new ArgumentNullException(nameof(Content), "You need to Add at least a body");
 
             return Content.ToHttpContent()
-                          .Concat(base.ToHttpContent())
+                          .Concat(this.Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>() )
+                          .Concat(this.Dimensions?.ToHttpContent() ?? Dimensions.ToChromeDefaults().ToHttpContent())
                           .Concat(Assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
         }
       

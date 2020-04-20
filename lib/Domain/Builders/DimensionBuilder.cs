@@ -7,69 +7,89 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public class DimensionBuilder : PdfRequestBuilder
+    public sealed class DimensionBuilder<TParent>: BaseRequestBuilder<ResourceRequest>
     {
-        public DimensionBuilder(ContentRequest request)
+        public DimensionBuilder(ResourceRequest request, TParent parent)
         {
+            this.Parent = parent;
             this.Request = request;
             this.Request.Dimensions ??= new Dimensions();
         }
-        
+
         [PublicAPI]
-        public DimensionBuilder SetScale(double scale)
+        public TParent Parent { get; }
+
+        [PublicAPI]
+        public DimensionBuilder<TParent> SetScale(double scale)
         {
             this.Request.Dimensions.Scale = scale;
             return this;
         }
-
         
         [PublicAPI]
-        public DimensionBuilder PaperWidth(double width)
+        public DimensionBuilder<TParent> PaperWidth(double width)
         {
             this.Request.Dimensions.PaperWidth = width;
             return this;
         }
 
         [PublicAPI]
-        public DimensionBuilder PaperHeight(double height)
+        public DimensionBuilder<TParent> PaperHeight(double height)
         {
             this.Request.Dimensions.PaperHeight = height;
             return this;
         }
 
         [PublicAPI]
-        public DimensionBuilder MarginTop(double marginTop)
+        public DimensionBuilder<TParent> MarginTop(double marginTop)
         {
             this.Request.Dimensions.MarginTop = marginTop;
             return this;
         }
 
         [PublicAPI]
-        public DimensionBuilder MarginBottom(double marginBottom)
+        public DimensionBuilder<TParent> MarginBottom(double marginBottom)
         {
             this.Request.Dimensions.MarginBottom = marginBottom;
             return this;
         }
         
         [PublicAPI]
-        public DimensionBuilder MarginLeft(double marginLeft)
+        public DimensionBuilder<TParent> MarginLeft(double marginLeft)
         {
             this.Request.Dimensions.MarginLeft = marginLeft;
             return this;
         }
         
         [PublicAPI]
-        public DimensionBuilder MarginRight(double marginRight)
+        public DimensionBuilder<TParent> MarginRight(double marginRight)
         {
             this.Request.Dimensions.MarginRight = marginRight;
             return this;
         }
 
         [PublicAPI]
-        public DimensionBuilder LandScape(bool landscape)
+        public DimensionBuilder<TParent> LandScape(bool landscape)
         {
             this.Request.Dimensions.Landscape = landscape;
             return this;
         }
+
+        #region dimension instance
+        
+        [PublicAPI]
+        public DimensionBuilder<TParent> SetDimensions(Dimensions dims)
+        {
+            this.Request.Dimensions = dims;
+            return this;
+        }
+
+        [PublicAPI]
+        public DimensionBuilder<TParent> UseChromeDefaults() => SetDimensions(Dimensions.ToChromeDefaults());
+
+        [PublicAPI]
+        public DimensionBuilder<TParent> UseDeliverableDefaults() => SetDimensions(Dimensions.ToDeliverableDefault());
+
+        #endregion
     }
 }

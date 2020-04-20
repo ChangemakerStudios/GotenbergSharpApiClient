@@ -7,37 +7,41 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class ConfigBuilder : PdfRequestBuilder
+    public sealed class ConfigBuilder<TParent> : BaseRequestBuilder<ResourceRequest>
     {
-        public ConfigBuilder(ContentRequest request)
+        public ConfigBuilder(ResourceRequest request, TParent parent)
         {
+            this.Parent = parent;
             this.Request = request;
             this.Request.Config ??= new RequestConfig();
         }
 
         [PublicAPI]
-        public ConfigBuilder TimeOut(float value)
+        public TParent Parent { get; }
+
+        [PublicAPI]
+        public ConfigBuilder<TParent> TimeOut(float value)
         {
             this.Request.Config.TimeOut = value;
             return this;
        }
         
         [PublicAPI]
-        public ConfigBuilder ChromeRpccBufferSize(int value)
+        public ConfigBuilder<TParent> ChromeRpccBufferSize(int value)
         {
             this.Request.Config.ChromeRpccBufferSize = value;
             return this;
         }
         
         [PublicAPI]
-        public ConfigBuilder PageRanges(string value)
+        public ConfigBuilder<TParent> PageRanges(string value)
         {
             this.Request.Config.PageRanges = value;
             return this;
         }
 
         [PublicAPI]
-        public ConfigBuilder ResultFileName(string value)
+        public ConfigBuilder<TParent> ResultFileName(string value)
         {
             if(value.IsNotSet()) throw new ArgumentException("ResultFileName was null || empty");
             this.Request.Config.ResultFileName = value;
@@ -45,7 +49,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
         
         [PublicAPI]
-        public ConfigBuilder WebHook(string value)
+        public ConfigBuilder<TParent> WebHook(string value)
         {
             if(value.IsNotSet()) throw new ArgumentException("WebHook was null || empty");
             if(!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("WebHook was not well formed. See https://docs.microsoft.com/en-us/dotnet/api/system.uri.iswellformeduristring?view=netstandard-2.0");
@@ -54,7 +58,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
         
         [PublicAPI]
-        public ConfigBuilder WebHook(Uri value)
+        public ConfigBuilder<TParent> WebHook(Uri value)
         {
             if(value == null) throw new ArgumentNullException(nameof(value));
             if(!value.IsAbsoluteUri) throw new ArgumentException("WebHook must be absolute");
@@ -63,11 +67,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public ConfigBuilder WebHookTimeOut(float value)
+        public ConfigBuilder<TParent> WebHookTimeOut(float value)
         {
             this.Request.Config.WebHookTimeOut = value;
             return this;
         }
-        
+ 
     }
 }

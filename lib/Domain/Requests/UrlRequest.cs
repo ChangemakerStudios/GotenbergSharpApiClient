@@ -12,7 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// For URL to PDF conversions
     /// </summary>
   
-    public sealed class UrlRequest : ResourceRequest
+    public sealed class UrlRequest : ResourceRequest, IConvertToHttpContent
     {
         [UsedImplicitly]
         public Uri Url { get; set; }
@@ -20,18 +20,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         [UsedImplicitly]
         public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
         
-        public override IEnumerable<HttpContent> ToHttpContent()
+        public  IEnumerable<HttpContent> ToHttpContent()
         {
             if(!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");
             
             var remoteUrl = new StringContent(this.Url.ToString());
             remoteUrl.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
-                Name =  Constants.Gotenberg.FormFieldNames.RemoteURL
-            };
+                                                                                                                                    Name =  Constants.Gotenberg.FormFieldNames.RemoteURL
+                                                                                                                                };
 
             yield return remoteUrl;
-            
-            foreach (var item in base.ToHttpContent().Concat(Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>()))
+
+
+            foreach (var item in Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>()
+                                         .Concat(this.Dimensions?.ToHttpContent() ?? Content.Dimensions.ToChromeDefaults().ToHttpContent()))
             {
                 yield return item;
             }

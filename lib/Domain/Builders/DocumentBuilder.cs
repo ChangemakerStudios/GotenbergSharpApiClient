@@ -13,13 +13,17 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public class DocumentBuilder : PdfRequestBuilder
+    public sealed class DocumentBuilder: PdfRequestBuilder
     {
-        public DocumentBuilder(ContentRequest request)
+        public DocumentBuilder(ContentRequest request, PdfRequestBuilder parent)
         {
+            this.Parent = parent;
             this.Request = request;
             this.Request.Content ??= new Document();
         }
+
+        [PublicAPI]
+        public PdfRequestBuilder Parent { get; }
 
         #region body
         
@@ -156,23 +160,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         #endregion
         
         #endregion
-        
-        #region dimension instance
-        
-        [PublicAPI]
-        public DocumentBuilder SetDimensions(Dimensions dims)
-        {
-            this.Request.Dimensions = dims;
-            return this;
-        }
-
-        [PublicAPI]
-        public DocumentBuilder SetChromeDimensionDefaults() => SetDimensions(Requests.Content.Dimensions.ToChromeDefaults());
-
-        [PublicAPI]
-        public DocumentBuilder SetDeliverableDimensionDefaults() => SetDimensions(Requests.Content.Dimensions.ToDeliverableDefault());
-
-        #endregion
-
+ 
     }
 }

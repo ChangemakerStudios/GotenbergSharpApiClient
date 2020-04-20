@@ -10,7 +10,8 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
-    /// A request to merge the specified items into one pdf file
+    /// A request to merge the specified items into one pdf file.
+    /// TODO make it like Url request??? Do merges support dimensions???
     /// </summary>
     public class MergeRequest : RequestBase, IMergeRequest
     {
@@ -30,15 +31,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
+            //Supports dims and config???
             return this.Items.Where(item => item.Value != null)
                 .Select(item =>
                 {
                     var contentItem = item.Value.ToHttpContentItem();
                     
                     contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
-                        Name = Constants.Gotenberg.FormFieldNames.Files,
-                        FileName = item.Key
-                    };
+                                                                                                                                              Name = Constants.Gotenberg.FormFieldNames.Files,
+                                                                                                                                              FileName = item.Key
+                                                                                                                                          };
 
                     contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
 

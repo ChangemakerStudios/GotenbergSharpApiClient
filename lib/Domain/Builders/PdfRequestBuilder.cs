@@ -7,29 +7,26 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     [PublicAPI]
-    public class PdfRequestBuilder
+    public class PdfRequestBuilder: BaseRequestBuilder<ContentRequest>
     {
-        protected ContentRequest Request { get; set; }
+        protected sealed override ContentRequest Request { get; set; }
 
         [PublicAPI]
-        public PdfRequestBuilder(bool isMarkDown = false) => Request = new ContentRequest(isMarkDown);
+        public PdfRequestBuilder(bool hasMarkdown = false) => this.Request = new ContentRequest(hasMarkdown);
 
         [PublicAPI]
-        public DocumentBuilder Document => new DocumentBuilder(Request);
+        public DocumentBuilder Document => new DocumentBuilder(Request, this);
 
         [PublicAPI]
-        public DimensionBuilder Dimensions => new DimensionBuilder(Request);
-        
-        [PublicAPI]
-        public ConfigBuilder ConfigureRequest => new ConfigBuilder(Request);
-     
+        public DimensionBuilder<PdfRequestBuilder> Dimensions => new DimensionBuilder<PdfRequestBuilder>(this.Request, this);
 
         [PublicAPI]
-        public ContentRequest Build()
+        public ConfigBuilder<PdfRequestBuilder> ConfigureRequest => new ConfigBuilder<PdfRequestBuilder>(this.Request, this);
+
+        [PublicAPI]
+        public ContentRequest Build() 
         {
-             if(this.Request?.Content == null) throw new NullReferenceException("Request.Content is null");
-             this.Request.Dimensions ??= Requests.Content.Dimensions.ToChromeDefaults();
-
+            if(this.Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
             return Request;
         }
     }
