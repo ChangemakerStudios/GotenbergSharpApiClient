@@ -1,7 +1,7 @@
-// Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
-
 using System;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders

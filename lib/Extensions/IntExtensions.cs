@@ -1,7 +1,6 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 using System.Linq;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
@@ -12,8 +11,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     [UsedImplicitly]
     public static class IntExtensions
     {
-        const int alphabetLength = 26;
-        static readonly char[] _alphabet = Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => (char) c).ToArray();
+        const int AlphabetLength = 26;
+        static readonly char[] Alphabet = Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => (char) c).ToArray();
 
         /// <summary>
         /// Returns a-z for the first 26 (0-25); then za - zz for the next; zza - zzz, etc.
@@ -29,7 +28,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             if(sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
 
-            return $"{new string('Z', sortNumber / alphabetLength)}{_alphabet[sortNumber % alphabetLength]}";
+            return $"{new string('Z', sortNumber / AlphabetLength)}{Alphabet[sortNumber % AlphabetLength]}";
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿// Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
@@ -18,12 +18,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         protected override MergeRequest Request { get; set; }
-      
-        [PublicAPI]
-        public MergeBuilder(Dictionary<string, ContentItem> items) => 
-                this.Request.Items = items ?? new Dictionary<string, ContentItem>();
 
         [PublicAPI]
+        public MergeBuilder(Dictionary<string, ContentItem> items) => Init(items);
+
+       [PublicAPI]
         public MergeBuilder(Dictionary<string, string> items) 
                 : this(items.ToDictionary(item => item.Key, item => new ContentItem(item.Value)))
         {
@@ -46,6 +45,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
                 : this(new Dictionary<string, ContentItem>( items?.ToDictionary(i=> i.Key, i=> i.Value ) ?? throw new InvalidOperationException() ))
         {
         }
+
         [PublicAPI]
         public ConfigBuilder<MergeBuilder> ConfigureRequest => new ConfigBuilder<MergeBuilder>(this.Request, this);
  
@@ -55,7 +55,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         /// <returns></returns>
         [PublicAPI]
         public IMergeRequest Build() => this.Request;
-     
+
+        void Init(Dictionary<string, ContentItem> items) 
+            => this.Request.Items = items ?? new Dictionary<string, ContentItem>();
     }
 
 }

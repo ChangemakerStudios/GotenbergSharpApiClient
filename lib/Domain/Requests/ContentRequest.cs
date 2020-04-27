@@ -1,10 +1,10 @@
-﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+using Gotenberg.Sharp.API.Client.Extensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -40,12 +40,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            if (Content?.Body == null) throw new ArgumentNullException(nameof(Content), "You need to Add at least a body");
+            if (Content?.Body == null) throw new NullReferenceException("You need to Add at least a body");
 
-            return Content.ToHttpContent()
-                          .Concat(this.Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>() )
-                          .Concat(this.Dimensions?.ToHttpContent() ?? Dimensions.ToChromeDefaults().ToHttpContent())
-                          .Concat(Assets?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
+            return Content.IfNullEmptyContent()
+                          .Concat(Config.IfNullEmptyContent() )
+                          .Concat(Dimensions.IfNullEmptyContent())
+                          .Concat(Assets.IfNullEmptyContent());
         }
       
     }

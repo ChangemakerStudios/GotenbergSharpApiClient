@@ -1,11 +1,12 @@
+using System;
 using System.IO;
 using System.Net.Http;
+
 using Gotenberg.Sharp.API.Client.Extensions;
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
 {
-    [UsedImplicitly]
+
     public sealed class ContentItem
     {
         readonly byte[] _bytes;
@@ -22,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
         {
             if (c._bytes != null) return new ByteArrayContent(c._bytes);
             if (c._stringItem.IsSet()) return new StringContent(c._stringItem);
-            return c._streamItem != null ? new StreamContent(c._streamItem) : null;
+            return  new StreamContent(c._streamItem ?? throw new NullReferenceException("No usable value was passed to constructor")) ;
         }
     }
 

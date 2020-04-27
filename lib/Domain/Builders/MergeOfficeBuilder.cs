@@ -1,8 +1,8 @@
-﻿// Gotenberg.Sharp.Api.Client - Copyright (c) 2020 CaptiveAire
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
@@ -14,9 +14,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public MergeOfficeBuilder(Dictionary<string, ContentItem> items)
         {
-            this._request = new MergeOfficeRequest() {
-                                                         Items = items
-                                                     };
+            this._request = new MergeOfficeRequest { Items = items };
         }
 
         [PublicAPI]

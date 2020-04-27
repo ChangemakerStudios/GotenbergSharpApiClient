@@ -1,5 +1,4 @@
-// Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
-
+using System;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 
@@ -12,8 +11,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public DimensionBuilder(ResourceRequest request, TParent parent)
         {
             this.Parent = parent;
-            this.Request = request;
-            this.Request.Dimensions ??= new Dimensions();
+            this.Request = request ?? throw new ArgumentNullException(nameof(request));
+            Request.Dimensions ??= new Dimensions();
         }
 
         [PublicAPI]

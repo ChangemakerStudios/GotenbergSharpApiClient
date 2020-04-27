@@ -1,6 +1,4 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
@@ -20,8 +18,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         /// <param name="mediaType">The media type</param>
         public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files, 
                                         string fileName = null, 
-                                        string contentDisposition = Constants.Http.Disposition.Types.FormData,
-                                        string mediaType = Constants.Http.MediaTypes.TextHtml)
+                                        string contentDisposition = Constants.HttpContent.Disposition.Types.FormData,
+                                        string mediaType = Constants.HttpContent.MediaTypes.TextHtml)
         {
             Name = name;
             FileName = fileName;

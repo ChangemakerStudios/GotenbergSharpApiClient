@@ -1,8 +1,9 @@
-// Gotenberg.Sharp.Api.Client - Copyright (c) 2020 CaptiveAire
-
+using System;
 using System.IO;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
@@ -13,7 +14,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public UrlHeaderFooterBuilder(UrlRequest request, UrlRequestBuilder parent)
         {
             this.Parent = parent;
-            this.Request = request;
+            this.Request = request ?? throw new ArgumentNullException(nameof(request));
             this.Request.Content = new HeaderFooterDocument();
         } 
         

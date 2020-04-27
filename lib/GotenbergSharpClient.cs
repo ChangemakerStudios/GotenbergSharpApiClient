@@ -1,15 +1,16 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
+
 using Microsoft.Net.Http.Headers;
 
 namespace Gotenberg.Sharp.API.Client
@@ -57,7 +58,7 @@ namespace Gotenberg.Sharp.API.Client
 
             if (this._innerClient.BaseAddress == null)
             {
-                throw new ArgumentNullException(nameof(innerClient.BaseAddress), "You must set the inner client's base address");
+                throw new NullReferenceException(nameof(innerClient.BaseAddress));
             }
 
             this._innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
@@ -73,11 +74,14 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-     
+
         [PublicAPI]
         public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
-            => await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
-        
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            return await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
+        }
+
         /// <summary>
         ///    Converts the specified request to a PDF document.
         /// </summary>
@@ -88,6 +92,7 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task<Stream> ToPdfAsync(ContentRequest request, CancellationToken cancelToken = default)
         {
+            if(request == null) throw new ArgumentNullException(nameof(request));
             var path = request.ContainsMarkdown ? Constants.Gotenberg.ApiPaths.MarkdownConvert : Constants.Gotenberg.ApiPaths.ConvertHtml;
             return await ExecuteRequest(request, path, cancelToken).ConfigureAwait(false);
         }
@@ -124,15 +129,14 @@ namespace Gotenberg.Sharp.API.Client
 
         async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken = default)  
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (request.Count == 0) throw new ArgumentException(nameof(request));
+            if (request?.Count == null) throw new ArgumentNullException(nameof(request));
 
             return await ExecuteRequest(request, mergePath, cancelToken).ConfigureAwait(false);
         }
 
         async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, CancellationToken cancelToken, KeyValuePair<string,string> remoteUrlHeader = default)
         {
-            using var formContent = new MultipartFormDataContent($"{Constants.Http.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
+            using var formContent = new MultipartFormDataContent($"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
             
             foreach (var item in request.ToHttpContent())
             {

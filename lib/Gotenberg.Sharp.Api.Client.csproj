@@ -30,19 +30,21 @@
   </PropertyGroup>    
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="Resources\gotenbergSharpClient.PNG" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup> 
 
   <ItemGroup>
     <Resource Include="Resources\gotenbergSharpClient.PNG" />
   </ItemGroup> 
-
-  <ItemGroup>
-    <Compile Remove="Domain\Requests\IDimensionalRequest.cs" />
-  </ItemGroup>
+ 
 </Project>

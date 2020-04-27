@@ -1,8 +1,8 @@
-// Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
-
 using System;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
@@ -12,7 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public ConfigBuilder(RequestBase request, TParent parent)
         {
             this.Parent = parent;
-            this.Request = request;
+            this.Request = request ?? throw new ArgumentNullException(nameof(request));
             this.Request.Config ??= new RequestConfig();
         }
 

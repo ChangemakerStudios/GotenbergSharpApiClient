@@ -1,10 +1,10 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
@@ -37,17 +37,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 {
                     var contentItem = item.Value.ToHttpContentItem();
                     
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) 
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData) 
                     {
                         Name = Constants.Gotenberg.FormFieldNames.Files,
                         FileName = item.Key
                     };
 
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
+                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
 
                     return contentItem;
                     
-                }).Concat(Config?.ToHttpContent() ?? Enumerable.Empty<HttpContent>());
+                }).Concat(Config.IfNullEmptyContent());
         }
     }
 }

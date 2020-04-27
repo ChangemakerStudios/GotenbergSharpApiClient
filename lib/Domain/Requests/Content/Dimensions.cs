@@ -1,11 +1,11 @@
-﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
@@ -19,6 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
     /// </remarks>
     public sealed class Dimensions : IConvertToHttpContent
     {
+        // ReSharper disable once InconsistentNaming
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
         #region Properties
@@ -95,11 +96,26 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Landscape)]
         public bool Landscape { [UsedImplicitly] get; set; }
-        
+
         #endregion
 
         #region public methods
-  
+
+       // https://www.prepressure.com/library/paper-size
+
+        public static Dimensions ToA4WithNoMargins()
+        {
+            return new Dimensions
+            {
+                PaperWidth = 8.27,
+                PaperHeight = 11.7,
+                MarginTop = 0,
+                MarginBottom = 0,
+                MarginLeft = 0,
+                MarginRight = 0
+            };
+        }
+
         /// <summary>
         ///     Default Google Chrome printer options
         /// </summary>
@@ -112,7 +128,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
             return new Dimensions { 
                 PaperWidth = 8.27, 
                 PaperHeight = 11.7,
-                Landscape = false,
                 MarginTop = 1,
                 MarginBottom = 1,
                 MarginLeft = 1,

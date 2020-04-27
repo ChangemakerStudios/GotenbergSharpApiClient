@@ -1,5 +1,5 @@
-﻿
-using Gotenberg.Sharp.API.Client.Infrastructure;
+﻿using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content

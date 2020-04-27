@@ -1,8 +1,9 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests;
-using JetBrains.Annotations;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+
+using Gotenberg.Sharp.API.Client.Domain.Requests;
+
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
@@ -14,34 +15,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public UrlRequestBuilder() => this.Request = new UrlRequest();
 
         [PublicAPI]
-        public UrlRequestBuilder(string url)
-        {
-            this.Request = new UrlRequest();
-            this.SetUrl(url);
-        }
-        
-        [PublicAPI]
-        public UrlRequestBuilder(Uri url)
-        {
-            this.Request = new UrlRequest();
-            this.SetUrl(url);
-        }
-        
-        [PublicAPI]
         public UrlRequestBuilder SetUrl(string url) => SetUrl(new Uri(url));
         
-        [PublicAPI]
-        public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
-        {
-            this.Request.RemoteUrlHeader = new KeyValuePair<string, string>(name, value);
-            return this;
-        }
-        
-
         [PublicAPI]
         public UrlRequestBuilder SetUrl(Uri url)
         {
             this.Request.Url = url;
+            return this;
+        }
+
+        [PublicAPI]
+        public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
+        {
+            this.Request.RemoteUrlHeader = new KeyValuePair<string, string>(name, value);
             return this;
         }
 

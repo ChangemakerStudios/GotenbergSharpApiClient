@@ -1,8 +1,9 @@
+// ReSharper disable All CA1034
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
     public static class Constants
     {
-        public static class Http
+        public static class HttpContent
         {
             public static class MediaTypes
             {
@@ -47,10 +48,10 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 public const string Files          =   "files";
                 public const string WaitTimeout    =   "waitTimeout";
                 public const string ResultFilename =   "resultFilename";
-                public const string RemoteURL      =   "remoteURL";
+                public const string RemoteUrl      =   "remoteURL";
                 
                 public const string PageRanges     =   "pageRanges";   
-                public const string WebhookURL     =   "webhookURL";
+                public const string WebhookUrl     =   "webhookURL";
                 public const string WebhookTimeout =   "webhookURLTimeout";
                 public const string ChromeRpccBufferSize = "googleChromeRpccBufferSize";
                 

@@ -1,11 +1,13 @@
-﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gotenberg.Sharp.API.Client.Extensions;
+
 using JetBrains.Annotations;
+
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
@@ -14,6 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
     /// </summary>
     /// <seealso cref="System.Net.Http.DelegatingHandler" />
     [UsedImplicitly]
+    [SuppressMessage("ReSharper", "CA2000")]
     public class TimeoutHandler : DelegatingHandler
     {
         /// <summary>
@@ -21,7 +24,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
         /// </summary>
         /// <param name="innerHandler">The inner handler which is responsible for processing the HTTP response messages.</param>
         public TimeoutHandler(HttpMessageHandler innerHandler = null)
-                : base(innerHandler ?? new HttpClientHandler())
+            : base(innerHandler ?? new HttpClientHandler())
         {
         }
 
@@ -47,7 +50,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 
             try
             {
-                return await base.SendAsync(request, cts?.Token ?? cancellationToken);
+                return await base.SendAsync(request, cts?.Token ?? cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
             {

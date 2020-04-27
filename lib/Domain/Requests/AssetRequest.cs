@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
+
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+    // ReSharper disable once CA1710
+    // ReSharper disable once CA1710
     public sealed class AssetRequest: Dictionary<string, ContentItem>, IConvertToHttpContent 
     {
-        readonly FileExtensionContentTypeProvider contentTypeProvider = new FileExtensionContentTypeProvider();
+        readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
       
         [UsedImplicitly]
         public void AddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
@@ -29,7 +34,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             return this.Select(item =>
                 {
-                    contentTypeProvider.TryGetContentType(item.Key, out var contentType);
+                    _contentTypeProvider.TryGetContentType(item.Key, out var contentType);
                     return new {Asset = item, MediaType = contentType};
                 })
                 .Where(i => i.MediaType.IsSet())
@@ -38,7 +43,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     var asset = item.Asset.Value.ToHttpContentItem();
 
                     asset.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData)
+                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                         {
                             Name = Constants.Gotenberg.FormFieldNames.Files,
                             FileName = item.Asset.Key

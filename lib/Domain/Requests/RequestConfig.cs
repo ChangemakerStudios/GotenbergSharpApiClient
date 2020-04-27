@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
@@ -16,7 +18,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         Uri _webHook;
         float? _timeOut;
-        const string _dispositionType = Constants.Http.Disposition.Types.FormData;
       
         #region Basic settings
 
@@ -78,6 +79,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public float? WebHookTimeOut { get; set; }
 
         #endregion
+
         #region ToHttpContent
         
         /// <summary>
@@ -93,7 +95,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
             if (this.WebHook != null)
             {
-                yield return CreateItem(this.WebHook,  Constants.Gotenberg.FormFieldNames.WebhookURL);
+                yield return CreateItem(this.WebHook,  Constants.Gotenberg.FormFieldNames.WebhookUrl);
 
                 if (this.WebHookTimeOut.HasValue)
                 {
@@ -120,10 +122,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         static StringContent CreateItem<T>(T value, string fieldName)
         {
             var item = new StringContent(value.ToString());
-            item.Headers.ContentDisposition = new ContentDispositionHeaderValue(_dispositionType) { Name = fieldName };
+            item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData) { Name = fieldName };
             return item;
         }
         
         #endregion
+
     }
 }

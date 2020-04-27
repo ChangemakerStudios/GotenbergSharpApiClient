@@ -1,15 +1,13 @@
-// Gotenberg.Sharp.Api.Client - Copyright (c) 2019 CaptiveAire
-
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
-
-using JetBrains.Annotations ;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+using Gotenberg.Sharp.API.Client.Extensions;
+
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
@@ -18,7 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public DocumentBuilder(ContentRequest request, PdfRequestBuilder parent)
         {
             this.Parent = parent;
-            this.Request = request;
+            this.Request = request ?? throw new ArgumentNullException(nameof(request));
             this.Request.Content ??= new FullDocument();
         }
 
@@ -90,7 +88,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public DocumentBuilder AddAsset(string name, ContentItem value)
         {
-            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.Contains(@"/"))
+            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.Contains('/'))
             {
                 throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
             }
@@ -118,7 +116,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public DocumentBuilder AddAssets(Dictionary<string, ContentItem> items)
         {
-            foreach (var item in items)
+            
+            foreach (var item in items ?? throw new ArgumentNullException(nameof(items)))
             {
                 this.AddAsset(item.Key, item.Value);
             }
