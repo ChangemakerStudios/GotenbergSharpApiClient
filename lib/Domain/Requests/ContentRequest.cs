@@ -16,24 +16,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     ///     using the Go template function 'toHTML' within the body element. Chrome uses the function to convert the contents a given markdown file to HTML.
     ///     See example here: https://thecodingmachine.github.io/gotenberg/#markdown.basic
     /// </remarks>
-    public class ContentRequest : ResourceRequest, IConvertToHttpContent
+    public class ContentRequest: ResourceRequest, IConvertToHttpContent
     {
         public ContentRequest(): this(false){}
 
-        public ContentRequest(bool forMarkdown = false) => this.ContainsMarkdown = forMarkdown;
+        public ContentRequest(bool containsMarkdown = false) => this.ContainsMarkdown = containsMarkdown;
 
         public bool ContainsMarkdown { get; }
 
-        public Document Content { get; set; }
-
+        public FullDocument Content { get; set; }
         AssetRequest Assets { get; set; }
-
-        public void AddAssets(AssetRequest assets)
-        {
-            this.Assets ??= new AssetRequest();
-            this.Assets.AddRange(assets);
-        }
-
+        
         public void AddAsset(string name, ContentItem value)
         {
             this.Assets ??= new AssetRequest();

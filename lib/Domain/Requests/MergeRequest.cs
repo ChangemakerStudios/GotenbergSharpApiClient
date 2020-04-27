@@ -37,10 +37,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 {
                     var contentItem = item.Value.ToHttpContentItem();
                     
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
-                                                                                                                                              Name = Constants.Gotenberg.FormFieldNames.Files,
-                                                                                                                                              FileName = item.Key
-                                                                                                                                          };
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) 
+                    {
+                        Name = Constants.Gotenberg.FormFieldNames.Files,
+                        FileName = item.Key
+                    };
 
                     contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
 

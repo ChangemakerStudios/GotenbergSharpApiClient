@@ -2,8 +2,10 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public abstract class BaseRequestBuilder<TRequest> where TRequest: ResourceRequest, new()
+    public abstract class BaseBuilder<TRequest> where TRequest: RequestBase, new()
     {
         protected virtual TRequest Request { get; set; }
     }
+    
+   
 }

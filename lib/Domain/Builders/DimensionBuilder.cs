@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class DimensionBuilder<TParent>: BaseRequestBuilder<ResourceRequest>
+    public sealed class DimensionBuilder<TParent>: BaseBuilder<ResourceRequest>
     {
         public DimensionBuilder(ResourceRequest request, TParent parent)
         {
@@ -69,7 +69,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public DimensionBuilder<TParent> LandScape(bool landscape)
+        public DimensionBuilder<TParent> LandScape(bool landscape = true)
         {
             this.Request.Dimensions.Landscape = landscape;
             return this;

@@ -11,17 +11,17 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     [PublicAPI]
-    public class MergeBuilder
+    public class MergeBuilder: BaseBuilder<MergeRequest> 
     {
-        readonly IMergeRequest _request;
-
-        protected MergeBuilder()
+        public MergeBuilder()
         {
         }
 
+        protected override MergeRequest Request { get; set; }
+      
         [PublicAPI]
         public MergeBuilder(Dictionary<string, ContentItem> items) => 
-                this._request = new MergeRequest { Items = items ?? new Dictionary<string, ContentItem>() };
+                this.Request.Items = items ?? new Dictionary<string, ContentItem>();
 
         [PublicAPI]
         public MergeBuilder(Dictionary<string, string> items) 
@@ -46,27 +46,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
                 : this(new Dictionary<string, ContentItem>( items?.ToDictionary(i=> i.Key, i=> i.Value ) ?? throw new InvalidOperationException() ))
         {
         }
-
-        /// <summary>
-        ///  Configures individual requests, overriding container level settings that define defaults
-        ///  In most cases the defaults are fine and there's no need to provide a custom configuration.   
-        /// </summary>
-        /// <param name="customConfig"></param>
-        /// <returns></returns>
         [PublicAPI]
-        public MergeBuilder ConfigureWith(RequestConfig customConfig)
-        {
-            this._request.Config = customConfig;
-
-            return this;
-        }
-
+        public ConfigBuilder<MergeBuilder> ConfigureRequest => new ConfigBuilder<MergeBuilder>(this.Request, this);
+ 
         /// <summary>
         /// Builds the merge request
         /// </summary>
         /// <returns></returns>
         [PublicAPI]
-        public IMergeRequest Build() => this._request;
+        public IMergeRequest Build() => this.Request;
      
     }
 

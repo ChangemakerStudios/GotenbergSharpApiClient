@@ -40,5 +40,9 @@
 
   <ItemGroup>
     <Resource Include="Resources\gotenbergSharpClient.PNG" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <Compile Remove="Domain\Requests\IDimensionalRequest.cs" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     [PublicAPI]
-    public class PdfRequestBuilder: BaseRequestBuilder<ContentRequest>
+    public class PdfRequestBuilder: BaseBuilder<ContentRequest>
     {
         protected sealed override ContentRequest Request { get; set; }
 

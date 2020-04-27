@@ -2,10 +2,10 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public class ResourceRequest : RequestBase, IDimensionalRequest
+    public class ResourceRequest : RequestBase 
     {
         public Dimensions Dimensions { get; set; }
-        //Page ranges go here + 
+        //Page ranges, etc. could go here + 
         //wait delay and googleChromeRpccBufferSize.  ChromeConfig is probably a good name for this.
         //The other configs are for Container level settings
     }

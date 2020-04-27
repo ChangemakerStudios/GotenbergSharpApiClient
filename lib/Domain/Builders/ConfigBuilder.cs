@@ -7,9 +7,9 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class ConfigBuilder<TParent> : BaseRequestBuilder<ResourceRequest>
+    public sealed class ConfigBuilder<TParent> : BaseBuilder<RequestBase>
     {
-        public ConfigBuilder(ResourceRequest request, TParent parent)
+        public ConfigBuilder(RequestBase request, TParent parent)
         {
             this.Parent = parent;
             this.Request = request;

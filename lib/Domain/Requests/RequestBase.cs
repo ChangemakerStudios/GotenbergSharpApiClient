@@ -2,7 +2,7 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public abstract class RequestBase : IConfigureRequests
+    public class RequestBase
     {
         public RequestConfig Config { get; set; }
     }

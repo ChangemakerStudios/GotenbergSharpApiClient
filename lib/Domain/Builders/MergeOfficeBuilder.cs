@@ -9,11 +9,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public class MergeOfficeBuilder : MergeBuilder
     {
-        readonly IMergeOfficeRequest _request;
+        readonly MergeOfficeRequest _request;
 
         [PublicAPI]
-        public MergeOfficeBuilder(Dictionary<string, ContentItem> items) =>
-                this._request = new MergeOfficeRequest( items ?? new Dictionary<string, ContentItem>() );
+        public MergeOfficeBuilder(Dictionary<string, ContentItem> items)
+        {
+            this._request = new MergeOfficeRequest() {
+                                                         Items = items
+                                                     };
+        }
 
         [PublicAPI]
         public new IMergeOfficeRequest Build() => this._request;

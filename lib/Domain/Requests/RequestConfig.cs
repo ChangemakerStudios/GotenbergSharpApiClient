@@ -25,7 +25,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         ///     conversion unsuccessful and return a 504 HTTP code. This overrides the
         ///     the container's DEFAULT_WAIT_TIMEOUT environment variable
         /// </summary>
-       
         public float? TimeOut
         {
             get => _timeOut;
@@ -79,7 +78,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public float? WebHookTimeOut { get; set; }
 
         #endregion
-
         #region ToHttpContent
         
         /// <summary>

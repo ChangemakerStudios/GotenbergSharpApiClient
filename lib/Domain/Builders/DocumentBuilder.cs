@@ -19,7 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         {
             this.Parent = parent;
             this.Request = request;
-            this.Request.Content ??= new Document();
+            this.Request.Content ??= new FullDocument();
         }
 
         [PublicAPI]
