@@ -18,28 +18,27 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
 ```
 
-## Usage
+## Scenario 1 
 *Html to PDF conversion with embedded assets:*
 
 ```csharp
-public async Task<string> BuildPdf()
+public async Task<string> HtmlToPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new PdfRequestBuilder().Document
 				.AddBody(GetBody())
 				.AddFooter(GetFooter())
-				.SetChromeDimensionDefaults()
-				.Dimensions.SetScale(.85)
-				.Dimensions.MarginLeft(.5)
-				.Dimensions.MarginRight(.5)
-				.Document.AddAsset("ear-on-beach.jpg", await GetImageBytes());
-	//Dims: Sets chrome's default dims and then over-writes margin left/right
-
-	var response = await sharpClient.HtmlToPdfAsync(builder.Build());
+				.ConfigureRequest.ChromeRpccBufferSize(1048555).Parent
+				.Dimensions.UseChromeDefaults()
+  			    .SetScale(.75)
+				.LandScape().Parent
+				.Assets.AddItem("ear-on-beach.jpg", await GetImageBytes()).Parent;
+	 
+	var response = await sharpClient.ToPdfAsync(builder.Build());
 
 	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}Gotenberg.pdf";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenbergFromHtml.pdf";
 
 	using (var destinationStream = File.Create(outPath))
 	{
@@ -88,69 +87,104 @@ string GetFooter()
 }
 ```
 
-## Usage in .NET Core App
-*Add an IServiceCollection extension:*
+## Scenario 2 
+*Html to PDF conversion with embedded assets:*
 
 ```csharp
-public static IHttpClientBuilder AddTypedApiClient<TClient>(this IServiceCollection services, InnerClientSettings settings) where TClient: class 
- {
-     if(settings == null) throw new ArgumentNullException(nameof(settings));
-     if(settings.GetApiBaseUriFunc == null) throw new ArgumentException(nameof(settings.GetApiBaseUriFunc));
+public async Task<string> UrlToPdf()
+{
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-     return services.AddHttpClient(settings.ClientName)
-                    .ConfigureHttpClient((sp, client) =>
-                                         {
-                                             client.Timeout = settings.Timeout;
-                                             client.BaseAddress = settings.GetApiBaseUriFunc(sp);
-                                         })
-                    .AddTypedClient<TClient>()
-                    .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
-                    .SetHandlerLifetime(settings.HandlerLifeTime);
-                    //Also recommended: add a Polly Retry policy using https://www.nuget.org/packages/Polly
-                    // https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory
-                    // https://www.stevejgordon.co.uk/httpclientfactory-using-polly-for-transient-fault-handling
+	var builder = new UrlRequestBuilder()
+				.SetUrl("https://www.nytimes.com")
+				.ConfigureRequest.PageRanges("1-1")
+				.Parent.Document
+					.AddHeader("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Header</h1> </body></html>")
+					.AddFooter("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Footer</h1></body></html>")
+				.Parent.Dimensions
+					.UseChromeDefaults()
+					.SetScale(.90)
+			 		.LandScape()
+					.Parent;
+
+	var response = await sharpClient.UrlToPdf(builder.Build());
+
+	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenbergFromUrl.pdf";
+
+	using (var destinationStream = File.Create(outPath))
+	{
+		await response.CopyToAsync(destinationStream);
+	}
+
+	return outPath;
 }
 ```
 
-*Add the client to the ServiceCollection in your Startup.cs:*
+## Scenario 3 Markdown
+*Markdown conversion with embedded assets:*
 
 ```csharp
-public IServiceProvider ConfigureServices(IServiceCollection services)
+async Task<string> MarkdownPdf()
 {
-	//add core services then
-	services.AddTypedApiClient<GotenbergApiSharpClient>(CreateGotenbergClientSettings());
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	return builder.Build();
+	var builder = new PdfRequestBuilder(hasMarkdown:true)
+				.Document
+					.AddBody(await GetBody())
+					.AddHeader(await GetHeader())
+					.AddFooter(await GetFooter())
+					.Assets.AddItems(await GetMarkdownAssets()).Parent
+					.Dimensions.UseChromeDefaults()
+					.SetScale(.85)
+					.LandScape()
+					.Parent.ConfigureRequest.ChromeRpccBufferSize(558576);
+				
+	var response = await sharpClient.ToPdfAsync(builder.Parent.Build());
+
+	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
+	var destination = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+	var outPath = @$"{destination}{platformAwareSlash}GotenbergFromMarkDown.pdf";
+
+
+	using (var destinationStream = File.Create(outPath))
+	{
+		await response.CopyToAsync(destinationStream);
+	}
+
+	return outPath;
 }
-```
 
-*Inject it where you need it: (Code needs to be updated for breaking changes)*
-
-```csharp
-public class GenerateSomePdfService
+async Task<string> GetBody()
 {
-	readonly GotenbergApiSharpClient _gotenbergClient;
-	
-	public GenerateSomePdfService(GotenbergApiSharpClient gotenbergClient)
-	{
-		_gotenbergClient = gotenbergClient;
-	}
+	var body = await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/index.html");
+	return body.Replace(@"<img src=""img.gif"">", string.Empty);
+}
 
-	public async Task<Stream> MakePdf(string body, string footer, CancellationToken cancelToken = default)
-	{
-		//Without using the builder:
-		var dims = new DocumentDimensions { PaperWidth = 8.26, PaperHeight = 11.69, Landscape = false, MarginBottom = .38 };
+async Task<string> GetHeader()
+{
+	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/header.html");
+}
 
-		var content = new DocumentRequest
-		{
-			Body = new ContentItem(body),
-			Footer = new ContentItem(footer)
-		};
+async Task<string> GetFooter()
+{
+	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/footer.html");
+}
 
-		var request = new PdfRequest { Content = content, Dimensions = dims };
+async Task<IEnumerable<KeyValuePair<string, string>>> GetMarkdownAssets()
+{
+	var bodyAssetNames = new[] { "font.woff", "style.css", "img.gif" };
+	var markdownFiles = new[] { "paragraph1.md", "paragraph2.md", "paragraph3.md" };
 
-		return await this._gotenbergClient.HtmlToPdfAsync(request, cancelToken).ConfigureAwait(false);
-	}
+	var client = new HttpClient() { BaseAddress = new Uri("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/") };
 
+	var bodyAssetTasks = bodyAssetNames.Select(ba => client.GetStringAsync(ba));
+	var mdTasks = markdownFiles.Select(md => client.GetStringAsync(md));
+
+	var bodyAssets = await Task.WhenAll(bodyAssetTasks);
+	var mdParagraphs = await Task.WhenAll(mdTasks);
+
+	return bodyAssetNames.Select((name, index) => KeyValuePair.Create(name, bodyAssets[index]))
+			   .Concat(markdownFiles.Select((name, index) => KeyValuePair.Create(name, mdParagraphs[index])));
 }
 ```
