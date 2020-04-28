@@ -88,7 +88,7 @@ string GetFooter()
 ```
 
 ## Scenario 2 
-*Html to PDF conversion with embedded assets:*
+*Url to PDF conversion with custom header & footer:*
 
 ```csharp
 public async Task<string> UrlToPdf()
@@ -122,7 +122,7 @@ public async Task<string> UrlToPdf()
 ```
 
 ## Scenario 3 Markdown
-*Markdown conversion with embedded assets:*
+*Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
 async Task<string> MarkdownPdf()
