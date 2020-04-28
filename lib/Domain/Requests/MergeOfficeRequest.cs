@@ -10,18 +10,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     
         public IMergeOfficeRequest FilterByExtension()
         {
-            var allowedItems = this.Items
+            /*var allowedItems = this.Assets
                                    .Where(item=> AllowedExtensions.Contains(new FileInfo(item.Key).Extension.ToLowerInvariant())).ToList()
                                    .ToDictionary(item => item.Key, item => item.Value);
  
-            var filteredRequest = new MergeOfficeRequest { Items = allowedItems, Config = this.Config };
+            var filteredRequest = new MergeOfficeRequest { Assets = allowedItems, Config = this.Config };
             
             foreach (var item in allowedItems)
             {   
                 filteredRequest.Items.Add(item.Key, item.Value);
             }
 
-            return filteredRequest;
+            return filteredRequest;*/
+            return null;
         }
     }
 }

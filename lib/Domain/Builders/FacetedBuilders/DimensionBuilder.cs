@@ -1,14 +1,13 @@
 using System;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
-
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 {
-    public sealed class DimensionBuilder<TParent>: BaseBuilder<ResourceRequest>
+    public sealed class DimensionBuilder<TParent>: BaseBuilder<ChromeRequest>
     {
-        public DimensionBuilder(ResourceRequest request, TParent parent)
+        public DimensionBuilder(ChromeRequest request, TParent parent)
         {
             this.Parent = parent;
             this.Request = request ?? throw new ArgumentNullException(nameof(request));

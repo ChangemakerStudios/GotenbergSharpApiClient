@@ -14,7 +14,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public MergeOfficeBuilder(Dictionary<string, ContentItem> items)
         {
-            this._request = new MergeOfficeRequest { Items = items };
+            /*this._request = new MergeOfficeRequest{Assets = items};*/
         }
 
         [PublicAPI]

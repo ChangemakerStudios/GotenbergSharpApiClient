@@ -13,7 +13,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// For URL to PDF conversions
     /// </summary>
-    public sealed class UrlRequest: ResourceRequest, IConvertToHttpContent
+    public sealed class UrlRequest: ChromeRequest, IConvertToHttpContent
     {
         public Uri Url { get; set; }
         public KeyValuePair<string, string> RemoteUrlHeader { get; set; }

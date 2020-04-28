@@ -1,13 +1,11 @@
 using System;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
-
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 {
-    public sealed class ConfigBuilder<TParent> : BaseBuilder<RequestBase>
+    public sealed class ConfigBuilder<TParent>: BaseBuilder<RequestBase>
     {
         public ConfigBuilder(RequestBase request, TParent parent)
         {
@@ -52,7 +50,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public ConfigBuilder<TParent> WebHook(string value)
         {
             if(value.IsNotSet()) throw new ArgumentException("WebHook was null || empty");
-            if(!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("WebHook was not well formed. See https://docs.microsoft.com/en-us/dotnet/api/system.uri.iswellformeduristring?view=netstandard-2.0");
+            if(!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("WebHook was not well formed");
             this.Request.Config.WebHook =new Uri(value);
             return this;
         }

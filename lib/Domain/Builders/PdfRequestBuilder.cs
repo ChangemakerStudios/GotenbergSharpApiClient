@@ -1,5 +1,5 @@
 using System;
-
+using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
 using JetBrains.Annotations;
@@ -16,6 +16,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
         [PublicAPI]
         public DocumentBuilder Document => new DocumentBuilder(Request, this);
+
+        [PublicAPI]
+        public AssetBuilder<PdfRequestBuilder> Assets => new AssetBuilder<PdfRequestBuilder>(this.Request, this);
 
         [PublicAPI]
         public DimensionBuilder<PdfRequestBuilder> Dimensions => new DimensionBuilder<PdfRequestBuilder>(this.Request, this);

@@ -19,7 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     public sealed class AssetRequest: Dictionary<string, ContentItem>, IConvertToHttpContent 
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
-      
+
         [UsedImplicitly]
         public void AddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {

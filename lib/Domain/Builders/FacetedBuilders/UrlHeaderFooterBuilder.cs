@@ -1,12 +1,10 @@
 using System;
 using System.IO;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
-
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 {
     public sealed class UrlHeaderFooterBuilder: UrlRequestBuilder
     {

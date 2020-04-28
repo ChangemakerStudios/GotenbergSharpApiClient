@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
 using JetBrains.Annotations;
