@@ -26,14 +26,14 @@ public async Task<string> HtmlToPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var builder = new PdfRequestBuilder().Document
-				.AddBody(GetBody())
-				.AddFooter(GetFooter())
-				.ConfigureRequest.ChromeRpccBufferSize(1048555).Parent
-				.Dimensions.UseChromeDefaults()
-  			    .SetScale(.75)
-				.LandScape().Parent
-				.Assets.AddItem("ear-on-beach.jpg", await GetImageBytes()).Parent;
+    var builder = new PdfRequestBuilder().Document
+		.AddBody(GetBody())
+        .AddFooter(GetFooter())
+        .ConfigureRequest.ChromeRpccBufferSize(1048555).Parent
+        .Dimensions.UseChromeDefaults()
+        .SetScale(.75)
+        .LandScape().Parent
+        .Assets.AddItem("ear-on-beach.jpg", await GetImageBytes()).Parent;
 	 
 	var response = await sharpClient.ToPdfAsync(builder.Build());
 
@@ -95,17 +95,15 @@ public async Task<string> UrlToPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var builder = new UrlRequestBuilder()
-				.SetUrl("https://www.nytimes.com")
-				.ConfigureRequest.PageRanges("1-1")
-				.Parent.Document
-					.AddHeader("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Header</h1> </body></html>")
-					.AddFooter("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Footer</h1></body></html>")
-				.Parent.Dimensions
-					.UseChromeDefaults()
-					.SetScale(.90)
-			 		.LandScape()
-					.Parent;
+    var builder = new UrlRequestBuilder()
+        .SetUrl("https://www.nytimes.com")
+        .ConfigureRequest.PageRanges("1-1").Parent
+        .Document.AddHeader("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Header</h1> </body></html>")
+        .AddFooter("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Footer</h1></body></html>")
+        .Parent.Dimensions
+        .UseChromeDefaults()
+        .SetScale(.90)
+        .LandScape().Parent;
 
 	var response = await sharpClient.UrlToPdf(builder.Build());
 
@@ -129,16 +127,16 @@ async Task<string> MarkdownPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var builder = new PdfRequestBuilder(hasMarkdown:true)
-				.Document
-					.AddBody(await GetBody())
-					.AddHeader(await GetHeader())
-					.AddFooter(await GetFooter())
-					.Assets.AddItems(await GetMarkdownAssets()).Parent
-					.Dimensions.UseChromeDefaults()
-					.SetScale(.85)
-					.LandScape()
-					.Parent.ConfigureRequest.ChromeRpccBufferSize(558576);
+    var builder = new PdfRequestBuilder(hasMarkdown:true)
+        .Document
+        .AddBody(await GetBody())
+        .AddHeader(await GetHeader())
+        .AddFooter(await GetFooter())
+        .Assets.AddItems(await GetMarkdownAssets()).Parent
+        .Dimensions.UseChromeDefaults()
+        .SetScale(.85)
+        .LandScape()
+        .Parent.ConfigureRequest.ChromeRpccBufferSize(558576);
 				
 	var response = await sharpClient.ToPdfAsync(builder.Parent.Build());
 
