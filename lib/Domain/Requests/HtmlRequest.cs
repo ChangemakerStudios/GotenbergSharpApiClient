@@ -5,6 +5,7 @@ using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using Gotenberg.Sharp.API.Client.Extensions;
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -16,11 +17,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     ///     using the Go template function 'toHTML' within the body element. Chrome uses the function to convert the contents a given markdown file to HTML.
     ///     See example here: https://thecodingmachine.github.io/gotenberg/#markdown.basic
     /// </remarks>
-    public class ContentRequest: ChromeRequest, IConvertToHttpContent
+    public class HtmlRequest: ChromeRequest, IConvertToHttpContent
     {
-        public ContentRequest(): this(false){}
+        [UsedImplicitly]
+        public HtmlRequest(): this(false){}
 
-        public ContentRequest(bool containsMarkdown = false) => this.ContainsMarkdown = containsMarkdown;
+        public HtmlRequest(bool containsMarkdown = false) => this.ContainsMarkdown = containsMarkdown;
 
         public bool ContainsMarkdown { get; }
 

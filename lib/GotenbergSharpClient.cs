@@ -90,7 +90,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> ToPdfAsync(ContentRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> ToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
             var path = request.ContainsMarkdown ? Constants.Gotenberg.ApiPaths.MarkdownConvert : Constants.Gotenberg.ApiPaths.ConvertHtml;
@@ -159,10 +159,15 @@ namespace Gotenberg.Sharp.API.Client
                 .ConfigureAwait(false);
          
             cancelToken.ThrowIfCancellationRequested();
-                
-            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+            if(response.IsSuccessStatusCode)
+                return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+            var message = await response.Content.ReadAsStringAsync().ConfigureAwait(false); 
+            throw new GotenbergApiException(message, response.RequestMessage.RequestUri, response.StatusCode, response.ReasonPhrase);
         }
 
         #endregion
     }
+
 }

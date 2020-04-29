@@ -1,14 +1,16 @@
 using System;
 using System.IO;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 {
-    public sealed class DocumentBuilder: PdfRequestBuilder
+    public sealed class DocumentBuilder: HtmlRequestBuilder
     {
-        public DocumentBuilder(ContentRequest request, PdfRequestBuilder parent)
+        public DocumentBuilder(HtmlRequest request, HtmlRequestBuilder parent)
         {
             this.Parent = parent;
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
@@ -16,7 +18,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
         }
 
         [PublicAPI]
-        public PdfRequestBuilder Parent { get; }
+        public HtmlRequestBuilder Parent { get; }
 
         #region body
         

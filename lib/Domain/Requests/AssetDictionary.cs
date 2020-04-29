@@ -14,9 +14,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    // ReSharper disable once CA1710
-    // ReSharper disable once CA1710
-    public sealed class AssetRequest: Dictionary<string, ContentItem>, IConvertToHttpContent 
+    public sealed class AssetDictionary: Dictionary<string, ContentItem>, IConvertToHttpContent 
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 

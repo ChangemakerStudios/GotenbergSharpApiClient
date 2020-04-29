@@ -15,7 +15,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
         {
             this.Parent = parent;
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
-            Request.Assets ??= new AssetRequest();
+            Request.Assets ??= new AssetDictionary();
         }
 
         [PublicAPI]

@@ -26,7 +26,7 @@ public async Task<string> HtmlToPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var builder = new PdfRequestBuilder().Document
+    var builder = new HtmlRequestBuilder().Document
 		.AddBody(GetBody())
         .AddFooter(GetFooter())
         .ConfigureRequest.ChromeRpccBufferSize(1048555).Parent
@@ -127,7 +127,7 @@ async Task<string> MarkdownPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var builder = new PdfRequestBuilder(hasMarkdown:true)
+    var builder = new HtmlRequestBuilder(hasMarkdown:true)
         .Document
         .AddBody(await GetBody())
         .AddHeader(await GetHeader())

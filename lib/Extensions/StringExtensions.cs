@@ -2,9 +2,6 @@
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class StringExtensions
     {
         /// <summary>

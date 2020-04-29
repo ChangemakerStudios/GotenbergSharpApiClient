@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-
+﻿
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public class MergeOfficeRequest: MergeRequest, IMergeOfficeRequest  
