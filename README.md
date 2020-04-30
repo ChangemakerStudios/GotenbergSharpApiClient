@@ -60,6 +60,7 @@ string GetBody()
 			<html lang=""en"">
     			<style>
 					body { max-width: 700px;  margin: auto;}
+					h1 { font-size: 55px; }
 					h1, h3{ text-align: center; } 
 					figure { width:548px; height:600px; } 
 					figure img { border: 10px solid #000; } 
@@ -119,7 +120,81 @@ public async Task<string> UrlToPdf()
 }
 ```
 
-## Scenario 3 Markdown
+## Scenario 3 Merge multiple Url request results into one pdf
+*Builds a 28 page pdf by merging the front two pages of several news sites. Takes about a minute to complete*
+
+```csharp
+public async Task<string> CreateWorldNewsSummary()
+{
+	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/", "https://www.csmonitor.com",
+			"https://time.com/", "https://www.usatoday.com/", "https://www.theguardian.com/international",
+			"https://calgaryherald.com/", "https://www.irishtimes.com/", "https://www.lemonde.fr/",
+			"https://www.thehindu.com/", "https://www.theaustralian.com.au/", "https://www.cankaoxiaoxi.com/",
+			"https://www.blesk.cz/", "https://www.animalpolitico.com/"}
+			.Select(u => new Uri(u));
+			
+	var builders = CreateRequestBuilders(sites);
+	var requests = builders.Select(b => b.Build());
+
+	var pathToMergednews = await ExecuteRequestsAndMerge(requests);
+	return pathToMergednews;
+}
+
+IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
+{
+	foreach (var uri in uris)
+	{
+		yield return new UrlRequestBuilder()
+		.SetUrl(uri)
+		.ConfigureRequest
+			.PageRanges("1-2")
+			.ResultFileName($"{uri.Host}.pdf")
+		.Parent.Document
+			.AddHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
+			.AddFooter(GetHeadFoot(uri.ToString()))
+		.Parent.Dimensions
+			.UseChromeDefaults()
+			.SetScale(.90)
+			.LandScape()
+		.Parent.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}");
+	}
+
+	static string GetHeadFoot(string heading)
+		=> "<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>" + heading + "</h1></body></html>";
+}
+
+async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
+{
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	
+	var tasks = requests.Select(r => sharpClient.UrlToPdf(r));
+	var results = await Task.WhenAll(tasks);
+
+	var mergeBuilder = new MergeBuilder()
+		.Assets.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)))
+		.Parent.ConfigureRequest.TimeOut(1799)
+		.Parent;
+
+	var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build());
+	
+	return await WriteFileAndGetPath(response);
+}
+
+async Task<string> WriteFileAndGetPath(Stream responseStream)
+{
+	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
+	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenberTodaysNewss.pdf";
+
+	using (var destinationStream = File.Create(outPath))
+	{
+		await responseStream.CopyToAsync(destinationStream);
+	}
+
+	return outPath;
+}
+```
+
+## Scenario 4 Markdown
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp

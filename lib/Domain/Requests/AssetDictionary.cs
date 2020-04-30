@@ -56,12 +56,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         internal AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            foreach (var item in items.ToList())
+            foreach (var item in items)
             {
                 this.Add(item.Key, item.Value);
             }
 
             return this;
+
         }
     }
 }
