@@ -24,10 +24,10 @@ docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=
 ```csharp
 public async Task<string> HtmlToPdf()
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
     var builder = new HtmlRequestBuilder().Document
-		.AddBody(GetBody())
+	.AddBody(GetBody())
         .AddFooter(GetFooter())
         .ConfigureRequest.ChromeRpccBufferSize(1048555).Parent
         .Dimensions.UseChromeDefaults()
@@ -94,7 +94,7 @@ string GetFooter()
 ```csharp
 public async Task<string> UrlToPdf()
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
     var builder = new UrlRequestBuilder()
         .SetUrl("https://www.nytimes.com")
