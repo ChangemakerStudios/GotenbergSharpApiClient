@@ -22,7 +22,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public void AddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            foreach (var item in items)
+            foreach (var item in items.ToList())
             {
                 this.Add(item.Key, item.Value);
             }
@@ -52,6 +52,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     return asset;
                 });
         }
-       
+
+        internal AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            foreach (var item in items.ToList())
+            {
+                this.Add(item.Key, item.Value);
+            }
+
+            return this;
+        }
     }
 }

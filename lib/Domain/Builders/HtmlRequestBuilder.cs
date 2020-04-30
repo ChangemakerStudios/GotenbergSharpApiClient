@@ -1,4 +1,5 @@
 using System;
+
 using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 

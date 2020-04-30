@@ -1,4 +1,5 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
+﻿
+using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
 using JetBrains.Annotations;
@@ -18,14 +19,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public ConfigBuilder<MergeBuilder> ConfigureRequest => new ConfigBuilder<MergeBuilder>(this.Request, this);
  
-        /// <summary>
-        /// Builds the merge request
-        /// </summary>
-        /// <returns></returns>
         [PublicAPI]
         public MergeRequest Build() => this.Request;
 
         void Init() => this.Request = new MergeRequest();
+       
     }
 
 }

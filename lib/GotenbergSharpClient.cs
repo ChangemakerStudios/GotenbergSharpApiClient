@@ -113,14 +113,15 @@ namespace Gotenberg.Sharp.API.Client
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
-        /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="GotenbergApiException"></exception>
         /// <remarks>
         ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
-        ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf containing the text. {"message":"Not Found"}
+        ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf
+        ///     containing the text. {"message":"Not Found"}. Such responses throw an error that has the content of the response file, etc.
         /// </remarks>
         [PublicAPI]
-        public async Task<Stream> MergeOfficeDocsAsync(IMergeOfficeRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
             => await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
 
         #endregion

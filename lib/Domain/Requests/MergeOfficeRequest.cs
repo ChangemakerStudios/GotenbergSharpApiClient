@@ -1,26 +1,38 @@
 ﻿
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public class MergeOfficeRequest: MergeRequest, IMergeOfficeRequest  
+    public class MergeOfficeRequest: RequestBase, IMergeRequest  
     {
-       
-        static readonly string[] AllowedExtensions = {".txt",".rtf",".fodt",".doc",".docx",".odt",".xls",".xlsx",".ods",".ppt",".pptx",".odp"};
-    
-        public IMergeOfficeRequest FilterByExtension()
-        {
-            /*var allowedItems = this.Assets
-                                   .Where(item=> AllowedExtensions.Contains(new FileInfo(item.Key).Extension.ToLowerInvariant())).ToList()
-                                   .ToDictionary(item => item.Key, item => item.Value);
- 
-            var filteredRequest = new MergeOfficeRequest { Assets = allowedItems, Config = this.Config };
-            
-            foreach (var item in allowedItems)
-            {   
-                filteredRequest.Items.Add(item.Key, item.Value);
-            }
+        public int Count => this.Assets.IfNullEmpty().Count;
 
-            return filteredRequest;*/
-            return null;
+        public IEnumerable<HttpContent> ToHttpContent()
+        {
+            return this.Assets.FilterOutNonOfficeDocs()
+                .ToAlphabeticalMergeOrderByIndex()
+                .Where(item => item.Value != null)
+                .Select(item =>
+                {
+                    var contentItem = item.Value.ToHttpContentItem();
+
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                    {
+                        Name = Constants.Gotenberg.FormFieldNames.Files,
+                        FileName = item.Key
+                    };
+
+                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+
+                    return contentItem;
+
+                }).Concat(Config.IfNullEmptyContent());
         }
     }
 }

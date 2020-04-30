@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using Gotenberg.Sharp.API.Client.Extensions;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
@@ -23,10 +26,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 
         #region one asset
 
+        /// <remarks>
+        ///     CA1307 b/c of multi-targeting net standard 2.0 has no overload for StringComparison
+        /// </remarks>
         [PublicAPI]
+        [SuppressMessage("Globalization", "CA1307:Specify StringComparison", Justification = "<Pending>")]
         public AssetBuilder<TParent> AddItem(string name, ContentItem value)
         {
-            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.Contains('/'))
+            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.Contains("/"))
             {
                 throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
             }
@@ -54,11 +61,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
         [PublicAPI]
         public AssetBuilder<TParent> AddItems(Dictionary<string, ContentItem> items)
         {
-
-            foreach (var item in items ?? throw new ArgumentNullException(nameof(items)))
+            foreach (var item in items.IfNullEmpty())
             {
                 this.AddItem(item.Key, item.Value);
             }
+
             return this;
         }
 
