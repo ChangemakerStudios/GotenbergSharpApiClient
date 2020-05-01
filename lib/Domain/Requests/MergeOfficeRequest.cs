@@ -6,13 +6,17 @@ using System.Net.Http.Headers;
 
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public class MergeOfficeRequest: RequestBase, IMergeRequest  
     {
+        readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
+
         public int Count => this.Assets.IfNullEmpty().Count;
 
+        //TODO: Confirm is this is redundant w/ other classes and if so, move to an extension
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.FilterOutNonOfficeDocs()
@@ -20,15 +24,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 .Where(item => item.Value != null)
                 .Select(item =>
                 {
-                    var contentItem = item.Value.ToHttpContentItem();
+                    _contentTypeProvider.TryGetContentType(item.Key, out var contentType);
+                    return new { Asset = item, MediaType = contentType };
+                })
+                .Where(item => item.MediaType.IsSet())
+                .Select(item =>
+                {
+                    var contentItem = item.Asset.Value.ToHttpContentItem();
 
                     contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                     {
                         Name = Constants.Gotenberg.FormFieldNames.Files,
-                        FileName = item.Key
+                        FileName = item.Asset.Key
                     };
 
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
 
                     return contentItem;
 

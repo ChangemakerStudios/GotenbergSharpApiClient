@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -26,14 +25,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 
         #region one asset
 
-        /// <remarks>
-        ///     CA1307 b/c of multi-targeting net standard 2.0 has no overload for StringComparison
-        /// </remarks>
-        [PublicAPI]
-        [SuppressMessage("Globalization", "CA1307:Specify StringComparison", Justification = "<Pending>")]
         public AssetBuilder<TParent> AddItem(string name, ContentItem value)
         {
-            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.Contains("/"))
+            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
                 throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
             }

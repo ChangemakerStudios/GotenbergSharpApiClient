@@ -144,7 +144,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
             return new Dimensions { 
                 PaperWidth = 8.26, 
                 PaperHeight = 11.69,
-                Landscape = false,
                 MarginTop = 0,
                 MarginBottom = .5,  
                 MarginLeft = 0,
@@ -163,7 +162,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
                 .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(item =>
                 {
-                    var value =  item.Prop.GetValue(this);
+                    var value = item.Prop.GetValue(this);
 
                     if (value == null) return null;
 

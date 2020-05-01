@@ -13,7 +13,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         protected sealed override HtmlRequest Request { get; set; }
 
         [PublicAPI]
-        public HtmlRequestBuilder(bool hasMarkdown = false) => this.Request = new HtmlRequest(hasMarkdown);
+        public HtmlRequestBuilder(bool containsMarkdown = false) => this.Request = new HtmlRequest(containsMarkdown);
 
         [PublicAPI]
         public DocumentBuilder Document => new DocumentBuilder(Request, this);

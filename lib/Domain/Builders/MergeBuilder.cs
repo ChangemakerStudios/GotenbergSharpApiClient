@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     [PublicAPI]
-    public class MergeBuilder: BaseBuilder<MergeRequest>
+    public sealed class MergeBuilder: BaseBuilder<MergeRequest>
     {
         public MergeBuilder() => Init();
     

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
 using Microsoft.Net.Http.Headers;
+ 
 
 namespace Gotenberg.Sharp.API.Client
 {
@@ -35,13 +37,11 @@ namespace Gotenberg.Sharp.API.Client
 
         #region ctors
 
-        /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(string address)
             : this(new Uri(address))
         {
         }
 
-        /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(Uri address)
             : this(new HttpClient { BaseAddress = address })
         {
@@ -61,7 +61,9 @@ namespace Gotenberg.Sharp.API.Client
                 throw new NullReferenceException(nameof(innerClient.BaseAddress));
             }
 
-            this._innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Clear();
+            _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
         }
 
         #endregion
@@ -128,14 +130,15 @@ namespace Gotenberg.Sharp.API.Client
        
         #region exec
 
-        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken = default)  
+        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken)  
         {
             if (request?.Count == null) throw new ArgumentNullException(nameof(request));
 
             return await ExecuteRequest(request, mergePath, cancelToken).ConfigureAwait(false);
         }
 
-        async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, CancellationToken cancelToken, KeyValuePair<string,string> remoteUrlHeader = default)
+        async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, 
+            CancellationToken cancelToken, KeyValuePair<string,string> remoteUrlHeader = default)
         {
             using var formContent = new MultipartFormDataContent($"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
             

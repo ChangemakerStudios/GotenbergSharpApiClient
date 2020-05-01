@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Net;
 
-using JetBrains.Annotations;
-
 // ReSharper disable All CA1032
 // ReSharper disable All CA1822 
 // ReSharper disable All MemberCanBePrivate.Global
@@ -20,15 +18,16 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             this.ReasonPhrase = reasonPhrase;
         }
 
-        public HttpStatusCode StatusCode { [UsedImplicitly] get; }
+        public HttpStatusCode StatusCode { get; }
  
-        public Uri RequestUri { [UsedImplicitly] get; }
+        public Uri RequestUri { get; }
 
-        public string ReasonPhrase { get; set; }
+        public string ReasonPhrase { get; }
 
         public override string ToString()
         {
             return $"Gotenberg Api response message: '{base.Message}' via {this.RequestUri}; Status Code: {this.StatusCode}; ReasonPhrase{ReasonPhrase}. Check the logs in the container.";
         }
+      
     }
 }

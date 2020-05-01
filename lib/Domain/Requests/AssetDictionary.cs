@@ -18,16 +18,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 
-        [UsedImplicitly]
-        public void AddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
+        public AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            foreach (var item in items.ToList())
+            foreach (var item in items)
             {
                 this.Add(item.Key, item.Value);
             }
+
+            return this;
         }
-        
+
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Select(item =>
@@ -53,16 +54,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 });
         }
 
-        internal AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-            foreach (var item in items)
-            {
-                this.Add(item.Key, item.Value);
-            }
-
-            return this;
-
-        }
     }
 }
