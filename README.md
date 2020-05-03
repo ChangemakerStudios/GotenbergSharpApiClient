@@ -18,8 +18,8 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
 ```
 
-## Scenario 1 
-*Html to PDF with embedded assets:*
+## Scenario 1 Html To Pdf
+*Html to pdf with embedded assets:*
 
 ```csharp
 public async Task<string> CreateFromHtml(string destinationDirectory)
@@ -84,8 +84,8 @@ static string GetFooter()
 }
 ```
 
-## Scenario 2 
-*Url to PDF with custom header & footer:*
+## Scenario 2 Url To Pdf
+*Url to Pdf with custom header & footer:*
 
 ```csharp
 public async Task<string> CreateFromUrl(string destinationPath, string headerPath, string footerPath)
@@ -158,7 +158,7 @@ async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string source
 	return names.Select((name, index) => KeyValuePair.Create(name, docs[index]));
 }
 ```
-## Scenario 4 Markdown
+## Scenario 4 Markdown to Pdf
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
