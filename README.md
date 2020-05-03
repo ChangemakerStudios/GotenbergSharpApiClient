@@ -212,8 +212,40 @@ async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationD
 	return fullPath; 
 }
 ```
+## Scenario 4 Merge Office Docs
+*Markdown to Pdf conversion with embedded assets:*
 
-## Scenario 4 Markdown
+```csharp
+async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
+{
+	var client = new GotenbergSharpClient("http://localhost:3000");
+
+	var items = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.TopDirectoryOnly)
+				.Select(item => KeyValuePair.Create(new FileInfo(item).Name, File.ReadAllBytes(item)));
+
+	var builder = new MergeOfficeBuilder()
+		.WithAssets(b => 
+		{
+	   		b.AddItems(items);
+	    }).ConfigureRequest(b =>
+		{
+			b.TimeOut(100);
+	   });
+	   
+	var request = builder.Build();
+	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
+
+	var filePathAndName =@$"{destinationDirectory}\GotenbergOfficeMerge.pdf";
+	using (var destinationStream = File.Create(filePathAndName))
+	{
+		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
+	}
+	 
+	return filePathAndName;
+}
+
+```
+## Scenario 5 Markdown
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
