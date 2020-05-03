@@ -255,7 +255,7 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	{
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
-			.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}")
+			.SetRemoteUrlHeader("gotenber-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
 			.ConfigureRequest(b =>
 			{
 			    b.PageRanges("1-2").ResultFileName($"{uri.Host}.pdf");
