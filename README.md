@@ -116,8 +116,8 @@ public async Task<string> UrlToPdf()
 		)).WithDimensions(b =>
 		{
 			b.UseChromeDefaults()
-		  	 .SetScale(.90)
-		  	.LandScape();
+			 .SetScale(.90)
+		  	 .LandScape();
 		});
 
 	var request = await builder.Build();
