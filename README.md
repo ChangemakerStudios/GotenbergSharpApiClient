@@ -29,7 +29,7 @@ public async Task<string> HtmlToPdf()
 	var builder = new HtmlRequestBuilder()
 		.AddDocument( 
 			b => b.SetBody(GetBody())
-			.SetFooter(GetFooter())
+				  .SetFooter(GetFooter())
 		).WithDimensions(b =>
 		{
 			b.UseChromeDefaults().LandScape().SetScale(.75);
@@ -68,22 +68,23 @@ string GetBody()
     			<style>
 					body { max-width: 700px;  margin: auto;}
 					h1 { font-size: 55px; }
-					h1, h3{ text-align: center; } 
+					h1, h3{ text-align: center; margin-top: 5px; } 
+					.photo-container { padding-bottom: 20px;  }
 					figure { width:548px; height:600px; } 
 					figure img { border: 10px solid #000; } 
 					figcaption { text-align: right; font-size: 10pt; } 
-					figcaption > a:link, a:visited { color: black; }
+					a:link, a:visited { color: black !important; }
 				</style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 				<body>
 					<h1>Hello world</h1>
-					<div>
+					<div class=""photo-container"">
 						<figure>
 						    <img src=""ear-on-beach.jpg"">
         	                <figcaption>Photo by <a href=""https://www.moma.org/artists/740"">Bill Brandt</a>.</figcaption>
 						 </figure>   
 					</div>
-					<h3>Powered by Gotenberg</h3>
+					<h3>Powered by <a href=""https://hub.docker.com/r/thecodingmachine/gotenberg"">Gotenberg</a></h3>
 				</body>
 			</html>";
 }
@@ -111,7 +112,7 @@ public async Task<string> UrlToPdf()
 		})
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllTextAsync(@"E:\GotenBerg\ProjectResources\UrlHeader.html"))
-			.SetFooter(File.ReadAllText(@"D:\GotenBergNotes\ProjectResources\UrlFooter.html")
+				  .SetFooter(File.ReadAllText(@"E:\GotenBergNotes\ProjectResources\UrlFooter.html")
 		)).WithDimensions(b =>
 		{
 			b.UseChromeDefaults()
@@ -242,7 +243,6 @@ async Task<string> MarkdownPdf()
 	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
 	var destination = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 	var outPath = @$"{destination}{platformAwareSlash}GotenbergFromMarkDown.pdf";
-
 
 	using (var destinationStream = File.Create(outPath))
 	{
