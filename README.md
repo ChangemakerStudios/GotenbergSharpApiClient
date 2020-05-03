@@ -26,16 +26,23 @@ public async Task<string> HtmlToPdf()
 {
     var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var builder = new HtmlRequestBuilder().Document
-	.AddBody(GetBody())
-        .AddFooter(GetFooter())
-        .ConfigureRequest.ChromeRpccBufferSize(1048555).Parent
-        .Dimensions.UseChromeDefaults()
-        .SetScale(.75)
-        .LandScape().Parent
-        .Assets.AddItem("ear-on-beach.jpg", await GetImageBytes()).Parent;
-	 
-	var response = await sharpClient.ToPdfAsync(builder.Build());
+	var builder = new HtmlRequestBuilder()
+		.AddDocument( 
+			b => b.SetBody(GetBody())
+			.SetFooter(GetFooter())
+		).WithDimensions(b =>
+		{
+			b.UseChromeDefaults().LandScape().SetScale(.75);
+		}).WithAsyncAssets(async
+			b => b.AddItem("ear-on-beach.jpg", await GetImageBytes())
+		).ConfigureRequest(b => {		
+		    b.ChromeRpccBufferSize(1024);
+		});
+
+	//You can also do this for async: 
+	//	.AddAsyncDocument(async b => b.SetBody(await GetBodyAsync()).SetFooter(GetFooter()))
+
+	var response = await sharpClient.ToPdfAsync(await builder.BuildAsync());
 
 	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
 	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenbergFromHtml.pdf";
@@ -96,17 +103,24 @@ public async Task<string> UrlToPdf()
 {
     var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var builder = new UrlRequestBuilder()
-        .SetUrl("https://www.nytimes.com")
-        .ConfigureRequest.PageRanges("1-1").Parent
-        .Document.AddHeader("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Header</h1> </body></html>")
-        .AddFooter("<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>Footer</h1></body></html>")
-        .Parent.Dimensions
-        .UseChromeDefaults()
-        .SetScale(.90)
-        .LandScape().Parent;
+	var builder = new UrlRequestBuilder()
+		.SetUrl("https://www.nytimes.com")
+		.ConfigureRequest(b =>
+		{
+			b.PageRanges("1-1").ChromeRpccBufferSize(3145728);
+		})
+		.AddAsyncHeaderFooter(async
+			b => b.SetHeader(await File.ReadAllTextAsync(@"E:\GotenBerg\ProjectResources\UrlHeader.html"))
+			.SetFooter(File.ReadAllText(@"D:\GotenBergNotes\ProjectResources\UrlFooter.html")
+		)).WithDimensions(b =>
+		{
+			b.UseChromeDefaults()
+		  	 .SetScale(.90)
+		  	.LandScape();
+		});
 
-	var response = await sharpClient.UrlToPdf(builder.Build());
+	var request = await builder.Build();
+	var response = await sharpClient.UrlToPdf(request);
 
 	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
 	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenbergFromUrl.pdf";
@@ -124,20 +138,21 @@ public async Task<string> UrlToPdf()
 *Builds a 28 page pdf by merging the front two pages of several news sites. Takes about a minute to complete*
 
 ```csharp
-public async Task<string> CreateWorldNewsSummary()
+public async Task CreateWorldNewsSummary(string destinationDirectory)
 {
 	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/", "https://www.csmonitor.com",
-			"https://time.com/", "https://www.usatoday.com/", "https://www.theguardian.com/international",
-			"https://calgaryherald.com/", "https://www.irishtimes.com/", "https://www.lemonde.fr/",
-			"https://www.thehindu.com/", "https://www.theaustralian.com.au/", "https://www.cankaoxiaoxi.com/",
-			"https://www.blesk.cz/", "https://www.animalpolitico.com/"}
+			"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com", 
+			"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk", 
+			"https://www.thehindu.com", "https://www.theaustralian.com.au", 
+			"https://www.welt.de", "https://www.cankaoxiaoxi.com", 
+			"https://www.novinky.cz","https://www.elobservador.com.uy"}
 			.Select(u => new Uri(u));
-			
-	var builders = CreateRequestBuilders(sites);
-	var requests = builders.Select(b => b.Build());
 
-	var pathToMergednews = await ExecuteRequestsAndMerge(requests);
-	return pathToMergednews;
+	var builders = CreateRequestBuilders(sites);
+	var requests = builders.Select(b => b.Build() );
+
+	var path = await ExecuteRequestsAndMerge(requests, destinationDirectory);
+	path.Dump();
 }
 
 IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
@@ -145,25 +160,27 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	foreach (var uri in uris)
 	{
 		yield return new UrlRequestBuilder()
-		.SetUrl(uri)
-		.ConfigureRequest
-			.PageRanges("1-2")
-			.ResultFileName($"{uri.Host}.pdf")
-		.Parent.Document
-			.AddHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
-			.AddFooter(GetHeadFoot(uri.ToString()))
-		.Parent.Dimensions
-			.UseChromeDefaults()
-			.SetScale(.90)
-			.LandScape()
-		.Parent.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}");
+			.SetUrl(uri)
+			.ConfigureRequest
+				.PageRanges("1-2")
+				.ResultFileName($"{uri.Host}.pdf")
+			.Parent.Document
+				.AddHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
+				.AddFooter(GetHeadFoot(uri.ToString()))
+			.Parent.Dimensions
+				.UseChromeDefaults()
+				.SetScale(.90)
+				.LandScape()
+				.MarginLeft(.5)
+				.MarginRight(.5)
+			.Parent.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}");
 	}
 
 	static string GetHeadFoot(string heading)
 		=> "<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>" + heading + "</h1></body></html>";
 }
 
-async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
+async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory)
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 	
@@ -177,20 +194,17 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
 
 	var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build());
 	
-	return await WriteFileAndGetPath(response);
+	return await WriteFileAndGetPath(response, destinationDirectory);
 }
 
-async Task<string> WriteFileAndGetPath(Stream responseStream)
+async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationDirectory)
 {
-	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenberTodaysNewss.pdf";
-
-	using (var destinationStream = File.Create(outPath))
+	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}.pdf";
+	using (var destinationStream = File.Create(fullPath))
 	{
 		await responseStream.CopyToAsync(destinationStream);
 	}
-
-	return outPath;
+	return fullPath; 
 }
 ```
 
