@@ -27,16 +27,16 @@ public async Task<string> HtmlToPdf()
     var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
-		.AddDocument( 
-			b => b.SetBody(GetBody())
-				  .SetFooter(GetFooter())
+		.AddDocument(b => 
+			b.SetBody(GetBody())
+			 .SetFooter(GetFooter())
 		).WithDimensions(b =>
 		{
 			b.UseChromeDefaults().LandScape().SetScale(.75);
 		}).WithAsyncAssets(async
 			b => b.AddItem("ear-on-beach.jpg", await GetImageBytes())
 		).ConfigureRequest(b => {		
-		    b.ChromeRpccBufferSize(1024);
+			b.ChromeRpccBufferSize(1024);
 		});
 
 	//You can also do this for async: 
