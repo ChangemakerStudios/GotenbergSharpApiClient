@@ -77,7 +77,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
 
         [PublicAPI]
-        public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
@@ -91,7 +91,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> ToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
+        public async Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
             var path = request.ContainsMarkdown ? Constants.Gotenberg.ApiPaths.MarkdownConvert : Constants.Gotenberg.ApiPaths.ConvertHtml;

@@ -37,7 +37,7 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 			b => b.AddItem("ear-on-beach.jpg", await GetImageBytes())
 		).ConfigureRequest(b => { b.ChromeRpccBufferSize(1024);	});
 
-	var response = await sharpClient.ToPdfAsync(await builder.BuildAsync());
+	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
 
 	var mergedPdfPath = @$"{destinationDirectory}\GotenbergFromHtml.pdf";
 	using (var destinationStream = File.Create(mergedPdfPath))
@@ -109,7 +109,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		});
 
 	var request = await builder.BuildAsync();
-	var response = await sharpClient.UrlToPdf(request);
+	var response = await sharpClient.UrlToPdfAsync(request);
 
 	var resultPath = @$"{destinationPath}\GotenbergFromUrl.pdf";
 
@@ -125,7 +125,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 *Merges office documents and configures the request time-out:*
 
 ```csharp
-async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
+public async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
 {
 	var client = new GotenbergSharpClient("http://localhost:3000");
 
@@ -162,7 +162,7 @@ async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string source
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
-async Task<string> CreateFromMarkdown(string destinationDirectory)
+public async Task<string> CreateFromMarkdown(string destinationDirectory)
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
@@ -183,7 +183,7 @@ async Task<string> CreateFromMarkdown(string destinationDirectory)
 		});
 
 	var request = await builder.BuildAsync();
-	var response = await sharpClient.ToPdfAsync(request);
+	var response = await sharpClient.HtmlToPdfAsync(request);
 
  
 	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown.pdf";
@@ -282,7 +282,7 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 	
-	var tasks = requests.Select(r => sharpClient.UrlToPdf(r));
+	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r));
 	var results = await Task.WhenAll(tasks);
 
 	var mergeBuilder = new MergeBuilder()
