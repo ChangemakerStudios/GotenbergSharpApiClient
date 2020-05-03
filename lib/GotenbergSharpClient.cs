@@ -30,8 +30,7 @@ namespace Gotenberg.Sharp.API.Client
     ///     https://github.com/thecodingmachine/gotenberg-php-client
     ///     https://github.com/yumauri/gotenberg-js-client
     /// </remarks>
-    [PublicAPI]
-    public class GotenbergSharpClient
+    public sealed class GotenbergSharpClient
     {
         readonly HttpClient _innerClient;
 

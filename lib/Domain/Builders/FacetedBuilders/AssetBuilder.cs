@@ -18,9 +18,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
             Request.Assets ??= new AssetDictionary();
         }
-      
+
         #region one asset
 
+        [PublicAPI]
         public AssetBuilder AddItem(string name, ContentItem value)
         {
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)

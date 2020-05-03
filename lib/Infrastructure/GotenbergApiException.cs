@@ -7,7 +7,7 @@ using System.Net;
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
     /// <inheritdoc />
-    public class GotenbergApiException: Exception
+    public sealed class GotenbergApiException: Exception
     {
         public GotenbergApiException(string message, Exception innerException) : base(message, innerException) { }
         public GotenbergApiException(string message, Uri requestUri, HttpStatusCode statusCode, string reasonPhrase)

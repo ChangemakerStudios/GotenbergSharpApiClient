@@ -6,19 +6,17 @@ using System.Net.Http.Headers;
 
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-using JetBrains.Annotations;
+
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    [PublicAPI]
     public class MergeOfficeRequest: RequestBase, IMergeRequest  
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 
         public int Count => this.Assets.IfNullEmpty().Count;
 
-        //TODO: Confirm is this is redundant w/ other classes and if so, move to an extension
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.FilterOutNonOfficeDocs()

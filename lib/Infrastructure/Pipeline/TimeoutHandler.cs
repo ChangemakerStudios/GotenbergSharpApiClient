@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
     /// <seealso cref="System.Net.Http.DelegatingHandler" />
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "CA2000")]
-    public class TimeoutHandler : DelegatingHandler
+    public sealed class TimeoutHandler : DelegatingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimeoutHandler"/> class.

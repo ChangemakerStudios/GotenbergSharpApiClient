@@ -8,20 +8,10 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    /// <summary>
-    /// A request to merge the specified items into one pdf file.
-    /// </summary>
     public sealed class MergeRequest: RequestBase, IMergeRequest
     {
-        /// <summary>
-        /// Gets the count of items
-        /// </summary>
         public int Count => this.Assets.IfNullEmpty().Count;
 
-        /// <summary>
-        /// Transforms the merge items to http content items
-        /// </summary>
-        /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.ToAlphabeticalMergeOrderByIndex()

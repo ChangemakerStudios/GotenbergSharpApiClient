@@ -18,7 +18,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         Uri _webHook;
         float? _timeOut;
-      
+
+        [PublicAPI]
+        public static readonly int MaxChromeRpccBufferSize = 104857600;
+
+        /// <summary>
+        /// This is the value used in Gotenberg if you pass nothing. I put to use it as a multiplier when desired.
+        /// </summary>
+        [PublicAPI]
+        public const int DefaultChromeRpccBufferSize = 1048576;
+
         #region Basic settings
 
         /// <summary>

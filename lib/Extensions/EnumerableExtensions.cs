@@ -28,14 +28,14 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// Gotenberg merges files in alphabetical order via the key/file name.
         /// https://thecodingmachine.github.io/gotenberg/#merge
         /// </summary>
-        /// <param name="unOrdered"></param>
+        /// <param name="unordered"></param>
         /// <remarks>
         ///     Note: For merges only. Embedded assets for html docs have
         ///     key values with whatever extension the html references: .md, .css, .jpg, etc
         /// </remarks>
-        public static AssetDictionary ToAlphabeticalMergeOrderByIndex([CanBeNull] this AssetDictionary unOrdered)
+        public static AssetDictionary ToAlphabeticalMergeOrderByIndex([CanBeNull] this AssetDictionary unordered)
         {
-            var ordered = unOrdered.IfNullEmpty().Select((item, index) =>
+            var ordered = unordered.IfNullEmpty().Select((item, index) =>
                 KeyValuePair.Create(index.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension), item.Value));
 
             return new AssetDictionary().FluentAddRange(ordered);

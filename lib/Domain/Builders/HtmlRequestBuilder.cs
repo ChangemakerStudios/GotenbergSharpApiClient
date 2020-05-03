@@ -11,7 +11,6 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
 
-    [PublicAPI]
     public class HtmlRequestBuilder: BaseBuilder<HtmlRequest>
     {
         readonly List<Task> _asyncTasks = new List<Task>();
@@ -24,6 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public HtmlRequestBuilder(bool containsMarkdown = false) 
             => this.Request = new HtmlRequest(containsMarkdown);
 
+        [PublicAPI]
         public HtmlRequestBuilder AddDocument(Action<DocumentBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
@@ -32,6 +32,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        [PublicAPI]
         public HtmlRequestBuilder AddAsyncDocument(Func<DocumentBuilder, Task> asyncAction)
         {
             if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
@@ -39,7 +40,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             this._asyncTasks.Add(asyncAction(new DocumentBuilder(this.Request)));
             return this;
         }
-        
+
+        [PublicAPI]
         public HtmlRequestBuilder WithDimensions(Action<DimensionBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
@@ -48,6 +50,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        [PublicAPI]
         public HtmlRequestBuilder WithAssets(Action<AssetBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
@@ -55,6 +58,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        [PublicAPI]
         public HtmlRequestBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
         {
             if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
@@ -62,6 +66,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        [PublicAPI]
         public HtmlRequestBuilder ConfigureRequest(Action<ConfigBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
