@@ -1,11 +1,9 @@
 using System;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
-
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
     public sealed class ConfigBuilder: BaseBuilder<RequestBase>
     {
