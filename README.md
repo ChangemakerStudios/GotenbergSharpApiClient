@@ -141,12 +141,12 @@ public async Task<string> UrlToPdf()
 public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 {
 	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/", "https://www.csmonitor.com",
-			"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com", 
-			"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk", 
-			"https://www.thehindu.com", "https://www.theaustralian.com.au", 
-			"https://www.welt.de", "https://www.cankaoxiaoxi.com", 
-			"https://www.novinky.cz","https://www.elobservador.com.uy"}
-			.Select(u => new Uri(u));
+		"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com", 
+		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk", 
+		"https://www.thehindu.com", "https://www.theaustralian.com.au", 
+		"https://www.welt.de", "https://www.cankaoxiaoxi.com", 
+		"https://www.novinky.cz","https://www.elobservador.com.uy"}
+		.Select(u => new Uri(u));
 
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build() );
@@ -163,8 +163,7 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 			.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}")
 			.ConfigureRequest(b =>
 			{
-			    b.PageRanges("1-2")
-				 .ResultFileName($"{uri.Host}.pdf");
+			    b.PageRanges("1-2").ResultFileName($"{uri.Host}.pdf");
 			}).AddHeaderFooter(b =>
 			{
 				b.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
@@ -204,7 +203,7 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 
 async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationDirectory)
 {
-	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}-2.pdf";
+	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}.pdf";
 	using (var destinationStream = File.Create(fullPath))
 	{
 		await responseStream.CopyToAsync(destinationStream);
@@ -221,18 +220,24 @@ async Task<string> MarkdownPdf()
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-    var builder = new HtmlRequestBuilder(hasMarkdown:true)
-        .Document
-        .AddBody(await GetBody())
-        .AddHeader(await GetHeader())
-        .AddFooter(await GetFooter())
-        .Assets.AddItems(await GetMarkdownAssets()).Parent
-        .Dimensions.UseChromeDefaults()
-        .SetScale(.85)
-        .LandScape()
-        .Parent.ConfigureRequest.ChromeRpccBufferSize(558576);
-				
-	var response = await sharpClient.ToPdfAsync(builder.Parent.Build());
+	var builder = new HtmlRequestBuilder(containsMarkdown: true)
+		.AddAsyncDocument(async
+			b => b.SetHeader(await this.GetHeaderAsync())
+				  .SetBody(await GetBodyAsync())
+				  .SetFooter(GetFooter())
+		).WithDimensions(b =>
+		{
+			b.UseChromeDefaults().LandScape().SetScale(.90);
+		}).WithAsyncAssets(async
+			b => b.AddItems(await GetMarkdownAssets())
+		).ConfigureRequest(b =>
+		{
+			b.ChromeRpccBufferSize(1048555)
+			 .ResultFileName("hello.pdf");
+		});
+
+	var request = await builder.BuildAsync();
+	var response = await sharpClient.ToPdfAsync(request);
 
 	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
 	var destination = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
