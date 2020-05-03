@@ -138,7 +138,7 @@ public async Task<string> UrlToPdf()
 *Builds a 28 page pdf by merging the front two pages of several news sites. Takes about a minute to complete*
 
 ```csharp
-public async Task CreateWorldNewsSummary(string destinationDirectory)
+public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 {
 	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/", "https://www.csmonitor.com",
 			"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com", 
@@ -151,8 +151,7 @@ public async Task CreateWorldNewsSummary(string destinationDirectory)
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build() );
 
-	var path = await ExecuteRequestsAndMerge(requests, destinationDirectory);
-	path.Dump();
+	return await ExecuteRequestsAndMerge(requests, destinationDirectory);
 }
 
 IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
@@ -161,19 +160,24 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	{
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
-			.ConfigureRequest
-				.PageRanges("1-2")
-				.ResultFileName($"{uri.Host}.pdf")
-			.Parent.Document
-				.AddHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
-				.AddFooter(GetHeadFoot(uri.ToString()))
-			.Parent.Dimensions
-				.UseChromeDefaults()
+			.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}")
+			.ConfigureRequest(b =>
+			{
+			    b.PageRanges("1-2")
+				 .ResultFileName($"{uri.Host}.pdf");
+			}).AddHeaderFooter(b =>
+			{
+				b.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
+				 .SetFooter(GetHeadFoot(uri.ToString()));
+			} )
+			.WithDimensions(b =>
+			{
+				b.UseChromeDefaults()
 				.SetScale(.90)
 				.LandScape()
 				.MarginLeft(.5)
-				.MarginRight(.5)
-			.Parent.SetRemoteUrlHeader("NewSummary", $"{DateTime.Now.ToShortDateString()}");
+				.MarginRight(.5);
+			});
 	}
 
 	static string GetHeadFoot(string heading)
@@ -188,10 +192,11 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 	var results = await Task.WhenAll(tasks);
 
 	var mergeBuilder = new MergeBuilder()
-		.Assets.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)))
-		.Parent.ConfigureRequest.TimeOut(1799)
-		.Parent;
-
+		.WithAssets(b => {
+		    b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)));
+		})
+		.ConfigureRequest(b=> b.TimeOut(1799));
+	
 	var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build());
 	
 	return await WriteFileAndGetPath(response, destinationDirectory);
@@ -199,7 +204,7 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 
 async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationDirectory)
 {
-	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}.pdf";
+	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}-2.pdf";
 	using (var destinationStream = File.Create(fullPath))
 	{
 		await responseStream.CopyToAsync(destinationStream);
