@@ -11,53 +11,49 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
     public sealed class UrlHeaderFooterBuilder: UrlRequestBuilder
     {
         [PublicAPI]
-        public UrlHeaderFooterBuilder(UrlRequest request, UrlRequestBuilder parent)
+        public UrlHeaderFooterBuilder(UrlRequest request)
         {
-            this.Parent = parent;
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
             this.Request.Content = new HeaderFooterDocument();
         } 
         
-        [PublicAPI]
-        public UrlRequestBuilder Parent { get; }
-
         #region header
         
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddHeader(ContentItem header)
+        public UrlHeaderFooterBuilder SetHeader(ContentItem header)
         {
             this.Request.Content.Header = header;
             return this;
         }
         
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddHeader(string body) => AddHeader(new ContentItem(body));
+        public UrlHeaderFooterBuilder SetHeader(string body) => SetHeader(new ContentItem(body));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddHeader(byte[] body) => AddHeader(new ContentItem(body));
+        public UrlHeaderFooterBuilder SetHeader(byte[] body) => SetHeader(new ContentItem(body));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddHeader(Stream body) => AddHeader(new ContentItem(body));
+        public UrlHeaderFooterBuilder SetHeader(Stream body) => SetHeader(new ContentItem(body));
 
         #endregion
         
         #region footer
         
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddFooter(ContentItem footer)
+        public UrlHeaderFooterBuilder SetFooter(ContentItem footer)
         {
             this.Request.Content.Footer = footer;
             return this;
         }
         
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddFooter(string body) => AddFooter(new ContentItem(body));
+        public UrlHeaderFooterBuilder SetFooter(string body) => SetFooter(new ContentItem(body));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddFooter(byte[] body) => AddFooter(new ContentItem(body));
+        public UrlHeaderFooterBuilder SetFooter(byte[] body) => SetFooter(new ContentItem(body));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder AddFooter(Stream body) => AddFooter(new ContentItem(body));
+        public UrlHeaderFooterBuilder SetFooter(Stream body) => SetFooter(new ContentItem(body));
         
         #endregion
 

@@ -16,6 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
     /// <remarks>
     ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
+    ///     Paper sizes: https://www.prepressure.com/library/paper-size  
     /// </remarks>
     public sealed class Dimensions : IConvertToHttpContent
     {
@@ -100,19 +101,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
         #endregion
 
         #region public methods
-
-       // https://www.prepressure.com/library/paper-size
-
+        
+        [PublicAPI]
         public static Dimensions ToA4WithNoMargins()
         {
             return new Dimensions
             {
                 PaperWidth = 8.27,
-                PaperHeight = 11.7,
-                MarginTop = 0,
-                MarginBottom = 0,
-                MarginLeft = 0,
-                MarginRight = 0
+                PaperHeight = 11.7
             };
         }
 
@@ -120,9 +116,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
         ///     Default Google Chrome printer options
         /// </summary>
         /// <remarks>
-        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/7e69ec4367069df52bb61c9ee0dce241b043a257/internal/pkg/printer/chrome.go#L47
+        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/master/internal/pkg/printer/chrome.go#L53
         /// </remarks>
         /// <returns></returns>
+        [PublicAPI]
         public static Dimensions ToChromeDefaults()
         {
             return new Dimensions { 
@@ -144,10 +141,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
             return new Dimensions { 
                 PaperWidth = 8.26, 
                 PaperHeight = 11.69,
-                MarginTop = 0,
-                MarginBottom = .5,  
-                MarginLeft = 0,
-                MarginRight = 0
+                MarginBottom = .5  
             };
         }
 

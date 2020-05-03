@@ -11,21 +11,17 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 {
-    public sealed class AssetBuilder<TParent>: BaseBuilder<RequestBase>
+    public sealed class AssetBuilder: BaseBuilder<RequestBase> 
     {
-        public AssetBuilder(RequestBase request, TParent parent)
+        public AssetBuilder(RequestBase request)
         {
-            this.Parent = parent;
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
             Request.Assets ??= new AssetDictionary();
         }
-
-        [PublicAPI]
-        public TParent Parent { get; }
-
+      
         #region one asset
 
-        public AssetBuilder<TParent> AddItem(string name, ContentItem value)
+        public AssetBuilder AddItem(string name, ContentItem value)
         {
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
@@ -33,18 +29,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
             }
 
             this.Request.Assets.Add(name, value);
-
+       
             return this;
         }
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItem(string name, string value) => AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, string value) => AddItem(name, new ContentItem(value));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItem(string name, byte[] value) => AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, byte[] value) => AddItem(name, new ContentItem(value));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItem(string name, Stream value) => AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, Stream value) => AddItem(name, new ContentItem(value));
 
         #endregion
 
@@ -53,7 +49,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
         #region from dictionaries
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(Dictionary<string, ContentItem> items)
+        public AssetBuilder AddItems(Dictionary<string, ContentItem> items)
         {
             foreach (var item in items.IfNullEmpty())
             {
@@ -64,15 +60,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
         }
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(Dictionary<string, string> assets) =>
+        public AssetBuilder AddItems(Dictionary<string, string> assets) =>
                 AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(Dictionary<string, byte[]> assets) =>
+        public AssetBuilder AddItems(Dictionary<string, byte[]> assets) =>
                 AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(Dictionary<string, Stream> assets) =>
+        public AssetBuilder AddItems(Dictionary<string, Stream> assets) =>
                 AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
 
         #endregion
@@ -80,19 +76,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
         #region from KVP enumerables
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
+        public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
                 AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ?? throw new ArgumentException("Assets can not be null")));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
+        public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
                 AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
+        public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
                 AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
 
         [PublicAPI]
-        public AssetBuilder<TParent> AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
+        public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
                 AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
 
         #endregion

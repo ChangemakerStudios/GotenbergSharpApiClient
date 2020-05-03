@@ -6,10 +6,12 @@ using System.Net.Http.Headers;
 
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+    [PublicAPI]
     public class MergeOfficeRequest: RequestBase, IMergeRequest  
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();

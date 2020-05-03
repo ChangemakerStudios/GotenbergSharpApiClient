@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -14,11 +15,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         protected override MergeRequest Request { get; set; }
 
         [PublicAPI]
-        public AssetBuilder<MergeBuilder> Assets => new AssetBuilder<MergeBuilder>(this.Request, this);
+        public AssetBuilder Assets => new AssetBuilder(this.Request);
 
-        [PublicAPI]
-        public ConfigBuilder<MergeBuilder> ConfigureRequest => new ConfigBuilder<MergeBuilder>(this.Request, this);
- 
+        public MergeBuilder ConfigureRequest(Action<ConfigBuilder> action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            action(new ConfigBuilder(this.Request));
+            return this;
+        }
+
         [PublicAPI]
         public MergeRequest Build() => this.Request;
 

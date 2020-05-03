@@ -8,75 +8,74 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
 {
+    /// <remarks>
+    ///     If you don't specify any dimensions the client sets them to Chrome's defaults
+    /// </remarks>
     public sealed class DocumentBuilder: HtmlRequestBuilder
     {
-        public DocumentBuilder(HtmlRequest request, HtmlRequestBuilder parent)
+        public DocumentBuilder(HtmlRequest request)
         {
-            this.Parent = parent;
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
             this.Request.Content ??= new FullDocument();
         }
 
-        [PublicAPI]
-        public HtmlRequestBuilder Parent { get; }
-
         #region body
         
         [PublicAPI]
-        public DocumentBuilder AddBody(ContentItem body)
+        public DocumentBuilder SetBody(ContentItem body)
         {
             this.Request.Content.Body = body;
             return this;
         }
 
         [PublicAPI]
-        public DocumentBuilder AddBody(string body) => AddBody(new ContentItem(body));
+        public DocumentBuilder SetBody(string body) => SetBody(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder AddBody(byte[] body) => AddBody(new ContentItem(body));
+        public DocumentBuilder SetBody(byte[] body) => SetBody(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder AddBody(Stream body) => AddBody(new ContentItem(body));
+        public DocumentBuilder SetBody(Stream body) => SetBody(new ContentItem(body));
 
         #endregion
 
         #region header
         
         [PublicAPI]
-        public DocumentBuilder AddHeader(ContentItem header)
+        public DocumentBuilder SetHeader(ContentItem header)
         {
             this.Request.Content.Header = header;
             return this;
         }
         
         [PublicAPI]
-        public DocumentBuilder AddHeader(string body) => AddHeader(new ContentItem(body));
+        public DocumentBuilder SetHeader(string body) => SetHeader(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder AddHeader(byte[] body) => AddHeader(new ContentItem(body));
+        public DocumentBuilder SetHeader(byte[] body) => SetHeader(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder AddHeader(Stream body) => AddHeader(new ContentItem(body));
+        public DocumentBuilder SetHeader(Stream body) => SetHeader(new ContentItem(body));
 
         #endregion
         
         #region footer
         
         [PublicAPI]
-        public DocumentBuilder AddFooter(ContentItem footer)
+        public DocumentBuilder SetFooter(ContentItem footer)
         {
             this.Request.Content.Footer = footer;
             return this;
         }
         
         [PublicAPI]
-        public DocumentBuilder AddFooter(string body) => AddFooter(new ContentItem(body));
+        public DocumentBuilder SetFooter(string body) => SetFooter(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder AddFooter(byte[] body) => AddFooter(new ContentItem(body));
+        public DocumentBuilder SetFooter(byte[] body) => SetFooter(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder AddFooter(Stream body) => AddFooter(new ContentItem(body));
+        public DocumentBuilder SetFooter(Stream body) => SetFooter(new ContentItem(body));
         
         #endregion
  

@@ -1,4 +1,4 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
+﻿/*using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
 using JetBrains.Annotations;
@@ -14,10 +14,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
     {
         public MergeOfficeBuilder() => Init();
 
-        protected override MergeOfficeRequest Request { get; set; }
+        public override MergeOfficeRequest Request { get; set; }
 
         [PublicAPI]
-        public AssetBuilder<MergeOfficeBuilder> Assets => new AssetBuilder<MergeOfficeBuilder>(this.Request, this);
+        public AssetBuilder Assets => new AssetBuilder(this.Request);
 
         [PublicAPI]
         public ConfigBuilder<MergeOfficeBuilder> ConfigureRequest => new ConfigBuilder<MergeOfficeBuilder>(this.Request, this);
@@ -27,4 +27,4 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
         void Init() => this.Request = new MergeOfficeRequest();
     }
-}
+}*/
