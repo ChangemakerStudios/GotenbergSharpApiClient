@@ -19,61 +19,49 @@ docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=
 ```
 
 ## Scenario 1 
-*Html to PDF conversion with embedded assets:*
+*Html to PDF with embedded assets:*
 
 ```csharp
-public async Task<string> HtmlToPdf()
+public async Task<string> CreateFromHtml(string destinationDirectory)
 {
-    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
-		.AddDocument(b => 
-			b.SetBody(GetBody())
-			 .SetFooter(GetFooter())
+		.AddDocument( 
+			b => b.SetBody(GetBody())
+			      .SetFooter(GetFooter())
 		).WithDimensions(b =>
 		{
 			b.UseChromeDefaults().LandScape().SetScale(.75);
 		}).WithAsyncAssets(async
 			b => b.AddItem("ear-on-beach.jpg", await GetImageBytes())
-		).ConfigureRequest(b => {		
-			b.ChromeRpccBufferSize(1024);
-		});
-
-	//You can also do this for async: 
-	//	.AddAsyncDocument(async b => b.SetBody(await GetBodyAsync()).SetFooter(GetFooter()))
+		).ConfigureRequest(b => { b.ChromeRpccBufferSize(1024);	});
 
 	var response = await sharpClient.ToPdfAsync(await builder.BuildAsync());
 
-	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenbergFromHtml.pdf";
-
-	using (var destinationStream = File.Create(outPath))
+	var mergedPdfPath = @$"{destinationDirectory}\GotenbergFromHtml.pdf";
+	using (var destinationStream = File.Create(mergedPdfPath))
 	{
 		await response.CopyToAsync(destinationStream);
 	}
 
-	return outPath;
+	return mergedPdfPath;
 }
 
-async Task<byte[]> GetImageBytes()
+static async Task<byte[]> GetImageBytes()
 {
-	return await new HttpClient().GetByteArrayAsync(
-		"http://4.bp.blogspot.com/-jdRdVRheb74/UlLHPkWs99I/AAAAAAAAAJc/lbJEG0KwfgI/s1600/bill-brandt-31.jpg");
+	return await new HttpClient().GetByteArrayAsync("http://4.bp.blogspot.com/-jdRdVRheb74/UlLHPkWs99I/AAAAAAAAAJc/lbJEG0KwfgI/s1600/bill-brandt-31.jpg");
 }
 
-string GetBody()
+static string GetBody()
 {
 	return @"<!doctype html>
 			<html lang=""en"">
     			<style>
-					body { max-width: 700px;  margin: auto;}
-					h1 { font-size: 55px; }
-					h1, h3{ text-align: center; margin-top: 5px; } 
-					.photo-container { padding-bottom: 20px;  }
-					figure { width:548px; height:600px; } 
-					figure img { border: 10px solid #000; } 
-					figcaption { text-align: right; font-size: 10pt; } 
-					a:link, a:visited { color: black !important; }
+					body { max-width: 700px;  margin: auto;} h1 { font-size: 55px; }
+					h1, h3{ text-align: center; margin-top: 5px; } .photo-container { padding-bottom: 20px;  }
+					figure { width:548px; height:600px; } figure img { border: 10px solid #000; } 
+					figcaption { text-align: right; font-size: 10pt; } 	a:link, a:visited { color: black !important; }
 				</style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 				<body>
@@ -84,47 +72,121 @@ string GetBody()
         	                <figcaption>Photo by <a href=""https://www.moma.org/artists/740"">Bill Brandt</a>.</figcaption>
 						 </figure>   
 					</div>
-					<h3>Powered by <a href=""https://hub.docker.com/r/thecodingmachine/gotenberg"">Gotenberg</a></h3>
+					<h3>Powered by <a href=""https://hub.docker.com/r/thecodingmachine/gotenberg"">The Coding Machine</a></h3>
 				</body>
 			</html>";
 }
 
-string GetFooter()
+static string GetFooter()
 {
-	return
-		@"<html><head><style>body { font-size: 8rem; font-family: Roboto,""Helvetica Neue"",Arial,sans-serif; margin: 4rem auto; }  </style></head><body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
+	return @"<html><head><style>body { font-size: 8rem; font-family: Roboto,""Helvetica Neue"",Arial,sans-serif; margin: 4rem auto; }  </style></head>
+	<body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
 }
 ```
 
 ## Scenario 2 
-*Url to PDF conversion with custom header & footer:*
+*Url to PDF with custom header & footer:*
 
 ```csharp
-public async Task<string> UrlToPdf()
+public async Task<string> CreateFromUrl(string destinationPath, string headerPath, string footerPath)
 {
-    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.nytimes.com")
 		.ConfigureRequest(b =>
 		{
-			b.PageRanges("1-1").ChromeRpccBufferSize(3145728);
+			b.PageRanges("1-2").ChromeRpccBufferSize(1048576);
 		})
 		.AddAsyncHeaderFooter(async
-			b => b.SetHeader(await File.ReadAllTextAsync(@"E:\GotenBerg\ProjectResources\UrlHeader.html"))
-				  .SetFooter(File.ReadAllText(@"E:\GotenBergNotes\ProjectResources\UrlFooter.html")
+			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))
+				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
 		)).WithDimensions(b =>
 		{
 			b.UseChromeDefaults()
-			 .SetScale(.90)
-		  	 .LandScape();
+			 .LandScape()
+			 .SetScale(.90);
 		});
 
-	var request = await builder.Build();
+	var request = await builder.BuildAsync();
 	var response = await sharpClient.UrlToPdf(request);
 
-	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
-	var outPath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}{platformAwareSlash}GotenbergFromUrl.pdf";
+	var resultPath = @$"{destinationPath}\GotenbergFromUrl.pdf";
+
+	using (var destinationStream = File.Create(resultPath))
+	{
+		await response.CopyToAsync(destinationStream);
+	}
+
+	return resultPath;
+}
+```
+## Scenario 4 Merge Office Docs
+*Markdown to Pdf conversion with embedded assets:*
+
+```csharp
+async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
+{
+	var client = new GotenbergSharpClient("http://localhost:3000");
+
+	var builder = new MergeOfficeBuilder()
+			.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
+			.ConfigureRequest(b =>
+			{
+				b.TimeOut(100);
+			});
+
+	var request = await builder.BuildAsync();
+	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
+
+	var mergeResultPath = @$"{destinationDirectory}\GotenbergOfficeMerge.pdf";
+	using (var destinationStream = File.Create(mergeResultPath))
+	{
+		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
+	}
+
+	return mergeResultPath;
+}
+
+async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string sourceDirectory)
+{
+	var paths = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.TopDirectoryOnly);
+	var names = paths.Select(p => new FileInfo(p).Name);
+	var tasks = paths.Select(async f => await File.ReadAllBytesAsync(f));
+	var docs = await Task.WhenAll(tasks);
+
+	return names.Select((name, index) => KeyValuePair.Create(name, docs[index]));
+}
+```
+## Scenario 4 Markdown
+*Markdown to Pdf conversion with embedded assets:*
+
+```csharp
+async Task<string> CreateFromMarkdown(string destinationDirectory)
+{
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+
+	var builder = new HtmlRequestBuilder(containsMarkdown: true)
+		.AddAsyncDocument(async
+			b => b.SetHeader(await this.GetHeaderAsync())
+				  .SetBody(await GetBodyAsync())
+				  .SetFooter(await GetFooterAsync())
+		).WithDimensions(b =>
+		{
+			b.UseChromeDefaults().LandScape().SetScale(.90);
+		}).WithAsyncAssets(async
+			b => b.AddItems(await GetMarkdownAssets())
+		).ConfigureRequest(b =>
+		{
+			b.ChromeRpccBufferSize(1048555)
+			 .ResultFileName("hello.pdf");
+		});
+
+	var request = await builder.BuildAsync();
+	var response = await sharpClient.ToPdfAsync(request);
+
+ 
+	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown.pdf";
 
 	using (var destinationStream = File.Create(outPath))
 	{
@@ -133,10 +195,42 @@ public async Task<string> UrlToPdf()
 
 	return outPath;
 }
-```
 
-## Scenario 3 Merge multiple Url request results into one pdf
-*Builds a 28 page pdf by merging the front two pages of several news sites. Takes about a minute to complete*
+async Task<string> GetBodyAsync()
+{
+	var body = await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/index.html");
+	return body.Replace(@"<img src=""img.gif"">", string.Empty);
+}
+
+async Task<string> GetHeaderAsync()
+{
+	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/header.html");
+}
+
+async Task<string> GetFooterAsync()
+{
+	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/footer.html");
+}
+
+async Task<IEnumerable<KeyValuePair<string, string>>> GetMarkdownAssets()
+{
+	var bodyAssetNames = new[] { "font.woff", "style.css", "img.gif" };
+	var markdownFiles = new[] { "paragraph1.md", "paragraph2.md", "paragraph3.md" };
+
+	var client = new HttpClient() { BaseAddress = new Uri("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/") };
+
+	var bodyAssetTasks = bodyAssetNames.Select(ba => client.GetStringAsync(ba));
+	var mdTasks = markdownFiles.Select(md => client.GetStringAsync(md));
+
+	var bodyAssets = await Task.WhenAll(bodyAssetTasks);
+	var mdParagraphs = await Task.WhenAll(mdTasks);
+
+	return bodyAssetNames.Select((name, index) => KeyValuePair.Create(name, bodyAssets[index]))
+			   .Concat(markdownFiles.Select((name, index) => KeyValuePair.Create(name, mdParagraphs[index])));
+}
+```
+## Scenario 5 Merge multiple Urls into one pdf
+*Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
 ```csharp
 public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
@@ -210,114 +304,5 @@ async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationD
 		await responseStream.CopyToAsync(destinationStream);
 	}
 	return fullPath; 
-}
-```
-## Scenario 4 Merge Office Docs
-*Markdown to Pdf conversion with embedded assets:*
-
-```csharp
-async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
-{
-	var client = new GotenbergSharpClient("http://localhost:3000");
-
-	var builder = new MergeOfficeBuilder()
-			.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
-			.ConfigureRequest(b =>
-			{
-				b.TimeOut(100);
-		   	});
-	   
-	var request = await builder.BuildAsync();
-	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
-
-	var mergeResultPath =@$"{destinationDirectory}\GotenbergOfficeMerge.pdf";
-	using (var destinationStream = File.Create(mergeResultPath))
-	{
-		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
-	}
-	 
-	return mergeResultPath;
-}
-
-async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string sourceDirectory)
-{
-	var paths = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.TopDirectoryOnly);
-	var names = paths.Select(p => new FileInfo(p).Name );
-	var tasks = paths.Select(async f => await File.ReadAllBytesAsync(f));
-	var docs = await Task.WhenAll(tasks);
-	
-	return names.Select((name,index) => KeyValuePair.Create(name, docs[index]));
-}
-```
-## Scenario 5 Markdown
-*Markdown to Pdf conversion with embedded assets:*
-
-```csharp
-async Task<string> MarkdownPdf()
-{
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
-
-	var builder = new HtmlRequestBuilder(containsMarkdown: true)
-		.AddAsyncDocument(async
-			b => b.SetHeader(await this.GetHeaderAsync())
-				  .SetBody(await GetBodyAsync())
-				  .SetFooter(GetFooter())
-		).WithDimensions(b =>
-		{
-			b.UseChromeDefaults().LandScape().SetScale(.90);
-		}).WithAsyncAssets(async
-			b => b.AddItems(await GetMarkdownAssets())
-		).ConfigureRequest(b =>
-		{
-			b.ChromeRpccBufferSize(1048555)
-			 .ResultFileName("hello.pdf");
-		});
-
-	var request = await builder.BuildAsync();
-	var response = await sharpClient.ToPdfAsync(request);
-
-	var platformAwareSlash = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\" : "/";
-	var destination = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-	var outPath = @$"{destination}{platformAwareSlash}GotenbergFromMarkDown.pdf";
-
-	using (var destinationStream = File.Create(outPath))
-	{
-		await response.CopyToAsync(destinationStream);
-	}
-
-	return outPath;
-}
-
-async Task<string> GetBody()
-{
-	var body = await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/index.html");
-	return body.Replace(@"<img src=""img.gif"">", string.Empty);
-}
-
-async Task<string> GetHeader()
-{
-	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/header.html");
-}
-
-async Task<string> GetFooter()
-{
-	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/footer.html");
-}
-
-async Task<IEnumerable<KeyValuePair<string, string>>> GetMarkdownAssets()
-{
-	var bodyAssetNames = new[] { "font.woff", "style.css", "img.gif" };
-	var markdownFiles = new[] { "paragraph1.md", "paragraph2.md", "paragraph3.md" };
-
-	var client = new HttpClient() { BaseAddress = new Uri("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/") };
-
-	var bodyAssetTasks = bodyAssetNames.Select(ba => client.GetStringAsync(ba));
-	var mdTasks = markdownFiles.Select(md => client.GetStringAsync(md));
-
-	var bodyAssets = await Task.WhenAll(bodyAssetTasks);
-	var mdParagraphs = await Task.WhenAll(mdTasks);
-
-	return bodyAssetNames.Select((name, index) => KeyValuePair.Create(name, bodyAssets[index]))
-			   .Concat(markdownFiles.Select((name, index) => KeyValuePair.Create(name, mdParagraphs[index])));
 }
 ```

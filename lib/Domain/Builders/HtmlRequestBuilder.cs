@@ -88,9 +88,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public async Task<HtmlRequest> BuildAsync()
         {
             if (_asyncTasks.Count == 0) throw new InvalidOperationException("Call Build");
-            if (this.Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
 
             await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+
+            if (this.Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
 
             return Request;
         }
