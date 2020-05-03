@@ -220,30 +220,34 @@ async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirec
 {
 	var client = new GotenbergSharpClient("http://localhost:3000");
 
-	var items = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.TopDirectoryOnly)
-				.Select(item => KeyValuePair.Create(new FileInfo(item).Name, File.ReadAllBytes(item)));
-
 	var builder = new MergeOfficeBuilder()
-		.WithAssets(b => 
-		{
-	   		b.AddItems(items);
-	    }).ConfigureRequest(b =>
-		{
-			b.TimeOut(100);
-	   });
+			.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
+			.ConfigureRequest(b =>
+			{
+				b.TimeOut(100);
+		   	});
 	   
-	var request = builder.Build();
+	var request = await builder.BuildAsync();
 	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
 
-	var filePathAndName =@$"{destinationDirectory}\GotenbergOfficeMerge.pdf";
-	using (var destinationStream = File.Create(filePathAndName))
+	var mergeResultPath =@$"{destinationDirectory}\GotenbergOfficeMerge.pdf";
+	using (var destinationStream = File.Create(mergeResultPath))
 	{
 		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
 	}
 	 
-	return filePathAndName;
+	return mergeResultPath;
 }
 
+async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string sourceDirectory)
+{
+	var paths = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.TopDirectoryOnly);
+	var names = paths.Select(p => new FileInfo(p).Name );
+	var tasks = paths.Select(async f => await File.ReadAllBytesAsync(f));
+	var docs = await Task.WhenAll(tasks);
+	
+	return names.Select((name,index) => KeyValuePair.Create(name, docs[index]));
+}
 ```
 ## Scenario 5 Markdown
 *Markdown to Pdf conversion with embedded assets:*

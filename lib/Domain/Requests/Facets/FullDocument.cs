@@ -1,8 +1,7 @@
 ﻿using Gotenberg.Sharp.API.Client.Infrastructure;
-
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     /// <summary>
     /// Represents the elements of a document

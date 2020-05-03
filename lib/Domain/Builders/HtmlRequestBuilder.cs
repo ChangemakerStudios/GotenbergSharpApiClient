@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders;
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
 using JetBrains.Annotations;

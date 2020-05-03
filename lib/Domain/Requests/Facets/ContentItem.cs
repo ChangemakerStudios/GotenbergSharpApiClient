@@ -1,10 +1,9 @@
 using System;
 using System.IO;
 using System.Net.Http;
-
 using Gotenberg.Sharp.API.Client.Extensions;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Content
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
 
     public sealed class ContentItem

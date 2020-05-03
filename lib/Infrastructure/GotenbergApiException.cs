@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
+
+using Newtonsoft.Json;
 
 // ReSharper disable All CA1032
 // ReSharper disable All CA1822 
@@ -9,13 +12,15 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
     /// <inheritdoc />
     public sealed class GotenbergApiException: Exception
     {
-        public GotenbergApiException(string message, Exception innerException) : base(message, innerException) { }
-        public GotenbergApiException(string message, Uri requestUri, HttpStatusCode statusCode, string reasonPhrase)
+        readonly HttpResponseMessage _response;
+
+        public GotenbergApiException(string message, HttpResponseMessage response)
             : base(message)
         {
-            this.StatusCode = statusCode;
-            this.RequestUri = requestUri;
-            this.ReasonPhrase = reasonPhrase;
+            _response = response;
+            this.StatusCode = _response.StatusCode;
+            this.RequestUri = _response.RequestMessage.RequestUri;
+            this.ReasonPhrase = _response.ReasonPhrase;
         }
 
         public HttpStatusCode StatusCode { get; }
@@ -26,7 +31,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
 
         public override string ToString()
         {
-            return $"Gotenberg Api response message: '{base.Message}' via {this.RequestUri}; Status Code: {this.StatusCode}; ReasonPhrase{ReasonPhrase}. Check the logs in the container.";
+            var responseJson = JsonConvert.SerializeObject(_response);
+            return $"Gotenberg Api response message: '{this.Message}' Response Json: {responseJson}.";
         }
       
     }

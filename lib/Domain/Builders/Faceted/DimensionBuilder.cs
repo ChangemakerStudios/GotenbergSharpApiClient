@@ -1,11 +1,10 @@
 using System;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
-
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
     public sealed class DimensionBuilder: BaseBuilder<ChromeRequest>
     {

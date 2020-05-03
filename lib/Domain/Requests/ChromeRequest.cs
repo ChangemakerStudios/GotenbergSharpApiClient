@@ -1,4 +1,4 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
+﻿using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {

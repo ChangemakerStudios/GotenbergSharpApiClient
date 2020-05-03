@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
@@ -12,7 +10,7 @@ using JetBrains.Annotations;
 
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public sealed class AssetDictionary: Dictionary<string, ContentItem>, IConvertToHttpContent 
     {

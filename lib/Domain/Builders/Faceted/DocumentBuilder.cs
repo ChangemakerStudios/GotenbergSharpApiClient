@@ -2,11 +2,10 @@ using System;
 using System.IO;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Content;
-
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.FacetedBuilders
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
     /// <remarks>
     ///     If you don't specify any dimensions the client sets them to Chrome's defaults

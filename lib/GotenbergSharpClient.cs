@@ -131,7 +131,7 @@ namespace Gotenberg.Sharp.API.Client
 
         async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken)  
         {
-            if (request?.Count == null) throw new ArgumentNullException(nameof(request));
+            if (request?.Count == null) throw new ArgumentException("Merge request contains no items");
 
             return await ExecuteRequest(request, mergePath, cancelToken).ConfigureAwait(false);
         }
@@ -167,7 +167,7 @@ namespace Gotenberg.Sharp.API.Client
                 return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var message = await response.Content.ReadAsStringAsync().ConfigureAwait(false); 
-            throw new GotenbergApiException(message, response.RequestMessage.RequestUri, response.StatusCode, response.ReasonPhrase);
+            throw new GotenbergApiException(message, response);
         }
 
         #endregion
