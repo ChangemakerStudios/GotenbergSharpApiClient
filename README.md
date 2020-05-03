@@ -18,7 +18,7 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
 ```
 
-## Scenario 1 Html To Pdf
+## Html To Pdf
 *Html to pdf with embedded assets:*
 
 ```csharp
@@ -84,7 +84,7 @@ static string GetFooter()
 }
 ```
 
-## Scenario 2 Url To Pdf
+## Url To Pdf
 *Url to Pdf with custom header & footer:*
 
 ```csharp
@@ -121,8 +121,8 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 	return resultPath;
 }
 ```
-## Scenario 4 Merge Office Docs
-*Markdown to Pdf conversion with embedded assets:*
+## Merge Office Docs
+*Merges office documents and configures the request time-out:*
 
 ```csharp
 async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
@@ -158,7 +158,7 @@ async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string source
 	return names.Select((name, index) => KeyValuePair.Create(name, docs[index]));
 }
 ```
-## Scenario 4 Markdown to Pdf
+## Markdown to Pdf
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
@@ -229,7 +229,7 @@ async Task<IEnumerable<KeyValuePair<string, string>>> GetMarkdownAssets()
 			   .Concat(markdownFiles.Select((name, index) => KeyValuePair.Create(name, mdParagraphs[index])));
 }
 ```
-## Scenario 5 Merge multiple Urls into one pdf
+## Merge 15 Urls to one pdf
 *Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
 ```csharp
