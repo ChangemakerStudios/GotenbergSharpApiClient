@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     /// <summary>
     /// All endpoints accept form fields for each property
@@ -22,9 +20,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         [PublicAPI]
         public static readonly int MaxChromeRpccBufferSize = 104857600;
 
-        /// <summary>
-        /// This is the value used in Gotenberg if you pass nothing. I put to use it as a multiplier when desired.
-        /// </summary>
         [PublicAPI]
         public const int DefaultChromeRpccBufferSize = 1048576;
 
@@ -95,6 +90,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// Converts the instance to a collection of http content items
         /// </summary>
         /// <returns></returns>
+        // ReSharper disable once MethodTooLong
         public IEnumerable<HttpContent> ToHttpContent()
         {
             if (this.TimeOut.HasValue)

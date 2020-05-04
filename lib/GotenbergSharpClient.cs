@@ -80,7 +80,7 @@ namespace Gotenberg.Sharp.API.Client
         public async Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            return await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
+            return await ExecuteRequestAsync(request, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -94,8 +94,8 @@ namespace Gotenberg.Sharp.API.Client
         public async Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));
-            var path = request.ContainsMarkdown ? Constants.Gotenberg.ApiPaths.MarkdownConvert : Constants.Gotenberg.ApiPaths.ConvertHtml;
-            return await ExecuteRequest(request, path, cancelToken).ConfigureAwait(false);
+
+            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -107,7 +107,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
-            => await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
+        {
+            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+        }
 
         /// <summary>
         ///     Converts one or more office documents into one merged pdf.
@@ -123,42 +125,19 @@ namespace Gotenberg.Sharp.API.Client
         /// </remarks>
         [PublicAPI]
         public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
-            => await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
+            => await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
 
         #endregion
-       
+
         #region exec
 
-        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken)  
+        async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken, 
+            KeyValuePair<string, string> remoteUrlHeader = default)
         {
-            if (request?.Count == null) throw new ArgumentException("Merge request contains no items");
+            using var message = request.ToApiRequestMessage(remoteUrlHeader);
 
-            return await ExecuteRequest(request, mergePath, cancelToken).ConfigureAwait(false);
-        }
-
-        async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, 
-            CancellationToken cancelToken, KeyValuePair<string,string> remoteUrlHeader = default)
-        {
-            using var formContent = new MultipartFormDataContent($"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
-            
-            foreach (var item in request.ToHttpContent())
-            {
-                formContent.Add(item);
-            }
-            
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, apiPath)
-            {
-                Content = formContent 
-            };
-
-            if (remoteUrlHeader.Key.IsSet())
-            {
-                var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteUrlHeader.Key.Trim()}";
-                requestMessage.Headers.Add(name, remoteUrlHeader.Value);
-            }
-            
             var response = await this._innerClient
-                .SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancelToken)
+                .SendAsync(message, HttpCompletionOption.ResponseContentRead, cancelToken)
                 .ConfigureAwait(false);
          
             cancelToken.ThrowIfCancellationRequested();
@@ -166,8 +145,7 @@ namespace Gotenberg.Sharp.API.Client
             if(response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-            var message = await response.Content.ReadAsStringAsync().ConfigureAwait(false); 
-            throw new GotenbergApiException(message, response);
+            throw GotenbergApiException.Create(response);
         }
 
         #endregion

@@ -24,6 +24,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public AssetBuilder AddItem(string name, ContentItem value)
         {
+            // ReSharper disable once ComplexConditionExpression
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
                 throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
@@ -52,7 +53,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, ContentItem> items)
         {
-            foreach (var item in items.IfNullEmpty())
+            foreach (var item in items ?? throw new ArgumentException("Assets can not be null"))
             {
                 this.AddItem(item.Key, item.Value);
             }
@@ -62,15 +63,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, string> assets) =>
-                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
+                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, byte[]> assets) =>
-                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
+                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, Stream> assets) =>
-                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null"));
+                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         #endregion
 

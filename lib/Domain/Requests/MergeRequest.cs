@@ -8,11 +8,13 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public sealed class MergeRequest: RequestBase, IMergeRequest
+    public sealed class MergeRequest: RequestBase
     {
+        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergePdf;
+
         public int Count => this.Assets.IfNullEmpty().Count;
 
-        public IEnumerable<HttpContent> ToHttpContent()
+        public override IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.ToAlphabeticalMergeOrderByIndex()
                 .Where(item => item.Value != null)

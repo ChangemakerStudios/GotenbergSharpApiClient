@@ -11,13 +11,15 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public class MergeOfficeRequest: RequestBase, IMergeRequest  
+    public class MergeOfficeRequest: RequestBase
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 
+        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergeOffice;
+
         public int Count => this.Assets.IfNullEmpty().Count;
 
-        public IEnumerable<HttpContent> ToHttpContent()
+        public override IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.FilterOutNonOfficeDocs()
                 .ToAlphabeticalMergeOrderByIndex()

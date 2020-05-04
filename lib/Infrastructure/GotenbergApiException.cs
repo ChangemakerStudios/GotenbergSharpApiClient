@@ -29,6 +29,12 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
 
         public string ReasonPhrase { get; }
 
+        public static GotenbergApiException Create(HttpResponseMessage response)
+        {
+            var message = response.Content.ReadAsStringAsync().Result;
+            return new GotenbergApiException(message, response);
+        }
+
         public override string ToString()
         {
             var responseJson = JsonConvert.SerializeObject(_response);

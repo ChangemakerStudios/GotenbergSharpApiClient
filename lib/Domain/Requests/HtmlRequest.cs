@@ -5,8 +5,7 @@ using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
-
-using JetBrains.Annotations;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -18,14 +17,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     ///     using the Go template function 'toHTML' within the body element. Chrome uses the function to convert the contents a given markdown file to HTML.
     ///     See example here: https://thecodingmachine.github.io/gotenberg/#markdown.basic
     /// </remarks>
-    public sealed class HtmlRequest: ChromeRequest, IConvertToHttpContent
+    public sealed class HtmlRequest: ChromeRequest
     {
-        [UsedImplicitly]
+        public override string ApiPath => 
+            this.ContainsMarkdown ? Constants.Gotenberg.ApiPaths.MarkdownConvert : Constants.Gotenberg.ApiPaths.ConvertHtml;
+
         public HtmlRequest(): this(false){}
 
         public HtmlRequest(bool containsMarkdown = false) => this.ContainsMarkdown = containsMarkdown;
 
-        public bool ContainsMarkdown { get; }
+        public bool ContainsMarkdown { get; internal set; }
 
         public FullDocument Content { get; set; }
 
@@ -34,7 +35,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         /// <returns></returns>
         /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
-        public IEnumerable<HttpContent> ToHttpContent()
+        public override IEnumerable<HttpContent> ToHttpContent()
         {
             if (Content?.Body == null) throw new NullReferenceException("You need to Add at least a body");
 
@@ -43,7 +44,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                           .Concat(Config.IfNullEmptyContent())
                           .Concat(Dimensions.IfNullEmptyContent());
         }
-      
     }
 
 }

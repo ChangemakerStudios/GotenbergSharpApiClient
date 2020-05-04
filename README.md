@@ -166,10 +166,11 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var builder = new HtmlRequestBuilder(containsMarkdown: true)
+	var builder = new HtmlRequestBuilder()
 		.AddAsyncDocument(async
 			b => b.SetHeader(await this.GetHeaderAsync())
 				  .SetBody(await GetBodyAsync())
+				  .ContainsMarkdown()
 				  .SetFooter(await GetFooterAsync())
 		).WithDimensions(b =>
 		{

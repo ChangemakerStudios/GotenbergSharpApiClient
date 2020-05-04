@@ -84,7 +84,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public async Task<UrlRequest> BuildAsync()
         {
-            if (_asyncTasks.Count == 0) throw new InvalidOperationException("Call Build");
+            if (_asyncTasks.Count == 0) throw new InvalidOperationException("Call Build instead");
             if (this.Request.Url == null) throw new NullReferenceException("Request.Url is null");
 
             await Task.WhenAll(_asyncTasks).ConfigureAwait(false);

@@ -1,6 +1,7 @@
 using System;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;

@@ -5,7 +5,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="System.Attribute" />
+    /// <seealso cref="Attribute" />
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class MultiFormHeaderAttribute : Attribute
     {
@@ -16,6 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         /// <param name="name">The name.</param>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="mediaType">The media type</param>
+        // ReSharper disable once TooManyDependencies
         public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files, 
                                         string fileName = null, 
                                         string contentDisposition = Constants.HttpContent.Disposition.Types.FormData,

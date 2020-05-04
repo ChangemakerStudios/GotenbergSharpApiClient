@@ -12,7 +12,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     public static class EnumerableExtensions
     {
         /// <remarks>
-        /// ToDo: Update if/when the CodingMachine people add new extensions.
         /// Source is here: https://github.com/thecodingmachine/gotenberg/blob/master/internal/app/xhttp/handler.go#L193
         /// </remarks>
         static readonly string[] OfficeExtensions = { ".txt", ".rtf", ".fodt", ".doc", ".docx", ".odt", ".xls", ".xlsx", ".ods", ".ppt", ".pptx", ".odp" };

@@ -9,6 +9,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     public static class IntExtensions
     {
         const int AlphabetLength = 26;
+        // ReSharper disable once ComplexConditionExpression
         static readonly char[] Alphabet = Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => (char) c).ToArray();
 
         /// <summary>

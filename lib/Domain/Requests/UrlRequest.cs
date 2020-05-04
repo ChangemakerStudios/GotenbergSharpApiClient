@@ -13,13 +13,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <summary>
     /// For URL to PDF conversions
     /// </summary>
-    public sealed class UrlRequest: ChromeRequest, IConvertToHttpContent
+    public sealed class UrlRequest: ChromeRequest
     {
+
+        public override string ApiPath => Constants.Gotenberg.ApiPaths.UrlConvert;
+
         public Uri Url { get; set; }
+        
         public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
+        
         public HeaderFooterDocument Content { get; set; }
         
-        public IEnumerable<HttpContent> ToHttpContent()
+        public override IEnumerable<HttpContent> ToHttpContent()
         {
             if (this.Url == null) throw new NullReferenceException(nameof(Url));
             if (!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");

@@ -21,6 +21,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         #region body
         
+         [PublicAPI]
+        public DocumentBuilder ContainsMarkdown(bool containsMarkdown = true)
+        {
+            this.Request.ContainsMarkdown = containsMarkdown;
+            return this;
+        }
+
+
         [PublicAPI]
         public DocumentBuilder SetBody(ContentItem body)
         {

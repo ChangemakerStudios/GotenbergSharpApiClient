@@ -17,6 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
     /// <seealso cref="System.Net.Http.DelegatingHandler" />
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "CA2000")]
+    // ReSharper disable once HollowTypeName
     public sealed class TimeoutHandler : DelegatingHandler
     {
         /// <summary>
