@@ -9,7 +9,7 @@
         A6 = 4,
         Letter = 5,
         Legal = 6,
-        Tabloid = 7,
+        Tabloid = 7
     }
 
 }

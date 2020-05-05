@@ -20,14 +20,15 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             (PaperSizes.Tabloid, Width: 11, Height: 17)
         };
 
-        public static (PaperSizes Size, double Width, double Height) ToSelectedSize(this PaperSizes sizes)
+        // ReSharper disable once FlagArgument
+        public static (PaperSizes Size, double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
         {
-            if (!Enum.IsDefined(typeof(PaperSizes), sizes))
-                throw new InvalidEnumArgumentException(nameof(sizes), (int) sizes, typeof(PaperSizes));
-            if (sizes == PaperSizes.None) 
-                throw new ArgumentOutOfRangeException(nameof(sizes));
+            if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
+                throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
+            if (selectedSize == PaperSizes.None) 
+                throw new ArgumentOutOfRangeException(nameof(selectedSize));
 
-            return PaperSizer.First(s => s.Size == sizes);
+            return PaperSizer.First(s => s.Size == selectedSize);
         }
 
     }

@@ -76,7 +76,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public UrlRequest Build() 
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException(this.CallBuildAsyncErrorMessage);
+            if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (this.Request.Url == null) throw new NullReferenceException("Request.Url is null");
             return Request;
         }

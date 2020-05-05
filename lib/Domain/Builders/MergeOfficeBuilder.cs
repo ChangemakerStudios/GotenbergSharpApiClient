@@ -50,7 +50,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public MergeOfficeRequest Build()
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException(this.CallBuildAsyncErrorMessage);
+            if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (Request.Count == 0) throw new InvalidOperationException("There are no items to merge");
             return Request;
         }

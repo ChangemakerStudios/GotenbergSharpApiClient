@@ -6,7 +6,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
     {
         protected virtual TRequest Request { get; set; }
 
-        protected string CallBuildAsyncErrorMessage = "Call BuildAsync, your request contains asynchronous items";
+        protected const string CallBuildAsyncErrorMessage = "Call BuildAsync: your request contains asynchronous items";
     }
 
 }

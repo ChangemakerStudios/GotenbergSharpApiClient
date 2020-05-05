@@ -78,7 +78,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public HtmlRequest Build()
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException(this.CallBuildAsyncErrorMessage);
+            if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
             return Request;
         }
