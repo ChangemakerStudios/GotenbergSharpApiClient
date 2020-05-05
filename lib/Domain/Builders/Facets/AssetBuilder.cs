@@ -11,8 +11,10 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
-    public sealed class AssetBuilder: BaseBuilder<RequestBase> 
+    public sealed class AssetBuilder: BaseBuilder<RequestBase>
     {
+        const string NullMessage = "Assets can not be null";
+        
         public AssetBuilder(RequestBase request)
         {
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
@@ -53,7 +55,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, ContentItem> items)
         {
-            foreach (var item in items ?? throw new ArgumentException("Assets can not be null"))
+            foreach (var item in items ?? throw new ArgumentException(NullMessage))
             {
                 this.AddItem(item.Key, item.Value);
             }
@@ -79,19 +81,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ?? throw new ArgumentException("Assets can not be null")));
+                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ?? throw new ArgumentException(NullMessage)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
+                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException(NullMessage)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
+                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException(NullMessage)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException("Assets can not be null")));
+                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException(NullMessage)));
 
         #endregion
 

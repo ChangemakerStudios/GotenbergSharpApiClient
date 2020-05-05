@@ -46,7 +46,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public MergeRequest Build()
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException("Call BuildAsync");
+            if (_asyncTasks.Any()) throw new InvalidOperationException(this.CallBuildAsyncErrorMessage);
             if (Request.Count == 0) throw new InvalidOperationException("There are no items to merge");
             return Request;
         }
@@ -55,9 +55,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public async Task<MergeRequest> BuildAsync()
         {
-            if (_asyncTasks.Count == 0) throw new InvalidOperationException("Call the synchronous Build");
-
-            await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+            if (_asyncTasks.Any())
+            {
+                await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+            }
 
             return Request;
         }

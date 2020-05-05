@@ -141,7 +141,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             return new Dimensions { 
                 PaperWidth = 8.26, 
                 PaperHeight = 11.69,
-                MarginBottom = .5  
+                MarginBottom = .5  //Smallest value to get footer to show up is .38
             };
         }
 

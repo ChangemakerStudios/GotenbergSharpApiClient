@@ -78,18 +78,23 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public HtmlRequest Build()
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException("Call BuildAsync");
+            if (_asyncTasks.Any()) throw new InvalidOperationException(this.CallBuildAsyncErrorMessage);
             if (Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
             return Request;
         }
 
-
+        /// <summary>
+        /// You only need to call this if you've used any of the async overloads on the builder.
+        /// If you call it when its not needed, no problem it'll just work
+        /// </summary>
+        /// <returns></returns>
         [PublicAPI]
         public async Task<HtmlRequest> BuildAsync()
         {
-            if (_asyncTasks.Count == 0) throw new InvalidOperationException("Call Build instead");
-
-            await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+            if (_asyncTasks.Any())
+            {
+                await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+            }
 
             if (this.Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
 
