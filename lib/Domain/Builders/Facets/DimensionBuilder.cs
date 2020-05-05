@@ -2,6 +2,7 @@ using System;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
 
@@ -16,9 +17,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         }
 
         [PublicAPI]
+        public DimensionBuilder SetPaperSize(PaperSizes sizes)
+        {
+            var value = sizes.ToSelectedSize();
+            this.Request.Dimensions.PaperWidth = value.Width;
+            this.Request.Dimensions.PaperHeight = value.Height;
+
+            return this;
+        }
+
+        /// <remarks>Gotenberg allows up to 200%, (2.0)</remarks>
+        [PublicAPI]
         public DimensionBuilder SetScale(double scale)
         {
             this.Request.Dimensions.Scale = scale;
+
             return this;
         }
 
