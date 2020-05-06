@@ -8,24 +8,24 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
-    public sealed class UrlHeaderFooterBuilder: UrlRequestBuilder
+    public sealed class UrlHeaderFooterBuilder : UrlRequestBuilder
     {
         [PublicAPI]
         public UrlHeaderFooterBuilder(UrlRequest request)
         {
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
-            this.Request.Content = new HeaderFooterDocument();
-        } 
-        
+            this.Request.Content ??= new HeaderFooterDocument();
+        }
+
         #region header
-        
+
         [PublicAPI]
         public UrlHeaderFooterBuilder SetHeader(ContentItem header)
         {
             this.Request.Content.Header = header;
             return this;
         }
-        
+
         [PublicAPI]
         public UrlHeaderFooterBuilder SetHeader(string body) => SetHeader(new ContentItem(body));
 
@@ -36,16 +36,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         public UrlHeaderFooterBuilder SetHeader(Stream body) => SetHeader(new ContentItem(body));
 
         #endregion
-        
+
         #region footer
-        
+
         [PublicAPI]
         public UrlHeaderFooterBuilder SetFooter(ContentItem footer)
         {
             this.Request.Content.Footer = footer;
             return this;
         }
-        
+
         [PublicAPI]
         public UrlHeaderFooterBuilder SetFooter(string body) => SetFooter(new ContentItem(body));
 
@@ -54,8 +54,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public UrlHeaderFooterBuilder SetFooter(Stream body) => SetFooter(new ContentItem(body));
-        
-        #endregion
 
+        #endregion
     }
 }

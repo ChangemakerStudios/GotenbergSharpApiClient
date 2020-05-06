@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
     /// <remarks>
     ///     If you don't specify any dimensions the client sets them to Chrome's defaults
     /// </remarks>
-    public sealed class DocumentBuilder: HtmlRequestBuilder
+    public sealed class DocumentBuilder : HtmlRequestBuilder
     {
         public DocumentBuilder(HtmlRequest request)
         {
@@ -20,8 +20,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         }
 
         #region body
-        
-         [PublicAPI]
+
+        [PublicAPI]
         public DocumentBuilder ContainsMarkdown(bool containsMarkdown = true)
         {
             this.Request.ContainsMarkdown = containsMarkdown;
@@ -48,14 +48,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         #endregion
 
         #region header
-        
+
         [PublicAPI]
         public DocumentBuilder SetHeader(ContentItem header)
         {
             this.Request.Content.Header = header;
             return this;
         }
-        
+
         [PublicAPI]
         public DocumentBuilder SetHeader(string body) => SetHeader(new ContentItem(body));
 
@@ -66,16 +66,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         public DocumentBuilder SetHeader(Stream body) => SetHeader(new ContentItem(body));
 
         #endregion
-        
+
         #region footer
-        
+
         [PublicAPI]
         public DocumentBuilder SetFooter(ContentItem footer)
         {
             this.Request.Content.Footer = footer;
             return this;
         }
-        
+
         [PublicAPI]
         public DocumentBuilder SetFooter(string body) => SetFooter(new ContentItem(body));
 
@@ -84,8 +84,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public DocumentBuilder SetFooter(Stream body) => SetFooter(new ContentItem(body));
-        
+
         #endregion
- 
     }
 }

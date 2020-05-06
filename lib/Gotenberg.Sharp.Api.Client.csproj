@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);NU1605;1701;1702;1705;1591</NoWarn>
-  </PropertyGroup>    
+  </PropertyGroup>
 
   <PropertyGroup Label="PackageInfo">
     <PackageVersion>$(VersionSuffix)</PackageVersion>
@@ -21,13 +21,13 @@
     <Company>CaptiveAire Systems</Company>
     <PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
     <Description>A C# api client for the Gotenberg micro-service v6.x, a docker-powered stateless API for converting HTML, Markdown and Office documents to PDF.</Description>
-    <IncludeSymbols>True</IncludeSymbols>  
+    <IncludeSymbols>True</IncludeSymbols>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/lib/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
     <PackageIcon>gotenbergSharpClient.PNG</PackageIcon>
-    <RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>	      
-  </PropertyGroup>    
+    <RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -38,10 +38,10 @@
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup> 
+  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Resources\gotenbergSharpClient.PNG" />
-  </ItemGroup> 
- 
+  </ItemGroup>
+
 </Project>

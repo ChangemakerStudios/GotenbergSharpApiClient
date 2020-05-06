@@ -8,7 +8,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public sealed class MergeRequest: RequestBase
+    public sealed class MergeRequest : RequestBase
     {
         public override string ApiPath => Constants.Gotenberg.ApiPaths.MergePdf;
 
@@ -21,17 +21,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 .Select(item =>
                 {
                     var contentItem = item.Value.ToHttpContentItem();
-                    
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData) 
-                    {
-                        Name = Constants.Gotenberg.FormFieldNames.Files,
-                        FileName = item.Key
-                    };
 
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                        {
+                            Name = Constants.Gotenberg.FormFieldNames.Files,
+                            FileName = item.Key
+                        };
+
+                    contentItem.Headers.ContentType =
+                        new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
 
                     return contentItem;
-                    
                 }).Concat(Config.IfNullEmptyContent());
         }
     }

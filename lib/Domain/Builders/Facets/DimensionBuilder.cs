@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
-    public sealed class DimensionBuilder: BaseBuilder<ChromeRequest>
+    public sealed class DimensionBuilder : BaseBuilder<ChromeRequest>
     {
         public DimensionBuilder(ChromeRequest request)
         {
@@ -62,14 +62,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
             this.Request.Dimensions.MarginBottom = marginBottom;
             return this;
         }
-        
+
         [PublicAPI]
         public DimensionBuilder MarginLeft(double marginLeft)
         {
             this.Request.Dimensions.MarginLeft = marginLeft;
             return this;
         }
-        
+
         [PublicAPI]
         public DimensionBuilder MarginRight(double marginRight)
         {
@@ -85,7 +85,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         }
 
         #region dimension instance
-        
+
         [PublicAPI]
         public DimensionBuilder SetDimensions(Dimensions dims)
         {

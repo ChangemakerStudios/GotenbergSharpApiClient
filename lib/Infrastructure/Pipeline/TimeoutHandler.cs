@@ -45,7 +45,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
         /// <param name="cancellationToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="TimeoutException">Request Timeout</exception>
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
             using var cts = GetCancelTokenSource(request, cancellationToken);
 
@@ -60,7 +61,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
         }
 
         CancellationTokenSource GetCancelTokenSource(HttpRequestMessage request,
-                                                     CancellationToken cancelToken)
+            CancellationToken cancelToken)
         {
             var timeout = request.GetTimeout() ?? DefaultTimeout;
             if (timeout == Timeout.InfiniteTimeSpan) return null;

@@ -14,7 +14,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             (PaperSizes.A3, Width: 11.7, Height: 16.5),
             (PaperSizes.A4, Width: 8.27, Height: 11.7),
             (PaperSizes.A5, Width: 5.8, Height: 8.2),
-            (PaperSizes.A6, Width: 4.1 , Height: 5.8),
+            (PaperSizes.A6, Width: 4.1, Height: 5.8),
             (PaperSizes.Letter, Width: 8.5, Height: 11),
             (PaperSizes.Legal, Width: 8.5, Height: 14),
             (PaperSizes.Tabloid, Width: 11, Height: 17)
@@ -25,11 +25,10 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
                 throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
-            if (selectedSize == PaperSizes.None) 
+            if (selectedSize == PaperSizes.None)
                 throw new ArgumentOutOfRangeException(nameof(selectedSize));
 
             return PaperSizer.First(s => s.Size == selectedSize);
         }
-
     }
 }

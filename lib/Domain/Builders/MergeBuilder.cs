@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,12 +10,12 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class MergeBuilder: BaseBuilder<MergeRequest>
+    public sealed class MergeBuilder : BaseBuilder<MergeRequest>
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
         public MergeBuilder() => Init();
-    
+
         protected override MergeRequest Request { get; set; }
 
         [PublicAPI]
@@ -64,7 +63,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         void Init() => this.Request = new MergeRequest();
-       
     }
-
 }

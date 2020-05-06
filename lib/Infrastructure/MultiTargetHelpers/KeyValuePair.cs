@@ -1,5 +1,4 @@
-﻿
-#if NETSTANDARD2_1
+﻿#if NETSTANDARD2_1
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Collections.Generic.KeyValuePair))]
 #else
 // ReSharper disable once CheckNamespace

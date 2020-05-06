@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public class UrlRequestBuilder: BaseBuilder<UrlRequest>
+    public class UrlRequestBuilder : BaseBuilder<UrlRequest>
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
@@ -21,14 +21,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
         [PublicAPI]
         public UrlRequestBuilder SetUrl(string url) => SetUrl(new Uri(url));
-        
+
         [PublicAPI]
         public UrlRequestBuilder SetUrl(Uri url)
         {
             this.Request.Url = url;
             return this;
         }
-   
+
 
         [PublicAPI]
         public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
@@ -47,7 +47,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public UrlRequestBuilder AddAsyncHeaderFooter(Func<UrlHeaderFooterBuilder,Task> asyncAction)
+        public UrlRequestBuilder AddAsyncHeaderFooter(Func<UrlHeaderFooterBuilder, Task> asyncAction)
         {
             if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
@@ -74,7 +74,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
 
         [PublicAPI]
-        public UrlRequest Build() 
+        public UrlRequest Build()
         {
             if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (this.Request.Url == null) throw new NullReferenceException("Request.Url is null");
@@ -94,5 +94,4 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return Request;
         }
     }
-
 }

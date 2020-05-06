@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,7 +10,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public class MergeOfficeRequest: RequestBase
+    public class MergeOfficeRequest : RequestBase
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 
@@ -34,16 +33,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 {
                     var contentItem = item.Asset.Value.ToHttpContentItem();
 
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                    {
-                        Name = Constants.Gotenberg.FormFieldNames.Files,
-                        FileName = item.Asset.Key
-                    };
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                        {
+                            Name = Constants.Gotenberg.FormFieldNames.Files,
+                            FileName = item.Asset.Key
+                        };
 
                     contentItem.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
 
                     return contentItem;
-
                 }).Concat(Config.IfNullEmptyContent());
         }
     }

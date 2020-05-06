@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
-    public sealed class AssetDictionary: Dictionary<string, ContentItem>, IConvertToHttpContent 
+    public sealed class AssetDictionary : Dictionary<string, ContentItem>, IConvertToHttpContent
     {
         readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
 
@@ -33,7 +33,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             return this.Select(item =>
                 {
                     _contentTypeProvider.TryGetContentType(item.Key, out var contentType);
-                    return new {Asset = item, MediaType = contentType};
+                    return new { Asset = item, MediaType = contentType };
                 })
                 .Where(i => i.MediaType.IsSet())
                 .Select(item =>
@@ -52,6 +52,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                     return asset;
                 });
         }
-
     }
 }

@@ -11,5 +11,4 @@
         Legal = 6,
         Tabloid = 7
     }
-
 }

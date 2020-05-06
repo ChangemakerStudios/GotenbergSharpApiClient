@@ -5,10 +5,10 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-
     public static class IntExtensions
     {
         const int AlphabetLength = 26;
+
         // ReSharper disable once ComplexConditionExpression
         static readonly char[] Alphabet = Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => (char) c).ToArray();
 
@@ -24,10 +24,10 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         [UsedImplicitly]
         public static string ToAlphabeticallySortableFileName(this int sortNumber, string extension)
         {
-            if(sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
+            if (sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
 
             var startsWithDot = extension?.StartsWith(".", StringComparison.InvariantCultureIgnoreCase) ?? false;
-            extension = extension.IsSet() && startsWithDot ? extension : ".pdf"; 
+            extension = extension.IsSet() && startsWithDot ? extension : ".pdf";
 
             return $"{new string('Z', sortNumber / AlphabetLength)}{Alphabet[sortNumber % AlphabetLength]}{extension}";
         }

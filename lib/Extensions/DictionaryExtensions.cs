@@ -9,12 +9,13 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    public static class EnumerableExtensions
+    public static class DictionaryExtensions
     {
         /// <remarks>
         /// Source is here: https://github.com/thecodingmachine/gotenberg/blob/master/internal/app/xhttp/handler.go#L193
         /// </remarks>
-        static readonly string[] OfficeExtensions = { ".txt", ".rtf", ".fodt", ".doc", ".docx", ".odt", ".xls", ".xlsx", ".ods", ".ppt", ".pptx", ".odp" };
+        static readonly string[] OfficeExtensions =
+            { ".txt", ".rtf", ".fodt", ".doc", ".docx", ".odt", ".xls", ".xlsx", ".ods", ".ppt", ".pptx", ".odp" };
 
         public static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(
             [CanBeNull] this Dictionary<TKey, TValue> instance)
@@ -44,9 +45,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             var filtered = unfiltered.IfNullEmpty()
                 .Where(asset => OfficeExtensions.Contains(new FileInfo(asset.Key).Extension, StringComparer.InvariantCultureIgnoreCase));
-            
+
             return new AssetDictionary().FluentAddRange(filtered);
         }
-
     }
 }

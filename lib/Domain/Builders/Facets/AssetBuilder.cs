@@ -11,10 +11,10 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
-    public sealed class AssetBuilder: BaseBuilder<RequestBase>
+    public sealed class AssetBuilder : BaseBuilder<RequestBase>
     {
         const string NullMessage = "Assets can not be null";
-        
+
         public AssetBuilder(RequestBase request)
         {
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
@@ -29,11 +29,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
             // ReSharper disable once ComplexConditionExpression
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
-                throw new ArgumentException("All keys in the asset dictionary must be relative file names with extensions");
+                throw new ArgumentException(
+                    "All keys in the asset dictionary must be relative file names with extensions");
             }
 
             this.Request.Assets.Add(name, value);
-       
+
             return this;
         }
 
@@ -65,15 +66,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, string> assets) =>
-                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
+            AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, byte[]> assets) =>
-                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
+            AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, Stream> assets) =>
-                AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
+            AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         #endregion
 
@@ -81,19 +82,26 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ?? throw new ArgumentException(NullMessage)));
+            AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ??
+                                                         throw new ArgumentException(NullMessage)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException(NullMessage)));
+            AddItems(new Dictionary<string, ContentItem>(
+                assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
+                throw new ArgumentException(NullMessage)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException(NullMessage)));
+            AddItems(new Dictionary<string, ContentItem>(
+                assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
+                throw new ArgumentException(NullMessage)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
-                AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ?? throw new ArgumentException(NullMessage)));
+            AddItems(new Dictionary<string, ContentItem>(
+                assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ??
+                throw new ArgumentException(NullMessage)));
 
         #endregion
 

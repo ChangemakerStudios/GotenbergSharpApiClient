@@ -10,8 +10,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-
-    public class HtmlRequestBuilder: BaseBuilder<HtmlRequest>
+    public class HtmlRequestBuilder : BaseBuilder<HtmlRequest>
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
@@ -20,7 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public HtmlRequestBuilder() => this.Request = new HtmlRequest();
 
         [PublicAPI]
-        public HtmlRequestBuilder(bool containsMarkdown = false) 
+        public HtmlRequestBuilder(bool containsMarkdown = false)
             => this.Request = new HtmlRequest(containsMarkdown);
 
         [PublicAPI]
@@ -79,15 +78,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public HtmlRequest Build()
         {
             if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
-            if (Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
+            if (Request.Content?.Body == null)
+                throw new NullReferenceException("Request.Content or Content.Body is null");
+
             return Request;
         }
 
-        /// <summary>
-        /// You only need to call this if you've used any of the async overloads on the builder.
-        /// If you call it when its not needed, no problem it'll just work
-        /// </summary>
-        /// <returns></returns>
         [PublicAPI]
         public async Task<HtmlRequest> BuildAsync()
         {
@@ -96,10 +92,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
                 await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
             }
 
-            if (this.Request.Content?.Body == null) throw new NullReferenceException("Request.Content or Content.Body is null");
+            if (this.Request.Content?.Body == null)
+                throw new NullReferenceException("Request.Content or Content.Body is null");
 
             return Request;
         }
-
     }
- }
+}

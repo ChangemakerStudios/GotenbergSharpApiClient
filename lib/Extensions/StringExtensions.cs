@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace Gotenberg.Sharp.API.Client.Extensions
+﻿namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class StringExtensions
     {
@@ -20,7 +18,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <returns>
         ///   <c>true</c> if [is not set] [the specified value]; otherwise, <c>false</c>.
         /// </returns>
-        [UsedImplicitly]
         public static bool IsNotSet(this string value) => string.IsNullOrWhiteSpace(value);
     }
 }

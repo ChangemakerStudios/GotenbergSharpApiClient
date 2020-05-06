@@ -39,13 +39,13 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 
 	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
 
-	var mergedPdfPath = @$"{destinationDirectory}\GotenbergFromHtml.pdf";
-	using (var destinationStream = File.Create(mergedPdfPath))
+	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml.pdf";
+	using (var destinationStream = File.Create(resultPath))
 	{
 		await response.CopyToAsync(destinationStream);
 	}
 
-	return mergedPdfPath;
+	return resultPath;
 }
 
 static async Task<byte[]> GetImageBytes()
@@ -103,7 +103,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
 		)).WithDimensions(b =>
 		{
-			b.UseChromeDefaults()
+			b.SetPaperSize(PaperSizes.Tabloid)
 			 .LandScape()
 			 .SetScale(.90);
 		});

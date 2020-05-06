@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
-    public sealed class ConfigBuilder: BaseBuilder<RequestBase>
+    public sealed class ConfigBuilder : BaseBuilder<RequestBase>
     {
         public ConfigBuilder(RequestBase request)
         {
@@ -16,21 +16,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
             this.Request.Config ??= new RequestConfig();
         }
 
-      
+
         [PublicAPI]
         public ConfigBuilder TimeOut(float value)
         {
             this.Request.Config.TimeOut = value;
             return this;
-       }
-        
+        }
+
         [PublicAPI]
         public ConfigBuilder ChromeRpccBufferSize(int value)
         {
             this.Request.Config.ChromeRpccBufferSize = value;
             return this;
         }
-        
+
         [PublicAPI]
         public ConfigBuilder PageRanges(string value)
         {
@@ -41,25 +41,26 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public ConfigBuilder ResultFileName(string value)
         {
-            if(value.IsNotSet()) throw new ArgumentException("ResultFileName was null || empty");
+            if (value.IsNotSet()) throw new ArgumentException("ResultFileName was null || empty");
             this.Request.Config.ResultFileName = value;
             return this;
         }
-        
+
         [PublicAPI]
         public ConfigBuilder WebHook(string value)
         {
-            if(value.IsNotSet()) throw new ArgumentException("WebHook was null || empty");
-            if(!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("WebHook was not well formed");
-            this.Request.Config.WebHook =new Uri(value);
+            if (value.IsNotSet()) throw new ArgumentException("WebHook was null || empty");
+            if (!Uri.IsWellFormedUriString(value, UriKind.Absolute))
+                throw new ArgumentException("WebHook was not well formed");
+            this.Request.Config.WebHook = new Uri(value);
             return this;
         }
-        
+
         [PublicAPI]
         public ConfigBuilder WebHook(Uri value)
         {
-            if(value == null) throw new ArgumentNullException(nameof(value));
-            if(!value.IsAbsoluteUri) throw new ArgumentException("WebHook must be absolute");
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (!value.IsAbsoluteUri) throw new ArgumentException("WebHook must be absolute");
             this.Request.Config.WebHook = value;
             return this;
         }
@@ -70,6 +71,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
             this.Request.Config.WebHookTimeOut = value;
             return this;
         }
- 
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public abstract class BaseBuilder<TRequest> where TRequest: RequestBase
+    public abstract class BaseBuilder<TRequest> where TRequest : RequestBase
     {
         protected virtual TRequest Request { get; set; }
 
         protected const string CallBuildAsyncErrorMessage = "Call BuildAsync: your request contains asynchronous items";
     }
-
 }

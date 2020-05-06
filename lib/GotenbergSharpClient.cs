@@ -13,7 +13,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 using JetBrains.Annotations;
 
 using Microsoft.Net.Http.Headers;
- 
+
 
 namespace Gotenberg.Sharp.API.Client
 {
@@ -62,7 +62,8 @@ namespace Gotenberg.Sharp.API.Client
 
             _innerClient.DefaultRequestHeaders.Clear();
             _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
-            _innerClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
+            _innerClient.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
         }
 
         #endregion
@@ -75,7 +76,6 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-
         [PublicAPI]
         public async Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
         {
@@ -93,8 +93,7 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
-
+            if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
@@ -108,6 +107,7 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
@@ -124,25 +124,31 @@ namespace Gotenberg.Sharp.API.Client
         ///     containing the text. {"message":"Not Found"}. Such responses throw an error that has the content of the response file, etc.
         /// </remarks>
         [PublicAPI]
-        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
-            => await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request,
+            CancellationToken cancelToken = default)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+        }
 
         #endregion
 
         #region exec
 
-        async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken, 
+        async Task<Stream> ExecuteRequestAsync(
+            IApiRequest request, 
+            CancellationToken cancelToken,
             KeyValuePair<string, string> remoteUrlHeader = default)
         {
-            using var message = request.ToApiRequestMessage(remoteUrlHeader);
+            using var message = request.ToApiRequestMessage(remoteUrlHeader.Key, remoteUrlHeader.Value);
 
             var response = await this._innerClient
                 .SendAsync(message, HttpCompletionOption.ResponseContentRead, cancelToken)
                 .ConfigureAwait(false);
-         
+
             cancelToken.ThrowIfCancellationRequested();
 
-            if(response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             throw GotenbergApiException.Create(response);
@@ -150,5 +156,4 @@ namespace Gotenberg.Sharp.API.Client
 
         #endregion
     }
-
 }

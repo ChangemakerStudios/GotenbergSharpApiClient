@@ -30,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Scale)]
         public double Scale { [UsedImplicitly] get; set; } = 1.0;
-        
+
         /// <summary>
         /// Gets or sets the width of the paper.
         /// </summary>
@@ -76,7 +76,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin left.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginLeft)]
-        public double MarginLeft  { [UsedImplicitly] get; set; }
+        public double MarginLeft { [UsedImplicitly] get; set; }
 
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         #endregion
 
         #region public methods
-        
+
         [PublicAPI]
         public static Dimensions ToA4WithNoMargins()
         {
@@ -122,8 +122,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         [PublicAPI]
         public static Dimensions ToChromeDefaults()
         {
-            return new Dimensions { 
-                PaperWidth = 8.27, 
+            return new Dimensions
+            {
+                PaperWidth = 8.27,
                 PaperHeight = 11.7,
                 MarginTop = 1,
                 MarginBottom = 1,
@@ -131,17 +132,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                 MarginRight = 1
             };
         }
-        
+
         /// <summary>
         /// Defaults used for deliverables
         /// </summary>
         /// <returns></returns>
         public static Dimensions ToDeliverableDefault()
         {
-            return new Dimensions { 
-                PaperWidth = 8.26, 
+            return new Dimensions
+            {
+                PaperWidth = 8.26,
                 PaperHeight = 11.69,
-                MarginBottom = .5  //Smallest value to get footer to show up is .38
+                MarginBottom = .5 //Smallest value to get footer to show up is .38
             };
         }
 
@@ -150,24 +152,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </summary>
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
-        {   
+        {
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
-                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
+                .Select(p => new
+                    { Prop = p, Attrib = (MultiFormHeaderAttribute) Attribute.GetCustomAttribute(p, _attributeType) })
                 .Select(item =>
                 {
                     var value = item.Prop.GetValue(this);
 
                     if (value == null) return null;
 
-                    var contentItem =new StringContent(value.ToString());
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name  };
+                    var contentItem = new StringContent(value.ToString());
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
 
                     return contentItem;
-                }).Where(item=> item != null);
+                }).Where(item => item != null);
         }
-        
+
         #endregion
-        
     }
 }

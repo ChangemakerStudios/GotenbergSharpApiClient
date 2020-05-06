@@ -17,9 +17,14 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
         }
 
-        public static HttpRequestMessage ToApiRequestMessage(this IApiRequest request, KeyValuePair<string, string> remoteUrlHeader = default)
+        public static HttpRequestMessage ToApiRequestMessage(
+            this IApiRequest request,
+            string remoteHeaderName = default, 
+            string remoteHeaderValue = default)
         {
-            var formContent = new MultipartFormDataContent($"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
+            var formContent =
+                new MultipartFormDataContent(
+                    $"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
 
             foreach (var item in request.ToHttpContent())
             {
@@ -31,13 +36,12 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 Content = formContent
             };
 
-            if (!remoteUrlHeader.Key.IsSet()) return requestMessage;
+            if (!remoteHeaderName.IsSet()) return requestMessage;
 
-            var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteUrlHeader.Key.Trim()}";
-            requestMessage.Headers.Add(name, remoteUrlHeader.Value);
+            var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteHeaderName.Trim()}";
+            requestMessage.Headers.Add(name, remoteHeaderValue);
 
             return requestMessage;
         }
-       
     }
 }

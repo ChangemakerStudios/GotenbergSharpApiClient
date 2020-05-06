@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
     /// <inheritdoc />
-    public sealed class GotenbergApiException: Exception
+    public sealed class GotenbergApiException : Exception
     {
         readonly HttpResponseMessage _response;
 
@@ -24,7 +24,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         }
 
         public HttpStatusCode StatusCode { get; }
- 
+
         public Uri RequestUri { get; }
 
         public string ReasonPhrase { get; }
@@ -40,6 +40,5 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             var responseJson = JsonConvert.SerializeObject(_response);
             return $"Gotenberg Api response message: '{this.Message}' Response Json: {responseJson}.";
         }
-      
     }
 }

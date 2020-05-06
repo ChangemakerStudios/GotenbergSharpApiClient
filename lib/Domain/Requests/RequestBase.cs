@@ -1,12 +1,11 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public abstract class RequestBase: IApiRequest
+    public abstract class RequestBase : IApiRequest
     {
         public abstract string ApiPath { get; }
 
@@ -16,5 +15,4 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public abstract IEnumerable<HttpContent> ToHttpContent();
     }
-
 }

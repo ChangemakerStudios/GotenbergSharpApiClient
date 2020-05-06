@@ -15,7 +15,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
     ///     A nice surprise: Gotenberg/Chrome will merge in all sheets within a multi-sheet excel workbook.
     ///     If you send in a csv file but with an xlsx extension, it will merge it in as text.
     /// </remarks>
-    public sealed class MergeOfficeBuilder: BaseBuilder<MergeOfficeRequest>
+    public sealed class MergeOfficeBuilder : BaseBuilder<MergeOfficeRequest>
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
