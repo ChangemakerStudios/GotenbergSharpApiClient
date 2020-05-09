@@ -4,13 +4,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
 using JetBrains.Annotations;
-
 using Microsoft.Net.Http.Headers;
 
 
@@ -134,7 +131,9 @@ namespace Gotenberg.Sharp.API.Client
         public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            if(!request.IsWebhookRequest) throw new ArgumentOutOfRangeException(nameof(request), "Only call this for webhook configured requests");
+            if (!request.IsWebhookRequest)
+                throw new ArgumentOutOfRangeException(nameof(request),
+                    "Only call this for webhook configured requests");
 
             using var message = request.ToApiRequestMessage();
 
@@ -147,8 +146,6 @@ namespace Gotenberg.Sharp.API.Client
             if (!response.IsSuccessStatusCode)
                 throw GotenbergApiException.Create(response);
         }
-
-
 
         #endregion
 

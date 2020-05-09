@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-
 using Newtonsoft.Json;
 
 // ReSharper disable All CA1032

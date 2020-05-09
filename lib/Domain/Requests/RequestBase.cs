@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
@@ -18,6 +17,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
 
         public abstract IEnumerable<HttpContent> ToHttpContent();
-
     }
 }

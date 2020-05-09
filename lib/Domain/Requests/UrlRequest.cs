@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
-{ 
+{
     public sealed class UrlRequest : ChromeRequest
     {
         public override string ApiPath => Constants.Gotenberg.ApiPaths.UrlConvert;
@@ -26,12 +25,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             if (!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");
 
             TryAddRemoteHeader();
-            
+
             return new[] { AddRemoteUrl(this.Url) }
                 .Concat(Content.IfNullEmptyContent())
                 .Concat(Config.IfNullEmptyContent())
                 .Concat(Dimensions.IfNullEmptyContent());
-
         }
 
         #region add url/header
@@ -56,8 +54,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return remoteUrl;
         }
 
-
         #endregion
-
     }
 }

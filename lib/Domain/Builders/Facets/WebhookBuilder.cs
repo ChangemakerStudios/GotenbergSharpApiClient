@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
 using JetBrains.Annotations;
 
 
@@ -47,20 +45,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public WebhookBuilder AddRequestHeader(string name, string value)
             => AddRequestHeader(name, new[] { value });
-        
+
         [PublicAPI]
         public WebhookBuilder AddRequestHeader(KeyValuePair<string, string> header)
-            => AddRequestHeader(header.Key, new [] { header.Value });
+            => AddRequestHeader(header.Key, new[] { header.Value });
 
         [PublicAPI]
         public WebhookBuilder AddRequestHeader(string name, IEnumerable<string> values)
         {
-            if(name.IsNotSet()) throw new ArgumentException(nameof(name));
+            if (name.IsNotSet()) throw new ArgumentException(nameof(name));
 
             var headerName = $"{Constants.Gotenberg.CustomRemoteHeaders.WebhookHeaderKeyPrefix}{name}";
             this.Request.CustomHeaders.Add(headerName, values);
             return this;
         }
-      
     }
 }

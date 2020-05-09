@@ -1,9 +1,7 @@
 using System;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
-
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
@@ -48,10 +46,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public ConfigBuilder AddWebhook(Action<WebhookBuilder> builder)
-       {
-           builder(new WebhookBuilder(this.Request));
-           return this;
-       }
-
+        {
+            builder(new WebhookBuilder(this.Request));
+            return this;
+        }
     }
 }

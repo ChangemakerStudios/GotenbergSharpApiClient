@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Net.Http;
-
 using Gotenberg.Sharp.API.Client.Extensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
@@ -23,7 +22,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             if (c._bytes != null) return new ByteArrayContent(c._bytes);
             if (c._stringItem.IsSet()) return new StringContent(c._stringItem);
             return new StreamContent(c._streamItem ??
-                                     throw new NullReferenceException("ContentItem: No usable value was pass through the builder"));
+                                     throw new NullReferenceException(
+                                         "ContentItem: No usable value was pass through the builder"));
         }
     }
 }

@@ -1,11 +1,8 @@
 ﻿using System;
 
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
-
-    public class Webhook 
+    public sealed class Webhook
     {
         Uri _targetUrl;
 
@@ -22,7 +19,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         public Uri TargetUrl
         {
             get => _targetUrl;
-            [UsedImplicitly]
             set => _targetUrl = value?.IsAbsoluteUri ?? false
                 ? value
                 : throw new ArgumentException("WebHook url must be absolute");

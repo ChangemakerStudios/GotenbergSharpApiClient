@@ -2,10 +2,8 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
@@ -72,7 +70,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </summary>
         /// <remarks>All request types support web hooks</remarks>
         public Webhook Webhook { get; set; }
-     
+
         #endregion
 
         #region ToHttpContent

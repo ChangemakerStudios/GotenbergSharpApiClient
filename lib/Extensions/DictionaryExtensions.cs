@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
@@ -36,7 +34,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         public static AssetDictionary ToAlphabeticalMergeOrderByIndex([CanBeNull] this AssetDictionary unordered)
         {
             var ordered = unordered.IfNullEmpty().Select((item, index) =>
-                KeyValuePair.Create(index.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension), item.Value));
+                KeyValuePair.Create(index.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension),
+                    item.Value));
 
             return new AssetDictionary().FluentAddRange(ordered);
         }
@@ -44,7 +43,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         public static AssetDictionary FilterOutNonOfficeDocs([CanBeNull] this AssetDictionary unfiltered)
         {
             var filtered = unfiltered.IfNullEmpty()
-                .Where(asset => OfficeExtensions.Contains(new FileInfo(asset.Key).Extension, StringComparer.InvariantCultureIgnoreCase));
+                .Where(asset => OfficeExtensions.Contains(new FileInfo(asset.Key).Extension,
+                    StringComparer.InvariantCultureIgnoreCase));
 
             return new AssetDictionary().FluentAddRange(filtered);
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
