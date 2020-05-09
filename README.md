@@ -230,6 +230,42 @@ async Task<IEnumerable<KeyValuePair<string, string>>> GetMarkdownAssets()
 			   .Concat(markdownFiles.Select((name, index) => KeyValuePair.Create(name, mdParagraphs[index])));
 }
 ```
+## Webhooks
+*All requests support webhooks*
+```csharp
+public async Task<string> SendPdfToWebhookEndpoint()
+{
+	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+
+	var builder = new UrlRequestBuilder()
+		.SetUrl("https://www.nytimes.com")
+		.ConfigureRequest(b =>
+		{
+			b.AddWebhook(hook =>
+			{
+				hook.SetUrl("http://host.docker.internal")
+					.SetTimeout(20)
+					.AddRequestHeader("custom-header", "value")
+			})
+			b.PageRanges("1-2")
+			 .ChromeRpccBufferSize(1048576);
+		})
+		.AddAsyncHeaderFooter(async
+			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))
+				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
+		)).WithDimensions(b =>
+		{
+			b.SetPaperSize(PaperSizes.Tabloid)
+			 .LandScape()
+			 .SetScale(.90);
+		});
+
+	var request = await builder.BuildAsync();
+	
+	await sharpClient.FireWebhookAndForgetAsync(request);
+}
+
+```
 ## Merge 15 Urls to one pdf
 *Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
