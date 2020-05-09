@@ -25,7 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
                 throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
             if (selectedSize == PaperSizes.None)
-                throw new ArgumentOutOfRangeException(nameof(selectedSize));
+                throw new InvalidOperationException(nameof(selectedSize));
 
             return PaperSizer.First(s => s.Size == selectedSize);
         }

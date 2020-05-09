@@ -11,8 +11,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 {
     public sealed class AssetBuilder : BaseBuilder<RequestBase>
     {
-        const string NullMessage = "Assets can not be null";
-
         public AssetBuilder(RequestBase request)
         {
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
@@ -27,7 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
             // ReSharper disable once ComplexConditionExpression
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
-                throw new ArgumentException(
+                throw new InvalidOperationException(
                     "All keys in the asset dictionary must be relative file names with extensions");
             }
 
@@ -54,7 +52,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public AssetBuilder AddItems(Dictionary<string, ContentItem> items)
         {
-            foreach (var item in items ?? throw new ArgumentException(NullMessage))
+            if (items == null) throw new ArgumentNullException(nameof(items));
+
+            foreach (var item in items)
             {
                 this.AddItem(item.Key, item.Value);
             }
@@ -81,25 +81,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
             AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ??
-                                                         throw new ArgumentException(NullMessage)));
+                                                         throw new ArgumentNullException(nameof(assets))));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
             AddItems(new Dictionary<string, ContentItem>(
                 assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentException(NullMessage)));
+                throw new ArgumentNullException(nameof(assets))));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
             AddItems(new Dictionary<string, ContentItem>(
                 assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentException(NullMessage)));
+                throw new ArgumentNullException(nameof(assets))));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
             AddItems(new Dictionary<string, ContentItem>(
                 assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentException(NullMessage)));
+                throw new ArgumentNullException(nameof(assets))));
 
         #endregion
 

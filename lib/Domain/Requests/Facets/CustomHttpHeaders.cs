@@ -8,7 +8,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     {
         public void AddItem(string name, string value)
         {
-            if (name.IsNotSet()) throw new ArgumentException(nameof(name));
+            if (name.IsNotSet()) throw new ArgumentException("Header name is null or empty");
 
             this.Add(name, new[] { value });
         }

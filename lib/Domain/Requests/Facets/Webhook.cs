@@ -21,7 +21,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             get => _targetUrl;
             set => _targetUrl = value?.IsAbsoluteUri ?? false
                 ? value
-                : throw new ArgumentException("WebHook url must be absolute");
+                : throw new InvalidOperationException("WebHook url must be absolute");
         }
 
         /// <summary>

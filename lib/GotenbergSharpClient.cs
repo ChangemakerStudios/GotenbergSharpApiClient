@@ -53,7 +53,7 @@ namespace Gotenberg.Sharp.API.Client
 
             if (this._innerClient.BaseAddress == null)
             {
-                throw new NullReferenceException(nameof(innerClient.BaseAddress));
+                throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
             }
 
             _innerClient.DefaultRequestHeaders.Clear();
@@ -75,7 +75,6 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
@@ -89,7 +88,6 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
@@ -103,7 +101,6 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
@@ -123,7 +120,6 @@ namespace Gotenberg.Sharp.API.Client
         public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request,
             CancellationToken cancelToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
@@ -132,8 +128,7 @@ namespace Gotenberg.Sharp.API.Client
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (!request.IsWebhookRequest)
-                throw new ArgumentOutOfRangeException(nameof(request),
-                    "Only call this for webhook configured requests");
+                throw new InvalidOperationException("Only call this for webhook configured requests");
 
             using var message = request.ToApiRequestMessage();
 

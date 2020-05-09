@@ -40,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            if (Content?.Body == null) throw new NullReferenceException("You need to Add at least a body");
+            if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
 
             return Content.IfNullEmptyContent()
                 .Concat(Assets.IfNullEmptyContent())

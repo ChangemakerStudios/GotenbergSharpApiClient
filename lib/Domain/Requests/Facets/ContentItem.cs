@@ -22,7 +22,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             if (c._bytes != null) return new ByteArrayContent(c._bytes);
             if (c._stringItem.IsSet()) return new StringContent(c._stringItem);
             return new StreamContent(c._streamItem ??
-                                     throw new NullReferenceException(
+                                     throw new InvalidOperationException(
                                          "ContentItem: No usable value was pass through the builder"));
         }
     }

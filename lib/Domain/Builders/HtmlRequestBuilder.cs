@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public HtmlRequestBuilder() => this.Request = new HtmlRequest();
 
         [PublicAPI]
-        public HtmlRequestBuilder(bool containsMarkdown = false)
+        public HtmlRequestBuilder(bool containsMarkdown)
             => this.Request = new HtmlRequest(containsMarkdown);
 
         [PublicAPI]
@@ -77,7 +77,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         {
             if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (Request.Content?.Body == null)
-                throw new NullReferenceException("Request.Content or Content.Body is null");
+                throw new InvalidOperationException("Request.Content or Content.Body is null");
 
             return Request;
         }
@@ -91,7 +91,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             }
 
             if (this.Request.Content?.Body == null)
-                throw new NullReferenceException("Request.Content or Content.Body is null");
+                throw new InvalidOperationException("Request.Content or Content.Body is null");
 
             return Request;
         }

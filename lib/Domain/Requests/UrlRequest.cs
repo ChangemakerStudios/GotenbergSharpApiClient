@@ -21,8 +21,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            if (this.Url == null) throw new NullReferenceException(nameof(Url));
-            if (!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");
+            if (this.Url == null) throw new InvalidOperationException("Url is null");
+            if (!this.Url.IsAbsoluteUri) throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
             TryAddRemoteHeader();
 
