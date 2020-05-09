@@ -52,7 +52,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 public const string RemoteUrl = "remoteURL";
 
                 public const string PageRanges = "pageRanges";
-                public const string WebhookUrl = "webhookURL";
+                public const string WebhookUrl = "webhookURL"; //all endpoints
                 public const string WebhookTimeout = "webhookURLTimeout";
                 public const string ChromeRpccBufferSize = "googleChromeRpccBufferSize";
 
@@ -69,11 +69,10 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 }
             }
 
-            //See https://github.com/thecodingmachine/gotenberg-go-client/releases/tag/v7.0.0
             public static class CustomRemoteHeaders
             {
-                public const string RemoteUrlKeyPrefix = "Gotenberg-Remoteurl-";
-                public const string WebhookHeaderKeyPrefix = "Gotenberg-Webhookurl-";
+                public const string RemoteUrlKeyPrefix = "Gotenberg-Remoteurl-"; // url requests
+                public const string WebhookHeaderKeyPrefix = "Gotenberg-Webhookurl-"; //all requests
             }
         }
     }

@@ -9,10 +9,7 @@ using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
-{
-    /// <summary>
-    /// For URL to PDF conversions
-    /// </summary>
+{ 
     public sealed class UrlRequest : ChromeRequest
     {
         public override string ApiPath => Constants.Gotenberg.ApiPaths.UrlConvert;
@@ -28,22 +25,39 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             if (this.Url == null) throw new NullReferenceException(nameof(Url));
             if (!this.Url.IsAbsoluteUri) throw new ArgumentException("Absolute Urls only");
 
+            TryAddRemoteHeader();
+            
             return new[] { AddRemoteUrl(this.Url) }
                 .Concat(Content.IfNullEmptyContent())
                 .Concat(Config.IfNullEmptyContent())
                 .Concat(Dimensions.IfNullEmptyContent());
 
-            static StringContent AddRemoteUrl(Uri url)
-            {
-                var remoteUrl = new StringContent(url.ToString());
-                remoteUrl.Headers.ContentDisposition =
-                    new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                    {
-                        Name = Constants.Gotenberg.FormFieldNames.RemoteUrl
-                    };
-
-                return remoteUrl;
-            }
         }
+
+        #region add url/header
+
+        void TryAddRemoteHeader()
+        {
+            if (!RemoteUrlHeader.Key.IsSet()) return;
+
+            var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{RemoteUrlHeader.Key}";
+            this.CustomHeaders.AddItem(name, RemoteUrlHeader.Value);
+        }
+
+        static StringContent AddRemoteUrl(Uri url)
+        {
+            var remoteUrl = new StringContent(url.ToString());
+            remoteUrl.Headers.ContentDisposition =
+                new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                {
+                    Name = Constants.Gotenberg.FormFieldNames.RemoteUrl
+                };
+
+            return remoteUrl;
+        }
+
+
+        #endregion
+
     }
 }

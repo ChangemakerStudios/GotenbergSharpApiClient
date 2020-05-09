@@ -9,10 +9,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         public abstract string ApiPath { get; }
 
+        public bool IsWebhookRequest => Config?.Webhook?.TargetUrl != null;
+
         public RequestConfig Config { get; set; }
 
         public AssetDictionary Assets { get; set; }
 
+        public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
+
         public abstract IEnumerable<HttpContent> ToHttpContent();
+
     }
 }

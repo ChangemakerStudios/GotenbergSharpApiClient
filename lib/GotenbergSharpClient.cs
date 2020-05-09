@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -80,7 +79,7 @@ namespace Gotenberg.Sharp.API.Client
         public async Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            return await ExecuteRequestAsync(request, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
+            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -131,16 +130,33 @@ namespace Gotenberg.Sharp.API.Client
             return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
         }
 
+        [PublicAPI]
+        public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if(!request.IsWebhookRequest) throw new ArgumentOutOfRangeException(nameof(request), "Only call this for webhook configured requests");
+
+            using var message = request.ToApiRequestMessage();
+
+            var response = await this._innerClient
+                .SendAsync(message, HttpCompletionOption.ResponseContentRead, cancelToken)
+                .ConfigureAwait(false);
+
+            cancelToken.ThrowIfCancellationRequested();
+
+            if (!response.IsSuccessStatusCode)
+                throw GotenbergApiException.Create(response);
+        }
+
+
+
         #endregion
 
         #region exec
 
-        async Task<Stream> ExecuteRequestAsync(
-            IApiRequest request, 
-            CancellationToken cancelToken,
-            KeyValuePair<string, string> remoteUrlHeader = default)
+        async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
         {
-            using var message = request.ToApiRequestMessage(remoteUrlHeader.Key, remoteUrlHeader.Value);
+            using var message = request.ToApiRequestMessage();
 
             var response = await this._innerClient
                 .SendAsync(message, HttpCompletionOption.ResponseContentRead, cancelToken)

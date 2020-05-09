@@ -10,17 +10,14 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    public static class ConvertToHttpContentExtensions
+    public static class RequestInterfaceExtensions
     {
         public static IEnumerable<HttpContent> IfNullEmptyContent([CanBeNull] this IConvertToHttpContent converter)
         {
             return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
         }
 
-        public static HttpRequestMessage ToApiRequestMessage(
-            this IApiRequest request,
-            string remoteHeaderName = default, 
-            string remoteHeaderValue = default)
+        public static HttpRequestMessage ToApiRequestMessage(this IApiRequest request)
         {
             var formContent =
                 new MultipartFormDataContent(
@@ -31,17 +28,17 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 formContent.Add(item);
             }
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, request.ApiPath)
+            var message = new HttpRequestMessage(HttpMethod.Post, request.ApiPath)
             {
                 Content = formContent
             };
 
-            if (!remoteHeaderName.IsSet()) return requestMessage;
+            foreach (var item in request.CustomHeaders.IfNullEmpty())
+            {
+                message.Headers.Add(item.Key, item.Value);
+            }
 
-            var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteHeaderName.Trim()}";
-            requestMessage.Headers.Add(name, remoteHeaderValue);
-
-            return requestMessage;
+            return message;
         }
     }
 }

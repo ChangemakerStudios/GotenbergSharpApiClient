@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,7 +15,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </summary>
     public sealed class RequestConfig : IConvertToHttpContent
     {
-        Uri _webHook;
         float? _timeOut;
 
         [PublicAPI] public static readonly int MaxChromeRpccBufferSize = 104857600;
@@ -68,25 +66,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         public string ResultFileName { get; set; }
 
         /// <summary>
-        /// If set the Gotenberg API will send the resulting PDF file in a POST with
-        /// the application-pdf content type to the given url. Requests to the API
-        /// complete before the conversion is performed.
+        ///     If provided, the API will send the resulting PDF file in a POST request with the application/pdf Content-Type to given URL.
+        ///     Requests to the API complete before the conversions complete. For web hook configured requests,
+        ///     call FireWebhookAndForgetAsync on the client which returns nothing.
         /// </summary>
-        public Uri WebHook
-        {
-            get => _webHook;
-            [UsedImplicitly]
-            set => _webHook = value?.IsAbsoluteUri ?? false
-                ? value
-                : throw new ArgumentException("WebHook url must be absolute");
-        }
-
-        /// <summary>
-        ///  By default, the API will wait 10 seconds before it considers the sending of the resulting PDF to be unsuccessful.
-        ///  On a per request basis, this property can override the container environment variable, DEFAULT_WEBHOOK_URL_TIMEOUT
-        /// </summary>
-        public float? WebHookTimeOut { get; set; }
-
+        /// <remarks>All request types support web hooks</remarks>
+        public Webhook Webhook { get; set; }
+     
         #endregion
 
         #region ToHttpContent
@@ -103,13 +89,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                 yield return CreateItem(this.TimeOut, Constants.Gotenberg.FormFieldNames.WaitTimeout);
             }
 
-            if (this.WebHook != null)
+            if (this.Webhook?.TargetUrl != null)
             {
-                yield return CreateItem(this.WebHook, Constants.Gotenberg.FormFieldNames.WebhookUrl);
+                yield return CreateItem(this.Webhook.TargetUrl, Constants.Gotenberg.FormFieldNames.WebhookUrl);
 
-                if (this.WebHookTimeOut.HasValue)
+                if (this.Webhook.Timeout.HasValue)
                 {
-                    yield return CreateItem(this.WebHookTimeOut, Constants.Gotenberg.FormFieldNames.WebhookTimeout);
+                    yield return CreateItem(this.Webhook.Timeout, Constants.Gotenberg.FormFieldNames.WebhookTimeout);
                 }
             }
 

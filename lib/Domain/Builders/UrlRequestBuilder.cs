@@ -29,7 +29,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
-
         [PublicAPI]
         public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
         {
