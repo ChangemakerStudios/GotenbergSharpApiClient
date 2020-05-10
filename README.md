@@ -243,12 +243,12 @@ public async Task<string> SendPdfToWebhookEndpoint()
 		{
 			b.AddWebhook(hook =>
 			{
-				hook.SetUrl("http://host.docker.internal")
-					.SetTimeout(20)
-					.AddRequestHeader("custom-header", "value")
+				hook.SetTimeout(20)
+					.SetUrl("http://host.docker.internal:5000/api/gotenberg/webhookReceive")
+					.AddRequestHeader("custom-header", "value");
 			})
-			b.PageRanges("1-2")
-			 .ChromeRpccBufferSize(1048576);
+			.PageRanges("1-2")
+			.ChromeRpccBufferSize(1048576);
 		})
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))

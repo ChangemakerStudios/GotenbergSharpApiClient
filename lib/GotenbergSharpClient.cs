@@ -126,20 +126,10 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (!request.IsWebhookRequest)
+            if (!request?.IsWebhookRequest ?? false)
                 throw new InvalidOperationException("Only call this for webhook configured requests");
 
-            using var message = request.ToApiRequestMessage();
-
-            var response = await this._innerClient
-                .SendAsync(message, HttpCompletionOption.ResponseContentRead, cancelToken)
-                .ConfigureAwait(false);
-
-            cancelToken.ThrowIfCancellationRequested();
-
-            if (!response.IsSuccessStatusCode)
-                throw GotenbergApiException.Create(response);
+            _ = await SendRequest(request, cancelToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -147,6 +137,15 @@ namespace Gotenberg.Sharp.API.Client
         #region exec
 
         async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
+        {
+            if(request == null) throw new ArgumentNullException(nameof(request));
+
+            var response = await SendRequest(request, cancelToken);
+
+            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        }
+
+        async Task<HttpResponseMessage> SendRequest(IApiRequest request, CancellationToken cancelToken)
         {
             using var message = request.ToApiRequestMessage();
 
@@ -157,7 +156,7 @@ namespace Gotenberg.Sharp.API.Client
             cancelToken.ThrowIfCancellationRequested();
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                return response;
 
             throw GotenbergApiException.Create(response);
         }
