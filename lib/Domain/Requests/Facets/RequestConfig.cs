@@ -2,8 +2,10 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets

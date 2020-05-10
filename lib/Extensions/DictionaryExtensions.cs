@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions

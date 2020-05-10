@@ -4,10 +4,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
+
 using Microsoft.Net.Http.Headers;
 
 
@@ -138,7 +141,7 @@ namespace Gotenberg.Sharp.API.Client
 
         async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
             var response = await SendRequest(request, cancelToken);
 

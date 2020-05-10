@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
 
 

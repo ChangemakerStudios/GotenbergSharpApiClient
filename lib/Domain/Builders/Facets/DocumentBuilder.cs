@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets

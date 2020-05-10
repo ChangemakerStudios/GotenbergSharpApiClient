@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
