@@ -76,9 +76,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         [PublicAPI]
         public Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
-        {
-            return ExecuteRequestAsync(request, cancelToken);
-        }
+            => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
         ///    Converts the specified request to a PDF document.
@@ -89,9 +87,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
         public Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
-        {
-            return ExecuteRequestAsync(request, cancelToken);
-        }
+            => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
         /// Merges items specified by the request
@@ -102,28 +98,21 @@ namespace Gotenberg.Sharp.API.Client
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
         public Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
-        {
-            return ExecuteRequestAsync(request, cancelToken);
-        }
+            => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
         ///     Converts one or more office documents into one merged pdf.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="GotenbergApiException"></exception>
         /// <remarks>
         ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
         ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf
         ///     containing the text. {"message":"Not Found"}. Such responses throw an error that has the content of the response file, etc.
         /// </remarks>
         [PublicAPI]
-        public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request,
-            CancellationToken cancelToken = default)
-        {
-            return ExecuteRequestAsync(request, cancelToken);
-        }
+        public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
 
         [PublicAPI]
         public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
