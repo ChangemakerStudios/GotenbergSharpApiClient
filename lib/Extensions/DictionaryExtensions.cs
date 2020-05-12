@@ -50,6 +50,5 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 
             return new AssetDictionary().FluentAddRange(filtered);
         }
-
     }
 }

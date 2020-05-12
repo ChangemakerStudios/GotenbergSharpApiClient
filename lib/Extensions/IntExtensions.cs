@@ -25,7 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         public static string ToAlphabeticallySortableFileName(this int sortNumber, string extension)
         {
             if (sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
-            if(extension.IsNotSet()) throw new ArgumentException("extension is either null or empty");
+            if (extension.IsNotSet()) throw new ArgumentException("extension is either null or empty");
 
             var startsWithDot = extension.StartsWith(".", StringComparison.InvariantCultureIgnoreCase);
             extension = startsWithDot ? extension : ".pdf";
