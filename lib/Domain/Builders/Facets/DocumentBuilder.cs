@@ -42,7 +42,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DocumentBuilder SetBody(byte[] body) => SetBody(new ContentItem(body));
 
-        [PublicAPI]                                                               
+        [PublicAPI]
         public DocumentBuilder SetBody(Stream body) => SetBody(new ContentItem(body));
 
         #endregion

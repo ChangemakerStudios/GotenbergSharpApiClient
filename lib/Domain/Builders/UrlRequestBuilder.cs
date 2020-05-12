@@ -24,7 +24,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public UrlRequestBuilder SetUrl(string url)
         {
-            if(url.IsNotSet()) throw new ArgumentException("url is either null or empty");
+            if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
             return SetUrl(new Uri(url));
         }
 
@@ -32,14 +32,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public UrlRequestBuilder SetUrl(Uri url)
         {
             this.Request.Url = url ?? throw new ArgumentNullException(nameof(url));
-            if(!url.IsAbsoluteUri) throw new InvalidOperationException("url is not absolute");
+            if (!url.IsAbsoluteUri) throw new InvalidOperationException("url is not absolute");
             return this;
         }
 
         [PublicAPI]
         public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
         {
-            if(name.IsNotSet()) throw new ArgumentException("header name is either null or empty");
+            if (name.IsNotSet()) throw new ArgumentException("header name is either null or empty");
             this.Request.RemoteUrlHeader = KeyValuePair.Create(name, value);
             return this;
         }

@@ -66,6 +66,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
             return Request;
         }
-     
     }
 }

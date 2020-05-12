@@ -24,7 +24,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 ? Constants.Gotenberg.ApiPaths.MarkdownConvert
                 : Constants.Gotenberg.ApiPaths.ConvertHtml;
 
-        public HtmlRequest() 
+        public HtmlRequest()
         {
         }
 

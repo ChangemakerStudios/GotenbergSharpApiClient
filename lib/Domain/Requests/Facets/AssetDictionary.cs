@@ -22,7 +22,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             if (items == null) throw new ArgumentNullException(nameof(items));
 
             var pairs = items as KeyValuePair<string, ContentItem>[] ?? items.ToArray();
-            if(pairs.Any(item=> item.Key.IsNotSet())) throw new ArgumentException("one ore more of the items keys is null or empty");
+            if (pairs.Any(item => item.Key.IsNotSet()))
+                throw new ArgumentException("one ore more of the items keys is null or empty");
 
             foreach (var item in pairs)
             {

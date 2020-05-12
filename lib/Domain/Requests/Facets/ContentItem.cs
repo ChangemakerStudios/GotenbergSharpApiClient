@@ -12,16 +12,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         readonly string _stringItem;
         readonly Stream _streamItem;
 
-        public ContentItem(byte[] value) 
+        public ContentItem(byte[] value)
             => _bytes = value ?? throw new ArgumentNullException(nameof(value));
- 
+
         public ContentItem(string value)
         {
             _stringItem = value ?? throw new ArgumentNullException(nameof(value));
-            if(_stringItem.IsNotSet()) throw new InvalidOperationException(nameof(value));
+            if (_stringItem.IsNotSet()) throw new InvalidOperationException(nameof(value));
         }
 
-        public ContentItem(Stream value) 
+        public ContentItem(Stream value)
             => _streamItem = value ?? throw new ArgumentNullException(nameof(value));
 
         public HttpContent ToHttpContentItem() => Convert(this);
@@ -34,7 +34,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                                      throw new InvalidOperationException(
                                          "ContentItem: An unusable value was passed through the builder"));
         }
-
-
     }
 }

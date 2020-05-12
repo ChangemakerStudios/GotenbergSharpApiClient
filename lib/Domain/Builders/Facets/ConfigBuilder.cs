@@ -34,7 +34,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public ConfigBuilder PageRanges(string value)
         {
-            if(value.IsNotSet()) throw new ArgumentException("value is either null or empty");
+            if (value.IsNotSet()) throw new ArgumentException("value is either null or empty");
             this.Request.Config.PageRanges = value;
             return this;
         }
@@ -59,10 +59,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         public ConfigBuilder AddWebhook(Webhook webhook)
         {
             this.Request.Config.Webhook = webhook ?? throw new ArgumentNullException(nameof(webhook));
-            if (!webhook.TargetUrl.IsAbsoluteUri) throw new InvalidOperationException("Webhook must have an absolute url");
+            if (!webhook.TargetUrl.IsAbsoluteUri)
+                throw new InvalidOperationException("Webhook must have an absolute url");
 
             return this;
         }
-
     }
 }

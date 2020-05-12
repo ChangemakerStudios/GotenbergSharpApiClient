@@ -30,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public WebhookBuilder SetUrl(string url)
         {
-            if(url.IsNotSet()) throw new ArgumentException("url is either null or empty");
+            if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
             return SetUrl(new Uri(url));
         }
 
