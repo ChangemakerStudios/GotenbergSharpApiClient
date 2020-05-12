@@ -28,12 +28,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         /// <param name="url"></param>
         /// <returns></returns>
         [PublicAPI]
-        public WebhookBuilder SetUrl(string url) => SetUrl(new Uri(url));
+        public WebhookBuilder SetUrl(string url)
+        {
+            if(url.IsNotSet()) throw new ArgumentException("url is either null or empty");
+            return SetUrl(new Uri(url));
+        }
 
         [PublicAPI]
         public WebhookBuilder SetUrl(Uri url)
         {
-            this.Request.Config.Webhook.TargetUrl = url;
+            this.Request.Config.Webhook.TargetUrl = url ?? throw new ArgumentNullException(nameof(url));
+            if (!url.IsAbsoluteUri) throw new InvalidOperationException("Url base href is not absolute");
             return this;
         }
 

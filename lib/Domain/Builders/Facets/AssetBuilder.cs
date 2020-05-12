@@ -28,10 +28,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
                 throw new InvalidOperationException(
-                    "All keys in the asset dictionary must be relative file names with extensions");
+                    "Asset names must be relative file names with extensions");
             }
 
-            this.Request.Assets.Add(name, value);
+            this.Request.Assets.Add(name, value ?? throw new ArgumentNullException(nameof(value)));
 
             return this;
         }
@@ -82,8 +82,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
-            AddItems(new Dictionary<string, ContentItem>(assets?.ToDictionary(a => a.Key, a => a.Value) ??
-                                                         throw new ArgumentNullException(nameof(assets))));
+            AddItems(new Dictionary<string, ContentItem>(
+                assets?.ToDictionary(a => a.Key, a => a.Value) ??
+                throw new ArgumentNullException(nameof(assets))));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>

@@ -32,7 +32,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DocumentBuilder SetBody(ContentItem body)
         {
-            this.Request.Content.Body = body;
+            this.Request.Content.Body = body ?? throw new ArgumentNullException(nameof(body));
             return this;
         }
 
@@ -42,7 +42,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DocumentBuilder SetBody(byte[] body) => SetBody(new ContentItem(body));
 
-        [PublicAPI]
+        [PublicAPI]                                                               
         public DocumentBuilder SetBody(Stream body) => SetBody(new ContentItem(body));
 
         #endregion
@@ -52,18 +52,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DocumentBuilder SetHeader(ContentItem header)
         {
-            this.Request.Content.Header = header;
+            this.Request.Content.Header = header ?? throw new ArgumentNullException(nameof(header));
             return this;
         }
 
         [PublicAPI]
-        public DocumentBuilder SetHeader(string body) => SetHeader(new ContentItem(body));
+        public DocumentBuilder SetHeader(string header) =>
+            SetHeader(new ContentItem(header));
 
         [PublicAPI]
-        public DocumentBuilder SetHeader(byte[] body) => SetHeader(new ContentItem(body));
+        public DocumentBuilder SetHeader(byte[] header) =>
+            SetHeader(new ContentItem(header));
 
         [PublicAPI]
-        public DocumentBuilder SetHeader(Stream body) => SetHeader(new ContentItem(body));
+        public DocumentBuilder SetHeader(Stream header) =>
+            SetHeader(new ContentItem(header));
 
         #endregion
 
@@ -72,18 +75,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DocumentBuilder SetFooter(ContentItem footer)
         {
-            this.Request.Content.Footer = footer;
+            this.Request.Content.Footer = footer ?? throw new ArgumentNullException(nameof(footer));
             return this;
         }
 
         [PublicAPI]
-        public DocumentBuilder SetFooter(string body) => SetFooter(new ContentItem(body));
+        public DocumentBuilder SetFooter(string footer) =>
+            SetFooter(new ContentItem(footer));
 
         [PublicAPI]
-        public DocumentBuilder SetFooter(byte[] body) => SetFooter(new ContentItem(body));
+        public DocumentBuilder SetFooter(byte[] footer) => SetFooter(new ContentItem(footer));
 
         [PublicAPI]
-        public DocumentBuilder SetFooter(Stream body) => SetFooter(new ContentItem(body));
+        public DocumentBuilder SetFooter(Stream footer) => SetFooter(new ContentItem(footer));
 
         #endregion
     }

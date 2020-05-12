@@ -59,7 +59,6 @@ namespace Gotenberg.Sharp.API.Client
                 throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
             }
 
-            _innerClient.DefaultRequestHeaders.Clear();
             _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
             _innerClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
@@ -76,9 +75,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         [PublicAPI]
-        public async Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
         {
-            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+            return ExecuteRequestAsync(request, cancelToken);
         }
 
         /// <summary>
@@ -89,9 +88,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
         {
-            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+            return ExecuteRequestAsync(request, cancelToken);
         }
 
         /// <summary>
@@ -102,9 +101,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
         {
-            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+            return ExecuteRequestAsync(request, cancelToken);
         }
 
         /// <summary>
@@ -120,10 +119,10 @@ namespace Gotenberg.Sharp.API.Client
         ///     containing the text. {"message":"Not Found"}. Such responses throw an error that has the content of the response file, etc.
         /// </remarks>
         [PublicAPI]
-        public async Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request,
+        public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request,
             CancellationToken cancelToken = default)
         {
-            return await ExecuteRequestAsync(request, cancelToken).ConfigureAwait(false);
+            return ExecuteRequestAsync(request, cancelToken);
         }
 
         [PublicAPI]
@@ -132,7 +131,7 @@ namespace Gotenberg.Sharp.API.Client
             if (!request?.IsWebhookRequest ?? false)
                 throw new InvalidOperationException("Only call this for webhook configured requests");
 
-            _ = await SendRequest(request, cancelToken).ConfigureAwait(false);
+            using var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
         }
 
         #endregion
@@ -143,17 +142,16 @@ namespace Gotenberg.Sharp.API.Client
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var response = await SendRequest(request, cancelToken);
-
+            var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
-        async Task<HttpResponseMessage> SendRequest(IApiRequest request, CancellationToken cancelToken)
+        async Task<HttpResponseMessage> SendRequest(IApiRequest request, HttpCompletionOption option, CancellationToken cancelToken)
         {
             using var message = request.ToApiRequestMessage();
 
             var response = await this._innerClient
-                .SendAsync(message, HttpCompletionOption.ResponseContentRead, cancelToken)
+                .SendAsync(message, option, cancelToken)
                 .ConfigureAwait(false);
 
             cancelToken.ThrowIfCancellationRequested();

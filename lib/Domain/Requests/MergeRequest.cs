@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public override IEnumerable<HttpContent> ToHttpContent()
         {
             return this.Assets.ToAlphabeticalMergeOrderByIndex()
-                .Where(item => item.Value != null)
+                .Where(item => item.Key.IsSet() && item.Value != null)
                 .Select(item =>
                 {
                     var contentItem = item.Value.ToHttpContentItem();

@@ -14,7 +14,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
-        public MergeBuilder() => Init();
+        public MergeBuilder() => this.Request = new MergeRequest();
 
         protected override MergeRequest Request { get; set; }
 
@@ -61,7 +61,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
             return Request;
         }
-
-        void Init() => this.Request = new MergeRequest();
     }
 }

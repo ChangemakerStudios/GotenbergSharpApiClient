@@ -37,8 +37,15 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
 
         public override string ToString()
         {
-            var responseJson = JsonConvert.SerializeObject(_response);
-            return $"Gotenberg Api response message: '{this.Message}' Response Json: {responseJson}.";
+            try
+            {
+                var responseJson = JsonConvert.SerializeObject(_response);
+                return $"Gotenberg Api response message: '{this.Message}' Response Json: {responseJson}.";
+            }
+            finally
+            {
+                _response?.Dispose();
+            }
         }
     }
 }

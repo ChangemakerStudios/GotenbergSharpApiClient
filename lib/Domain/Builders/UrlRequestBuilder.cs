@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Facets;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
 
@@ -20,19 +22,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         public UrlRequestBuilder() => this.Request = new UrlRequest();
 
         [PublicAPI]
-        public UrlRequestBuilder SetUrl(string url) => SetUrl(new Uri(url));
+        public UrlRequestBuilder SetUrl(string url)
+        {
+            if(url.IsNotSet()) throw new ArgumentException("url is either null or empty");
+            return SetUrl(new Uri(url));
+        }
 
         [PublicAPI]
         public UrlRequestBuilder SetUrl(Uri url)
         {
-            this.Request.Url = url;
+            this.Request.Url = url ?? throw new ArgumentNullException(nameof(url));
+            if(!url.IsAbsoluteUri) throw new InvalidOperationException("url is not absolute");
             return this;
         }
 
         [PublicAPI]
         public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
         {
-            this.Request.RemoteUrlHeader = new KeyValuePair<string, string>(name, value);
+            if(name.IsNotSet()) throw new ArgumentException("header name is either null or empty");
+            this.Request.RemoteUrlHeader = KeyValuePair.Create(name, value);
             return this;
         }
 
@@ -55,11 +63,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
+        public UrlRequestBuilder WithDimensions(Dimensions dimensions)
+        {
+            this.Request.Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
+            return this;
+        }
+
+        [PublicAPI]
         public UrlRequestBuilder WithDimensions(Action<DimensionBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
 
             action(new DimensionBuilder(this.Request));
+            return this;
+        }
+
+        [PublicAPI]
+        public UrlRequestBuilder ConfigureRequest(RequestConfig config)
+        {
+            this.Request.Config = config ?? throw new ArgumentNullException(nameof(config));
             return this;
         }
 

@@ -20,7 +20,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         public AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            foreach (var item in items)
+
+            var pairs = items as KeyValuePair<string, ContentItem>[] ?? items.ToArray();
+            if(pairs.Any(item=> item.Key.IsNotSet())) throw new ArgumentException("one ore more of the items keys is null or empty");
+
+            foreach (var item in pairs)
             {
                 this.Add(item.Key, item.Value);
             }

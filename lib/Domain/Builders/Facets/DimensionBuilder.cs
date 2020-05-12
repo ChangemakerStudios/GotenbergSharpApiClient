@@ -89,7 +89,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DimensionBuilder SetDimensions(Dimensions dims)
         {
-            this.Request.Dimensions = dims;
+            this.Request.Dimensions = dims ?? throw new ArgumentNullException(nameof(dims));
             return this;
         }
 

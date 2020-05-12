@@ -19,7 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
-        public MergeOfficeBuilder() => Init();
+        public MergeOfficeBuilder() => this.Request = new MergeOfficeRequest();
 
         protected override MergeOfficeRequest Request { get; set; }
 
@@ -66,7 +66,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
             return Request;
         }
-
-        void Init() => this.Request = new MergeOfficeRequest();
+     
     }
 }
