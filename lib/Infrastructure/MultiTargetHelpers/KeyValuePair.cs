@@ -4,7 +4,7 @@
 // ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
 {
-    public static class KeyValuePair
+    internal static class KeyValuePair
     {
         /// <summary>
         ///  b/c Kvp.Create is not supported by netstandard2.0
@@ -16,7 +16,7 @@ namespace System.Collections.Generic
         /// <returns>
         /// .
         /// </returns>
-        public static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value)
+        internal static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value)
         {
             return new KeyValuePair<TKey, TValue>(key, value);
         }
