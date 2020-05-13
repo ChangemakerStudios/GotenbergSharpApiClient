@@ -20,7 +20,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             KeyValuePair.Create(PaperSizes.Tabloid, (Width: 11.0, Height: 17.0))
         };
 
-        static readonly IEnumerable<KeyValuePair<Margins, 
+        static readonly IEnumerable<KeyValuePair<Margins,
             (double Left, double Right, double Top, double Bottom)>> MarginSizer = new[]
         {
             KeyValuePair.Create(Margins.None, (Left: 0.0, Right: 0.0, Top: 0.0, Bottom: 0.0)),

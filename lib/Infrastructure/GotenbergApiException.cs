@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.Http;
 
+using Gotenberg.Sharp.API.Client.Domain.Requests;
+
 using Newtonsoft.Json;
 
 // ReSharper disable All CA1032
@@ -12,11 +14,13 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
     /// <inheritdoc />
     public sealed class GotenbergApiException : Exception
     {
+        readonly IApiRequest _request;
         readonly HttpResponseMessage _response;
 
-        public GotenbergApiException(string message, HttpResponseMessage response)
+        public GotenbergApiException(string message, IApiRequest request, HttpResponseMessage response)
             : base(message)
         {
+            _request = request;
             _response = response;
             this.StatusCode = _response.StatusCode;
             this.RequestUri = _response.RequestMessage.RequestUri;
@@ -29,18 +33,26 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
 
         public string ReasonPhrase { get; }
 
-        public static GotenbergApiException Create(HttpResponseMessage response)
+        public static GotenbergApiException Create(IApiRequest request, HttpResponseMessage response)
         {
             var message = response.Content.ReadAsStringAsync().Result;
-            return new GotenbergApiException(message, response);
+            return new GotenbergApiException(message, request, response);
         }
 
-        public override string ToString()
+        public string ToString(bool verbose = false)
         {
             using (_response)
             {
-                var responseJson = JsonConvert.SerializeObject(_response);
-                return $"Gotenberg Api response message: '{this.Message}' Response Json: {responseJson}.";
+                return JsonConvert.SerializeObject(new
+                {
+                    GotenbergMessage = Message,
+                    ClientRequestSent = _request,
+                    ClientRequestFormContent = verbose ? _request.ToHttpContent() : null,
+                    GotenbergResponseReceived = verbose ? _response : null,
+                }, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
             }
         }
     }

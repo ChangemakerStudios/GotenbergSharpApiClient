@@ -149,7 +149,7 @@ namespace Gotenberg.Sharp.API.Client
             if (response.IsSuccessStatusCode)
                 return response;
 
-            throw GotenbergApiException.Create(response);
+            throw GotenbergApiException.Create(request, response);
         }
 
         #endregion
