@@ -20,11 +20,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DimensionBuilder SetMargins(Margins margins)
         {
-            var (left, right, top, bottom) = margins.ToSelectedMargins();
-            this.Request.Dimensions.MarginLeft = left;
-            this.Request.Dimensions.MarginRight = right;
-            this.Request.Dimensions.MarginTop = top;
-            this.Request.Dimensions.MarginBottom = bottom;
+            var selected = margins.ToSelectedMargins();
+            this.Request.Dimensions.MarginLeft = selected.Left;
+            this.Request.Dimensions.MarginRight = selected.Right;
+            this.Request.Dimensions.MarginTop = selected.Top;
+            this.Request.Dimensions.MarginBottom = selected.Bottom;
 
             return this;
         }
@@ -32,9 +32,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
         [PublicAPI]
         public DimensionBuilder SetPaperSize(PaperSizes sizes)
         {
-            var (width, height) = sizes.ToSelectedSize();
-            this.Request.Dimensions.PaperWidth = width;
-            this.Request.Dimensions.PaperHeight = height;
+            var selected = sizes.ToSelectedSize();
+            this.Request.Dimensions.PaperWidth = selected.Width;
+            this.Request.Dimensions.PaperHeight = selected.Height;
 
             return this;
         }

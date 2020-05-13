@@ -44,6 +44,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             if (!Enum.IsDefined(typeof(Margins), selected))
                 throw new InvalidEnumArgumentException(nameof(selected), (int) selected, typeof(PaperSizes));
+
             return MarginSizer.First(m => m.MarginType == selected).Value;
         }
     }
