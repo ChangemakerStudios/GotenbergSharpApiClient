@@ -1,4 +1,4 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
+﻿// Gotenberg.Sharp.Api.Client - Copyright (c) 2020 CaptiveAire
 
 using System;
 using System.Collections.Generic;
@@ -6,10 +6,13 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
+
 using Microsoft.Net.Http.Headers;
 
 namespace Gotenberg.Sharp.API.Client
@@ -73,11 +76,11 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-     
         [PublicAPI]
-        public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
-            => await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
-        
+        public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default) =>
+            await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader)
+                .ConfigureAwait(false);
+
         /// <summary>
         ///    Converts the specified request to a PDF document.
         /// </summary>
@@ -86,8 +89,8 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> HtmlToPdfAsync(IConversionRequest request, CancellationToken cancelToken = default)  
-            =>  await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
+        public async Task<Stream> HtmlToPdfAsync(IConversionRequest request, CancellationToken cancelToken = default) =>
+            await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
 
         /// <summary>
         /// Merges items specified by the request
@@ -97,7 +100,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> MergePdfsAsync(IMergeRequest request, CancellationToken cancelToken = default)  
+        public async Task<Stream> MergePdfsAsync(IMergeRequest request, CancellationToken cancelToken = default)
         {
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
         }
@@ -118,41 +121,41 @@ namespace Gotenberg.Sharp.API.Client
         {
             return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
         }
-   
+
         #endregion
-       
+
         #region exec
 
-        async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, CancellationToken cancelToken = default, KeyValuePair<string,string> remoteUrlHeader = default)
+        async Task<Stream> ExecuteRequest(
+            IConvertToHttpContent request,
+            string apiPath,
+            CancellationToken cancelToken = default,
+            KeyValuePair<string, string> remoteUrlHeader = default)
         {
             using var formContent = new MultipartFormDataContent($"{Constants.Http.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
-            
+
             foreach (var item in request.ToHttpContent())
             {
                 formContent.Add(item);
             }
-            
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, apiPath)
-            {
-                Content = formContent 
-            };
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, apiPath) { Content = formContent };
 
             if (remoteUrlHeader.Key.IsSet())
             {
                 var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteUrlHeader.Key.Trim()}";
                 requestMessage.Headers.Add(name, remoteUrlHeader.Value);
             }
-            
-            var response = await this._innerClient
-                .SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancelToken)
+
+            var response = await this._innerClient.SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancelToken)
                 .ConfigureAwait(false);
-         
+
             cancelToken.ThrowIfCancellationRequested();
-                
+
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
-        
-        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken = default)  
+
+        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (request.Count == 0) throw new ArgumentException(nameof(request));
