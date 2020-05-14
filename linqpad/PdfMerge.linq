@@ -1,12 +1,12 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
-  <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>System.Net.Http</Namespace>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
-  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests.Facets</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
+  <Namespace>System.Net.Http</Namespace>
+  <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
 async Task Main()

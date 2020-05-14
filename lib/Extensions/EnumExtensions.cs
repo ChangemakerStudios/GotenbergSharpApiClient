@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Facets;
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 // ReSharper disable FlagArgument
 

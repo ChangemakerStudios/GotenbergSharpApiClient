@@ -9,7 +9,7 @@ using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
     public sealed class AssetBuilder : BaseBuilder<RequestBase>
     {

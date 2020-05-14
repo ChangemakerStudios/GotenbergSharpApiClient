@@ -20,8 +20,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         public GotenbergApiException(string message, IApiRequest request, HttpResponseMessage response)
             : base(message)
         {
-            _request = request;
-            _response = response;
+            this._request = request;
+            this._response = response;
             this.StatusCode = _response.StatusCode;
             this.RequestUri = _response.RequestMessage.RequestUri;
             this.ReasonPhrase = _response.ReasonPhrase;

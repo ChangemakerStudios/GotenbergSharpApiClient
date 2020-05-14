@@ -1,4 +1,4 @@
-﻿namespace Gotenberg.Sharp.API.Client.Domain.Builders.Facets
+﻿namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
     public enum PaperSizes
     {
