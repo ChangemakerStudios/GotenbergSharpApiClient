@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
+using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
+using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 using JetBrains.Annotations;
-
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public sealed class AssetDictionary : Dictionary<string, ContentItem>, IConvertToHttpContent
     {
-        readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
+        readonly IResolveContentType _resolveContentType = new ResolveContentTypeImplementation();
 
         public AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
@@ -35,11 +33,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Select(item =>
-                {
-                    _contentTypeProvider.TryGetContentType(item.Key, out var contentType);
-                    return new { Asset = item, MediaType = contentType };
-                })
+            return this.Select(item => new { Asset = item, MediaType = _resolveContentType.GetContentType(item.Key) })
                 .Where(i => i.MediaType.IsSet())
                 .Select(item =>
                 {

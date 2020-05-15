@@ -2,17 +2,16 @@
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
+using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using Microsoft.AspNetCore.StaticFiles;
+using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public class MergeOfficeRequest : RequestBase
     {
-        readonly FileExtensionContentTypeProvider _contentTypeProvider = new FileExtensionContentTypeProvider();
+        readonly IResolveContentType _resolveContentType = new ResolveContentTypeImplementation();
 
         public override string ApiPath => Constants.Gotenberg.ApiPaths.MergeOffice;
 
@@ -23,11 +22,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return this.Assets.FilterOutNonOfficeDocs()
                 .ToAlphabeticalMergeOrderByIndex()
                 .Where(item => item.Value != null)
-                .Select(item =>
-                {
-                    _contentTypeProvider.TryGetContentType(item.Key, out var contentType);
-                    return new { Asset = item, MediaType = contentType };
-                })
+                .Select(item => new { Asset = item, MediaType = _resolveContentType.GetContentType(item.Key) })
                 .Where(item => item.MediaType.IsSet())
                 .Select(item =>
                 {
