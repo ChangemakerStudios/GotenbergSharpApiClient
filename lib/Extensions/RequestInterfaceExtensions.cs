@@ -12,7 +12,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class RequestInterfaceExtensions
     {
-        public static IEnumerable<HttpContent> IfNullEmptyContent([CanBeNull] this IConvertToHttpContent converter)
+        public static IEnumerable<HttpContent> IfNullEmptyContent(this IConvertToHttpContent? converter)
         {
             return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
         }

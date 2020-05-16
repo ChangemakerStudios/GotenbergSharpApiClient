@@ -32,18 +32,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public ConfigBuilder PageRanges(string value)
+        public ConfigBuilder PageRanges(string pageRanges)
         {
-            if (value.IsNotSet()) throw new ArgumentException("value is either null or empty");
-            this.Request.Config.PageRanges = value;
+            if (pageRanges.IsNotSet()) throw new ArgumentException("Cannot be null or empty", nameof(pageRanges));
+            this.Request.Config.PageRanges = pageRanges;
             return this;
         }
 
         [PublicAPI]
-        public ConfigBuilder ResultFileName(string value)
+        public ConfigBuilder ResultFileName(string resultFileName)
         {
-            if (value.IsNotSet()) throw new ArgumentException("ResultFileName is either null or empty");
-            this.Request.Config.ResultFileName = value;
+            if (resultFileName.IsNotSet()) throw new ArgumentException("Cannot be null or empty", nameof(resultFileName));
+            this.Request.Config.ResultFileName = resultFileName;
             return this;
         }
 

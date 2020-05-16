@@ -59,7 +59,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public WebhookBuilder AddRequestHeader(string name, IEnumerable<string> values)
         {
-            if (name.IsNotSet()) throw new ArgumentException("request header name is null || empty");
+            if (name.IsNotSet()) throw new ArgumentException("request header name is null || empty", nameof(name));
 
             var headerName = $"{Constants.Gotenberg.CustomRemoteHeaders.WebhookHeaderKeyPrefix}{name}";
             this.Request.CustomHeaders.Add(headerName, values);

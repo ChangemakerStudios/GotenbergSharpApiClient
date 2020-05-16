@@ -27,7 +27,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             // ReSharper disable once ComplexConditionExpression
             if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
-                throw new InvalidOperationException(
+                throw new ArgumentOutOfRangeException(nameof(name),
                     "Asset names must be relative file names with extensions");
             }
 

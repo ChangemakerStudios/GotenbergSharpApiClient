@@ -1,38 +1,41 @@
 using System;
 using System.IO;
 using System.Net.Http;
-
 using Gotenberg.Sharp.API.Client.Extensions;
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public sealed class ContentItem
     {
-        readonly byte[] _bytes;
-        readonly string _stringItem;
-        readonly Stream _streamItem;
+        private readonly Func<HttpContent> _getHttpContent;
 
-        public ContentItem(byte[] value)
-            => _bytes = value ?? throw new ArgumentNullException(nameof(value));
-
-        public ContentItem(string value)
+        private ContentItem(Func<HttpContent> getHttpContent)
         {
-            _stringItem = value ?? throw new ArgumentNullException(nameof(value));
-            if (_stringItem.IsNotSet()) throw new InvalidOperationException(nameof(value));
+            _getHttpContent = getHttpContent;
         }
 
-        public ContentItem(Stream value)
-            => _streamItem = value ?? throw new ArgumentNullException(nameof(value));
-
-        public HttpContent ToHttpContentItem() => Convert(this);
-
-        static HttpContent Convert(ContentItem c)
+        public ContentItem([NotNull] byte[] bytes)
+            : this(() => new ByteArrayContent(bytes))
         {
-            if (c._bytes != null) return new ByteArrayContent(c._bytes);
-            if (c._stringItem.IsSet()) return new StringContent(c._stringItem);
-            return new StreamContent(c._streamItem ??
-                                     throw new InvalidOperationException(
-                                         "ContentItem: An unusable value was passed through the builder"));
+            if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+        }
+
+        public ContentItem([NotNull] string str)
+            : this(() => new StringContent(str))
+        {
+            if (str.IsNotSet()) throw new ArgumentOutOfRangeException(nameof(str), "Must not be null or empty");
+        }
+
+        public ContentItem([NotNull] Stream stream)
+            : this(() => new StreamContent(stream))
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+        }
+
+        public HttpContent ToHttpContentItem()
+        {
+            return _getHttpContent();
         }
     }
 }
