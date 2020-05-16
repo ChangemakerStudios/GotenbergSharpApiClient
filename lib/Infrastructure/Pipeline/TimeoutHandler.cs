@@ -11,10 +11,6 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <seealso cref="System.Net.Http.DelegatingHandler" />
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "CA2000")]
     // ReSharper disable once HollowTypeName

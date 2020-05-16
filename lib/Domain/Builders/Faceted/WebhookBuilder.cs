@@ -21,7 +21,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 
         /// <summary>
         /// When testing web hooks against a local container and a service
-        /// running on localhost to receive the posts, use http://host.docker.internal 
+        /// running on localhost, to receive the posts, use http://host.docker.internal:your-port 
         /// Reference: https://docs.docker.com/docker-for-windows/networking/#use-cases-and-workarounds
         /// </summary>
         /// <param name="url"></param>
