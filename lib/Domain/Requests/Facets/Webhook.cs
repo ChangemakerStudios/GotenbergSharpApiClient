@@ -19,9 +19,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         public Uri TargetUrl
         {
             get => _targetUrl;
-            set => _targetUrl = value?.IsAbsoluteUri ?? false
-                ? value
-                : throw new InvalidOperationException("WebHook url must be absolute");
+            set
+            {
+                _targetUrl = value ?? throw new ArgumentNullException(nameof(value));
+                if (!_targetUrl.IsAbsoluteUri ) throw new InvalidOperationException("WebHook url must be absolute");
+            }
         }
 
         /// <summary>

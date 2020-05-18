@@ -14,11 +14,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         public override string ApiPath => Constants.Gotenberg.ApiPaths.UrlConvert;
 
-        public Uri? Url { get; set; }
+        public Uri Url { get; set; }
 
         public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
 
-        public HeaderFooterDocument? Content { get; set; }
+        public HeaderFooterDocument Content { get; set; }
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {

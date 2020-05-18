@@ -13,9 +13,12 @@ namespace Gotenberg.Sharp.API.Client.Domain
         public Uri HealthCheckUrl { get; [UsedImplicitly] set; } = new Uri("http://localhost:3000/ping");
 
         [UsedImplicitly]
-        public int PollyRetryCount { get; set; } = 3;
+        public int RetryCount { get; set; } = 3;
 
         [UsedImplicitly]
-        public bool LogPollyRetries { get; set; }
+        public bool RetryOnFailure { get; set; } = true;
+
+        [UsedImplicitly]
+        public bool LogRetries { get; set; }
     }
 }

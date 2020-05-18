@@ -16,7 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             { ".txt", ".rtf", ".fodt", ".doc", ".docx", ".odt", ".xls", ".xlsx", ".ods", ".ppt", ".pptx", ".odp" };
 
         public static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(
-            this Dictionary<TKey, TValue>? instance)
+            this Dictionary<TKey, TValue> instance)
         {
             return instance ?? new Dictionary<TKey, TValue>();
         }
@@ -31,7 +31,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         ///     Note: For merges only. Embedded assets for html docs have
         ///     key values with whatever extension the html references: .md, .css, .jpg, etc
         /// </remarks>
-        public static AssetDictionary ToAlphabeticalMergeOrderByIndex(this AssetDictionary? unordered)
+        public static AssetDictionary ToAlphabeticalMergeOrderByIndex(this AssetDictionary unordered)
         {
             var ordered = unordered.IfNullEmpty().Select((item, index) =>
                 KeyValuePair.Create(index.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension),
@@ -40,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             return new AssetDictionary().FluentAddRange(ordered);
         }
 
-        public static AssetDictionary FilterOutNonOfficeDocs(this AssetDictionary? unfiltered)
+        public static AssetDictionary FilterOutNonOfficeDocs(this AssetDictionary unfiltered)
         {
             var filtered = unfiltered.IfNullEmpty()
                 .Where(asset => OfficeExtensions.Contains(new FileInfo(asset.Key).Extension,

@@ -8,9 +8,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public sealed class ContentItem
     {
-        private readonly Func<HttpContent> _getHttpContent;
+        readonly Func<HttpContent> _getHttpContent;
 
-        private ContentItem(Func<HttpContent> getHttpContent)
+        ContentItem(Func<HttpContent> getHttpContent)
         {
             _getHttpContent = getHttpContent;
         }

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Nullable>enable</Nullable>
     <LangVersion>8.0</LangVersion>
     <AssemblyName>Gotenberg.Sharp.API.Client</AssemblyName>
     <RootNamespace>Gotenberg.Sharp.API.Client</RootNamespace>

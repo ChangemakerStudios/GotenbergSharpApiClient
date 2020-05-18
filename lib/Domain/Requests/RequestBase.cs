@@ -11,9 +11,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public bool IsWebhookRequest => Config?.Webhook?.TargetUrl != null;
 
-        public RequestConfig? Config { get; set; }
+        public RequestConfig Config { get; set; }
 
-        public AssetDictionary? Assets { get; set; }
+        public AssetDictionary Assets { get; set; }
 
         public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
 

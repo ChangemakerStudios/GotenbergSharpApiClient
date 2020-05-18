@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Polly;
 using Polly.Timeout;
@@ -20,19 +21,21 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     public static class ServiceCollectionExtensions
     {
         [UsedImplicitly]
-        public static IHttpClientBuilder AddGotenbergSharpTypedClient(this IServiceCollection services,
-            int retryCount = 2)
+        public static IHttpClientBuilder AddGotenbergSharpTypedClient(this IServiceCollection services)
         {
-            return services.AddHttpClient(nameof(GotenbergSharpClient),
-                    (sp, client) =>
+            return services.AddHttpClient(nameof(GotenbergSharpClient), (sp, client) =>
                     {
-                        client.BaseAddress = sp.GetRequiredService<GotenbergSharpClientOptions>().ServiceUrl;
+                        client.BaseAddress = GetOptions(sp).ServiceUrl;
                     }).AddTypedClient<GotenbergSharpClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
                     { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
-                .AddPolicyHandler(SimpleRetryPolicyBuilder) //may remove this so callers can add it if they want.
-                .SetHandlerLifetime(TimeSpan.FromMinutes(6));
+                .AddPolicyHandler((sp, request) =>
+                {
+                    var enabled = GetOptions(sp).RetryOnFailure;
+                    return enabled ? SimpleRetryPolicyBuilder(sp, request) : Policy.NoOpAsync<HttpResponseMessage>();
+                }).SetHandlerLifetime(TimeSpan.FromMinutes(6));
         }
+
 
         [UsedImplicitly]
         public static IHttpClientBuilder AddGotenbergSharpTypedClient(this IServiceCollection services,
@@ -40,7 +43,13 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             return services.AddHttpClient(nameof(GotenbergSharpClient), configureClient)
                 .AddTypedClient<GotenbergSharpClient>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(6));
+                .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
+                    { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
+                .AddPolicyHandler((sp, request) =>
+                {
+                    var enabled = GetOptions(sp).RetryOnFailure;
+                    return enabled ? SimpleRetryPolicyBuilder(sp, request) : Policy.NoOpAsync<HttpResponseMessage>();
+                }).SetHandlerLifetime(TimeSpan.FromMinutes(6));
         }
 
         [UsedImplicitly]
@@ -49,30 +58,27 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             SimpleRetryPolicyBuilder = (sp, request) =>
                 HandleTransientHttpError()
                     .Or<TimeoutRejectedException>()
-                    .WaitAndRetryAsync(sp.GetRequiredService<GotenbergSharpClientOptions>().PollyRetryCount,
-                        sleepDurationProvider: retryCount => TimeSpan.FromSeconds(Math.Pow(2, retryCount)),
-                        onRetry: (outcome, delay, retryCount, context) =>
+                    .WaitAndRetryAsync(sp.GetRequiredService<GotenbergSharpClientOptions>().RetryCount,
+                        retryCount => TimeSpan.FromSeconds(Math.Pow(2, retryCount)),
+                        (outcome, delay, retryCount, context) =>
                         {
                             context["retry-count"] = retryCount;
-                            var options = sp.GetRequiredService<GotenbergSharpClientOptions>();
+                            var options = GetOptions(sp);
 
-                            if (!options.LogPollyRetries) return;
+                            if (!options.LogRetries) return;
 
-                            var factory = sp.GetRequiredService<ILoggerFactory>();
-                            var logger = factory.CreateLogger(context.PolicyKey);
-
+                            var logger = sp.GetRequiredService<ILogger<GotenbergSharpClientOptions>>();
 
                             logger?.LogWarning(
                                 "{name} delaying for {@delay} ms, then making retry # {@retry} of {@retryAttempts}. Retry reason: '{reason}'",
                                 context.PolicyKey,
                                 delay.TotalMilliseconds,
                                 retryCount,
-                                options.PollyRetryCount,
+                                options.RetryCount,
                                 outcome?.Exception?.Message ?? "No exception message");
                         })
-                    .WithPolicyKey($"{nameof(GotenbergSharpClient)}PollyRetryLogger");
+                    .WithPolicyKey(nameof(GotenbergSharpClient));
 
-        //Above works but this might be the better way to get the logger:
-        //https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory#configuring-policies-to-use-services-registered-with-di-such-as-iloggert
+        static GotenbergSharpClientOptions GetOptions(IServiceProvider sp) => sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value;
     }
 }
