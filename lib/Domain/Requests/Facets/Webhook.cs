@@ -22,7 +22,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             set
             {
                 _targetUrl = value ?? throw new ArgumentNullException(nameof(value));
-                if (!_targetUrl.IsAbsoluteUri ) throw new InvalidOperationException("WebHook url must be absolute");
+                if (!_targetUrl.IsAbsoluteUri) throw new InvalidOperationException("WebHook url must be absolute");
             }
         }
 

@@ -117,7 +117,7 @@ namespace Gotenberg.Sharp.API.Client
         [PublicAPI]
         public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
         {
-            if(request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null) throw new ArgumentNullException(nameof(request));
             if (!request.IsWebhookRequest)
                 throw new InvalidOperationException("Only call this for webhook configured requests");
 

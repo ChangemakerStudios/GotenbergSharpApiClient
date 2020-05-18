@@ -1,5 +1,4 @@
-﻿
-namespace Gotenberg.Sharp.API.Client.Domain.ContentTypes
+﻿namespace Gotenberg.Sharp.API.Client.Domain.ContentTypes
 {
     public interface IResolveContentType
     {

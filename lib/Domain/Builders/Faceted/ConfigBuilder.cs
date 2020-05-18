@@ -42,7 +42,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public ConfigBuilder ResultFileName(string resultFileName)
         {
-            if (resultFileName.IsNotSet()) throw new ArgumentException("Cannot be null or empty", nameof(resultFileName));
+            if (resultFileName.IsNotSet())
+                throw new ArgumentException("Cannot be null or empty", nameof(resultFileName));
             this.Request.Config.ResultFileName = resultFileName;
             return this;
         }

@@ -21,12 +21,12 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     public static class ServiceCollectionExtensions
     {
         [UsedImplicitly]
-        public static IHttpClientBuilder AddGotenbergSharpTypedClient(this IServiceCollection services)
+        public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services)
         {
-            return services.AddHttpClient(nameof(GotenbergSharpClient), (sp, client) =>
-                    {
-                        client.BaseAddress = GetOptions(sp).ServiceUrl;
-                    }).AddTypedClient<GotenbergSharpClient>()
+            return services
+                .AddHttpClient(nameof(GotenbergSharpClient),
+                    (sp, client) => { client.BaseAddress = GetOptions(sp).ServiceUrl; })
+                .AddTypedClient<GotenbergSharpClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
                     { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
                 .AddPolicyHandler((sp, request) =>
@@ -38,7 +38,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 
 
         [UsedImplicitly]
-        public static IHttpClientBuilder AddGotenbergSharpTypedClient(this IServiceCollection services,
+        public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services,
             Action<IServiceProvider, HttpClient> configureClient)
         {
             return services.AddHttpClient(nameof(GotenbergSharpClient), configureClient)
@@ -52,13 +52,12 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 }).SetHandlerLifetime(TimeSpan.FromMinutes(6));
         }
 
-        [UsedImplicitly]
-        public static readonly Func<IServiceProvider, HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>>
+        static readonly Func<IServiceProvider, HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>>
             // ReSharper disable once ComplexConditionExpression
             SimpleRetryPolicyBuilder = (sp, request) =>
                 HandleTransientHttpError()
                     .Or<TimeoutRejectedException>()
-                    .WaitAndRetryAsync(sp.GetRequiredService<GotenbergSharpClientOptions>().RetryCount,
+                    .WaitAndRetryAsync(GetOptions(sp).RetryCount,
                         retryCount => TimeSpan.FromSeconds(Math.Pow(2, retryCount)),
                         (outcome, delay, retryCount, context) =>
                         {
@@ -79,6 +78,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                         })
                     .WithPolicyKey(nameof(GotenbergSharpClient));
 
-        static GotenbergSharpClientOptions GetOptions(IServiceProvider sp) => sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value;
+        static GotenbergSharpClientOptions GetOptions(IServiceProvider sp) =>
+            sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value;
     }
 }
