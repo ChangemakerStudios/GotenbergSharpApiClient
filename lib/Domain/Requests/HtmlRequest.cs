@@ -7,6 +7,8 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
+using JetBrains.Annotations;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
@@ -24,10 +26,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 ? Constants.Gotenberg.ApiPaths.MarkdownConvert
                 : Constants.Gotenberg.ApiPaths.ConvertHtml;
 
+        [PublicAPI]
         public HtmlRequest()
         {
         }
 
+        [PublicAPI]
         public HtmlRequest(bool containsMarkdown) => this.ContainsMarkdown = containsMarkdown;
 
         public bool ContainsMarkdown { get; internal set; }

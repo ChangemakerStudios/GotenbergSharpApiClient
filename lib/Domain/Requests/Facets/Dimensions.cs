@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
@@ -168,7 +169,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                         new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
 
                     return contentItem;
-                }).Where(item => item != null);
+                }).WhereNotNull();
         }
 
         #endregion

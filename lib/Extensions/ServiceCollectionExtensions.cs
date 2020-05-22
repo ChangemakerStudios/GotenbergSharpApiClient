@@ -20,24 +20,29 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        [UsedImplicitly]
+        [PublicAPI]
         public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services)
         {
             return services
                 .AddHttpClient(nameof(GotenbergSharpClient),
-                    (sp, client) => { client.BaseAddress = GetOptions(sp).ServiceUrl; })
+                    (sp, client) =>
+                    {
+                        var ops = GetOptions(sp);
+                        client.Timeout = ops.TimeOut;
+                        client.BaseAddress = ops.ServiceUrl;
+                    })
                 .AddTypedClient<GotenbergSharpClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
                     { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
-                .AddPolicyHandler((sp, request) =>
-                {
-                    var enabled = GetOptions(sp).RetryOnFailure;
-                    return enabled ? SimpleRetryPolicyBuilder(sp, request) : Policy.NoOpAsync<HttpResponseMessage>();
-                }).SetHandlerLifetime(TimeSpan.FromMinutes(6));
+                .AddPolicyHandler((sp, request)
+                    => GetOptions(sp).RetryOnFailure
+                        ? AddSimpleRetryPolicy(sp, request)
+                        : Policy.NoOpAsync<HttpResponseMessage>())
+                .SetHandlerLifetime(TimeSpan.FromMinutes(6));
         }
 
 
-        [UsedImplicitly]
+        [PublicAPI]
         public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services,
             Action<IServiceProvider, HttpClient> configureClient)
         {
@@ -45,20 +50,20 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 .AddTypedClient<GotenbergSharpClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
                     { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
-                .AddPolicyHandler((sp, request) =>
-                {
-                    var enabled = GetOptions(sp).RetryOnFailure;
-                    return enabled ? SimpleRetryPolicyBuilder(sp, request) : Policy.NoOpAsync<HttpResponseMessage>();
-                }).SetHandlerLifetime(TimeSpan.FromMinutes(6));
+                .AddPolicyHandler((sp, request)
+                    => GetOptions(sp).RetryOnFailure
+                        ? AddSimpleRetryPolicy(sp, request)
+                        : Policy.NoOpAsync<HttpResponseMessage>())
+                .SetHandlerLifetime(TimeSpan.FromMinutes(6));
         }
 
         static readonly Func<IServiceProvider, HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>>
             // ReSharper disable once ComplexConditionExpression
-            SimpleRetryPolicyBuilder = (sp, request) =>
+            AddSimpleRetryPolicy = (sp, request) =>
                 HandleTransientHttpError()
                     .Or<TimeoutRejectedException>()
                     .WaitAndRetryAsync(GetOptions(sp).RetryCount,
-                        retryCount => TimeSpan.FromSeconds(Math.Pow(2, retryCount)),
+                        retryCount => TimeSpan.FromSeconds(Math.Pow(1.5, retryCount)),
                         (outcome, delay, retryCount, context) =>
                         {
                             context["retry-count"] = retryCount;
@@ -66,10 +71,10 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 
                             if (!options.LogRetries) return;
 
-                            var logger = sp.GetRequiredService<ILogger<GotenbergSharpClientOptions>>();
+                            var logger = sp.GetRequiredService<ILogger<GotenbergSharpClient>>();
 
                             logger?.LogWarning(
-                                "{name} delaying for {@delay} ms, then making retry # {@retry} of {@retryAttempts}. Retry reason: '{reason}'",
+                                "{name} delaying for {delay} ms, then making retry # {retry} of {retryAttempts}. Retry reason: '{reason}'",
                                 context.PolicyKey,
                                 delay.TotalMilliseconds,
                                 retryCount,
