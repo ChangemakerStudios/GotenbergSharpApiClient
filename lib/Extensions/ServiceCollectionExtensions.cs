@@ -23,19 +23,12 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         [PublicAPI]
         public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services)
         {
-            return services
-                .AddHttpClient(nameof(GotenbergSharpClient),
-                    (sp, client) =>
-                    {
-                        var ops = GetOptions(sp);
-                        client.Timeout = ops.TimeOut;
-                        client.BaseAddress = ops.ServiceUrl;
-                    })
-                .AddTypedClient<GotenbergSharpClient>()
-                .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
-                    { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
-                .AddPolicyHandler(AddRetryPolicyOrNoOp)
-                .SetHandlerLifetime(TimeSpan.FromMinutes(6));
+            return services.AddGotenbergSharpClient((sp, client) =>
+            {
+                var ops = GetOptions(sp);
+                client.Timeout = ops.TimeOut;
+                client.BaseAddress = ops.ServiceUrl;
+            });
         }
 
 
@@ -43,6 +36,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services,
             Action<IServiceProvider, HttpClient> configureClient)
         {
+            if (configureClient == null) throw new ArgumentNullException(nameof(configureClient));
+
             return services.AddHttpClient(nameof(GotenbergSharpClient), configureClient)
                 .AddTypedClient<GotenbergSharpClient>()
                 .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(new HttpClientHandler
