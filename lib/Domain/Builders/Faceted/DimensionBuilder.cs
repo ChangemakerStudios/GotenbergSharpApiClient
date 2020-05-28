@@ -39,17 +39,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
-       /// <summary>
-       /// Scale values less than 0.1 or greater than 2.0 are invalid
-       /// </summary>
-       /// <param name="scale"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Scale values less than 0.1 or greater than 2.0 are invalid
+        /// </summary>
+        /// <param name="scale"></param>
+        /// <returns></returns>
         [PublicAPI]
         public DimensionBuilder SetScale(double scale)
         {
             // ReSharper disable once ComplexConditionExpression
-            if (scale < 0.1 || scale > 2.0 )
-                throw new ArgumentOutOfRangeException(nameof(scale), "Invalid scale.  Valid range is from 0.1 to 2.0 (1% through 200%)");
+            if (scale < 0.1 || scale > 2.0)
+                throw new ArgumentOutOfRangeException(nameof(scale),
+                    "Invalid scale.  Valid range is from 0.1 to 2.0 (1% through 200%)");
             this.Request.Dimensions.Scale = scale;
 
             return this;

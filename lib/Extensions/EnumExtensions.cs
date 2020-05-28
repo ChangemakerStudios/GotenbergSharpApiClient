@@ -47,6 +47,5 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             (PaperSizes.Legal, (Width: 8.5, Height: 14.0)),
             (PaperSizes.Tabloid, (Width: 11.0, Height: 17.0))
         };
-
     }
 }

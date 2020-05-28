@@ -20,7 +20,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-
         [PublicAPI]
         public static IHttpClientBuilder AddGotenbergSharpClient(this IServiceCollection services)
         {

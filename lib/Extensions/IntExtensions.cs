@@ -26,7 +26,5 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 
             return $"{new string('Z', sortNumber / AlphabetLength)}{Alphabet[sortNumber % AlphabetLength]}{extension}";
         }
-
-       
     }
 }
