@@ -11,6 +11,24 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class EnumExtensions
     {
+        public static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
+        {
+            if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
+                throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
+            if (selectedSize == PaperSizes.None)
+                throw new InvalidOperationException(nameof(selectedSize));
+
+            return PaperSizer.First(s => s.Size == selectedSize).Value;
+        }
+
+        public static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(this Margins selected)
+        {
+            if (!Enum.IsDefined(typeof(Margins), selected))
+                throw new InvalidEnumArgumentException(nameof(selected), (int) selected, typeof(PaperSizes));
+
+            return MarginSizer.First(m => m.MarginType == selected).Value;
+        }
+
         static readonly IEnumerable<(Margins MarginType,
             (double Left, double Right, double Top, double Bottom) Value)> MarginSizer = new[]
         {
@@ -30,22 +48,5 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             (PaperSizes.Tabloid, (Width: 11.0, Height: 17.0))
         };
 
-        public static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
-        {
-            if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
-                throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
-            if (selectedSize == PaperSizes.None)
-                throw new InvalidOperationException(nameof(selectedSize));
-
-            return PaperSizer.First(s => s.Size == selectedSize).Value;
-        }
-
-        public static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(this Margins selected)
-        {
-            if (!Enum.IsDefined(typeof(Margins), selected))
-                throw new InvalidEnumArgumentException(nameof(selected), (int) selected, typeof(PaperSizes));
-
-            return MarginSizer.First(m => m.MarginType == selected).Value;
-        }
     }
 }

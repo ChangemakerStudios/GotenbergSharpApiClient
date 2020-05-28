@@ -107,8 +107,7 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="cancelToken"></param>
         /// <remarks>
         ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
-        ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf
-        ///     containing the text. {"message":"Not Found"}. Such responses throw an error that has the content of the response file, etc.
+        ///    via the DISABLE_UNOCONV: '1' Environment variable. 
         /// </remarks>
         [PublicAPI]
         public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)

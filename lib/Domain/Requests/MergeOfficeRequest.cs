@@ -20,8 +20,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Assets.FilterOutNonOfficeDocs()
-                .ToAlphabeticalMergeOrderByIndex()
+            return this.Assets.RemoveInvalidOfficeDocs()
+                .ToAlphabeticalOrderByIndex()
                 .Where(item => item.Value != null)
                 .Select(item => new { Asset = item, MediaType = _resolveContentType.GetContentType(item.Key) })
                 .Where(item => item.MediaType.IsSet())

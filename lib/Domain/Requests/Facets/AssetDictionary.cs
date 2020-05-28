@@ -23,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
             var pairs = items as KeyValuePair<string, ContentItem>[] ?? items.ToArray();
             if (pairs.Any(item => item.Key.IsNotSet()))
-                throw new ArgumentException("One or more of the item keys are null or empty");
+                throw new ArgumentException("One or more asset file names are null or empty");
 
             foreach (var item in pairs)
             {

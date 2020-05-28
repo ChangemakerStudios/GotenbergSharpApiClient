@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class IntExtensions
@@ -21,16 +19,14 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <param name="sortNumber"></param>
         /// <param name="extension"></param>
         /// <returns></returns>
-        [UsedImplicitly]
         public static string ToAlphabeticallySortableFileName(this int sortNumber, string extension)
         {
             if (sortNumber < 0) throw new ArgumentOutOfRangeException(nameof(sortNumber));
             if (extension.IsNotSet()) throw new ArgumentException("extension is either null or empty");
 
-            var startsWithDot = extension.StartsWith(".", StringComparison.InvariantCultureIgnoreCase);
-            extension = startsWithDot ? extension : ".pdf";
-
             return $"{new string('Z', sortNumber / AlphabetLength)}{Alphabet[sortNumber % AlphabetLength]}{extension}";
         }
+
+       
     }
 }
