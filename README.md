@@ -147,8 +147,45 @@ public async Task<Stream> CreateFromMarkdown()
 	return await sharpClient.HtmlToPdfAsync(request);
 }
 ```
-## Webhooks
-*All requests support webhooks*
+## Webhook
+*All request types support webhooks*
+
+```csharp
+ public async Task SendUrlToWebhookEndpoint(string headerPath, string footerPath)
+ {
+     var builder = new UrlRequestBuilder()
+         .SetUrl("https://www.cnn.com")
+         .ConfigureRequest(reqBuilder =>
+         {
+             reqBuilder.AddWebhook(hook =>
+                 {
+                     hook.SetTimeout(20)
+                         .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
+                         .AddRequestHeader("custom-header", "value");
+                 })
+                 .PageRanges("1-2")
+                 .ChromeRpccBufferSize(1048576);
+         })
+         .AddAsyncHeaderFooter(async
+             docBuilder => docBuilder.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
+                 .SetFooter(await System.IO.File.ReadAllBytesAsync(footerPath))
+         ).WithDimensions(dimBuilder =>
+         {
+             dimBuilder.SetPaperSize(PaperSizes.A4)
+                 .SetMargins(Margins.None)
+                 .SetScale(.90)
+                 .LandScape();
+         });
+
+     var request = await builder.BuildAsync();
+
+     await new sharpClient.FireWebhookAndForgetAsync(request);
+ }
+
+```
+## Merge 15 Urls to one pdf
+*Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
+
 ```csharp
 public async Task<Stream> CreateWorldNewsSummary()
 {
@@ -203,10 +240,11 @@ async Task<Stream> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
     var results = await Task.WhenAll(tasks);
 
     var mergeBuilder = new MergeBuilder()
-        .WithAssets(b => { b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r))); })
-        .ConfigureRequest(b => b.TimeOut(1799));
+        .WithAssets(b => 
+			{ b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r))); }
+		).ConfigureRequest(b => b.TimeOut(1799));
 
     var request = mergeBuilder.Build();
     return await sharpClient.MergePdfsAsync(request);
 }
-```
+``` 
