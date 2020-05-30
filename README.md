@@ -150,36 +150,37 @@ public async Task<Stream> CreateFromMarkdown()
 ## Webhooks
 *All requests support webhooks*
 ```csharp
-public async Task SendUrlToWebhookEndpoint(string headerPath, string footerPath)
-{
-	var builder = new UrlRequestBuilder()
-		.SetUrl("https://www.cnn.com")
-		.ConfigureRequest(b =>
-		{
-			b.AddWebhook(hook =>
-			{
-				hook.SetTimeout(20)
-					.SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
-					.AddRequestHeader("custom-header", "value");
-			})
-			.PageRanges("1-2")
-			.ChromeRpccBufferSize(1048576);
-		})
-		.AddAsyncHeaderFooter(async
-			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))
-				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
-		)).WithDimensions(b =>
-		{
-			b.SetPaperSize(PaperSizes.A4)
-			 .SetMargins(Margins.None)
-			 .SetScale(.90)
-			 .LandScape();
-		});
+ public async Task SendUrlToWebhookEndpoint(string headerPath, string footerPath)
+ {
+     var builder = new UrlRequestBuilder()
+         .SetUrl("https://www.cnn.com")
+         .ConfigureRequest(b =>
+         {
+             b.AddWebhook(hook =>
+                 {
+                     hook.SetTimeout(20)
+                         .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
+                         .AddRequestHeader("custom-header", "value");
+                 })
+                 .PageRanges("1-2")
+                 .ChromeRpccBufferSize(1048576);
+         })
+         .AddAsyncHeaderFooter(async
+             b => b.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
+                 .SetFooter(await System.IO.File.ReadAllBytesAsync(footerPath))
+         ).WithDimensions(b =>
+         {
+             b.SetPaperSize(PaperSizes.A4)
+                 .SetMargins(Margins.None)
+                 .SetScale(.90)
+                 .LandScape();
+         });
 
-	var request = await builder.BuildAsync();
-	
-	await sharpClient.FireWebhookAndForgetAsync(request);
-}
+     var request = await builder.BuildAsync();
+
+     await new sharpClient.FireWebhookAndForgetAsync(request);
+ }
+
 
 ```
 ## Merge 15 Urls to one pdf
