@@ -17,7 +17,7 @@ async Task Main()
 
 public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 {
-	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/", "https://www.csmonitor.com",
+	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/","https://www.cnn.com",  "https://www.csmonitor.com",
 		"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com",
 		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk",
 		"https://english.elpais.com/", 	"https://www.thehindu.com", "https://www.theaustralian.com.au",

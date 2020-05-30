@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain
+namespace Gotenberg.Sharp.API.Client.Domain.Settings
 {
     public class RetryOptions
     {
@@ -10,6 +10,10 @@ namespace Gotenberg.Sharp.API.Client.Domain
         [UsedImplicitly]
         public int RetryCount { get; set; } = 3;
 
+        /// <summary>
+        ///  Configures the sleep duration provider with an exponential wait time backoff between retries. Based on the current retry attempt.
+        ///  E.G. sleepDurationProvider: retryCount => TimeSpan.FromSeconds(Math.Pow(retryOps.BackoffPower, retryCount))
+        /// </summary>
         [UsedImplicitly]
         public double BackoffPower { get; set; } = 1.5;
 

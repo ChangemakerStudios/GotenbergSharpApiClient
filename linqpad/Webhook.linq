@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>System.Threading.Tasks</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
@@ -8,6 +8,8 @@
 
 async Task Main()
 {
+	//For this to work you need an api running on localhost:5000 w/ an endpoint to receive the webhook
+	
 	var destinationPath = @"D:\Gotenberg\Dumps\FromWebhook";
 	var footerPath = @"D:\Gotenberg\Resources\Html\UrlHeader.html";
 	var headerPath =@"D:\Gotenberg\Resources\Html\UrlFooter.html";
@@ -26,7 +28,7 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 		{
 			b.AddWebhook(hook =>
 			{
-				hook.SetUrl("http://host.docker.internal:5000/api/gotenberg/webhookReceive")
+				hook.SetUrl("http://host.docker.internal:5000/api/WebhookReceiver")
 					.SetTimeout(20)
 					.AddRequestHeader("custom-header", "value");
 			}).ChromeRpccBufferSize(1024);
