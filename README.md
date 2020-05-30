@@ -150,102 +150,63 @@ public async Task<Stream> CreateFromMarkdown()
 ## Webhooks
 *All requests support webhooks*
 ```csharp
- public async Task SendUrlToWebhookEndpoint(string headerPath, string footerPath)
- {
-     var builder = new UrlRequestBuilder()
-         .SetUrl("https://www.cnn.com")
-         .ConfigureRequest(b =>
-         {
-             b.AddWebhook(hook =>
-                 {
-                     hook.SetTimeout(20)
-                         .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
-                         .AddRequestHeader("custom-header", "value");
-                 })
-                 .PageRanges("1-2")
-                 .ChromeRpccBufferSize(1048576);
-         })
-         .AddAsyncHeaderFooter(async
-             b => b.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
-                 .SetFooter(await System.IO.File.ReadAllBytesAsync(footerPath))
-         ).WithDimensions(b =>
-         {
-             b.SetPaperSize(PaperSizes.A4)
-                 .SetMargins(Margins.None)
-                 .SetScale(.90)
-                 .LandScape();
-         });
-
-     var request = await builder.BuildAsync();
-
-     await new sharpClient.FireWebhookAndForgetAsync(request);
- }
-
-
-```
-## Merge 15 Urls to one pdf
-*Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
-
-```csharp
 public async Task<Stream> CreateWorldNewsSummary()
 {
-	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/", "https://www.csmonitor.com",
-		"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com", 
-		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk", 
-		"https://www.thehindu.com", "https://www.theaustralian.com.au", 
-		"https://www.welt.de", "https://www.cankaoxiaoxi.com", 
-		"https://www.novinky.cz","https://www.elobservador.com.uy"}
-		.Select(u => new Uri(u));
+    var sites = new[]
+        {
+            "https://www.nytimes.com", "https://www.axios.com/", "https://www.csmonitor.com",
+            "https://www.wsj.com", "https://www.usatoday.com", "https://www.irishtimes.com",
+            "https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk",
+            "https://www.thehindu.com", "https://www.theaustralian.com.au",
+            "https://www.welt.de", "https://www.cankaoxiaoxi.com",
+            "https://www.novinky.cz", "https://www.elobservador.com.uy"
+        }
+        .Select(u => new Uri(u));
 
-	var builders = CreateBuilders(sites);
-	var requests = builders.Select(b => b.Build());
+    var builders = CreateBuilders(sites);
+    var requests = builders.Select(b => b.Build());
 
-	return await ExecuteRequestsAndMerge(requests);
+    return await ExecuteRequestsAndMerge(requests);
 }
 
 IEnumerable<UrlRequestBuilder> CreateBuilders(IEnumerable<Uri> uris)
 {
-	foreach (var uri in uris)
-	{
-		yield return new UrlRequestBuilder()
-			.SetUrl(uri)
-			.SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
-			.ConfigureRequest(b =>
-			{
-			    b.PageRanges("1-2");
-			}).AddHeaderFooter(b =>
-			{
-				b.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
-				 .SetFooter(GetHeadFoot(uri.ToString()));
-			} )
-			.WithDimensions(b =>
-			{
-				b.UseChromeDefaults()
-				.SetScale(.90)
-				.LandScape()
-				.MarginLeft(.5)
-				.MarginRight(.5);
-			});
-	}
+    foreach (var uri in uris)
+    {
+        yield return new UrlRequestBuilder()
+            .SetUrl(uri)
+            .SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
+            .ConfigureRequest(req => { req.PageRanges("1-2"); })
+            .AddHeaderFooter(docBuilder =>
+            {
+                docBuilder.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
+                   .SetFooter(GetHeadFoot(uri.ToString()));
+            })
+            .WithDimensions(dimBuilder =>
+            {
+                dimBuilder.UseChromeDefaults()
+                    .SetScale(.90)
+                    .LandScape()
+                    .MarginLeft(.5)
+                    .MarginRight(.5);
+            });
+    }
 
-	static string GetHeadFoot(string heading)
-		=> "<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>" + heading + "</h1></body></html>";
+    static string GetHeadFoot(string heading)
+        => "<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>" +
+           heading + "</h1></body></html>";
 }
 
 async Task<Stream> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
-	
-	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r));
-	var results = await Task.WhenAll(tasks);
+    var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r));
+    var results = await Task.WhenAll(tasks);
 
-	var mergeBuilder = new MergeBuilder()
-		.WithAssets(b => {
-		    b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)));
-		})
-		.ConfigureRequest(b=> b.TimeOut(1799));
-	
-	var request = mergeBuilder.Build();
-	return await sharpClient.MergePdfsAsync(request);
+    var mergeBuilder = new MergeBuilder()
+        .WithAssets(b => { b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r))); })
+        .ConfigureRequest(b => b.TimeOut(1799));
+
+    var request = mergeBuilder.Build();
+    return await sharpClient.MergePdfsAsync(request);
 }
 ```
