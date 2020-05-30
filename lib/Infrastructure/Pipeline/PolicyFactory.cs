@@ -19,9 +19,9 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
     public static class PolicyFactory
     {
-     
         [NotNull]
-        public static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(IServiceProvider sp, HttpRequestMessage request)
+        public static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(IServiceProvider sp,
+            HttpRequestMessage request)
         {
             Contract.Ensures(Contract.Result<IAsyncPolicy<HttpResponseMessage>>() != null);
 
@@ -44,13 +44,12 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
                         logger?.LogWarning(
                             "{name} delaying for {delay} ms, then making retry # {retry} of {retryAttempts}. Retry reason: '{reason}'",
                             context.PolicyKey, delay.TotalMilliseconds, retryCount, retryOps.RetryCount,
-                            outcome?.Exception?.Message ?? "No exception message");
+                            outcome?.Exception?.Message ?? "No exception, check the gotenberg container logs for errors");
                     })
                 .WithPolicyKey(nameof(GotenbergSharpClient));
         }
 
         static RetryOptions GetRetryOptions(IServiceProvider sp) =>
-            sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value?.RetryPolicy
-            ?? throw new InvalidOperationException("GotenbergSharpClientOptions has no RetryPolicy configured");
+            sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value?.RetryPolicy;
     }
 }

@@ -41,8 +41,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         }
 
         static GotenbergSharpClientOptions GetOptions(IServiceProvider sp) =>
-            sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value
-            ?? throw new InvalidOperationException(
-                "Invalid GotenbergSharpClientOptions. Not added to service collection or incorrect formatting in appSettings.");
+            sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value;
+
     }
 }

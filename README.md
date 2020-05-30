@@ -2,46 +2,79 @@
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh/branch/master?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient/branch/master)
 
-.NET C# Client for interacting with the [Gotenberg](https://thecodingmachine.github.io/gotenberg) micro-service's API, version 6.x.
-[Gotenberg](https://github.com/thecodingmachine/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/thecodingmachine/gotenberg) for converting HTML, Markdown and Office documents to PDF.
+.NET C# Client for interacting with the [Gotenberg](https://thecodingmachine.github.io/gotenberg) micro-service's API. [Gotenberg](https://github.com/thecodingmachine/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/thecodingmachine/gotenberg) for converting & merging HTML, Markdown and Office documents to PDF.
 
-## Getting started
-*Install the Gotenberg.Sharp.Api.Client package from Visual Studio's NuGet console:*
-
+# Getting Started
+*Pull the image from dockerhub.com*
 ```powershell
-PM> Install-Package Gotenberg.Sharp.Api.Client
+> docker pull thecodingmachine/gotenberg:latest
 ```
-
-*Start up Gotenberg Docker Instance:*
-
+*Create & start a container*
 ```powershell
 docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
 ```
-# Usage
-*Complete examples are found in the [linqPad folder](linqpad/)*
+# .NET Core Project Setup
+*Install nuget package into your project*
+```powershell
+PM> Install-Package Gotenberg.Sharp.Api.Client
+```
+## AppSettings
+```json
+  "GotenbergSharpClient": {
+    "ServiceUrl": "http://localhost:3000",
+    "HealthCheckUrl": "http://localhost:3000/ping",
+    "RetryPolicy": {
+      "Enabled": true,
+      "RetryCount": 4,
+      "BackoffPower": 1.5,
+      "LoggingEnabled": true
+    }
+  }
+```
 
-## Html To Pdf
-*Html to pdf with embedded assets:*
+## Configure Services In Startup.cs
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+	.....
+    services.AddOptions<GotenbergSharpClientOptions>()
+	        .Bind(Configuration.GetSection("GotenbergSharpClient"));
+    services.AddGotenbergSharpClient();
+	.....    
+}
+
+```
+# Using GotenbergSharpClient
+*See the [linqPad folder](linqpad/)* for complete examples
+
+## Html To Pdf 
+*With embedded assets:*
 
 ```csharp
-public async Task<Stream> CreateFromHtml()
-{
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+ [HttpGet]
+ public async Task<ActionResult> HtmlToPdf([FromServices] GotenbergSharpClient sharpClient)
+ {
+     var builder = new HtmlRequestBuilder()
+         .AddDocument(doc => 
+             doc.SetBody(GetBody()).SetFooter(GetFooter())
+         ).WithDimensions(dims =>
+         {
+             dims.SetPaperSize(PaperSizes.A3)
+                 .SetMargins(Margins.None)
+                 .SetScale(.99);
+         }).WithAsyncAssets(async assets => assets.AddItem("some-image.jpg", await GetImageBytes()))
+         .ConfigureRequest(config =>
+         {
+             config.ChromeRpccBufferSize(1024)
+                 .PageRanges("1");
+         });
 
-	var builder = new HtmlRequestBuilder()
-		.AddDocument( 
-			b => b.SetBody(GetBody())
-			      .SetFooter(GetFooter())
-		).WithDimensions(b =>
-		{
-			b.UseChromeDefaults().LandScape().SetScale(.75);
-		}).WithAsyncAssets(async
-			b => b.AddItem("ear-on-beach.jpg", await GetImageBytes())
-		).ConfigureRequest(b => { b.ChromeRpccBufferSize(1024);	});
+     var req = await builder.BuildAsync();
 
-	var request = await builder.BuildAsync();
-	return await sharpClient.HtmlToPdfAsync(request);
-}
+     var result = await sharpClient.HtmlToPdfAsync(req);
+
+     return this.File(result, "application/pdf", "gotenbergFromHtml.pdf");
+ }
 ```
 
 ## Url To Pdf
@@ -50,8 +83,6 @@ public async Task<Stream> CreateFromHtml()
 ```csharp
 public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
-
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
 		.ConfigureRequest(b =>
@@ -79,17 +110,15 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 ```csharp
 public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 {
-	var client = new GotenbergSharpClient("http://localhost:3000");
-
 	var builder = new MergeOfficeBuilder()
-			.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
-			.ConfigureRequest(b =>
-			{
-				b.TimeOut(100);
-			});
+		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
+		.ConfigureRequest(b =>
+		{
+			b.TimeOut(100);
+		});
 
 	var request = await builder.BuildAsync();
-	return await client.MergeOfficeDocsAsync(request);
+	return await sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
 ## Markdown to Pdf
@@ -98,8 +127,6 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 ```csharp
 public async Task<Stream> CreateFromMarkdown()
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
-
 	var builder = new HtmlRequestBuilder()
 		.AddAsyncDocument(async
 			b => b.SetHeader(await this.GetHeaderAsync())
@@ -113,8 +140,7 @@ public async Task<Stream> CreateFromMarkdown()
 			b => b.AddItems(await GetMarkdownAssets())
 		).ConfigureRequest(b =>
 		{
-			b.ChromeRpccBufferSize(1048555)
-			 .ResultFileName("hello.pdf");
+			b.ChromeRpccBufferSize(1048555);
 		});
 
 	var request = await builder.BuildAsync();
@@ -126,8 +152,6 @@ public async Task<Stream> CreateFromMarkdown()
 ```csharp
 public async Task SendUrlToWebhookEndpoint(string headerPath, string footerPath)
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
-
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
 		.ConfigureRequest(b =>
