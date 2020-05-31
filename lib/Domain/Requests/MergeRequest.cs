@@ -1,56 +1,39 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    /// <summary>
-    /// A request to merge the specified items into one pdf file
-    /// </summary>
-    public sealed class MergeRequest : IMergeRequest
+    public sealed class MergeRequest : RequestBase
     {
-        
-        /// <summary>
-        /// Gets the request configuration containing fields that all Gotenberg endpoints accept
-        /// </summary>
-        // ReSharper disable once MemberCanBeProtected.Global
-        public RequestConfig Config { get; set; } = new RequestConfig();
+        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergePdf;
 
-        /// <summary>
-        /// Key = file name; value = the document content
-        /// </summary>
-        public Dictionary<string, ContentItem> Items { get; set; }
+        public int Count => this.Assets.IfNullEmpty().Count;
 
-        /// <summary>
-        /// Gets the count of items
-        /// </summary>
-        public int Count => this.Items?.Count ?? 0;
-
-        /// <summary>
-        /// Transforms the merge items to http content items
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<HttpContent> ToHttpContent()
+        public override IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Items.Where(_ => _.Value != null)
-                .Select(_ =>
+            return this.Assets.ToAlphabeticalOrderByIndex()
+                .Where(item => item.Key.IsSet() && item.Value != null)
+                .Select(item =>
                 {
-                    var item = _.Value.ToHttpContentItem();
-                    
-                    item.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.Http.Disposition.Types.FormData) {
-                        Name = Constants.Gotenberg.FormFieldNames.Files,
-                        FileName = _.Key
-                    };
+                    var contentItem = item.Value.ToHttpContentItem();
 
-                    item.Headers.ContentType = new MediaTypeHeaderValue(Constants.Http.MediaTypes.ApplicationPdf);
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                        {
+                            Name = Constants.Gotenberg.FormFieldNames.Files,
+                            FileName = item.Key
+                        };
 
-                    return item;
-                    
-                }).Concat(Config.ToHttpContent());
+                    contentItem.Headers.ContentType =
+                        new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+
+                    return contentItem;
+                }).Concat(Config.IfNullEmptyContent());
         }
     }
 }

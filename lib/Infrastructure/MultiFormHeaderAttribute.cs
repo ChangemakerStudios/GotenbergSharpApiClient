@@ -1,13 +1,7 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class MultiFormHeaderAttribute : Attribute
     {
@@ -18,10 +12,11 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         /// <param name="name">The name.</param>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="mediaType">The media type</param>
-        public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files, 
-                                        string fileName = null, 
-                                        string contentDisposition = Constants.Http.Disposition.Types.FormData,
-                                        string mediaType = Constants.Http.MediaTypes.TextHtml)
+        // ReSharper disable once TooManyDependencies
+        public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files,
+            string fileName = null,
+            string contentDisposition = Constants.HttpContent.Disposition.Types.FormData,
+            string mediaType = Constants.HttpContent.MediaTypes.TextHtml)
         {
             Name = name;
             FileName = fileName;
@@ -35,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         /// <value>
         /// The content disposition.
         /// </value>
-        public string ContentDisposition {get;}
+        public string ContentDisposition { get; }
 
         /// <summary>
         /// Gets or sets the name.
@@ -43,14 +38,15 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         /// <value>
         /// The name.
         /// </value>
-        public string Name {get;}
+        public string Name { get; }
+
         /// <summary>
         /// Gets or sets the name of the file.
         /// </summary>
         /// <value>
         /// The name of the file.
         /// </value>
-        public string FileName {get;}
+        public string FileName { get; }
 
         /// <summary>
         /// Gets the type of the media.

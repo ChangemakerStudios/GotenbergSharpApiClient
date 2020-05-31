@@ -1,27 +1,27 @@
-﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gotenberg.Sharp.API.Client.Extensions;
+
 using JetBrains.Annotations;
+
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <seealso cref="System.Net.Http.DelegatingHandler" />
     [UsedImplicitly]
-    public class TimeoutHandler : DelegatingHandler
+    [SuppressMessage("ReSharper", "CA2000")]
+    // ReSharper disable once HollowTypeName
+    public sealed class TimeoutHandler : DelegatingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimeoutHandler"/> class.
         /// </summary>
         /// <param name="innerHandler">The inner handler which is responsible for processing the HTTP response messages.</param>
         public TimeoutHandler(HttpMessageHandler innerHandler = null)
-                : base(innerHandler ?? new HttpClientHandler())
+            : base(innerHandler ?? new HttpClientHandler())
         {
         }
 
@@ -41,13 +41,14 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
         /// <param name="cancellationToken">The cancel token.</param>
         /// <returns></returns>
         /// <exception cref="TimeoutException">Request Timeout</exception>
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
             using var cts = GetCancelTokenSource(request, cancellationToken);
 
             try
             {
-                return await base.SendAsync(request, cts?.Token ?? cancellationToken);
+                return await base.SendAsync(request, cts?.Token ?? cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
             {
@@ -56,7 +57,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
         }
 
         CancellationTokenSource GetCancelTokenSource(HttpRequestMessage request,
-                                                     CancellationToken cancelToken)
+            CancellationToken cancelToken)
         {
             var timeout = request.GetTimeout() ?? DefaultTimeout;
             if (timeout == Timeout.InfiniteTimeSpan) return null;

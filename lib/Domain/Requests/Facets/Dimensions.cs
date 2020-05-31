@@ -1,14 +1,15 @@
-﻿// CaptiveAire.Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     /// <summary>
     ///  Represents the dimensions of the pdf document
@@ -16,9 +17,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <remarks>
     ///     Paper size and margins have to be provided in inches. Same for margins.
     ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
+    ///     Paper sizes: https://www.prepressure.com/library/paper-size  
     /// </remarks>
-    public sealed class DocumentDimensions : IConvertToHttpContent
+    public sealed class Dimensions : IConvertToHttpContent
     {
+        // ReSharper disable once InconsistentNaming
         static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
         #region Properties
@@ -28,7 +31,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Scale)]
         public double Scale { [UsedImplicitly] get; set; } = 1.0;
-        
+
         /// <summary>
         /// Gets or sets the width of the paper.
         /// </summary>
@@ -74,7 +77,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// The margin left.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginLeft)]
-        public double MarginLeft  { [UsedImplicitly] get; set; }
+        public double MarginLeft { [UsedImplicitly] get; set; }
 
 
         /// <summary>
@@ -88,52 +91,60 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="DocumentDimensions"/> is landscape.
+        /// Gets or sets a value indicating whether this <see cref="Dimensions"/> is landscape.
         /// </summary>
         /// <value>
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Landscape)]
         public bool Landscape { [UsedImplicitly] get; set; }
-        
+
         #endregion
 
         #region public methods
-  
+
+        [PublicAPI]
+        public static Dimensions ToA4WithNoMargins()
+        {
+            return new Dimensions
+            {
+                PaperWidth = 8.27,
+                PaperHeight = 11.7
+            };
+        }
+
         /// <summary>
         ///     Default Google Chrome printer options
         /// </summary>
         /// <remarks>
-        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/7e69ec4367069df52bb61c9ee0dce241b043a257/internal/pkg/printer/chrome.go#L47
+        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/master/internal/pkg/printer/chrome.go#L53
         /// </remarks>
         /// <returns></returns>
-        public static DocumentDimensions ToChromeDefaults()
+        [PublicAPI]
+        public static Dimensions ToChromeDefaults()
         {
-            return new DocumentDimensions { 
-                PaperWidth = 8.27, 
+            return new Dimensions
+            {
+                PaperWidth = 8.27,
                 PaperHeight = 11.7,
-                Landscape = false,
                 MarginTop = 1,
                 MarginBottom = 1,
                 MarginLeft = 1,
                 MarginRight = 1
             };
         }
-        
+
         /// <summary>
         /// Defaults used for deliverables
         /// </summary>
         /// <returns></returns>
-        public static DocumentDimensions ToDeliverableDefault()
+        public static Dimensions ToDeliverableDefault()
         {
-            return new DocumentDimensions { 
-                PaperWidth = 8.26, 
+            return new Dimensions
+            {
+                PaperWidth = 8.26,
                 PaperHeight = 11.69,
-                Landscape = false,
-                MarginTop = 0,
-                MarginBottom = .5,  
-                MarginLeft = 0,
-                MarginRight = 0
+                MarginBottom = .5 //Smallest value to get footer to show up is .38
             };
         }
 
@@ -142,24 +153,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// </summary>
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
-        {   
+        {
             return this.GetType().GetProperties()
                 .Where(prop => Attribute.IsDefined(prop, _attributeType))
-                .Select(p=> new { Prop = p, Attrib = (MultiFormHeaderAttribute)Attribute.GetCustomAttribute(p, _attributeType) })
-                .Select(_ =>
+                .Select(p => new
+                    { Prop = p, Attrib = (MultiFormHeaderAttribute) Attribute.GetCustomAttribute(p, _attributeType) })
+                .Select(item =>
                 {
-                    var value =  _.Prop.GetValue(this);
+                    var value = item.Prop.GetValue(this);
 
                     if (value == null) return null;
 
-                    var contentItem =new StringContent(value.ToString());
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(_.Attrib.ContentDisposition) { Name = _.Attrib.Name  };
+                    var contentItem = new StringContent(value.ToString());
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
 
                     return contentItem;
-                }).Where(item=> item != null);
+                }).WhereNotNull();
         }
-        
+
         #endregion
-        
     }
 }

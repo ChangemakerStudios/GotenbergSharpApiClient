@@ -10,16 +10,21 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class MergeBuilder : BaseBuilder<MergeRequest>
+    /// <remarks>
+    ///     Any non office files sent in are just ignored.
+    ///     A nice surprise: Gotenberg/Chrome will merge in all sheets within a multi-sheet excel workbook.
+    ///     If you send in a csv file but with an xlsx extension, it will merge it in as text.
+    /// </remarks>
+    public sealed class MergeOfficeBuilder : BaseBuilder<MergeOfficeRequest>
     {
         readonly List<Task> _asyncTasks = new List<Task>();
 
-        public MergeBuilder() => this.Request = new MergeRequest();
+        public MergeOfficeBuilder() => this.Request = new MergeOfficeRequest();
 
-        protected override MergeRequest Request { get; set; }
+        protected override MergeOfficeRequest Request { get; set; }
 
         [PublicAPI]
-        public MergeBuilder WithAssets(Action<AssetBuilder> action)
+        public MergeOfficeBuilder WithAssets(Action<AssetBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
             action(new AssetBuilder(this.Request));
@@ -27,7 +32,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public MergeBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
+        public MergeOfficeBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
         {
             if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
             this._asyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));
@@ -35,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public MergeBuilder ConfigureRequest(Action<ConfigBuilder> action)
+        public MergeOfficeBuilder ConfigureRequest(Action<ConfigBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
             action(new ConfigBuilder(this.Request));
@@ -43,7 +48,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public MergeRequest Build()
+        public MergeOfficeRequest Build()
         {
             if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (Request.Count == 0) throw new InvalidOperationException("There are no items to merge");
@@ -52,7 +57,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
 
         [PublicAPI]
-        public async Task<MergeRequest> BuildAsync()
+        public async Task<MergeOfficeRequest> BuildAsync()
         {
             if (_asyncTasks.Any())
             {

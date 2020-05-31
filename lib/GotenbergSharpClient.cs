@@ -1,16 +1,18 @@
-﻿// Gotenberg.Sharp.API.Client - Copyright (c) 2019 CaptiveAire
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using JetBrains.Annotations;
+
 using Microsoft.Net.Http.Headers;
+
 
 namespace Gotenberg.Sharp.API.Client
 {
@@ -27,20 +29,17 @@ namespace Gotenberg.Sharp.API.Client
     ///     https://github.com/thecodingmachine/gotenberg-php-client
     ///     https://github.com/yumauri/gotenberg-js-client
     /// </remarks>
-    [PublicAPI]
-    public class GotenbergSharpClient
+    public sealed class GotenbergSharpClient
     {
         readonly HttpClient _innerClient;
 
         #region ctors
 
-        /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(string address)
             : this(new Uri(address))
         {
         }
 
-        /// Use this one for demos/test but in an app use the ctor that accepts an instance of http client
         public GotenbergSharpClient(Uri address)
             : this(new HttpClient { BaseAddress = address })
         {
@@ -57,10 +56,12 @@ namespace Gotenberg.Sharp.API.Client
 
             if (this._innerClient.BaseAddress == null)
             {
-                throw new ArgumentNullException(nameof(innerClient.BaseAddress), "You must set the inner client's base address");
+                throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
             }
 
-            this._innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
         }
 
         #endregion
@@ -73,11 +74,10 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-     
         [PublicAPI]
-        public async Task<Stream> UrlToPdf(UrlRequest request, CancellationToken cancelToken = default)
-            => await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.UrlConvert, cancelToken, request.RemoteUrlHeader).ConfigureAwait(false);
-        
+        public Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
+
         /// <summary>
         ///    Converts the specified request to a PDF document.
         /// </summary>
@@ -86,8 +86,8 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> HtmlToPdfAsync(IConversionRequest request, CancellationToken cancelToken = default)  
-            =>  await ExecuteRequest(request, Constants.Gotenberg.ApiPaths.ConvertHtml, cancelToken).ConfigureAwait(false);
+        public Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
         /// Merges items specified by the request
@@ -97,67 +97,59 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public async Task<Stream> MergePdfsAsync(IMergeRequest request, CancellationToken cancelToken = default)  
-        {
-            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergePdf, cancelToken).ConfigureAwait(false);
-        }
+        public Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
         ///     Converts one or more office documents into one merged pdf.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         /// <remarks>
         ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
-        ///    via the DISABLE_UNOCONV: '1' Environment variable.  The API returns a 400 response with a 1KB pdf containing the text. {"message":"Not Found"}
+        ///    via the DISABLE_UNOCONV: '1' Environment variable. 
         /// </remarks>
         [PublicAPI]
-        public async Task<Stream> MergeOfficeDocsAsync(IMergeRequest request, CancellationToken cancelToken = default)
-        {
-            return await ExecuteMergeAsync(request, Constants.Gotenberg.ApiPaths.MergeOffice, cancelToken).ConfigureAwait(false);
-        }
-   
-        #endregion
-       
-        #region exec
+        public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
 
-        async Task<Stream> ExecuteRequest(IConvertToHttpContent request, string apiPath, CancellationToken cancelToken = default, KeyValuePair<string,string> remoteUrlHeader = default)
-        {
-            using var formContent = new MultipartFormDataContent($"{Constants.Http.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
-            
-            foreach (var item in request.ToHttpContent())
-            {
-                formContent.Add(item);
-            }
-            
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, apiPath)
-            {
-                Content = formContent 
-            };
-
-            if (remoteUrlHeader.Key.IsSet())
-            {
-                var name = $"{Constants.Gotenberg.CustomRemoteHeaders.RemoteUrlKeyPrefix}{remoteUrlHeader.Key.Trim()}";
-                requestMessage.Headers.Add(name, remoteUrlHeader.Value);
-            }
-            
-            var response = await this._innerClient
-                .SendAsync(requestMessage, HttpCompletionOption.ResponseContentRead, cancelToken)
-                .ConfigureAwait(false);
-         
-            cancelToken.ThrowIfCancellationRequested();
-                
-            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        }
-        
-        async Task<Stream> ExecuteMergeAsync(IMergeRequest request, string mergePath, CancellationToken cancelToken = default)  
+        [PublicAPI]
+        public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            if (request.Count == 0) throw new ArgumentException(nameof(request));
+            if (!request.IsWebhookRequest)
+                throw new InvalidOperationException("Only call this for webhook configured requests");
 
-            return await ExecuteRequest(request, mergePath, cancelToken).ConfigureAwait(false);
+            using var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+        }
+
+        #endregion
+
+        #region exec
+
+        async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        }
+
+        async Task<HttpResponseMessage> SendRequest(IApiRequest request, HttpCompletionOption option,
+            CancellationToken cancelToken)
+        {
+            using var message = request.ToApiRequestMessage();
+
+            var response = await this._innerClient
+                .SendAsync(message, option, cancelToken)
+                .ConfigureAwait(false);
+
+            cancelToken.ThrowIfCancellationRequested();
+
+            if (response.IsSuccessStatusCode)
+                return response;
+
+            throw GotenbergApiException.Create(request, response);
         }
 
         #endregion
