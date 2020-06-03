@@ -1,4 +1,4 @@
-version: 1.0-alpha-000{build}
+version: 1.0.{build}-alpha
 
 image: Visual Studio 2019
 
