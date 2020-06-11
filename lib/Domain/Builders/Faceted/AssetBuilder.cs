@@ -37,13 +37,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public AssetBuilder AddItem(string name, string value) => AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, string value) =>
+            AddItem(name, new ContentItem(value));
 
         [PublicAPI]
-        public AssetBuilder AddItem(string name, byte[] value) => AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, byte[] value) =>
+            AddItem(name, new ContentItem(value));
 
         [PublicAPI]
-        public AssetBuilder AddItem(string name, Stream value) => AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, Stream value) =>
+            AddItem(name, new ContentItem(value));
 
         #endregion
 
@@ -94,15 +97,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
-            AddItems(new Dictionary<string, ContentItem>(
-                assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentNullException(nameof(assets))));
+            AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
+                     throw new ArgumentNullException(nameof(assets)));
 
         [PublicAPI]
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
-            AddItems(new Dictionary<string, ContentItem>(
-                assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentNullException(nameof(assets))));
+            AddItems(assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ??
+                     throw new ArgumentNullException(nameof(assets)));
 
         #endregion
 

@@ -38,14 +38,14 @@ public void ConfigureServices(IServiceCollection services)
 {
 	.....
     services.AddOptions<GotenbergSharpClientOptions>()
-	        .Bind(Configuration.GetSection("GotenbergSharpClient"));
+	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
     services.AddGotenbergSharpClient();
 	.....    
 }
 
 ```
 # Using GotenbergSharpClient
-*See the [linqPad folder](linqpad/)* for complete examples
+*See the [linqPad folder](linqpad/)* for complete examples. 
 
 ## Html To Pdf 
 *With embedded assets:*
@@ -85,23 +85,23 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 {
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
-		.ConfigureRequest(b =>
+		.ConfigureRequest(config =>
 		{
-			b.PageRanges("1-2").ChromeRpccBufferSize(1048576);
+			config.PageRanges("1-2").ChromeRpccBufferSize(1048576);
 		})
 		.AddAsyncHeaderFooter(async
-			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))
+			doc => doc.SetHeader(await File.ReadAllTextAsync(headerPath))
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
-		)).WithDimensions(b =>
+		)).WithDimensions(dims =>
 		{
-			b.SetPaperSize(PaperSizes.A4)
+			dims.SetPaperSize(PaperSizes.A4)
 			 .SetMargins(Margins.None)
 			 .SetScale(.90)
 			 .LandScape();
 		});
 
 	var request = await builder.BuildAsync();
-	return await sharpClient.UrlToPdfAsync(request);
+	return await _sharpClient.UrlToPdfAsync(request);
 }
 ```
 ## Merge Office Docs
@@ -111,14 +111,14 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 {
 	var builder = new MergeOfficeBuilder()
-		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
-		.ConfigureRequest(b =>
+		.WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)))
+		.ConfigureRequest(config =>
 		{
-			b.TimeOut(100);
+			config.TimeOut(100);
 		});
 
 	var request = await builder.BuildAsync();
-	return await sharpClient.MergeOfficeDocsAsync(request);
+	return await _sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
 ## Markdown to Pdf
@@ -129,22 +129,22 @@ public async Task<Stream> CreateFromMarkdown()
 {
 	var builder = new HtmlRequestBuilder()
 		.AddAsyncDocument(async
-			b => b.SetHeader(await this.GetHeaderAsync())
+			doc => doc.SetHeader(await this.GetHeaderAsync())
 				  .SetBody(await GetBodyAsync())
 				  .ContainsMarkdown()
 				  .SetFooter(await GetFooterAsync())
-		).WithDimensions(b =>
+		).WithDimensions(dims =>
 		{
-			b.UseChromeDefaults().LandScape().SetScale(.90);
+			dims.UseChromeDefaults().LandScape().SetScale(.90);
 		}).WithAsyncAssets(async
-			b => b.AddItems(await GetMarkdownAssets())
-		).ConfigureRequest(b =>
+			a => a.AddItems(await GetMarkdownAssets())
+		).ConfigureRequest(req =>
 		{
-			b.ChromeRpccBufferSize(1048555);
+			req.ChromeRpccBufferSize(1048555);
 		});
 
 	var request = await builder.BuildAsync();
-	return await sharpClient.HtmlToPdfAsync(request);
+	return await _sharpClient.HtmlToPdfAsync(request);
 }
 ```
 ## Webhook
@@ -179,7 +179,7 @@ public async Task<Stream> CreateFromMarkdown()
 
      var request = await builder.BuildAsync();
 
-     await new sharpClient.FireWebhookAndForgetAsync(request);
+     await _sharpClient.FireWebhookAndForgetAsync(request);
  }
 
 ```
@@ -236,7 +236,7 @@ IEnumerable<UrlRequestBuilder> CreateBuilders(IEnumerable<Uri> uris)
 
 async Task<Stream> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
 {
-    var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r));
+    var tasks = requests.Select(r => _sharpClient.UrlToPdfAsync(r));
     var results = await Task.WhenAll(tasks);
 
     var mergeBuilder = new MergeBuilder()
@@ -245,6 +245,6 @@ async Task<Stream> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
 		).ConfigureRequest(b => b.TimeOut(1799));
 
     var request = mergeBuilder.Build();
-    return await sharpClient.MergePdfsAsync(request);
+    return await _sharpClient.MergePdfsAsync(request);
 }
 ``` 

@@ -44,7 +44,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
                         logger?.LogWarning(
                             "{name} delaying for {delay} ms, then making retry # {retry} of {retryAttempts}. Retry reason: '{reason}'",
                             context.PolicyKey, delay.TotalMilliseconds, retryCount, retryOps.RetryCount,
-                            outcome?.Exception?.Message ?? "No exception, check the gotenberg container logs for errors");
+                            outcome?.Exception?.Message ??
+                            "No exception, check the gotenberg container logs for errors");
                     })
                 .WithPolicyKey(nameof(GotenbergSharpClient));
         }

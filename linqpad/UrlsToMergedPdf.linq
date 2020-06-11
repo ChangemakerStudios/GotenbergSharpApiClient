@@ -23,7 +23,10 @@ public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 		"https://english.elpais.com/", 	"https://www.thehindu.com", "https://www.theaustralian.com.au",
 		"https://www.welt.de", "https://www.cankaoxiaoxi.com", "https://www.novinky.cz","https://www.elobservador.com.uy"}
 		.Select(u => new Uri(u));
-
+	
+	//when running with .net framework, you'll need to add this line:
+	// ServicePointManager.DefaultConnectionLimit = sites.Count();
+	
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build());
 

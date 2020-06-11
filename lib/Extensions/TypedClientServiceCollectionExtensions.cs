@@ -42,6 +42,5 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 
         static GotenbergSharpClientOptions GetOptions(IServiceProvider sp) =>
             sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value;
-
     }
 }
