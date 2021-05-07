@@ -173,7 +173,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                 }).WhereNotNull();
         }
 
-        string GetValueAsUsString(object value)
+        static string GetValueAsUsString(object value)
         {
             var cultureInfo = CultureInfo.GetCultureInfo("en-US");
 
