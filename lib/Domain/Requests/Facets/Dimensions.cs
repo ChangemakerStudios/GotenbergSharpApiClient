@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -164,12 +165,28 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
                     if (value == null) return null;
 
-                    var contentItem = new StringContent(value.ToString());
-                    contentItem.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
+                    var contentItem = new StringContent(GetValueAsUsString(value));
+
+                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
 
                     return contentItem;
                 }).WhereNotNull();
+        }
+
+        string GetValueAsUsString(object value)
+        {
+            var cultureInfo = CultureInfo.GetCultureInfo("en-US");
+
+            return value switch
+            {
+                float f => f.ToString(cultureInfo),
+                double d => d.ToString(cultureInfo),
+                decimal c => c.ToString(cultureInfo),
+                int i => i.ToString(cultureInfo),
+                long l => l.ToString(cultureInfo),
+                DateTime date => date.ToString(cultureInfo),
+                _ => value?.ToString()
+            };
         }
 
         #endregion
