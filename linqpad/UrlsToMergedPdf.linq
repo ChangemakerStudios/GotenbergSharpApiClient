@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.0.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <NuGetReference Version="1.2.0">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -64,7 +64,7 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
-	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r));
+	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r, CancellationToken.None));
 	var results = await Task.WhenAll(tasks);
 
 	var mergeBuilder = new MergeBuilder()

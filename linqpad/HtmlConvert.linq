@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.0.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <NuGetReference Version="1.2.0">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
