@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -18,5 +20,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
 
         public abstract IEnumerable<HttpContent> ToHttpContent();
+
+        public static StringContent CreateFormDataItem<T>(T value, string fieldName)
+        {
+            var item = new StringContent(value.ToString());
+            item.Headers.ContentDisposition =
+                new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                    { Name = fieldName };
+            return item;
+        }
     }
 }

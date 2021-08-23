@@ -47,10 +47,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
 
-            return Content.IfNullEmptyContent()
+            return 
+                Content.IfNullEmptyContent()
                 .Concat(Assets.IfNullEmptyContent())
                 .Concat(Config.IfNullEmptyContent())
-                .Concat(Dimensions.IfNullEmptyContent());
+                .Concat(Dimensions.IfNullEmptyContent())
+                .Concat(GetExtraHeaderHttpContent().IfNullEmpty());
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-
+using Gotenberg.Sharp.API.Client.Extensions;
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
@@ -21,6 +21,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public HtmlRequestBuilder(bool containsMarkdown)
             => this.Request = new HtmlRequest(containsMarkdown);
+
+        [PublicAPI]
+        public HtmlRequestBuilder AddAdditionalHeaders(string headerName, string headerValue)
+        {
+            if (headerName.IsNotSet()) throw new InvalidOperationException("headerName is not set");
+            this.Request.AddExtraHeaders(headerName, headerValue);
+
+            return this;
+        }
 
         [PublicAPI]
         public HtmlRequestBuilder AddDocument(Action<DocumentBuilder> action)

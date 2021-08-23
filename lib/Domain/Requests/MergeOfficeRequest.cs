@@ -39,7 +39,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     contentItem.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
 
                     return contentItem;
-                }).Concat(Config.IfNullEmptyContent());
+
+                })
+                .Concat(new[] { CreateFormDataItem("true", "merge") })
+                .Concat(Config.IfNullEmptyContent());
         }
+
     }
 }

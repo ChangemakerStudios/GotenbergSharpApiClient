@@ -105,6 +105,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
+        [PublicAPI]
+        public DimensionBuilder PreferCssPageSize(bool prefer = true)
+        {
+            this.Request.Dimensions.PreferCssPageSize = prefer;
+            return this;
+        }
+
+        [PublicAPI]
+        public DimensionBuilder PrintBackground(bool printBackground = true)
+        {
+            this.Request.Dimensions.PrintBackground = printBackground;
+            return this;
+        }
+
         #region dimension instance
 
         [PublicAPI]

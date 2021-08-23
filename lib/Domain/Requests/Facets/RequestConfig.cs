@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-
-using Gotenberg.Sharp.API.Client.Extensions;
+﻿using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
+
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -86,43 +86,50 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         {
             if (this.TimeOut.HasValue)
             {
-                yield return CreateItem(this.TimeOut, Constants.Gotenberg.FormFieldNames.WaitTimeout);
+                yield return RequestBase.CreateFormDataItem(this.TimeOut, Constants.Gotenberg.FormFieldNames.WaitTimeout);
             }
 
-            if (this.Webhook?.TargetUrl != null)
-            {
-                yield return CreateItem(this.Webhook.TargetUrl, Constants.Gotenberg.FormFieldNames.WebhookUrl);
-
-                if (this.Webhook.Timeout.HasValue)
-                {
-                    yield return CreateItem(this.Webhook.Timeout, Constants.Gotenberg.FormFieldNames.WebhookTimeout);
-                }
-            }
+            foreach (var httpContent in TryAddWebhookHeaders()) yield return httpContent;
 
             if (this.PageRanges.IsSet())
             {
-                yield return CreateItem(this.PageRanges, Constants.Gotenberg.FormFieldNames.PageRanges);
+                yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.FormFieldNames.PageRanges);
             }
 
             if (this.ResultFileName.IsSet())
             {
-                yield return CreateItem(this.ResultFileName, Constants.Gotenberg.FormFieldNames.ResultFilename);
+                yield return RequestBase.CreateFormDataItem(this.ResultFileName, Constants.Gotenberg.FormFieldNames.ResultFilename);
             }
 
+            /*
             if (ChromeRpccBufferSize.HasValue)
             {
                 yield return CreateItem(this.ChromeRpccBufferSize,
                     Constants.Gotenberg.FormFieldNames.ChromeRpccBufferSize);
-            }
+            }*/
         }
 
-        static StringContent CreateItem<T>(T value, string fieldName)
+        IEnumerable<HttpContent> TryAddWebhookHeaders()
         {
-            var item = new StringContent(value.ToString());
-            item.Headers.ContentDisposition =
-                new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                    { Name = fieldName };
-            return item;
+            if (this.Webhook?.TargetUrl != null)
+            {
+                yield return RequestBase.CreateFormDataItem(this.Webhook.TargetUrl, Constants.Gotenberg.FormFieldNames.Webhook.Url);
+
+                if (this.Webhook.HttpMethod.IsSet())
+                {
+                    yield return RequestBase.CreateFormDataItem(this.Webhook.HttpMethod, Constants.Gotenberg.FormFieldNames.Webhook.HttpMethod);
+                }
+
+                if (this.Webhook.ErrorUrl != null)
+                {
+                    yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorUrl, Constants.Gotenberg.FormFieldNames.Webhook.ErrorUrl);
+                    if (this.Webhook.ErrorHttpMethod.IsSet())
+                    {
+                        yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorHttpMethod,
+                            Constants.Gotenberg.FormFieldNames.Webhook.ErrorHttpMethod);
+                    }
+                }
+            }
         }
 
         #endregion

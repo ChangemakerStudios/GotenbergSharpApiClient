@@ -100,6 +100,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Landscape)]
         public bool Landscape { [UsedImplicitly] get; set; }
 
+        /// <summary>
+        /// Defines whether to prefer page size as defined by CSS (default false)
+        /// </summary>
+        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PreferCssPageSize)]
+        public bool PreferCssPageSize { [UsedImplicitly] get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not to print background graphics.
+        /// </summary>
+        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PrintBackground)]
+        public bool PrintBackground { [UsedImplicitly] get; set; }
+
+
         #endregion
 
         #region public methods

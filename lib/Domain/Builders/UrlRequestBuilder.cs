@@ -37,6 +37,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
+        public UrlRequestBuilder AddAdditionalHeaders(string headerName, string headerValue)
+        {
+            if (headerName.IsNotSet()) throw new InvalidOperationException("headerName is not set");
+            this.Request.AddExtraHeaders(headerName, headerValue);
+          
+            return this;
+        }
+
+
+        [PublicAPI]
         public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
         {
             if (name.IsNotSet()) throw new ArgumentException("header name is either null or empty");
@@ -92,7 +102,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             action(new ConfigBuilder(this.Request));
             return this;
         }
-
 
         [PublicAPI]
         public UrlRequest Build()
