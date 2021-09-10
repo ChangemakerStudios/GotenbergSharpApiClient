@@ -2,7 +2,7 @@
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient) [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
 
-.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) micro-service's [API](https://gotenberg.dev/docs/modules/api).  A [Docker-powered stateless API](https://hub.docker.com/r/thecodingmachine/gotenberg) [Gotenberg](https://github.com/thecodingmachine/gotenberg) is used to convert & merge HTML, Markdown and Office files into to PDF documents. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
+.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) micro-service's API. [Gotenberg](https://github.com/thecodingmachine/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
 
 # Getting Started
 *Pull the image from dockerhub.com*
