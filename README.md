@@ -1,6 +1,6 @@
 **⚠️ Not working for Gotenberg >= 7 ⚠️** 
 
-* **The V7 branch works against V7P**. 
+* **The V7 branch works against the V7 doker image**. 
 * *To test branch with Linqpad scripts, remove package dependency and replace by referencing the local bits*. 
 * **Release in a few weeks**
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
