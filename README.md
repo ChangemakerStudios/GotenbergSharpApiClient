@@ -1,8 +1,8 @@
 **⚠️ Not working for Gotenberg >= 7 ⚠️** 
 
-**The V7 branch works against V7P**. *To test branch with Linqpad scripts, replace package by referencing the local bits*. 
-
-**Release in a few weeks**
+* **The V7 branch works against V7P**. 
+* *To test branch with Linqpad scripts, remove package dependency and replace by referencing the local bits*. 
+* **Release in a few weeks**
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient) [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
