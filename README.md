@@ -12,7 +12,7 @@
 # Getting Started
 *Pull the image from dockerhub.com*
 ```powershell
-> docker pull thecodingmachine/gotenberg:latest
+> docker pull thecodingmachine/gotenberg:6.4.4
 ```
 *Create & start a container*
 ```powershell
