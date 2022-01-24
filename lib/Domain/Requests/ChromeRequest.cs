@@ -29,7 +29,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             if (_extraHeaders != null)
             {
-                yield return CreateFormDataItem(_extraHeaders, Constants.Gotenberg.CustomRemoteHeaders.ExtraHttpHeaders);
+                yield return CreateFormDataItem(_extraHeaders, Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.ExtraHttpHeaders);
             }
         }
     }

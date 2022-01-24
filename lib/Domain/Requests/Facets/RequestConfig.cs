@@ -93,7 +93,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
             if (this.PageRanges.IsSet())
             {
-                yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.FormFieldNames.PageRanges);
+                yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.FormFieldNames.Dims.PageRanges);
             }
 
             if (this.ResultFileName.IsSet())

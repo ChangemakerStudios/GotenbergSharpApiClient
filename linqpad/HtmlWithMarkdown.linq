@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.2.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -8,6 +8,8 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
+//Currently Broken. Problem is the syntax used in the index.htlm sample here:
+//https://github.com/thecodingmachine/gotenberg-php-client/blob/master/tests/assets/markdown/index.html
 async Task Main()
 {
 	var path = await CreateFromMarkdown(@"D:\Gotenberg\Dumps");

@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.2.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -22,7 +22,8 @@ public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk",
 		"https://english.elpais.com/", 	"https://www.thehindu.com", "https://www.theaustralian.com.au",
 		"https://www.welt.de", "https://www.cankaoxiaoxi.com", "https://www.novinky.cz","https://www.elobservador.com.uy"}
-		.Select(u => new Uri(u));
+		.Select(u => new Uri(u))
+		.Take(5);
 	
 	//when running with .net framework, you'll need to add this line:
 	// ServicePointManager.DefaultConnectionLimit = sites.Count();

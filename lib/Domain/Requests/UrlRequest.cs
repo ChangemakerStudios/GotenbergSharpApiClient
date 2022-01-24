@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class UrlRequest : ChromeRequest
     {
-        public override string ApiPath => Constants.Gotenberg.ApiPaths.UrlConvert;
+        public override string ApiPath => Constants.Gotenberg.ApiPaths.ConvertUrl;
 
         public Uri Url { get; set; }
 
