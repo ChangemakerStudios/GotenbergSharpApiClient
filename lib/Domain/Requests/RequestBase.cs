@@ -9,6 +9,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class RequestBase : IApiRequest
     {
+        const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
+
         public abstract string ApiPath { get; }
 
         public bool IsWebhookRequest => Config?.Webhook?.TargetUrl != null;
@@ -24,9 +26,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public static StringContent CreateFormDataItem<T>(T value, string fieldName)
         {
             var item = new StringContent(value.ToString());
-            item.Headers.ContentDisposition =
-                new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                    { Name = fieldName };
+            
+            item.Headers.ContentDisposition = 
+                new ContentDispositionHeaderValue(DispositionType) { Name = fieldName };
+        
             return item;
         }
     }

@@ -1,4 +1,6 @@
 // ReSharper disable All CA1034
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
@@ -60,11 +62,10 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             public static class FormFieldNames
             {
                 public const string Files = "files";
-                public const string ResultFilename = "resultFilename";
+
+                public const string OutputFileName = "Gotenberg-Output-Filename";
 
                 public const string RemoteUrl = "url";
-                public const string WaitTimeout = "waitTimeout";
-                public const string ApiReadTimeout = "api-read-timeout";
 
                 public static class Dims
                 {
@@ -139,23 +140,10 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 /// </summary>
                 public static class PdfEngines
                 {
-                    public const string PdfFormat = "pdfFormat";
-
                     /// <summary>
-                    ///     Used in merges and conversions
-                    ///     Source: https://github.com/gotenberg/gotenberg/blob/872263d25335445423f22f6043922964ec3d5eff/pkg/gotenberg/pdfengine.go#L19
+                    /// Values reside in <see cref="PdfFormats"/>
                     /// </summary>
-                    public static class PdfFormats
-                    {
-                        public const string A1a = "PDF/A-1a";
-                        public const string A1b = "PDF/A-1b";
-                        public const string A2a = "PDF/A-2a";
-                        public const string A2b = "PDF/A-2b";
-                        public const string A2u = "PDF/A-2u";
-                        public const string A3a = "PDF/A-3a";
-                        public const string A3b = "PDF/A-3b";
-                        public const string A3u = "PDF/A-3u";
-                    }                    
+                    public const string PdfFormat = "pdfFormat";
                 }
             }
         }

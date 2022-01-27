@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -7,8 +7,12 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
+
+static Random rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+
 async Task Main()
 {
+	
 	var file = await CreateFromHtml(@"D:\Gotenberg\Dumps");
 	file.Dump();
 }
@@ -38,8 +42,8 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	//req.Dump("Built request", 1);
 	//req.ToHttpContent().Dump("As HttpContent", 1);
 	//req.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
-	
-	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml.pdf";
+
+	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{rand.Next()}.pdf";
 	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
 
 	using (var destinationStream = File.Create(resultPath))

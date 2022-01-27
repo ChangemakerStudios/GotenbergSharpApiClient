@@ -16,21 +16,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             this.Request.Config ??= new RequestConfig();
         }
 
-
-        [PublicAPI]
-        public ConfigBuilder TimeOut(float value)
-        {
-            this.Request.Config.TimeOut = value;
-            return this;
-        }
-
-        [PublicAPI]
-        public ConfigBuilder ChromeRpccBufferSize(int value)
-        {
-            this.Request.Config.ChromeRpccBufferSize = value;
-            return this;
-        }
-
         [PublicAPI]
         public ConfigBuilder PageRanges(string pageRanges)
         {
