@@ -7,10 +7,14 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
+static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+
 async Task Main()
 {
 	var destinationPath = @"D:\Gotenberg\Dumps";
  	var headerFooterPath = @"D:\Gotenberg\Resources\Html";
+	
+	//Looks like V7 doesn't support head/footers for Url conversions.
  	var file = await CreateFromUrl(destinationPath, @$"{headerFooterPath}\UrlHeader.html", @$"{headerFooterPath}\UrlFooter.html" );
 	file.Dump();
 }
@@ -23,7 +27,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		.SetUrl("https://www.cnn.com")
 		.ConfigureRequest(b =>
 		{
-			b.PageRanges("1-2").ChromeRpccBufferSize(1048576);
+			b.PageRanges("1-2");
 		})
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllBytesAsync(headerPath))
@@ -39,7 +43,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 	var request = await builder.BuildAsync();
 	var response = await sharpClient.UrlToPdfAsync(request);
 
-	var resultPath = @$"{destinationPath}\GotenbergFromUrl.pdf";
+	var resultPath = @$"{destinationPath}\GotenbergFromUrl-{Rando.Next()}.pdf";
 
 	using (var destinationStream = File.Create(resultPath))
 	{

@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -29,9 +29,8 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 			b.AddWebhook(hook =>
 			{
 				hook.SetUrl("http://host.docker.internal:5000/api/WebhookReceiver")
-					.SetTimeout(20)
 					.AddRequestHeader("custom-header", "value");
-			}).ChromeRpccBufferSize(1024);
+			});
 		})
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))

@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -8,7 +8,7 @@
 </Query>
 
 
-static Random rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
@@ -32,18 +32,14 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 				.SetScale(.75);
 		}).WithAsyncAssets(async
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
-		).ConfigureRequest(config =>
-		{
-			config.ChromeRpccBufferSize(1024)
-			 .PageRanges("1");
-		});
+		);
 
 	var req = await builder.BuildAsync();
 	//req.Dump("Built request", 1);
 	//req.ToHttpContent().Dump("As HttpContent", 1);
 	//req.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
 
-	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{rand.Next()}.pdf";
+	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{Rando.Next()}.pdf";
 	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
 
 	using (var destinationStream = File.Create(resultPath))

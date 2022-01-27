@@ -1,11 +1,13 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
+
+static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
@@ -72,8 +74,7 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 		.WithAssets(b =>
 		{
 			b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)));
-		})
-		.ConfigureRequest(b => b.TimeOut(1799));
+		});
 
 	var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build());
 
@@ -82,8 +83,8 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 
 async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationDirectory)
 {
-	var date = DateTime.Now;
-	var fullPath = @$"{desinationDirectory}\{date.ToString("yyyy-MM-MMMM-dd")}-{date.Ticks}-a4.pdf";
+	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}-{Rando.Next()}.pdf";
+	
 	using (var destinationStream = File.Create(fullPath))
 	{
 		await responseStream.CopyToAsync(destinationStream);

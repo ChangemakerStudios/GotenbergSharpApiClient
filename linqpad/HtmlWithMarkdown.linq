@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -10,6 +10,9 @@
 
 //Currently Broken. Problem is the syntax used in the index.htlm sample here:
 //https://github.com/thecodingmachine/gotenberg-php-client/blob/master/tests/assets/markdown/index.html
+
+static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+
 async Task Main()
 {
 	var path = await CreateFromMarkdown(@"D:\Gotenberg\Dumps");
@@ -34,14 +37,13 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 			b => b.AddItems(await GetMarkdownAssets())
 		).ConfigureRequest(b =>
 		{
-			b.ChromeRpccBufferSize(1048555)
-			 .ResultFileName("hello.pdf");
+			b.ResultFileName("hello.pdf");
 		});
 
 	var request = await builder.BuildAsync();
 	var response = await sharpClient.HtmlToPdfAsync(request);
 
-	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown.pdf";
+	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown-{Rando.Next()}.pdf";
 
 	using (var destinationStream = File.Create(outPath))
 	{

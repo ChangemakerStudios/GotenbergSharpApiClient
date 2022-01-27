@@ -17,6 +17,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
 
+
+        /// <summary>
+        /// Docs don't mention url headers/footers: https://gotenberg.dev/docs/modules/chromium#url
+        /// Footers work in UrlsToMergedPdf not headers
+        /// </summary>
         public HeaderFooterDocument Content { get; set; }
 
         public override IEnumerable<HttpContent> ToHttpContent()

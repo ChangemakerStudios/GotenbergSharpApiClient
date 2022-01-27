@@ -8,6 +8,9 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
+
+static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+
 async Task Main()
 {
 	var source = @"D:\Gotenberg\Resources\OfficeDocs";
@@ -21,16 +24,13 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 	var client = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new MergeOfficeBuilder()
-			.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
-			.ConfigureRequest(b =>
-			{
-				b.TimeOut(100);
-			});
+		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)));
 
 	var request = await builder.BuildAsync();
 	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
 
-	var mergeResultPath = @$"{destinationDirectory}\GotenbergOfficeMerge.pdf";
+	var mergeResultPath = @$"{destinationDirectory}\GotenbergOfficeMerge-{Rando.Next()}.pdf";
+	
 	using (var destinationStream = File.Create(mergeResultPath))
 	{
 		await response.CopyToAsync(destinationStream).ConfigureAwait(false);
