@@ -2,6 +2,10 @@ version: 1.3.{build}
 
 image: Visual Studio 2022
 
+branches:
+  except:
+    - /feature\/.+/
+
 configuration: Release
 
 dotnet_csproj:
