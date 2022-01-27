@@ -35,7 +35,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		)).WithDimensions(b =>
 		{
 			b.SetPaperSize(PaperSizes.A4)
-			.SetMargins(Margins.None)
+			.SetMargins(Margins.Normal)
 			 .LandScape()
 			 .SetScale(.90);
 		});

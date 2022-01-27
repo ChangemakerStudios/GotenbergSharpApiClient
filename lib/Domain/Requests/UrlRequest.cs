@@ -19,8 +19,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
 
         /// <summary>
-        /// Docs don't mention url headers/footers: https://gotenberg.dev/docs/modules/chromium#url
-        /// Footers work in UrlsToMergedPdf not headers
+        ///  Requires top/bottom marge set to appear   
+        ///  Docs don't mention url headers/footers: https://gotenberg.dev/docs/modules/chromium#url
         /// </summary>
         public HeaderFooterDocument Content { get; set; }
 
