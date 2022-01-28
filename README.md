@@ -1,8 +1,10 @@
+⭐ Works with Gotenberg v7; not v6⭐
+
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient) [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
 
-.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) micro-service's API. [Gotenberg](https://github.com/thecodingmachine/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
+.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
 
 # Getting Started
 *Pull the image from dockerhub.com*
@@ -11,7 +13,7 @@
 ```
 *Create & start a container*
 ```powershell
-docker run --name gotenbee -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
+docker run --name gotenbee7 -e DEFAULT_WAIT_TIMEOUT=1800 -e MAXIMUM_WAIT_TIMEOUT=1800 -e LOG_LEVEL=DEBUG -p:3000:3000 "thecodingmachine/gotenberg:latest"
 ```
 # .NET Core Project Setup
 *Install nuget package into your project*
@@ -22,7 +24,7 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 ```json
   "GotenbergSharpClient": {
     "ServiceUrl": "http://localhost:3000",
-    "HealthCheckUrl": "http://localhost:3000/ping",
+    "HealthCheckUrl": "http://localhost:3000/health",
     "RetryPolicy": {
       "Enabled": true,
       "RetryCount": 4,
@@ -62,12 +64,7 @@ public void ConfigureServices(IServiceCollection services)
              dims.SetPaperSize(PaperSizes.A3)
                  .SetMargins(Margins.None)
                  .SetScale(.99);
-         }).WithAsyncAssets(async assets => assets.AddItem("some-image.jpg", await GetImageBytes()))
-         .ConfigureRequest(config =>
-         {
-             config.ChromeRpccBufferSize(1024)
-                 .PageRanges("1");
-         });
+         }).WithAsyncAssets(async assets => assets.AddItem("some-image.jpg", await GetImageBytes()));
 
      var req = await builder.BuildAsync();
 
@@ -87,7 +84,7 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 		.SetUrl("https://www.cnn.com")
 		.ConfigureRequest(config =>
 		{
-			config.PageRanges("1-2").ChromeRpccBufferSize(1048576);
+			config.PageRanges("1-2");
 		})
 		.AddAsyncHeaderFooter(async
 			doc => doc.SetHeader(await File.ReadAllTextAsync(headerPath))
@@ -111,11 +108,7 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 {
 	var builder = new MergeOfficeBuilder()
-		.WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)))
-		.ConfigureRequest(config =>
-		{
-			config.TimeOut(100);
-		});
+		.WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)));
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.MergeOfficeDocsAsync(request);
@@ -138,10 +131,7 @@ public async Task<Stream> CreateFromMarkdown()
 			dims.UseChromeDefaults().LandScape().SetScale(.90);
 		}).WithAsyncAssets(async
 			a => a.AddItems(await GetMarkdownAssets())
-		).ConfigureRequest(req =>
-		{
-			req.ChromeRpccBufferSize(1048555);
-		});
+		));
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.HtmlToPdfAsync(request);
@@ -163,12 +153,11 @@ public async Task<Stream> CreateFromMarkdown()
                          .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
                          .AddRequestHeader("custom-header", "value");
                  })
-                 .PageRanges("1-2")
-                 .ChromeRpccBufferSize(1048576);
+                 .PageRanges("1-2");
          })
          .AddAsyncHeaderFooter(async
-             docBuilder => docBuilder.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
-                 .SetFooter(await System.IO.File.ReadAllBytesAsync(footerPath))
+             b => b.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
+                   .SetFooter(await System.IO.File.ReadAllBytesAsync(footerPath))
          ).WithDimensions(dimBuilder =>
          {
              dimBuilder.SetPaperSize(PaperSizes.A4)
@@ -240,9 +229,9 @@ async Task<Stream> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
     var results = await Task.WhenAll(tasks);
 
     var mergeBuilder = new MergeBuilder()
-        .WithAssets(b => 
-			{ b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r))); }
-		).ConfigureRequest(b => b.TimeOut(1799));
+        .WithAssets(b => { 
+            b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r))); 
+        });
 
     var request = mergeBuilder.Build();
     return await _sharpClient.MergePdfsAsync(request);
