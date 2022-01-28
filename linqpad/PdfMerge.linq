@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
@@ -12,7 +12,11 @@
 async Task Main()
 {
 	var p = await DoMerge(@"D:\Gotenberg\Dumps");
-	p.Dump();
+	
+	var info = new ProcessStartInfo { FileName = p, UseShellExecute = true };
+	Process.Start(info);
+	
+	p.Dump("Done");
 }
 
 async Task<string> DoMerge(string destinationPath)
@@ -30,14 +34,7 @@ async Task<string> DoMerge(string destinationPath)
 	var toMerge = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  
  	var builder = new MergeBuilder()
-		.WithAssets(b => {
-			b.AddItems(toMerge);
-		}).ConfigureRequest(b =>
-		{
-			b.ChromeRpccBufferSize(RequestConfig.DefaultChromeRpccBufferSize * 3)
-			 .ResultFileName("WTF.pdf")
-			 .TimeOut(55);
-		});
+		.WithAssets(b => { b.AddItems(toMerge) ;});
 		
 	var request = builder.Build();	
  

@@ -17,7 +17,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
 
-
         /// <summary>
         ///  Requires top/bottom marge set to appear   
         ///  Docs don't mention url headers/footers: https://gotenberg.dev/docs/modules/chromium#url

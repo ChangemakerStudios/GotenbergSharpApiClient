@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -8,26 +8,30 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
-//Currently Broken. Problem is the syntax used in the index.htlm sample here:
-//https://github.com/thecodingmachine/gotenberg-php-client/blob/master/tests/assets/markdown/index.html
 
-static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Markdown";
 
 async Task Main()
 {
 	var path = await CreateFromMarkdown(@"D:\Gotenberg\Dumps");
-	path.Dump("Done");
+	
+	var info = new ProcessStartInfo { FileName = path, UseShellExecute = true };
+	Process.Start(info);
+	
+	path.Dump("done");
 }
+
 public async Task<string> CreateFromMarkdown(string destinationDirectory)
 {
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
 		.AddAsyncDocument(async
-			b => b.SetHeader(await this.GetHeaderAsync())
-				  .SetBody(await GetBodyAsync())
+			b => b.SetHeader(await GetFile("header.html"))
+				  .SetBody(await GetFile("index.html"))
 				  .ContainsMarkdown()
-				  .SetFooter(await GetFooterAsync())
+				  .SetFooter(await GetFile("footer.html"))
 		).WithDimensions(b =>
 		{
 			b.UseChromeDefaults()
@@ -43,7 +47,7 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 	var request = await builder.BuildAsync();
 	var response = await sharpClient.HtmlToPdfAsync(request);
 
-	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown-{Rando.Next()}.pdf";
+	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown-{Rand.Next()}.pdf";
 
 	using (var destinationStream = File.Create(outPath))
 	{
@@ -53,35 +57,20 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 	return outPath;
 }
 
-async Task<string> GetBodyAsync()
-{
-	var body = await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/index.html");
-	return body;
-}
-
-async Task<string> GetHeaderAsync()
-{
-	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/header.html");
-}
-
-async Task<string> GetFooterAsync()
-{
-	return await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/footer.html");
-}
+async Task<string> GetFile(string fileName)
+	=> await File.ReadAllTextAsync(@$"{ResourcePath}\{fileName}");
 
 async Task<IEnumerable<KeyValuePair<string, string>>> GetMarkdownAssets()
 {
 	var bodyAssetNames = new[] {"img.gif" , "font.woff", "style.css" };
 	var markdownFiles = new[] { "paragraph1.md", "paragraph2.md", "paragraph3.md" };
 
-	var client = new HttpClient() { BaseAddress = new Uri("https://raw.githubusercontent.com/thecodingmachine/gotenberg-php-client/master/tests/assets/markdown/") };
-
-	var bodyAssetTasks = bodyAssetNames.Select(ba => client.GetStringAsync(ba));
-	var mdTasks = markdownFiles.Select(md => client.GetStringAsync(md));
+	var bodyAssetTasks = bodyAssetNames.Select(ba => GetFile(ba));
+	var mdTasks = markdownFiles.Select(md => GetFile(md));
 
 	var bodyAssets = await Task.WhenAll(bodyAssetTasks);
 	var mdParagraphs = await Task.WhenAll(mdTasks);
 
-	return bodyAssetNames.Select((name, index) => new KeyValuePair<string, string>(name, bodyAssets[index]))
-			   .Concat(markdownFiles.Select((name, index) => new KeyValuePair<string,string>(name, mdParagraphs[index])));
+	return bodyAssetNames.Select((name, index) => KeyValuePair.Create(name, bodyAssets[index]))
+			   .Concat(markdownFiles.Select((name, index) => KeyValuePair.Create(name, mdParagraphs[index])));
 }

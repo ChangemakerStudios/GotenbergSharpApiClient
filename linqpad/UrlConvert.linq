@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -7,16 +7,22 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
-static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
 	var destinationPath = @"D:\Gotenberg\Dumps";
- 	var headerFooterPath = @"D:\Gotenberg\Resources\Html";
+ 	var headerFooterPath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html";;
+
+	var path = await CreateFromUrl(
+		destinationPath, 
+		@$"{headerFooterPath}\UrlHeader.html", 
+		@$"{headerFooterPath}\UrlFooter.html");
 	
-	//Looks like V7 doesn't support head/footers for Url conversions.
- 	var file = await CreateFromUrl(destinationPath, @$"{headerFooterPath}\UrlHeader.html", @$"{headerFooterPath}\UrlFooter.html" );
-	file.Dump();
+	var info = new ProcessStartInfo { FileName = path, UseShellExecute = true };
+	Process.Start(info);
+	
+	path.Dump("done");
 }
 
 public async Task<string> CreateFromUrl(string destinationPath, string headerPath, string footerPath)
@@ -43,7 +49,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 	var request = await builder.BuildAsync();
 	var response = await sharpClient.UrlToPdfAsync(request);
 
-	var resultPath = @$"{destinationPath}\GotenbergFromUrl-{Rando.Next()}.pdf";
+	var resultPath = @$"{destinationPath}\GotenbergFromUrl-{Rand.Next()}.pdf";
 
 	using (var destinationStream = File.Create(resultPath))
 	{

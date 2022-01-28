@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+
+using JetBrains.Annotations;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -158,7 +158,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             {
                 PaperWidth = 8.26,
                 PaperHeight = 11.69,
-                MarginBottom = .5 //Smallest value to get footer to show up is .38
+                MarginBottom = .38 //smallest value to get footer to show up is .38
             };
         }
 

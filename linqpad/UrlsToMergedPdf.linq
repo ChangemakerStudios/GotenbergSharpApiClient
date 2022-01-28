@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -7,14 +7,16 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
-static Random Rando = new Random(Math.Abs( (int) DateTime.Now.Ticks));
+static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
 	var path = await CreateWorldNewsSummary($@"D:\NewsArchive");
+	
 	var info = new ProcessStartInfo{ FileName = path, UseShellExecute = true};
 	Process.Start(info);
-	path.Dump();
+	
+	path.Dump("Done");
 }
 
 public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
@@ -26,9 +28,9 @@ public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 		"https://www.welt.de", "https://www.cankaoxiaoxi.com", "https://www.novinky.cz","https://www.elobservador.com.uy"}
 		.Select(u => new Uri(u))
 		.Take(5);
-	
-	//when running with .net framework, you'll need to add this line:
-	// ServicePointManager.DefaultConnectionLimit = sites.Count();
+		
+	//Takes 5 b/c On Goten, v7.4.2 it errors when all the urls are sent and returns a 503 response. 
+	//Error: "convert to PDF: chromium PDF: wait for events: wait for event networkIdle: context deadline exceeded"
 	
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build());
@@ -45,7 +47,7 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 			.SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
 			.ConfigureRequest(b =>
 			{
-				 b.PageRanges("1-3");
+				 b.PageRanges("1-2");
 			}).AddHeaderFooter(b =>
 			{
 				 b.SetFooter(GetHeadFoot(uri.ToString()));
@@ -83,7 +85,7 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 
 async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationDirectory)
 {
-	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}-{Rando.Next()}.pdf";
+	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}-{Rand.Next()}.pdf";
 	
 	using (var destinationStream = File.Create(fullPath))
 	{

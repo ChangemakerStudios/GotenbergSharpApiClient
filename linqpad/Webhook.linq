@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">..\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -10,9 +10,13 @@ async Task Main()
 {
 	//For this to work you need an api running on localhost:5000 w/ an endpoint to receive the webhook
 	
+	var resourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html";
+	
 	var destinationPath = @"D:\Gotenberg\Dumps\FromWebhook";
-	var footerPath = @"D:\Gotenberg\Resources\Html\UrlHeader.html";
-	var headerPath =@"D:\Gotenberg\Resources\Html\UrlFooter.html";
+	var footerPath = @$"{resourcePath}\UrlHeader.html";
+	var headerPath =@$"{resourcePath}\UrlFooter.html";
+	
+	headerPath.Dump();
 	
 	await CreateFromUrl(destinationPath,headerPath, footerPath);
 	
