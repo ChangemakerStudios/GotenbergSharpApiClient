@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </summary>
     /// <remarks>
     ///     Paper size and margins have to be provided in inches. Same for margins.
-    ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
+    ///     See unit info here: https://gotenberg.dev/docs/modules/chromium#routes
     ///     Paper sizes: https://www.prepressure.com/library/paper-size  
     /// </remarks>
     public sealed class Dimensions : IConvertToHttpContent
@@ -131,7 +131,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         ///     Default Google Chrome printer options
         /// </summary>
         /// <remarks>
-        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/master/internal/pkg/printer/chrome.go#L53
+        ///     Source: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/chromium/chromium.go#L200
         /// </remarks>
         /// <returns></returns>
         [PublicAPI]

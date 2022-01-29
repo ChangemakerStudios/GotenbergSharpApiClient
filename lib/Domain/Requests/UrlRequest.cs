@@ -19,7 +19,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         /// <summary>
         ///  Requires top/bottom marge set to appear   
-        ///  Docs don't mention url headers/footers: https://gotenberg.dev/docs/modules/chromium#url
         /// </summary>
         public HeaderFooterDocument Content { get; set; }
 

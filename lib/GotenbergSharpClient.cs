@@ -21,13 +21,11 @@ namespace Gotenberg.Sharp.API.Client
     /// </summary>
     /// <remarks>
     ///     Gotenberg:
-    ///     https://thecodingmachine.github.io/gotenberg/
-    ///     https://github.com/thecodingmachine/gotenberg
+    ///     https://gotenberg.dev
+    ///     https://github.com/gotenberg/gotenberg
     /// 
-    ///     Other clients:
-    ///     https://github.com/thecodingmachine/gotenberg-go-client
-    ///     https://github.com/thecodingmachine/gotenberg-php-client
-    ///     https://github.com/yumauri/gotenberg-js-client
+    ///     Other clients available:
+    ///     https://github.com/gotenberg/awesome-gotenberg#clients
     /// </remarks>
     public sealed class GotenbergSharpClient
     {

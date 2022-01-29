@@ -18,7 +18,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <summary>
         /// Ensures the merged documents appear in the order each was added.
         /// Gotenberg merges files in alphabetical order via the key/file name.
-        /// https://thecodingmachine.github.io/gotenberg/#merge
+        /// https://gotenberg.dev/docs/modules/pdf-engines#merge
         /// </summary>
         /// <param name="unordered"></param>
         /// <remarks>
@@ -46,7 +46,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         #region office extension list
 
         /// <remarks>
-        /// Source is here: https://github.com/thecodingmachine/gotenberg/blob/master/internal/app/xhttp/handler.go#L193
+        /// Source is here: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/libreoffice/unoconv/unoconv.go#L380
+        /// Also this: https://github.com/gotenberg/gotenberg/blob/main/docs/openapi.yaml#L193
         /// </remarks>
         static readonly string[] OfficeExtensions =
             {   ".bib",

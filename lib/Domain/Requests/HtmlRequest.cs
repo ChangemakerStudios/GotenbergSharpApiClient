@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <remarks>
     ///     For Markdown conversions your Content.Body must contain HTML that references one or more markdown files
     ///     using the Go template function 'toHTML' within the body element. Chrome uses the function to convert the contents of a given markdown file to HTML.
-    ///     See example here: https://thecodingmachine.github.io/gotenberg/#markdown.basic
+    ///     See example here: https://gotenberg.dev/docs/modules/chromium#markdown
     /// </remarks>
     public sealed class HtmlRequest : ChromeRequest
     {
