@@ -30,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     var contentItem = item.Asset.Value.ToHttpContentItem();
 
                     contentItem.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                        new ContentDispositionHeaderValue(ConstantsHttpContent.Disposition.Types.FormData)
                         {
                             Name = Constants.Gotenberg.FormFieldNames.Files,
                             FileName = item.Asset.Key

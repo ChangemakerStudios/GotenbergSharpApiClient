@@ -36,21 +36,54 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        /// <summary>
+        ///  Configures gotenberg to emulate html loading as screen. By default it loads it as print
+        /// </summary>
+        /// <returns></returns>
         [PublicAPI]
-        public UrlRequestBuilder AddAdditionalHeaders(string headerName, string headerValue)
+        public UrlRequestBuilder EmulateAsScreen()
         {
-            if (headerName.IsNotSet()) throw new InvalidOperationException("headerName is not set");
-            this.Request.AddExtraHeaders(headerName, headerValue);
-          
+            this.Request.ConversionBehaviors.EmulatedMediaType = "screen";
+
+            return this;
+        }
+
+        /// <summary>
+        ///  Tells gotenberg to return a 409 response if there are exceptions in the Chromium console. 
+        /// </summary>
+        /// <returns></returns>
+        [PublicAPI]
+        public UrlRequestBuilder FailOnConsoleExceptions()
+        {
+            this.Request.ConversionBehaviors.FailOnConsoleExceptions = true;
+
+            return this;
+        }
+
+        [PublicAPI]
+        public UrlRequestBuilder SetBrowserWaitDelay(int seconds)
+        {
+            this.Request.ConversionBehaviors.WaitDelay = $"{seconds}s";
+
+            return this;
+        }
+
+        [PublicAPI]
+        public UrlRequestBuilder SetBrowserWaitExpression(string expression)
+        {
+            if(expression.IsNotSet()) throw new InvalidOperationException("expression is not set");
+            this.Request.ConversionBehaviors.WaitForExpression = expression;
+
             return this;
         }
 
 
         [PublicAPI]
-        public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
+        public UrlRequestBuilder AddAdditionalHeaders(string headerName, string headerValue)
         {
-            if (name.IsNotSet()) throw new ArgumentException("header name is either null or empty");
-            this.Request.RemoteUrlHeader = KeyValuePair.Create(name, value);
+            if (headerName.IsNotSet()) throw new InvalidOperationException("headerName is not set");
+            this.Request.ConversionBehaviors.AddExtraHeaders(headerName, headerValue);
+          
             return this;
         }
 

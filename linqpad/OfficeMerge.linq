@@ -6,6 +6,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Infrastructure</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
 
@@ -31,6 +32,11 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)));
 
 	var request = await builder.BuildAsync();
+
+	//request.Dump("Built request", 1);
+	//request.ToHttpContent().Dump("As HttpContent", 1);
+	//request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+
 	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
 
 	var mergeResultPath = @$"{destinationDirectory}\GotenbergOfficeMerge-{Rand.Next()}.pdf";

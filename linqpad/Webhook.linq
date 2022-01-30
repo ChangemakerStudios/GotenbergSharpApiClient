@@ -4,6 +4,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
 async Task Main()
@@ -47,5 +48,10 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 		});
 
 	var request = await builder.BuildAsync();
+
+	request.Dump("Built request", 1);
+	request.ToHttpContent().Dump("As HttpContent", 1);
+	request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+
 	await sharpClient.FireWebhookAndForgetAsync(request);
 }

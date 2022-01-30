@@ -27,12 +27,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 : Constants.Gotenberg.ApiPaths.ConvertHtml;
 
         [PublicAPI]
-        public HtmlRequest()
-        {
-        }
+        public HtmlRequest(): this(false) {}
 
         [PublicAPI]
-        public HtmlRequest(bool containsMarkdown) => this.ContainsMarkdown = containsMarkdown;
+        public HtmlRequest(bool containsMarkdown) => 
+            this.ContainsMarkdown = containsMarkdown;
 
         public bool ContainsMarkdown { get; internal set; }
 
@@ -47,12 +46,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
 
-            return 
-                Content.IfNullEmptyContent()
+            return base.ToHttpContent()
+                .Concat(Content.IfNullEmptyContent())
                 .Concat(Assets.IfNullEmptyContent())
                 .Concat(Config.IfNullEmptyContent())
-                .Concat(Dimensions.IfNullEmptyContent())
-                .Concat(GetExtraHeaderHttpContent().IfNullEmpty());
+                .Concat(Dimensions.IfNullEmptyContent());
+
         }
     }
 }

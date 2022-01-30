@@ -11,11 +11,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class UrlRequest : ChromeRequest
     {
-        public override string ApiPath => Constants.Gotenberg.ApiPaths.ConvertUrl;
+        public override string ApiPath 
+            => Constants.Gotenberg.ApiPaths.ConvertUrl;
 
         public Uri Url { get; set; }
-
-        public KeyValuePair<string, string> RemoteUrlHeader { get; set; }
 
         /// <summary>
         ///  Requires top/bottom marge set to appear   
@@ -27,11 +26,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             if (this.Url == null) throw new InvalidOperationException("Url is null");
             if (!this.Url.IsAbsoluteUri) throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
-            return new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.FormFieldNames.RemoteUrl) }
+            return base.ToHttpContent()
+                .Concat(new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.FormFieldNames.RemoteUrl) })
                 .Concat(Content.IfNullEmptyContent())
                 .Concat(Config.IfNullEmptyContent())
-                .Concat(Dimensions.IfNullEmptyContent())
-                .Concat(GetExtraHeaderHttpContent().IfNullEmpty());
+                .Concat(Dimensions.IfNullEmptyContent());
         }
  
     }

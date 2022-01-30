@@ -25,9 +25,9 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
-		.AddDocument(
+		.AddDocument( 
 			doc => doc.SetBody(GetBody())
-				  .SetFooter(GetFooter())
+					  .SetFooter(GetFooter())
 		).WithDimensions(dims =>
 		{
 			dims.UseChromeDefaults()
@@ -38,9 +38,20 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 		);
 
 	var req = await builder.BuildAsync();
-	//req.Dump("Built request", 1);
-	//req.ToHttpContent().Dump("As HttpContent", 1);
-	//req.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+	
+//	req.Dump("Built request", 0);
+//
+//	req.ToHttpContent()
+//		.SelectMany(r => r.Headers.Select(h => KeyValuePair.Create(h.Key, string.Join(", ", h.Value )) ))
+//		.Dump("As HttpContent", 0);
+//	
+//	var msg = req.ToApiRequestMessage();
+//	msg.Dump("DDD", 0);
+//	new {
+//	 	TargetUri = msg.RequestUri.ToString(),
+//		Method = msg.Method.ToString(),
+//		Content = msg.Content.Dump()
+//	 }.Dump("From RequestMessage", 1);
 
 	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{Rand.Next()}.pdf";
 	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
@@ -70,7 +81,7 @@ static string GetBody()
 				</style>
 				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
 				<body>
-					<h1>Hello world</h1>
+					<h1>Hello World</h1>
 					<div class=""photo-container"">
 						<figure>
 						    <img src=""ear-on-beach.jpg"">

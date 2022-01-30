@@ -16,17 +16,60 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 
         protected sealed override HtmlRequest Request { get; set; }
 
-        public HtmlRequestBuilder() => this.Request = new HtmlRequest();
+        public HtmlRequestBuilder() 
+            => this.Request = new HtmlRequest();
 
         [PublicAPI]
         public HtmlRequestBuilder(bool containsMarkdown)
             => this.Request = new HtmlRequest(containsMarkdown);
 
+        /// <summary>
+        ///  Configures gotenberg to emulate html loading as screen. By default it loads it as print
+        /// </summary>
+        /// <returns></returns>
+        [PublicAPI]
+        public HtmlRequestBuilder EmulateAsScreen()
+        {
+            this.Request.ConversionBehaviors.EmulatedMediaType = "screen";
+
+            return this;
+        }
+
+        /// <summary>
+        ///  Tells gotenberg to return a 409 response if there are exceptions in the Chromium console. 
+        /// </summary>
+        /// <returns></returns>
+        [PublicAPI]
+        public HtmlRequestBuilder FailOnConsoleExceptions()
+        {
+            this.Request.ConversionBehaviors.FailOnConsoleExceptions = true;
+
+            return this;
+        }
+
+        [PublicAPI]
+        public HtmlRequestBuilder SetBrowserWaitDelay(int seconds)
+        {
+            this.Request.ConversionBehaviors.WaitDelay = $"{seconds}s";
+
+            return this;
+        }
+
+        [PublicAPI]
+        public HtmlRequestBuilder SetBrowserWaitExpression(string expression)
+        {
+            if (expression.IsNotSet()) throw new InvalidOperationException("expression is not set");
+            this.Request.ConversionBehaviors.WaitForExpression = expression;
+
+            return this;
+        }
+
+
         [PublicAPI]
         public HtmlRequestBuilder AddAdditionalHeaders(string headerName, string headerValue)
         {
             if (headerName.IsNotSet()) throw new InvalidOperationException("headerName is not set");
-            this.Request.AddExtraHeaders(headerName, headerValue);
+            this.Request.ConversionBehaviors.AddExtraHeaders(headerName, headerValue);
 
             return this;
         }

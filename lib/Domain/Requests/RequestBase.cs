@@ -9,7 +9,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class RequestBase : IApiRequest
     {
-        const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
+        const string DispositionType = ConstantsHttpContent.Disposition.Types.FormData;
 
         public abstract string ApiPath { get; }
 
@@ -19,6 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public AssetDictionary Assets { get; set; }
 
+        //TODO: Don't think this is used anywhere. Is it no longer supported, or had it never been used?
         public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
 
         public abstract IEnumerable<HttpContent> ToHttpContent();

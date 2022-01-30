@@ -5,6 +5,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
@@ -31,6 +32,8 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
+		.EmulateAsScreen()
+		.SetBrowserWaitDelay(17)
 		.ConfigureRequest(b =>
 		{
 			b.PageRanges("1-2");
@@ -41,12 +44,15 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		)).WithDimensions(b =>
 		{
 			b.SetPaperSize(PaperSizes.A4)
-			.SetMargins(Margins.Normal)
-			 .LandScape()
-			 .SetScale(.90);
+			.SetMargins(Margins.None);
 		});
 
 	var request = await builder.BuildAsync();
+
+	//request.Dump("Built request", 1);
+	//request.ToHttpContent().Dump("As HttpContent", 1);
+	//request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+
 	var response = await sharpClient.UrlToPdfAsync(request);
 
 	var resultPath = @$"{destinationPath}\GotenbergFromUrl-{Rand.Next()}.pdf";

@@ -1,12 +1,8 @@
 ﻿using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using JetBrains.Annotations;
-
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -68,6 +64,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             }
         }
 
+        //TODO Move to an extension method
         IEnumerable<HttpContent> TryAddWebhookHeaders()
         {
             if (this.Webhook?.TargetUrl != null)

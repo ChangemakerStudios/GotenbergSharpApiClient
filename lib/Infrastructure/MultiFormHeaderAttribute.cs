@@ -15,8 +15,8 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         // ReSharper disable once TooManyDependencies
         public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files,
             string fileName = null,
-            string contentDisposition = Constants.HttpContent.Disposition.Types.FormData,
-            string mediaType = Constants.HttpContent.MediaTypes.TextHtml)
+            string contentDisposition = ConstantsHttpContent.Disposition.Types.FormData,
+            string mediaType = ConstantsHttpContent.MediaTypes.TextHtml)
         {
             Name = name;
             FileName = fileName;

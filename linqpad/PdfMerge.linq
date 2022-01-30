@@ -36,9 +36,13 @@ async Task<string> DoMerge(string destinationPath)
  	var builder = new MergeBuilder()
 		.WithAssets(b => { b.AddItems(toMerge) ;});
 		
-	var request = builder.Build();	
- 
-	 var response = await sharpClient.MergePdfsAsync(request);
+	var request = builder.Build();
+//
+//	request.Dump("Built request", 1);
+//	request.ToHttpContent().Dump("As HttpContent", 1);
+//	request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+
+	var response = await sharpClient.MergePdfsAsync(request);
 
 	var outPath = @$"{destinationPath}\GotenbergMergeResult.pdf";
 

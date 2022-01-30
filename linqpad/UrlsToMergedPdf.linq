@@ -44,20 +44,17 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	{
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
-			.SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
+			.EmulateAsScreen()
 			.ConfigureRequest(b =>
 			{
 				 b.PageRanges("1-2");
-			}).AddHeaderFooter(b =>
-			{
-				 b.SetFooter(GetHeadFoot(uri.ToString()));
 			})
 			.WithDimensions(b =>
 			{
-				b.SetPaperSize(PaperSizes.A4)
-				 .SetMargins(Margins.None)
-				 .MarginBottom(1)
-				 .LandScape();
+				b.SetMargins(Margins.None)
+				.SetPaperSize(PaperSizes.A4)
+				 .MarginLeft(.2)
+				 .MarginRight(.2);
 			});
 	}
 

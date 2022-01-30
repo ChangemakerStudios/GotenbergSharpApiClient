@@ -84,10 +84,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             SetFooter(new ContentItem(footer));
 
         [PublicAPI]
-        public DocumentBuilder SetFooter(byte[] footer) => SetFooter(new ContentItem(footer));
+        public DocumentBuilder SetFooter(byte[] footer)
+            => SetFooter(new ContentItem(footer));
 
         [PublicAPI]
-        public DocumentBuilder SetFooter(Stream footer) => SetFooter(new ContentItem(footer));
+        public DocumentBuilder SetFooter(Stream footer)
+            => SetFooter(new ContentItem(footer));
 
         #endregion
     }

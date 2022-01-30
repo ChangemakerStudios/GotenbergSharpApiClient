@@ -45,6 +45,11 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 		});
 
 	var request = await builder.BuildAsync();
+
+	//request.Dump("Built request", 1);
+	//request.ToHttpContent().Dump("As HttpContent", 1);
+	//request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+
 	var response = await sharpClient.HtmlToPdfAsync(request);
 
 	var outPath = @$"{destinationDirectory}\GotenbergFromMarkDown-{Rand.Next()}.pdf";
