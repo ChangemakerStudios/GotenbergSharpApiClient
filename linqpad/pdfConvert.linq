@@ -9,9 +9,16 @@
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
 </Query>
 
+static Random Rand = new Random(Math.Abs((int)DateTime.Now.Ticks));
+
+//Gotenberg supports only format A1a out of the box
+//To get support for A-1b, PDF/A-2b, PDF/A-3b
+//Run the Gotenberg-Ghost script module: 
+//See https://github.com/Vrex123/gotenberg-ghostscript#quick-start
+
 async Task Main()
 {
-	var p = await DoConversion(@"D:\Gotenberg\Dumps");
+	var p = await DoConversion(@"D:\Gotenberg\Delivs");
 	
 	var info = new ProcessStartInfo { FileName = p, UseShellExecute = true };
 	Process.Start(info);
@@ -26,13 +33,13 @@ async Task<string> DoConversion(string destinationPath)
 	var items = Directory.GetFiles(destinationPath, "*.pdf", SearchOption.TopDirectoryOnly)
 		.Select(p => new { Info = new FileInfo(p), Path = p })
 		.OrderBy(item => item.Info.CreationTime)
-		.Take(2);
+		.Take(4);
 		
 	var toConvert = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  
  	var builder = new PdfConversionBuilder()
 		.AddItems(b => b.AddItems(toConvert) )
-		.SetFormat(PdfFormats.A1a); //A1a is the only one Gotenberg can handle?
+		.SetFormat(PdfFormats.A1a); 
 		
 	var request = builder.Build();
  
