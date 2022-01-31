@@ -90,7 +90,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginRight)]
         public double MarginRight { [UsedImplicitly] get; set; }
 
-
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Dimensions"/> is landscape.
         /// </summary>

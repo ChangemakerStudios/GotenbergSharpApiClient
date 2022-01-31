@@ -67,7 +67,7 @@ namespace Gotenberg.Sharp.API.Client
         #region api methods
 
         /// <summary>
-        /// For remote URL conversions. Works just like <see><cref>HtmlToPDf</cref></see>
+        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>

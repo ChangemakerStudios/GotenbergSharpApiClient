@@ -32,8 +32,11 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
-		.EmulateAsScreen()
-		.SetBrowserWaitDelay(17)
+		.SetConversionBehaviors(b => {
+		   b.EmulateAsScreen()
+		   .SetBrowserWaitDelay(2)
+  	       .SetUserAgent(nameof(GotenbergSharpClient));
+		} )
 		.ConfigureRequest(b =>
 		{
 			b.PageRanges("1-2");

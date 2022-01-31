@@ -44,7 +44,9 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	{
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
-			.EmulateAsScreen()
+			.SetConversionBehaviors(n => 
+			    n.EmulateAsScreen()
+			    .SetUserAgent(nameof(GotenbergSharpClient) ))
 			.ConfigureRequest(b =>
 			{
 				 b.PageRanges("1-2");

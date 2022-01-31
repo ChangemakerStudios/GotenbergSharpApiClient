@@ -14,7 +14,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         readonly IResolveContentType _resolveContentType = new ResolveContentTypeImplementation();
 
-        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergeOffice;
+        public override string ApiPath 
+            => Constants.Gotenberg.ApiPaths.MergeOffice;
 
         public int Count => this.Assets.IfNullEmpty().Count;
 

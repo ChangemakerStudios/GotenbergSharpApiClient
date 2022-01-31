@@ -75,21 +75,14 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 /// https://gotenberg.dev/docs/modules/chromium
                 /// </summary>
                 public static class HtmlConvertBehaviors
-                {                    
-                    public const string ExtraHttpHeaders = "extraHttpHeaders"; //all requests
-                    
-                    //Duration to wait when loading an HTML document before converting it to PDF
+                {
                     public const string WaitDelay = "waitDelay";
-                    
-                    //The JavaScript expression to wait before converting an HTML document to PDF until it returns true
                     public const string WaitForExpression = "waitForExpression";
-
+                    public const string UserAgent = "userAgent";
+                    public const string ExtraHttpHeaders = "extraHttpHeaders"; //all requests
                     public const string FailOnConsoleExceptions = "failOnConsoleExceptions";
-
-                    /// <summary>
-                    ///   The media type to emulate, either "screen" or "print" - empty means "print"
-                    /// </summary>
                     public const string EmulatedMediaType = "emulatedMediaType";
+                    public const string PdfFormat = "pdfFormat";
                 }
 
                 /// <summary>

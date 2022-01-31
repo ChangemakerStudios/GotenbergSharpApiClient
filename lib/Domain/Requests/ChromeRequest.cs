@@ -9,13 +9,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class ChromeRequest : RequestBase
     {
-        public Dimensions Dimensions { get; set; } = Dimensions.ToChromeDefaults();
+        public Dimensions Dimensions { get; set; } 
+            = Dimensions.ToChromeDefaults();
 
-        public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new HtmlConversionBehaviors();
+        public HtmlConversionBehaviors ConversionBehaviors { get; set; } 
+            = new HtmlConversionBehaviors();
 
-        public override IEnumerable<HttpContent> ToHttpContent()
-            => ConversionBehaviors.IfNullEmptyContent()
-                .Concat(Dimensions.IfNullEmptyContent());
-
+        public override IEnumerable<HttpContent> ToHttpContent() 
+            => Config.IfNullEmptyContent()
+                .Concat(Assets.IfNullEmptyContent())
+                .Concat(Dimensions.IfNullEmptyContent())
+                .Concat(ConversionBehaviors.IfNullEmptyContent());
     }
 }

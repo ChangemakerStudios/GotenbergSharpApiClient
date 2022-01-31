@@ -1,12 +1,13 @@
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+
+using JetBrains.Annotations;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
@@ -22,57 +23,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public HtmlRequestBuilder(bool containsMarkdown)
             => this.Request = new HtmlRequest(containsMarkdown);
-
-        /// <summary>
-        ///  Configures gotenberg to emulate html loading as screen. By default it loads it as print
-        /// </summary>
-        /// <returns></returns>
-        [PublicAPI]
-        public HtmlRequestBuilder EmulateAsScreen()
-        {
-            this.Request.ConversionBehaviors.EmulatedMediaType = "screen";
-
-            return this;
-        }
-
-        /// <summary>
-        ///  Tells gotenberg to return a 409 response if there are exceptions in the Chromium console. 
-        /// </summary>
-        /// <returns></returns>
-        [PublicAPI]
-        public HtmlRequestBuilder FailOnConsoleExceptions()
-        {
-            this.Request.ConversionBehaviors.FailOnConsoleExceptions = true;
-
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder SetBrowserWaitDelay(int seconds)
-        {
-            this.Request.ConversionBehaviors.WaitDelay = $"{seconds}s";
-
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder SetBrowserWaitExpression(string expression)
-        {
-            if (expression.IsNotSet()) throw new InvalidOperationException("expression is not set");
-            this.Request.ConversionBehaviors.WaitForExpression = expression;
-
-            return this;
-        }
-
-
-        [PublicAPI]
-        public HtmlRequestBuilder AddAdditionalHeaders(string headerName, string headerValue)
-        {
-            if (headerName.IsNotSet()) throw new InvalidOperationException("headerName is not set");
-            this.Request.ConversionBehaviors.AddExtraHeaders(headerName, headerValue);
-
-            return this;
-        }
 
         [PublicAPI]
         public HtmlRequestBuilder AddDocument(Action<DocumentBuilder> action)
@@ -125,6 +75,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        [PublicAPI]
+        public HtmlRequestBuilder SetConversionBehaviors(Action<HtmlConversionBehaviorBuilder> action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            action(new HtmlConversionBehaviorBuilder(this.Request));
+            return this;
+        }
+
+        [PublicAPI]
+        public HtmlRequestBuilder SetConversionBehaviors(HtmlConversionBehaviors behaviors)
+        {
+            if (behaviors == null) throw new ArgumentNullException(nameof(behaviors));
+            this.Request.ConversionBehaviors = behaviors;
+            return this;
+        }
 
         [PublicAPI]
         public HtmlRequest Build()

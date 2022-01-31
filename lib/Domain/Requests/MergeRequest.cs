@@ -10,7 +10,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class MergeRequest : RequestBase
     {
-        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergePdf;
+        public override string ApiPath 
+            => Constants.Gotenberg.ApiPaths.MergePdf;
 
         public int Count => this.Assets.IfNullEmpty().Count;
 

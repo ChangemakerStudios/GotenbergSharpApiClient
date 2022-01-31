@@ -25,9 +25,8 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
-		.AddDocument( 
-			doc => doc.SetBody(GetBody())
-					  .SetFooter(GetFooter())
+		.AddDocument( doc => doc.SetBody(GetBody())
+					  			.SetFooter(GetFooter())
 		).WithDimensions(dims =>
 		{
 			dims.UseChromeDefaults()
@@ -35,7 +34,8 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 				.SetScale(.75);
 		}).WithAsyncAssets(async
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
-		);
+		).SetConversionBehaviors(b => b.SetBrowserWaitDelay(1))
+		 .ConfigureRequest(b=> b.PageRanges("1"));
 
 	var req = await builder.BuildAsync();
 	

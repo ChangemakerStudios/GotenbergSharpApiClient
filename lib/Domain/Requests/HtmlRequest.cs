@@ -21,8 +21,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// </remarks>
     public sealed class HtmlRequest : ChromeRequest
     {
-        public override string ApiPath =>
-            this.ContainsMarkdown
+        public override string ApiPath
+            => this.ContainsMarkdown
                 ? Constants.Gotenberg.ApiPaths.ConvertMarkdown
                 : Constants.Gotenberg.ApiPaths.ConvertHtml;
 
@@ -47,11 +47,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
 
             return base.ToHttpContent()
-                .Concat(Content.IfNullEmptyContent())
-                .Concat(Assets.IfNullEmptyContent())
-                .Concat(Config.IfNullEmptyContent())
-                .Concat(Dimensions.IfNullEmptyContent());
-
+                .Concat(Content.IfNullEmptyContent());
         }
     }
 }

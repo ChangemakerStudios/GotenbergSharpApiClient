@@ -27,10 +27,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             if (!this.Url.IsAbsoluteUri) throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
             return base.ToHttpContent()
-                .Concat(new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.FormFieldNames.RemoteUrl) })
                 .Concat(Content.IfNullEmptyContent())
-                .Concat(Config.IfNullEmptyContent())
-                .Concat(Dimensions.IfNullEmptyContent());
+                .Concat(new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.FormFieldNames.RemoteUrl) });
         }
  
     }
