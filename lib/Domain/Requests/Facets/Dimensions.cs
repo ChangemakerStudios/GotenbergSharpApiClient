@@ -22,9 +22,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </remarks>
     public sealed class Dimensions : IConvertToHttpContent
     {
-        // ReSharper disable once InconsistentNaming
-        static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
-
         #region Properties
 
         /// <summary>
@@ -167,19 +164,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.GetType().GetProperties()
-                .Where(prop => Attribute.IsDefined(prop, _attributeType))
-                .Select(p => new
-                    { Prop = p, Attrib = (MultiFormHeaderAttribute) Attribute.GetCustomAttribute(p, _attributeType) })
+            return this.GetType().ToMultiFormPropertyItems()
                 .Select(item =>
                 {
-                    var value = item.Prop.GetValue(this);
+                    var value = item.Property.GetValue(this);
 
                     if (value == null) return null;
 
                     var contentItem = new StringContent(GetValueAsUsString(value));
 
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
+                    contentItem.Headers.ContentDisposition = 
+                        new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
+                        {
+                            Name = item.Attribute.Name
+                        };
 
                     return contentItem;
                 }).WhereNotNull();

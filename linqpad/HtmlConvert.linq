@@ -5,6 +5,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
 </Query>
 
 
@@ -28,14 +29,13 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 		.AddDocument( doc => doc.SetBody(GetBody())
 					  			.SetFooter(GetFooter())
 		).WithDimensions(dims =>
-		{
-			dims.UseChromeDefaults()
-				.LandScape()
-				.SetScale(.75);
+		{ 
 		}).WithAsyncAssets(async
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
-		).SetConversionBehaviors(b => b.SetBrowserWaitDelay(1))
-		 .ConfigureRequest(b=> b.PageRanges("1"));
+		).SetConversionBehaviors(b => 
+			b.SetBrowserWaitDelay(1)
+			.SetPdfFormat(PdfFormats.A1a) 
+		).ConfigureRequest(b=> b.PageRanges("1"));
 
 	var req = await builder.BuildAsync();
 	

@@ -5,9 +5,7 @@ using JetBrains.Annotations;
 
 using Newtonsoft.Json.Linq;
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
@@ -18,8 +16,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 /// </summary>
 public class HtmlConversionBehaviors : IConvertToHttpContent
 {
-    static readonly Type AttributeType = typeof(MultiFormHeaderAttribute);
-
     /// <summary>
     /// Duration to wait when loading an HTML document before converting it to PDF
     /// </summary>
@@ -83,24 +79,18 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
                 Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.PdfFormat);
         }
 
-        foreach (var item in this.GetType().GetProperties()
-                     .Where(prop => Attribute.IsDefined(prop, AttributeType))
-                     .Select(p => new
-                     {
-                         Prop = p, 
-                         Attrib = (MultiFormHeaderAttribute) Attribute.GetCustomAttribute(p, AttributeType)
-                     }))
+        foreach (var item in this.GetType().ToMultiFormPropertyItems())
         {
-            var value = item.Prop.GetValue(this);
+            var value = item.Property.GetValue(this);
 
             if (value == null) continue;
 
             var contentItem = new StringContent(value.ToString());
 
             contentItem.Headers.ContentDisposition = 
-                new ContentDispositionHeaderValue(item.Attrib.ContentDisposition)
+                new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
                 {
-                    Name = item.Attrib.Name
+                    Name = item.Attribute.Name
                 };
 
             yield return contentItem;
