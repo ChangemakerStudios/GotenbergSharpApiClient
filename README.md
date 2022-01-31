@@ -13,7 +13,7 @@
 ```
 *Create & start a container*
 ```powershell
-docker run --name gotenbee7x --rm -p 3000:3000 gotenberg/gotenberg:latest gotenberg --log-level=debug
+docker run --name gotenbee7x --rm -p 3000:3000 gotenberg/gotenberg:latest gotenberg --api-timeout=1800s --log-level=debug
 ```
 # .NET Core Project Setup
 *Install nuget package into your project*

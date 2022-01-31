@@ -5,8 +5,11 @@
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>System.Net.Http</Namespace>
 </Query>
 
+//NOTE: You need to increase gotenberg api's timeout for this to work. 
+//e.g. pass --api-timeout=1800s
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -26,8 +29,7 @@ public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk",
 		"https://english.elpais.com/", 	"https://www.thehindu.com", "https://www.theaustralian.com.au",
 		"https://www.welt.de", "https://www.cankaoxiaoxi.com", "https://www.novinky.cz","https://www.elobservador.com.uy"}
-		.Select(u => new Uri(u))
-		.Take(5);
+		.Select(u => new Uri(u));
 		
 	//Takes 5 b/c On Goten, v7.4.2 it errors when all the urls are sent and returns a 503 response. 
 	//Error: "convert to PDF: chromium PDF: wait for events: wait for event networkIdle: context deadline exceeded"
@@ -44,9 +46,10 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	{
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
-			.SetConversionBehaviors(n => 
-			    n.EmulateAsScreen()
-			    .SetUserAgent(nameof(GotenbergSharpClient) ))
+			.SetConversionBehaviors(b => 
+			   // b.SetPdfFormat(PdfFormats.A1a)
+				b.EmulateAsScreen()
+			    .SetUserAgent(nameof(GotenbergSharpClient)))
 			.ConfigureRequest(b =>
 			{
 				 b.PageRanges("1-2");
@@ -55,8 +58,8 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 			{
 				b.SetMargins(Margins.None)
 				.SetPaperSize(PaperSizes.A4)
-				 .MarginLeft(.2)
-				 .MarginRight(.2);
+				 .MarginLeft(.1)
+				 .MarginRight(.1);
 			});
 	}
 
@@ -66,7 +69,12 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 
 async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory)
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	var innerClient = new HttpClient {
+		 BaseAddress = new Uri("http://localhost:3000"),
+		 Timeout = TimeSpan.FromMinutes(7)
+	};
+	
+	var sharpClient = new GotenbergSharpClient(innerClient);
 
 	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r, CancellationToken.None));
 	var results = await Task.WhenAll(tasks);

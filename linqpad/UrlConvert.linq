@@ -46,8 +46,8 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
 		)).WithDimensions(b =>
 		{
-			//b.SetPaperSize(PaperSizes.A4)
-			b.SetMargins(Margins.None);
+			b.SetPaperSize(PaperSizes.A4)
+			 .SetMargins(Margins.None);
 		});
 
 	var request = await builder.BuildAsync();

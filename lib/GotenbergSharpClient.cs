@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -33,11 +34,13 @@ namespace Gotenberg.Sharp.API.Client
 
         #region ctors
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public GotenbergSharpClient(string address)
             : this(new Uri(address))
         {
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public GotenbergSharpClient(Uri address)
             : this(new HttpClient { BaseAddress = address })
         {
