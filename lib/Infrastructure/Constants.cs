@@ -3,9 +3,31 @@ using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure
-{
+{ 
     public static class Constants
     {
+        public static class HttpContent
+        {
+            public static class MediaTypes
+            {
+                public const string TextHtml = "text/html";
+                public const string ApplicationPdf = "application/pdf";
+            }
+
+            public static class MultipartData
+            {
+                public const string BoundaryPrefix = "--------------------------";
+            }
+
+            public static class Disposition
+            {
+                public static class Types
+                {
+                    public const string FormData = "form-data";
+                }
+            }
+        }
+
         /// <summary>
         /// https://gotenberg.dev/docs/about
         /// </summary>

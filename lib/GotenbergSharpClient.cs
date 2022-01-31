@@ -62,7 +62,7 @@ namespace Gotenberg.Sharp.API.Client
 
             _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
             _innerClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue(ConstantsHttpContent.MediaTypes.ApplicationPdf));
+                new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
         }
 
         #endregion

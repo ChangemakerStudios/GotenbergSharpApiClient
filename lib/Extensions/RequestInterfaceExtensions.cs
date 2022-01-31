@@ -19,7 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             var formContent =
                 new MultipartFormDataContent(
-                    $"{ConstantsHttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
+                    $"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
 
             foreach (var item in request.ToHttpContent())
             {

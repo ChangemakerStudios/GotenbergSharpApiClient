@@ -9,7 +9,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class RequestBase : IApiRequest
     {
-        const string DispositionType = ConstantsHttpContent.Disposition.Types.FormData;
+        const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
 
         public abstract string ApiPath { get; }
 
