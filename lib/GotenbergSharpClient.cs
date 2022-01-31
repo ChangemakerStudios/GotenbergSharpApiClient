@@ -124,6 +124,10 @@ namespace Gotenberg.Sharp.API.Client
             using var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
         }
 
+        [PublicAPI]
+        public Task<Stream> ConvertPdfDocumentsAsync(PdfConversionRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
+
         #endregion
 
         #region exec
