@@ -8,6 +8,11 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
     {
         public static class HttpContent
         {
+            public static class Headers
+            {
+                public const string UserAgent = "User-Agent";
+            }
+
             public static class MediaTypes
             {
                 public const string TextHtml = "text/html";

@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+
+using JetBrains.Annotations;
+
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
-
-using Microsoft.Net.Http.Headers;
 
 
 namespace Gotenberg.Sharp.API.Client
@@ -60,7 +58,7 @@ namespace Gotenberg.Sharp.API.Client
                 throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
             }
 
-            _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Add(Constants.HttpContent.Headers.UserAgent, nameof(GotenbergSharpClient));
             _innerClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
         }

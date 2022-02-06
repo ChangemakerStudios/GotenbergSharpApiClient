@@ -62,7 +62,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public WebhookBuilder SetErrorUrl(Uri url, HttpMethod method = null)
         {
-            this.Request.Config.Webhook.TargetUrl = url ?? throw new ArgumentNullException(nameof(url));
+            this.Request.Config.Webhook.ErrorUrl = url ?? throw new ArgumentNullException(nameof(url));
 
             if (!url.IsAbsoluteUri) throw new InvalidOperationException("Url base href is not absolute");
             
