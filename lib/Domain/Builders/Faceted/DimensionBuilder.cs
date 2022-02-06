@@ -128,10 +128,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public DimensionBuilder UseChromeDefaults() => SetDimensions(Dimensions.ToChromeDefaults());
+        public DimensionBuilder UseChromeDefaults() => 
+            SetDimensions(Dimensions.ToChromeDefaults());
 
         [PublicAPI]
-        public DimensionBuilder UseDeliverableDefaults() => SetDimensions(Dimensions.ToDeliverableDefault());
+        public DimensionBuilder UseDeliverableDefaults() => 
+            SetDimensions(Dimensions.ToDeliverableDefault());
 
         #endregion
     }

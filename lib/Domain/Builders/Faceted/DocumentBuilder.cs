@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
     /// <remarks>
     ///     If you don't specify any dimensions the client sets them to Chrome's defaults
     /// </remarks>
-    public sealed class DocumentBuilder : HtmlRequestBuilder
+    public sealed class DocumentBuilder : BaseBuilder<HtmlRequest>
     {
         public DocumentBuilder(HtmlRequest request)
         {
@@ -37,13 +37,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public DocumentBuilder SetBody(string body) => SetBody(new ContentItem(body));
+        public DocumentBuilder SetBody(string body) => 
+            SetBody(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder SetBody(byte[] body) => SetBody(new ContentItem(body));
+        public DocumentBuilder SetBody(byte[] body) => 
+            SetBody(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder SetBody(Stream body) => SetBody(new ContentItem(body));
+        public DocumentBuilder SetBody(Stream body) => 
+            SetBody(new ContentItem(body));
 
         #endregion
 

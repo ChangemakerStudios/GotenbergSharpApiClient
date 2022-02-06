@@ -62,7 +62,6 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 public const string ConvertUrl = $"{Modules.Chromium}/convert/url";
                 public const string ConvertMarkdown = $"{Modules.Chromium}/convert/markdown";
 
-                //TODO: currently unused
                 public const string ConvertPdf = $"{Modules.PdfEngines}/convert";
                 public const string MergePdf = $"{Modules.PdfEngines}/merge"; 
                 public const string MergeOffice = $"{Modules.LibreOffice}/convert";
@@ -110,15 +109,15 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                     public const string FailOnConsoleExceptions = "failOnConsoleExceptions";
                     public const string EmulatedMediaType = "emulatedMediaType";
                     public const string PdfFormat = "pdfFormat";
-                }
 
-                /// <summary>
-                /// https://gotenberg.dev/docs/modules/chromium#url
-                /// </summary>
-                public static class UrlConvertBehaviors
-                {
-                    public const string ExtraLinkTags = "extraLinkTags";
-                    public const string ExtraScriptTags = "extraScriptTags";
+                    /// <summary>
+                    /// https://gotenberg.dev/docs/modules/chromium#url
+                    /// </summary>
+                    public static class UrlConvert
+                    {
+                        public const string ExtraLinkTags = "extraLinkTags";
+                        public const string ExtraScriptTags = "extraScriptTags";
+                    }
                 }
 
                 /// <summary>

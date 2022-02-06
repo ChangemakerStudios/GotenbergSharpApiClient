@@ -31,7 +31,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 KeyValuePair.Create(index.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension),
                     item.Value));
 
-            return new AssetDictionary().FluentAddRange(ordered);
+            return new AssetDictionary().AddRangeFluently(ordered);
         }
 
         public static AssetDictionary RemoveInvalidOfficeDocs(this AssetDictionary unfiltered)
@@ -40,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 .Where(asset => OfficeExtensions.Contains(new FileInfo(asset.Key).Extension,
                     StringComparer.InvariantCultureIgnoreCase));
 
-            return new AssetDictionary().FluentAddRange(filtered);
+            return new AssetDictionary().AddRangeFluently(filtered);
         }
 
         #region office extension list

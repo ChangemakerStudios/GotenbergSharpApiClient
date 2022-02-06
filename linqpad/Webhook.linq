@@ -7,6 +7,8 @@
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
+static bool DumpHttpContent = true;
+
 async Task Main()
 {
 	//For this to work you need an api running on localhost:5000 w/ an endpoint to receive the webhook
@@ -48,10 +50,8 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 		});
 
 	var request = await builder.BuildAsync();
-
-	request.Dump("Built request", 1);
-	request.ToHttpContent().Dump("As HttpContent", 1);
-	request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+	
+    if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	await sharpClient.FireWebhookAndForgetAsync(request);
 }

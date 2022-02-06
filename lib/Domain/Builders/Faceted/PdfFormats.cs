@@ -1,9 +1,15 @@
-﻿using System.ComponentModel;
+﻿using JetBrains.Annotations;
+
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
+[PublicAPI]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum PdfFormats
 {
+    [UsedImplicitly]
     None = 0,
 
     [Description("PDF/A-1a")]

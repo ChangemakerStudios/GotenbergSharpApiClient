@@ -25,6 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         {
             if (hook?.TargetUrl == null) throw new ArgumentNullException(nameof(hook));
             this.Request.Config.Webhook = hook;
+
             return this;
         }
 
@@ -40,6 +41,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         public WebhookBuilder SetUrl(string url, HttpMethod method = null)
         {
             if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
+
             return SetUrl(new Uri(url), method);
         }
 
@@ -49,6 +51,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             this.Request.Config.Webhook.TargetUrl = url ?? throw new ArgumentNullException(nameof(url));
             this.Request.Config.Webhook.HttpMethod = method?.ToString();
             if (!url.IsAbsoluteUri) throw new InvalidOperationException("Url base href is not absolute");
+
             return this;
         }
 
@@ -56,6 +59,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         public WebhookBuilder SetErrorUrl(string url, HttpMethod method = null)
         {
             if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
+
             return SetErrorUrl(new Uri(url), method);
         }
 
@@ -85,6 +89,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             if (name.IsNotSet()) throw new ArgumentException("request header name is null || empty", nameof(name));
 
             this.Request.CustomHeaders.Add(Constants.Gotenberg.FormFieldNames.Webhook.ExtraHeaders, values);
+
             return this;
         }
     }

@@ -8,6 +8,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
 </Query>
 
+static bool DumpHttpContent = false;
 
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
@@ -34,24 +35,11 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
 		).SetConversionBehaviors(b => 
 			b.SetBrowserWaitDelay(1)
-			.SetPdfFormat(PdfFormats.A1a) 
 		).ConfigureRequest(b=> b.PageRanges("1"));
 
-	var req = await builder.BuildAsync();
-	
-//	req.Dump("Built request", 0);
-//
-//	req.ToHttpContent()
-//		.SelectMany(r => r.Headers.Select(h => KeyValuePair.Create(h.Key, string.Join(", ", h.Value )) ))
-//		.Dump("As HttpContent", 0);
-//	
-//	var msg = req.ToApiRequestMessage();
-//	msg.Dump("DDD", 0);
-//	new {
-//	 	TargetUri = msg.RequestUri.ToString(),
-//		Method = msg.Method.ToString(),
-//		Content = msg.Content.Dump()
-//	 }.Dump("From RequestMessage", 1);
+	var request = await builder.BuildAsync();
+
+	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{Rand.Next()}.pdf";
 	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
@@ -64,9 +52,9 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	return resultPath;
 }
 
-static async Task<byte[]> GetImageBytes()
+static Task<byte[]> GetImageBytes()
 {
-	return await new HttpClient().GetByteArrayAsync("http://4.bp.blogspot.com/-jdRdVRheb74/UlLHPkWs99I/AAAAAAAAAJc/lbJEG0KwfgI/s1600/bill-brandt-31.jpg");
+	return new HttpClient().GetByteArrayAsync("http://4.bp.blogspot.com/-jdRdVRheb74/UlLHPkWs99I/AAAAAAAAAJc/lbJEG0KwfgI/s1600/bill-brandt-31.jpg");
 }
 
 static string GetBody()

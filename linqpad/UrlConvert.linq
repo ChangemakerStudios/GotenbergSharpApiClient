@@ -8,6 +8,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
+static bool DumpHttpContent = false;
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -32,29 +33,24 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
-		.SetConversionBehaviors(b => {
+		.SetConversionBehaviors(b =>
 		   b.EmulateAsScreen()
-		   .SetBrowserWaitDelay(2)
-  	       .SetUserAgent(nameof(GotenbergSharpClient));
-		} )
-		.ConfigureRequest(b =>
-		{
-			b.PageRanges("1-2");
-		})
+		    .SetBrowserWaitDelay(2)
+			.SetUserAgent(nameof(GotenbergSharpClient))
+		).ConfigureRequest(b => b.PageRanges("1-2"))
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllBytesAsync(headerPath))
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
 		)).WithDimensions(b =>
-		{
 			b.SetPaperSize(PaperSizes.A4)
-			 .SetMargins(Margins.None);
-		});
+			 .UseChromeDefaults()
+			 .MarginLeft(0)
+			 .MarginRight(0)
+		);
 
 	var request = await builder.BuildAsync();
 
-	//request.Dump("Built request", 1);
-	//request.ToHttpContent().Dump("As HttpContent", 1);
-	//request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var response = await sharpClient.UrlToPdfAsync(request);
 

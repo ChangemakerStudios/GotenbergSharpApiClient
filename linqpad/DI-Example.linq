@@ -32,8 +32,11 @@
 //	Turn gotenberg back on & the request will successfully complete. 
 //Example builds a 1 page PDF from the specified TargetUrl
 
+static bool DumpHttpContent = false;
+
 const string TargetUrl = "https://www.cnn.com";
 const string SaveToPath = @"D:\Gotenberg\Dumps";
+
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -47,7 +50,7 @@ async Task Main()
 		var sharpClient = sp.GetRequiredService<GotenbergSharpClient>();
  
  		var request = await CreateUrlRequest();
- 
+
 		var response = await sharpClient.UrlToPdfAsync(request);
 
 		var resultPath = @$"{SaveToPath}\GotenbergFromUrl-{Rand.Next()}.pdf";
@@ -61,6 +64,8 @@ async Task Main()
 		Process.Start(info);
 
 		resultPath.Dump("Done");
+
+		if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 		//var ops = sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>();
 		//ops.Dump();

@@ -10,6 +10,8 @@
 </Query>
 
 
+static bool DumpHttpContent = false;
+
 static Random Rand = new Random(Math.Abs((int)DateTime.Now.Ticks));
 static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\OfficeDocs";
 
@@ -33,9 +35,7 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 
 	var request = await builder.BuildAsync();
 
-	//request.Dump("Built request", 1);
-	//request.ToHttpContent().Dump("As HttpContent", 1);
-	//request.ToApiRequestMessage().Dump("As HttpRequestMessage", 1);
+	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
 

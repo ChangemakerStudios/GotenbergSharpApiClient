@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Extensions;
 
 using Newtonsoft.Json;
 
@@ -39,19 +40,23 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             return new GotenbergApiException(message, request, response);
         }
 
-        public string ToString(bool verbose = false)
+        public string ToVerboseJson(
+            bool indentJson = false, 
+            bool includeRequestContent = true, 
+            bool includeGotenbergResponse = true)
         {
             using (_response)
             {
                 return JsonConvert.SerializeObject(new
                 {
                     GotenbergMessage = Message,
+                    GotenbergResponseReceived = includeGotenbergResponse ? _response : null,
                     ClientRequestSent = _request,
-                    ClientRequestFormContent = verbose ? _request.ToHttpContent() : null,
-                    GotenbergResponseReceived = verbose ? _response : null,
+                    ClientRequestFormContent = includeRequestContent ? _request.IfNullEmptyContent().ToDumpFriendlyFormat(false) : null,
                 }, new JsonSerializerSettings
                 {
-                    NullValueHandling = NullValueHandling.Ignore
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = indentJson ? Formatting.Indented : Formatting.None
                 });
             }
         }

@@ -5,8 +5,6 @@ using System.Linq;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-// ReSharper disable FlagArgument
-
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class EnumExtensions

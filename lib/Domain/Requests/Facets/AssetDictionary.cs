@@ -17,11 +17,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     {
         readonly IResolveContentType _resolveContentType = new ResolveContentTypeImplementation();
 
-        public AssetDictionary FluentAddRange([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
+        public AssetDictionary AddRangeFluently([NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
             var pairs = items as KeyValuePair<string, ContentItem>[] ?? items.ToArray();
+
             if (pairs.Any(item => item.Key.IsNotSet()))
                 throw new ArgumentException("One or more asset file names are null or empty");
 

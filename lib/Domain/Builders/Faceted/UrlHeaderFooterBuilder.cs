@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class UrlHeaderFooterBuilder : UrlRequestBuilder
+    public sealed class UrlHeaderFooterBuilder : BaseBuilder<UrlRequest>
     {
         [PublicAPI]
         public UrlHeaderFooterBuilder(UrlRequest request)
@@ -31,10 +31,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             SetHeader(new ContentItem(header));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder SetHeader(byte[] header) => SetHeader(new ContentItem(header));
+        public UrlHeaderFooterBuilder SetHeader(byte[] header) => 
+            SetHeader(new ContentItem(header));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder SetHeader(Stream header) => SetHeader(new ContentItem(header));
+        public UrlHeaderFooterBuilder SetHeader(Stream header) => 
+            SetHeader(new ContentItem(header));
 
         #endregion
 
@@ -48,13 +50,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder SetFooter(string footer) => SetFooter(new ContentItem(footer));
+        public UrlHeaderFooterBuilder SetFooter(string footer) => 
+            SetFooter(new ContentItem(footer));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder SetFooter(byte[] footer) => SetFooter(new ContentItem(footer));
+        public UrlHeaderFooterBuilder SetFooter(byte[] footer) => 
+            SetFooter(new ContentItem(footer));
 
         [PublicAPI]
-        public UrlHeaderFooterBuilder SetFooter(Stream footer) => SetFooter(new ContentItem(footer));
+        public UrlHeaderFooterBuilder SetFooter(Stream footer) => 
+            SetFooter(new ContentItem(footer));
 
         #endregion
     }

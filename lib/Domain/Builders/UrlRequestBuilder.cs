@@ -14,7 +14,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
     public class UrlRequestBuilder : BaseBuilder<UrlRequest>
     {
-        readonly List<Task> _asyncTasks = new List<Task>();
+        readonly List<Task> _asyncTasks = new();
 
         protected sealed override UrlRequest Request { get; set; }
 

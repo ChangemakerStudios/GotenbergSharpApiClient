@@ -1,5 +1,8 @@
-﻿namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
+﻿using JetBrains.Annotations;
+
+namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
+    [PublicAPI]
     public enum PaperSizes
     {
         None = 0,
