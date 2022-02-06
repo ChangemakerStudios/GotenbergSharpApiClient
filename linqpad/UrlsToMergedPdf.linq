@@ -24,16 +24,18 @@ async Task Main()
 
 public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 {
-	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/","https://www.cnn.com",  "https://www.csmonitor.com",
-		"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com",
-		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk",
-		"https://english.elpais.com/", 	"https://www.thehindu.com", "https://www.theaustralian.com.au",
-		"https://www.welt.de", "https://www.cankaoxiaoxi.com", "https://www.novinky.cz","https://www.elobservador.com.uy"}
+	var sites = new[] {
+		"https://www.nytimes.com","https://www.axios.com/",
+		"https://www.cnn.com",  "https://www.csmonitor.com",
+		"https://www.wsj.com", "https://www.usatoday.com",  
+		"https://www.irishtimes.com", "https://www.lemonde.fr", 
+		"https://calgaryherald.com", "https://www.bbc.com/news/uk",
+		"https://english.elpais.com/", 	"https://www.thehindu.com", 
+		"https://www.theaustralian.com.au",	"https://www.welt.de", 
+		"https://www.cankaoxiaoxi.com", "https://www.novinky.cz",
+		"https://www.elobservador.com.uy"}
 		.Select(u => new Uri(u));
 		
-	//Takes 5 b/c On Goten, v7.4.2 it errors when all the urls are sent and returns a 503 response. 
-	//Error: "convert to PDF: chromium PDF: wait for events: wait for event networkIdle: context deadline exceeded"
-	
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build());
 
@@ -57,14 +59,12 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 			.WithDimensions(b =>
 			{
 				b.SetMargins(Margins.None)
-				.SetPaperSize(PaperSizes.A4)
-				 .MarginLeft(.1)
-				 .MarginRight(.1);
+				 .MarginLeft(.3)
+				 .MarginRight(.3)
+				.SetPaperSize(PaperSizes.A4);
 			});
 	}
 
-	static string GetHeadFoot(string heading)
-		=> "<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>" + heading + "</h1></body></html>";
 }
 
 async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory)

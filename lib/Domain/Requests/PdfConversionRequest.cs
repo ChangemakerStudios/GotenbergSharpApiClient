@@ -48,7 +48,9 @@ public class PdfConversionRequest: RequestBase
 
         yield return CreateFormDataItem(format, Constants.Gotenberg.FormFieldNames.PdfEngines.PdfFormat);
 
-        foreach (var item in Config.IfNullEmptyContent())
+        foreach (var item in Config
+                     .IfNullEmptyContent()
+                     .Concat(this.Assets.IfNullEmptyContent()))
         {
             yield return item;
         }

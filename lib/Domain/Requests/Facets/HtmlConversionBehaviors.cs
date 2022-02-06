@@ -58,7 +58,6 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
 
     /// <summary>
     /// The media type to emulate, either "screen" or "print" - empty means "print".
-    /// Builders only provide the ability to emulate screen b/c Gotenberg emulates print by default
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.EmulatedMediaType)]
     public string EmulatedMediaType { [UsedImplicitly] get; set; }
@@ -67,10 +66,15 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// After a Chromium conversion, the PDF engines will convert the resulting PDF to a specific format.
     /// </summary>
     public PdfFormats PdfFormat { get; set; }
- 
+
+    /// <summary>
+    ///  JSON format allows you to add remote paths and override the default alphabetical ordering.
+    /// </summary>
+    public string ExtraLinkTags { [UsedImplicitly] get; set; }
+
     public IEnumerable<HttpContent> ToHttpContent()
     {
-        if (PdfFormat != PdfFormats.None)
+        if (PdfFormat != default)
         {
             //sloppy...   
             var format = $"PDF/A-{PdfFormat.ToString().Substring(1,2)}";

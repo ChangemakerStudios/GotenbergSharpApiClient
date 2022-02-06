@@ -29,9 +29,8 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest>
         return this;
     }
 
-
     [PublicAPI]
-    public PdfConversionBuilder AddItems(Action<AssetBuilder> action)
+    public PdfConversionBuilder WithPdfs(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
         action(new AssetBuilder(this.Request));
@@ -40,7 +39,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest>
     }
 
     [PublicAPI]
-    public PdfConversionBuilder AddItemsAsync(Func<AssetBuilder, Task> asyncAction)
+    public PdfConversionBuilder WithPdfsAsync(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
         this._asyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));

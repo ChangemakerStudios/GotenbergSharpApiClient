@@ -26,11 +26,11 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
-		.AddDocument( doc => doc.SetBody(GetBody())
-					  			.SetFooter(GetFooter())
-		).WithDimensions(dims =>
-		{ 
-		}).WithAsyncAssets(async
+		.AddDocument(doc => 
+			doc.SetBody(GetBody())
+			   .SetFooter(GetFooter())
+		).WithDimensions(dims => dims.UseChromeDefaults())
+		.WithAsyncAssets(async
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
 		).SetConversionBehaviors(b => 
 			b.SetBrowserWaitDelay(1)

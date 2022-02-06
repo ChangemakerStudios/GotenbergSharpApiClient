@@ -38,7 +38,7 @@ async Task<string> DoConversion(string destinationPath)
 	var toConvert = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  
  	var builder = new PdfConversionBuilder()
-		.AddItems(b => b.AddItems(toConvert) )
+		.WithPdfs(b => b.AddItems(toConvert) )
 		.SetFormat(PdfFormats.A1a); 
 		
 	var request = builder.Build();
