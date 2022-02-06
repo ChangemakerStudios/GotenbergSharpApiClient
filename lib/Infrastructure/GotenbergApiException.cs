@@ -41,9 +41,9 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         }
 
         public string ToVerboseJson(
-            bool indentJson = false, 
-            bool includeRequestContent = true, 
-            bool includeGotenbergResponse = true)
+            bool includeGotenbergResponse = true,
+            bool includeRequestContent = true,
+            bool indentJson = false)
         {
             using (_response)
             {

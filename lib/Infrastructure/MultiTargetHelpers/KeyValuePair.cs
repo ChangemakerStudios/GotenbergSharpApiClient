@@ -14,7 +14,6 @@ namespace System.Collections.Generic
         /// <param name="key">   The key.</param>
         /// <param name="value"> The value.</param>
         /// <returns>
-        /// .
         /// </returns>
         internal static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value)
         {

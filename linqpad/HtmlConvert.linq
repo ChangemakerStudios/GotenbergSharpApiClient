@@ -10,6 +10,7 @@
 
 static bool DumpHttpContent = false;
 
+static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html\ConvertExample\";
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -27,9 +28,9 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new HtmlRequestBuilder()
-		.AddDocument(doc => 
-			doc.SetBody(GetBody())
-			   .SetFooter(GetFooter())
+	   .AddAsyncDocument(async doc => 
+			doc.SetBody(await GetHtmlFile("body.html"))
+			   .SetFooter(await GetHtmlFile("footer.html"))
 		).WithDimensions(dims => dims.UseChromeDefaults())
 		.WithAsyncAssets(async
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
@@ -54,35 +55,10 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 
 static Task<byte[]> GetImageBytes()
 {
-	return new HttpClient().GetByteArrayAsync("http://4.bp.blogspot.com/-jdRdVRheb74/UlLHPkWs99I/AAAAAAAAAJc/lbJEG0KwfgI/s1600/bill-brandt-31.jpg");
+	return File.ReadAllBytesAsync($@"{ResourcePath}\ear-on-beach.jpg");
 }
 
-static string GetBody()
+static Task<byte[]> GetHtmlFile(string fileName)
 {
-	return @"<!doctype html>
-			<html lang=""en"">
-    			<style>
-					body { max-width: 700px;  margin: auto;} h1 { font-size: 55px; }
-					h1, h3{ text-align: center; margin-top: 5px; } .photo-container { padding-bottom: 20px;  }
-					figure { width:548px; height:600px; } figure img { border: 10px solid #000; } 
-					figcaption { text-align: right; font-size: 10pt; } 	a:link, a:visited { color: black !important; }
-				</style>
-				<head><meta charset=""utf-8""><title>Thanks to TheCodingMachine</title></head>  
-				<body>
-					<h1>Hello World</h1>
-					<div class=""photo-container"">
-						<figure>
-						    <img src=""ear-on-beach.jpg"">
-        	                <figcaption>Photo by <a href=""https://www.moma.org/artists/740"">Bill Brandt</a>.</figcaption>
-						 </figure>   
-					</div>
-					<h3>Powered by <a href=""https://hub.docker.com/r/thecodingmachine/gotenberg"">The Coding Machine</a></h3>
-				</body>
-			</html>";
-}
-
-static string GetFooter()
-{
-	return @"<html><head><style>body { font-size: 8rem; font-family: Roboto,""Helvetica Neue"",Arial,sans-serif; margin: 4rem auto; }  </style></head>
-	<body><p><span class=""pageNumber""></span> of <span class=""totalPages""> pages</span> PDF Created on <span class=""date""></span> <span class=""title""></span></p></body></html>";
+	return File.ReadAllBytesAsync($@"{ResourcePath}\{fileName}");
 }
