@@ -8,7 +8,6 @@
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
-static bool DumpHttpContent = false;
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -35,7 +34,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		.SetUrl("https://www.cnn.com")
 		.SetConversionBehaviors(b =>
 		   b.EmulateAsScreen()
-		    .SetBrowserWaitDelay(2)
+		    .SetBrowserWaitDelay(1)
 			.SetUserAgent(nameof(GotenbergSharpClient))
 		).ConfigureRequest(b => b.PageRanges("1-2"))
 		.AddAsyncHeaderFooter(async
@@ -49,8 +48,6 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		);
 
 	var request = await builder.BuildAsync();
-
-	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var response = await sharpClient.UrlToPdfAsync(request);
 

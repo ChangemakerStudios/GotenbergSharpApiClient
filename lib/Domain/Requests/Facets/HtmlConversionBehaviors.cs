@@ -67,11 +67,6 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// </summary>
     public PdfFormats PdfFormat { get; set; }
 
-    /// <summary>
-    ///  JSON format allows you to add remote paths and override the default alphabetical ordering.
-    /// </summary>
-    public string ExtraLinkTags { [UsedImplicitly] get; set; }
-
     public IEnumerable<HttpContent> ToHttpContent()
     {
         if (PdfFormat != default)

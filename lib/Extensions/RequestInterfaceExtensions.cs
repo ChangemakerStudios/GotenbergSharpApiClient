@@ -53,7 +53,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <param name="items"></param>
         /// <param name="includeNonText"></param>
         /// <returns></returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IEnumerable<object> ToDumpFriendlyFormat(this IEnumerable<HttpContent> items, bool includeNonText = false)
         {
             return items.Select(c => new

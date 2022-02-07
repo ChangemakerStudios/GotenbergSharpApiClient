@@ -1,14 +1,14 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
@@ -99,6 +99,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             if (action == null) throw new ArgumentNullException(nameof(action));
             action(new HtmlConversionBehaviorBuilder(this.Request));
             return this;
+        }
+
+        [PublicAPI]
+        public UrlRequestBuilder AddExtraResources(Action<UrlExtraResourcesBuilder> action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            action(new UrlExtraResourcesBuilder(this.Request));
+            return this;
+
         }
 
         [PublicAPI]

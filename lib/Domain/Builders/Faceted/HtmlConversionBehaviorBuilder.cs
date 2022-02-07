@@ -24,7 +24,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseBuilder<ChromeRequest>
     /// </summary>
     /// <param name="seconds"></param>
     /// <returns></returns>
-    /// <remarks>Prefer <see cref="SetBrowserWaitExpression"/>  over waitDelay.</remarks> 
+    /// <remarks>Prefer <see cref="SetBrowserWaitExpression"/> over waitDelay.</remarks> 
     [PublicAPI]
     public HtmlConversionBehaviorBuilder SetBrowserWaitDelay(int seconds)
     {
@@ -136,5 +136,5 @@ public sealed class HtmlConversionBehaviorBuilder : BaseBuilder<ChromeRequest>
 
         return this;
     }
-
+ 
 }

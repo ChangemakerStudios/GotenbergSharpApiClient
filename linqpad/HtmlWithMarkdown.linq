@@ -9,8 +9,6 @@
 </Query>
 
 
-static bool DumpHttpContent = false;
-
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Markdown";
 
@@ -45,8 +43,6 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 		).SetConversionBehaviors(b => b.SetBrowserWaitDelay(2));
 
 	var request = await builder.BuildAsync();
-
-	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var response = await sharpClient.HtmlToPdfAsync(request);
 

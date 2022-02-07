@@ -7,7 +7,6 @@
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
 </Query>
 
-static bool DumpHttpContent = true;
 
 async Task Main()
 {
@@ -51,7 +50,5 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 
 	var request = await builder.BuildAsync();
 	
-    if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
-
 	await sharpClient.FireWebhookAndForgetAsync(request);
 }

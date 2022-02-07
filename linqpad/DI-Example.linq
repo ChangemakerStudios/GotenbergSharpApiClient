@@ -32,8 +32,6 @@
 //	Turn gotenberg back on & the request will successfully complete. 
 //Example builds a 1 page PDF from the specified TargetUrl
 
-static bool DumpHttpContent = false;
-
 const string TargetUrl = "https://www.cnn.com";
 const string SaveToPath = @"D:\Gotenberg\Dumps";
 
@@ -64,8 +62,6 @@ async Task Main()
 		Process.Start(info);
 
 		resultPath.Dump("Done");
-
-		if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 		//var ops = sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>();
 		//ops.Dump();

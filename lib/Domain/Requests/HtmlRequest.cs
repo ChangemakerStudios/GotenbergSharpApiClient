@@ -47,7 +47,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
 
             return base.ToHttpContent()
-                .Concat(Content.IfNullEmptyContent());
+                .Concat(Content.IfNullEmptyContent())
+                .Concat(Assets.IfNullEmptyContent());
+
         }
     }
 }

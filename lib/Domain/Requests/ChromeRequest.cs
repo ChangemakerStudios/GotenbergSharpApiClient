@@ -17,7 +17,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public override IEnumerable<HttpContent> ToHttpContent() 
             => Config.IfNullEmptyContent()
-                .Concat(Assets.IfNullEmptyContent())
                 .Concat(Dimensions.IfNullEmptyContent())
                 .Concat(ConversionBehaviors.IfNullEmptyContent());
     }

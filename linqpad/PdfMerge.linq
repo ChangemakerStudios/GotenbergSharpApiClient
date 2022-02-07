@@ -9,8 +9,6 @@
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
-static bool DumpHttpContent = false;
-
 async Task Main()
 {
 	var p = await DoMerge(@"D:\Gotenberg\Dumps");
@@ -39,8 +37,6 @@ async Task<string> DoMerge(string destinationPath)
 		.WithAssets(b => { b.AddItems(toMerge) ;});
 		
 	var request = builder.Build();
-
-	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var response = await sharpClient.MergePdfsAsync(request);
 

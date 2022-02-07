@@ -10,8 +10,6 @@
 </Query>
 
 
-static bool DumpHttpContent = false;
-
 static Random Rand = new Random(Math.Abs((int)DateTime.Now.Ticks));
 
 //Gotenberg supports only format A1a out of the box
@@ -45,8 +43,6 @@ async Task<string> DoConversion(string destinationPath)
 		.SetFormat(PdfFormats.A1a); 
 		
 	var request = builder.Build();
-
-	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var response = await sharpClient.ConvertPdfDocumentsAsync(request);
 

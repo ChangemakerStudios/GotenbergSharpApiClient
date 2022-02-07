@@ -8,7 +8,6 @@
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
 </Query>
 
-static bool DumpHttpContent = false;
 
 static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html\ConvertExample\";
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
@@ -39,8 +38,6 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 		).ConfigureRequest(b=> b.PageRanges("1"));
 
 	var request = await builder.BuildAsync();
-
-	if (DumpHttpContent) request.ToHttpContent().ToDumpFriendlyFormat().Dump("HttpConent X-Ray");
 
 	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{Rand.Next()}.pdf";
 	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
