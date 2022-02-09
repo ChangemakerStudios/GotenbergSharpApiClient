@@ -27,18 +27,6 @@ public class ExtraUrlResources : IConvertToHttpContent
 
     public IEnumerable<HttpContent> ToHttpContent()
     {
-        var linkAssets = LinkTags.Items.IfNullEmpty()
-            .Where(i => i.Asset.IsValid())
-            .Select(lt => lt.Asset);
-
-        var scriptAssets = ScriptTags.Items.IfNullEmpty()
-            .Where(st => st.Asset.IsValid())
-            .Select(st => st.Asset);
-
-        var allExtra = linkAssets.Concat(scriptAssets);
-
-        this._request.Assets.AddRangeFluently(allExtra);
-
         return LinkTags.IfNullEmptyContent()
             .Concat(ScriptTags.IfNullEmptyContent())
             .Concat(_request.Assets.IfNullEmptyContent());

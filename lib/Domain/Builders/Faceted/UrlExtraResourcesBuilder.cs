@@ -33,16 +33,12 @@ public sealed class UrlExtraResourcesBuilder : BaseBuilder<UrlRequest>
     {
         var toAdd = items.IfNullEmpty().ToList();
 
-        if (!toAdd.Any()) throw new ArgumentNullException(nameof(items));
-
-        if(toAdd.IfNullEmpty().Any(ta=> ta.Url == null && !ta.Asset.IsValid()))
-            throw new InvalidOperationException(nameof(items));
+        if (!toAdd.Any()) throw new ArgumentException(nameof(items));
 
         this.Request.ExtraResources.LinkTags.Items.AddRange(toAdd);
 
         return this;
     }
-
 
     #region urls
 

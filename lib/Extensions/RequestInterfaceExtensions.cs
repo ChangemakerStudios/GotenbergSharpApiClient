@@ -6,12 +6,15 @@ using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
 using Newtonsoft.Json;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class RequestInterfaceExtensions
     {
+        const string BoundaryPrefix = Constants.HttpContent.MultipartData.BoundaryPrefix;
+
         public static IEnumerable<HttpContent> IfNullEmptyContent(this IConvertToHttpContent converter)
         {
             return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
@@ -20,8 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         public static HttpRequestMessage ToApiRequestMessage(this IApiRequest request)
         {
             var formContent =
-                new MultipartFormDataContent(
-                    $"{Constants.HttpContent.MultipartData.BoundaryPrefix}{DateTime.Now.Ticks}");
+                new MultipartFormDataContent($"{BoundaryPrefix}{DateTime.Now.Ticks}");
 
             foreach (var item in request.ToHttpContent())
             {
@@ -44,7 +46,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static string ToDetailedExceptionJson(this IEnumerable<HttpContent> items, bool includeNonText)
         {
-            return JsonConvert.SerializeObject(items.ToDumpFriendlyFormat(false));
+            return JsonConvert.SerializeObject(items.ToDumpFriendlyFormat(includeNonText));
         }
 
         /// <summary>
@@ -59,13 +61,13 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             {
                 Headers = new
                 {
-                    ContentType = string.Join("| ", c.Headers.ContentType),
-                    Disposition = string.Join("| ", c.Headers.ContentDisposition)
+                    ContentType = string.Join(" | ", c.Headers.ContentType),
+                    Disposition = string.Join(" | ", c.Headers.ContentDisposition)
                 },
                 Content = (c.Headers.ContentType!.ToString() ?? string.Empty)
                     .StartsWith("text") || includeNonText
                     ? c.ReadAsStringAsync().Result
-                    : "its not text"
+                    : "-its not text-"
             });
         }
     }

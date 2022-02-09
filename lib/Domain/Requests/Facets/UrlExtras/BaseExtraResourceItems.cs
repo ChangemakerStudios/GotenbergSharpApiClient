@@ -7,7 +7,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 public abstract class BaseExtraResourceItems<TResourceItem> : IConvertToHttpContent 
     where TResourceItem : BaseExtraResourceItem
 {
-    private readonly string _formDataFieldName;
+    readonly string _formDataFieldName;
 
     protected BaseExtraResourceItems(string formDataFieldName)
     {
@@ -18,8 +18,7 @@ public abstract class BaseExtraResourceItems<TResourceItem> : IConvertToHttpCont
 
     public IEnumerable<HttpContent> ToHttpContent()
     {
-        var value = string.Join(", ", Items
-            .Select(i => i.ToJson()));
+        var value = string.Join(", ", Items.Select(i => i.ToJson()));
       
         return new HttpContent[]
         {

@@ -1,14 +1,14 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -19,7 +19,8 @@ public class PdfConversionRequest: RequestBase
 
     public int Count => this.Assets.IfNullEmpty().Count;
 
-    [PublicAPI] public PdfFormats ToFormat { get; set; } = PdfFormats.A1a;
+    [PublicAPI] 
+    public PdfFormats ToFormat { get; set; }
 
     public override IEnumerable<HttpContent> ToHttpContent()
     {
@@ -29,7 +30,7 @@ public class PdfConversionRequest: RequestBase
         var format = $"PDF/A-{ToFormat.ToString().Substring(1, 2)}";
 
         foreach (var item in this.Assets
-                     .Where(item => item.Key.IsSet() && item.Value != null))
+                     .Where(item => item.IsValid()))
         {
             var contentItem = item.Value.ToHttpContentItem();
 

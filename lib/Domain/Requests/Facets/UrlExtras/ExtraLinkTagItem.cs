@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 
 using System;
-using System.Collections.Generic;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
@@ -11,21 +10,7 @@ public class ExtraLinkTagItem : BaseExtraResourceItem
     {
     }
 
-    public ExtraLinkTagItem(string key, ContentItem item) : base(key,item)
-    {
-    }
+    public override string ToJson() => 
+        JsonConvert.SerializeObject(new { href = this.Url.ToString() });
 
-    public ExtraLinkTagItem(KeyValuePair<string, ContentItem> asset) : base(asset)
-    {
-    }
-
-    public override string ToJson()
-    {
-        if (Url != null)
-        {
-            return JsonConvert.SerializeObject(new { href = this.Url.ToString() });
-        }
-
-        return JsonConvert.SerializeObject(new { href = this.Asset.Key });
-    }
 }

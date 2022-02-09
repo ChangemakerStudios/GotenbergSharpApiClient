@@ -139,7 +139,9 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 {
                     public const string Merge = "merge";
                     //TODO currently unused
-                    public const string PdfA1aFormat = "nativePdfA1aFormat";
+                    public const string NativePdfFormat = "nativePdfFormat";
+                    /*     * Tells Gotenberg to use unoconv for converting the resulting PDF to a PDF
+                         * format.*/
                     //just passes true as the value
                 }
 
