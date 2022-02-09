@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 using Gotenberg.Sharp.API.Client.Extensions;
 
@@ -16,108 +15,103 @@ public sealed class UrlExtraResourcesBuilder : BaseBuilder<UrlRequest>
     public UrlExtraResourcesBuilder(UrlRequest request)
     {
         this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.ExtraResources ??= new ExtraUrlResources(this.Request);
-        Request.Assets ??= new AssetDictionary();
+        this.Request.ExtraResources ??= new ExtraUrlResources();
     }
+
+    #region add one
+
+    #region link tag
+
+    [PublicAPI]
+    public UrlExtraResourcesBuilder AddLinkTag(string url)
+    {
+        if (url.IsNotSet()) throw new InvalidOperationException(nameof(url));
+
+        return this.AddLinkTag(new Uri(url));
+    }
+    [PublicAPI]
+    public UrlExtraResourcesBuilder AddLinkTag(Uri url)
+    {
+        return this.AddItem(new ExtraUrlResourceItem(url, ExtraUrlResourceType.LinkTag));
+    }
+
+    #endregion
+
+    #region script tag
+
+    [PublicAPI]
+    public UrlExtraResourcesBuilder AddScriptTag(string url)
+    {
+        if (url.IsNotSet()) throw new InvalidOperationException(nameof(url));
+
+        return this.AddScriptTag(new Uri(url));
+    }
+
+    [PublicAPI]
+    public UrlExtraResourcesBuilder AddScriptTag(Uri url)
+    {
+        return this.AddItem(new ExtraUrlResourceItem(url, ExtraUrlResourceType.ScriptTag));
+    }
+
+    #endregion
+
+    #region caller specifies type
+
+    [PublicAPI]
+    public UrlExtraResourcesBuilder AddItem(ExtraUrlResourceItem item)
+    {
+        return this.AddItems(new[] { item ?? throw new ArgumentNullException(nameof(item)) });
+    }
+
+    #endregion
+
+    #endregion
+
+    #region add many
 
     #region link tags
 
     [PublicAPI]
-    public UrlExtraResourcesBuilder AddLinkTagItem(ExtraLinkTagItem item)
+    public UrlExtraResourcesBuilder AddLinkTags(IEnumerable<string> urls)
     {
-        return AddLinkTagItems(new[] {item});
+        return this.AddLinkTags(urls.IfNullEmpty().Select(u => new Uri(u)));
     }
 
     [PublicAPI]
-    public UrlExtraResourcesBuilder AddLinkTagItems(IEnumerable<ExtraLinkTagItem> items)
+    public UrlExtraResourcesBuilder AddLinkTags(IEnumerable<Uri> urls)
     {
-        var toAdd = items.IfNullEmpty().ToList();
-
-        if (!toAdd.Any()) throw new ArgumentException(nameof(items));
-
-        this.Request.ExtraResources.LinkTags.Items.AddRange(toAdd);
-
-        return this;
+        return this.AddItems(urls.IfNullEmpty().Select(u => new ExtraUrlResourceItem(u, ExtraUrlResourceType.LinkTag)));
     }
-
-    #region urls
-
-    [PublicAPI]
-    public UrlExtraResourcesBuilder AddLinkTagUrl(string url)
-    {
-        return AddLinkTagUrl(new Uri(url));
-    }
-
-    [PublicAPI]
-    public UrlExtraResourcesBuilder AddLinkTagUrl(Uri url)
-    {
-        return AddLinkTagUrls(new[] { url });
-    }
-
-    [PublicAPI]
-    public UrlExtraResourcesBuilder AddLinkTagUrls(IEnumerable<string> urls)
-    {
-        return AddLinkTagUrls(urls.Select(u => new Uri(u)));
-    }
-
-    [PublicAPI]
-    public UrlExtraResourcesBuilder AddLinkTagUrls(IEnumerable<Uri> urls)
-    {
-        var uris = urls.IfNullEmpty().ToList();
-
-        if (!uris.Any()) throw new ArgumentNullException(nameof(urls));
-        if (uris.Any(u => !u.IsAbsoluteUri)) throw new InvalidOperationException("Url must have absolute uri");
-
-        var scriptItems = uris.Select(u => new ExtraLinkTagItem(u));
-
-        this.Request.ExtraResources.LinkTags.Items.AddRange(scriptItems);
-
-        return this;
-    }
-
-    #endregion
 
     #endregion
 
     #region script tags
 
-    #region urls
-
     [PublicAPI]
-    public UrlExtraResourcesBuilder AddScriptTagUrl(string url)
+    public UrlExtraResourcesBuilder AddScriptTags(IEnumerable<string> urls)
     {
-        return AddScriptTagUrl(new Uri(url));
+        return this.AddScriptTags(urls.IfNullEmpty().Select(u => new Uri(u)));
     }
 
     [PublicAPI]
-    public UrlExtraResourcesBuilder AddScriptTagUrl(Uri url)
+    public UrlExtraResourcesBuilder AddScriptTags(IEnumerable<Uri> urls)
     {
-        return AddScriptTagUrls(new[] { url });
+        return this.AddItems(urls.IfNullEmpty().Select(u => new ExtraUrlResourceItem(u, ExtraUrlResourceType.ScriptTag)));
     }
 
-    [PublicAPI]
-    public UrlExtraResourcesBuilder AddScriptTagUrls(IEnumerable<string> urls)
-    {
-        return AddScriptTagUrls(urls.Select(u=> new Uri(u)));
-    }
+    #endregion
+
+    #region caller specifies type
 
     [PublicAPI]
-    public UrlExtraResourcesBuilder AddScriptTagUrls(IEnumerable<Uri> urls)
+    public UrlExtraResourcesBuilder AddItems(IEnumerable<ExtraUrlResourceItem> items)
     {
-        var uris = urls.IfNullEmpty().ToList();
-
-        if (!uris.Any()) throw new ArgumentNullException(nameof(urls));
-        if (uris.Any(u => !u.IsAbsoluteUri)) throw new InvalidOperationException("Url must have absolute uri");
-
-        var scriptItems = uris.Select(u => new ExtraScriptTagItem(u));
-
-        this.Request.ExtraResources.ScriptTags.Items.AddRange(scriptItems);
-
+        this.Request.ExtraResources.Items.AddRange(items.IfNullEmpty());
         return this;
     }
 
     #endregion
 
     #endregion
-
+    
 }
