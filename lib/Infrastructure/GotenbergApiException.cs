@@ -5,11 +5,12 @@ using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Extensions;
 
+using JetBrains.Annotations;
+
 using Newtonsoft.Json;
 
 // ReSharper disable All CA1032
 // ReSharper disable All CA1822 
-// ReSharper disable All MemberCanBePrivate.Global
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
     /// <inheritdoc />
@@ -40,6 +41,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             return new GotenbergApiException(message, request, response);
         }
 
+        [PublicAPI]
         public string ToVerboseJson(
             bool includeGotenbergResponse = true,
             bool includeRequestContent = true,

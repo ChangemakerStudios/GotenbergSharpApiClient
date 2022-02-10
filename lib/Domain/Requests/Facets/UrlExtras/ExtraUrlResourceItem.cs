@@ -37,13 +37,11 @@ public class ExtraUrlResourceItem
 
     internal string FormDataFieldName { get; }
 
-    public string ToJson()
+    internal string ToJson()
     {
         return ItemType == ExtraUrlResourceType.ScriptTag
             ? JsonConvert.SerializeObject(new { src = this.Url.ToString() })
             : JsonConvert.SerializeObject(new { href = this.Url.ToString() });
     }
-
-
-
+    
 }

@@ -29,8 +29,7 @@ public class PdfConversionRequest: RequestBase
 
         var format = $"PDF/A-{ToFormat.ToString().Substring(1, 2)}";
 
-        foreach (var item in this.Assets
-                     .Where(item => item.IsValid()))
+        foreach (var item in this.Assets.Where(item => item.IsValid()))
         {
             var contentItem = item.Value.ToHttpContentItem();
 

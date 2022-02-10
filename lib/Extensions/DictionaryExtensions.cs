@@ -1,9 +1,9 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
@@ -46,11 +46,10 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         #region office extension list
 
         /// <remarks>
-        /// Source is here: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/libreoffice/unoconv/unoconv.go#L380
-        /// Also this: https://github.com/gotenberg/gotenberg/blob/main/docs/openapi.yaml#L193
+        /// Source is here: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/libreoffice/uno/uno.go
         /// </remarks>
-        static readonly string[] OfficeExtensions =
-            {   ".bib",
+        static readonly string[] OfficeExtensions = {   
+                ".bib",
                 ".doc",
                 ".xml",
                 ".docx",
@@ -125,7 +124,8 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 ".uos",
                 ".xls",
                 ".xlt",
-                ".xlsx",};
+                ".xlsx"
+        };
 
         #endregion
     }

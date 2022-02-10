@@ -1,16 +1,16 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+
+using JetBrains.Annotations;
 
 
 namespace Gotenberg.Sharp.API.Client
@@ -135,6 +135,7 @@ namespace Gotenberg.Sharp.API.Client
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 

@@ -1,9 +1,10 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -11,20 +12,23 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
 
+        /// <summary>
+        /// Only meant for internal use. Scoped as public b/c the interface defines it. 
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public abstract string ApiPath { get; }
 
-        public bool IsWebhookRequest => Config?.Webhook?.TargetUrl != null;
+        public bool IsWebhookRequest => Config?.Webhook?.TargetUrl != default;
 
         public RequestConfig Config { get; set; }
 
         public AssetDictionary Assets { get; set; }
 
-        //TODO: Don't think this is used anywhere. Is it no longer supported, or had it never been used?
         public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
 
         public abstract IEnumerable<HttpContent> ToHttpContent();
 
-        public static StringContent CreateFormDataItem<T>(T value, string fieldName)
+        internal static StringContent CreateFormDataItem<T>(T value, string fieldName)
         {
             var item = new StringContent(value.ToString());
             
