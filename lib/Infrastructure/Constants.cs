@@ -138,11 +138,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
                 public static class OfficeLibre
                 {
                     public const string Merge = "merge";
-                    //TODO currently unused
                     public const string NativePdfFormat = "nativePdfFormat";
-                    /*     * Tells Gotenberg to use unoconv for converting the resulting PDF to a PDF
-                         * format.*/
-                    //just passes true as the value
                 }
 
                 /// <summary>

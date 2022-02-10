@@ -7,6 +7,7 @@
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
 </Query>
 
 
@@ -29,9 +30,18 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 	var client = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new MergeOfficeBuilder()
-		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)));
+		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
+		.PrintAsLandscape()
+		//.SetPdfFormat(PdfFormats.A2b) //LibreOffice performs conversion
+		 .UseNativePdfFormat(PdfFormats.A3b) //UnoConv performs conversion
+		.ConfigureRequest(n => 
+			n.SetPageRanges("1-2")
+		);
 
 	var request = await builder.BuildAsync();
+	
+	request.ToHttpContent()
+	.ToDumpFriendlyFormat().Dump();
 
 	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
 
@@ -53,5 +63,6 @@ async Task<IEnumerable<KeyValuePair<string, byte[]>>> GetDocsAsync(string source
 
 	var docs = await Task.WhenAll(tasks);
 
-	return names.Select((name, index) => KeyValuePair.Create(name, docs[index]));
+	return names.Select((name, index) => KeyValuePair.Create(name, docs[index]))
+	.Take(10);
 }

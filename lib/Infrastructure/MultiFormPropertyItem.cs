@@ -2,7 +2,7 @@
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
-public class MultiFormPropertyItem
+internal class MultiFormPropertyItem
 {
     public PropertyInfo Property { get; set; }
     public MultiFormHeaderAttribute Attribute { get; set; }

@@ -17,11 +17,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public ConfigBuilder PageRanges(string pageRanges)
+        public ConfigBuilder SetPageRanges(string pageRanges)
         {
             if (pageRanges.IsNotSet()) throw new ArgumentException("Cannot be null or empty", nameof(pageRanges));
             this.Request.Config.PageRanges = pageRanges;
             return this;
+        }
+
+        [PublicAPI]
+        [Obsolete("Use SetPageRanges instead. This is going away")]
+        public ConfigBuilder PageRanges(string pageRanges)
+        {
+            return SetPageRanges(pageRanges);
         }
 
         [PublicAPI]

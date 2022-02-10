@@ -42,7 +42,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     public string UserAgent { [UsedImplicitly] get; set; }
 
     /// <summary>
-    /// HTTP headers to send by Chromium while loading the HTML document (JSON format)
+    /// Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.ExtraHttpHeaders)]
     public JObject ExtraHeaders { [UsedImplicitly] get; set; }

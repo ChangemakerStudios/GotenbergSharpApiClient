@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
@@ -13,6 +16,21 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             this Dictionary<TKey, TValue> instance)
         {
             return instance ?? new Dictionary<TKey, TValue>();
+        }
+
+        internal static IEnumerable<ValidOfficeMergeItem> FindValidOfficeMergeItems(
+            this AssetDictionary assets, 
+            IResolveContentType resolver)
+        {
+            return assets.RemoveInvalidOfficeDocs()
+                .ToAlphabeticalOrderByIndex()
+                .Where(item => item.IsValid())
+                .Select(item => new ValidOfficeMergeItem
+                {
+                    Asset = item,
+                    MediaType = resolver.GetContentType(item.Key)
+                })
+                .Where(item => item.MediaType.IsSet());
         }
 
         /// <summary>

@@ -1,49 +1,57 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
-
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
+using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public class MergeOfficeRequest : RequestBase
     {
-        readonly IResolveContentType _resolveContentType = new ResolveContentTypeImplementation();
+        readonly IResolveContentType _resolver = new ResolveContentTypeImplementation();
 
         public override string ApiPath 
             => Constants.Gotenberg.ApiPaths.MergeOffice;
 
         public int Count => this.Assets.IfNullEmpty().Count;
 
+        public bool PrintAsLandscape { get; set; }
+
+        /// <summary>
+        /// When used without setting <see cref="UseNativePdfFormat"/> to true
+        /// Gotenberg has LibreOffice perform the conversion.
+        /// When this and UseNativePdfFormat are set, gotenberg has unoconv do the work.
+        /// </summary>
+        public PdfFormats Format { get; set; }
+
+        /// <summary>
+        /// This tells gotenberg to use unoconv to perform the conversion.
+        /// If you specify this with a <see cref="Format"/> it'll have unoconv convert it to that. 
+        /// Note: the documentation says you can't use both together but I believe that regards the headers sent in.
+        /// Using Format alone tells Gotenberg to have LibreOffice do the conversion.
+        /// If you this prop to true and do not set <see cref="Format"/>, it'll default to PDF/A-1a
+        /// </summary>
+        public bool UseNativePdfFormat { get; set; }
+
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Assets.RemoveInvalidOfficeDocs()
-                .ToAlphabeticalOrderByIndex()
-                .Where(item => item.Value != null)
-                .Select(item => new { Asset = item, MediaType = _resolveContentType.GetContentType(item.Key) })
-                .Where(item => item.MediaType.IsSet())
-                .Select(item =>
-                {
-                    var contentItem = item.Asset.Value.ToHttpContentItem();
+            var lazyValidityCheck = new Lazy<List<ValidOfficeMergeItem>>(this.Assets.FindValidOfficeMergeItems(_resolver).ToList);
 
-                    contentItem.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                        {
-                            Name = Constants.Gotenberg.FormFieldNames.Files,
-                            FileName = item.Asset.Key
-                        };
+            foreach (var item in new[] { Count > 1, lazyValidityCheck.Value.Count() > 1 })
+                if (!item) yield break;
 
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
+            yield return CreateFormDataItem("true", Constants.Gotenberg.FormFieldNames.OfficeLibre.Merge);
 
-                    return contentItem;
+            foreach (var item in lazyValidityCheck.Value.ToHttpContent())
+                yield return item;
 
-                })
-                .Concat(new[] { CreateFormDataItem("true", Constants.Gotenberg.FormFieldNames.OfficeLibre.Merge) })
-                .Concat(Config.IfNullEmptyContent());
+            foreach (var item in this.PropertiesToHttpContent()) 
+                yield return item;
         }
 
     }

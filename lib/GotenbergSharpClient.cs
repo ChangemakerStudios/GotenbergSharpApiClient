@@ -48,6 +48,7 @@ namespace Gotenberg.Sharp.API.Client
         /// Initializes a new instance of the <see cref="GotenbergSharpClient"/> class.
         /// </summary>
         /// <param name="innerClient"></param>
+        /// <remarks>Client was built for DI use</remarks>
         [PublicAPI]
         public GotenbergSharpClient(HttpClient innerClient)
         {
@@ -100,16 +101,16 @@ namespace Gotenberg.Sharp.API.Client
             => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
-        ///     Converts one or more office documents into one merged pdf.
+        ///     Converts one or more office documents into a merged pdf.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
-        /// <remarks>
-        ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
-        ///    via the DISABLE_UNOCONV: '1' Environment variable. 
-        /// </remarks>
         [PublicAPI]
         public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
+
+        [PublicAPI]
+        public Task<Stream> ConvertPdfDocumentsAsync(PdfConversionRequest request, CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         [PublicAPI]
@@ -122,10 +123,6 @@ namespace Gotenberg.Sharp.API.Client
             using var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
         }
 
-        [PublicAPI]
-        public Task<Stream> ConvertPdfDocumentsAsync(PdfConversionRequest request, CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
-
         #endregion
 
         #region exec
@@ -133,7 +130,6 @@ namespace Gotenberg.Sharp.API.Client
         async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-
             var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
 
             return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

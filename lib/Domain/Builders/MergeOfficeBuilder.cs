@@ -48,6 +48,48 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
+        public MergeOfficeBuilder PrintAsLandscape()
+        {
+            this.Request.PrintAsLandscape = true;
+            return this;
+        }
+
+        /// <summary>
+        /// This tells gotenberg to have OfficeLibre perform the conversion.
+        /// If you set <see cref="MergeOfficeRequest.UseNativePdfFormat"/> to true
+        /// then gotenberg will hand the work off to unoconv to do the work
+        /// </summary>
+        [PublicAPI]
+        public MergeOfficeBuilder SetPdfFormat(PdfFormats format)
+        {
+            this.Request.Format = format;
+            return this;
+        }
+
+        /// <summary>
+        /// This tells gotenberg to use unoconv to perform the conversion.
+        /// When <see cref="MergeOfficeRequest.Format"/> is not set it defaults to using PDF/A-1a
+        /// </summary>
+        [PublicAPI]
+        public MergeOfficeBuilder UseNativePdfFormat()
+        {
+            this.Request.UseNativePdfFormat = true;
+            return this;
+        }
+
+        /// <summary>
+        /// This tells gotenberg to use unoconv to perform the conversion in the specified format.
+        /// </summary>
+        [PublicAPI]
+        public MergeOfficeBuilder UseNativePdfFormat(PdfFormats format)
+        {
+            this.Request.UseNativePdfFormat = true;
+            this.Request.Format = format;
+
+            return this;
+        }
+
+        [PublicAPI]
         public MergeOfficeRequest Build()
         {
             if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);

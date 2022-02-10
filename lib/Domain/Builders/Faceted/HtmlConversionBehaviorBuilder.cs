@@ -66,7 +66,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseBuilder<ChromeRequest>
     }
 
     /// <summary>
-    /// HTTP headers to send by Chromium while loading the HTML document. 
+    /// Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     /// <param name="headerName"></param>
     /// <param name="headerValue"></param>
@@ -82,7 +82,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseBuilder<ChromeRequest>
     }
 
     /// <summary>
-    ///  HTTP headers to send by Chromium while loading the HTML document (JSON format)
+    ///   Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     /// <param name="extraHeaders"></param>
     /// <returns></returns>
