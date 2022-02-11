@@ -35,7 +35,7 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 			assets => assets.AddItem("ear-on-beach.jpg", await GetImageBytes())
 		).SetConversionBehaviors(b => 
 			b.SetBrowserWaitDelay(1)
-		).ConfigureRequest(b=> b.PageRanges("1"));
+		).ConfigureRequest(b=> b.SetPageRanges("1"));
 
 	var request = await builder.BuildAsync();
 

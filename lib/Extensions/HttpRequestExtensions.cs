@@ -5,9 +5,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    /// <summary>
-    /// </summary>
-    public static class HttpRequestExtensions
+    internal static class HttpRequestExtensions
     {
         const string TimeoutPropertyKey = "RequestTimeout";
 
@@ -18,7 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <param name="timeout">The timeout.</param>
         /// <exception cref="ArgumentOutOfRangeException">request</exception>
         [UsedImplicitly]
-        public static void SetTimeout(this HttpRequestMessage request, TimeSpan? timeout)
+        internal static void SetTimeout(this HttpRequestMessage request, TimeSpan? timeout)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -30,7 +28,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public static TimeSpan? GetTimeout(this HttpRequestMessage request)
+        internal static TimeSpan? GetTimeout(this HttpRequestMessage request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 

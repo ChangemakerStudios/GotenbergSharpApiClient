@@ -7,9 +7,9 @@ using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    public static class EnumExtensions
+    internal static class EnumExtensions
     {
-        public static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
+        internal static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
         {
             if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
                 throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
@@ -20,7 +20,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             return PaperSizer.First(s => s.Size == selectedSize).Value;
         }
 
-        public static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(this Margins selected)
+        internal static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(this Margins selected)
         {
             if (!Enum.IsDefined(typeof(Margins), selected))
                 throw new InvalidEnumArgumentException(nameof(selected), (int) selected, typeof(PaperSizes));

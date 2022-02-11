@@ -7,6 +7,8 @@ using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
+using JetBrains.Annotations;
+
 using Newtonsoft.Json;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
@@ -55,19 +57,26 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// <param name="items"></param>
         /// <param name="includeNonText"></param>
         /// <returns></returns>
+        [PublicAPI]
         public static IEnumerable<object> ToDumpFriendlyFormat(this IEnumerable<HttpContent> items, bool includeNonText = false)
         {
-            return items.Select(c => new
+            return items.Select(c =>
             {
-                Headers = new
+                var includeContent = includeNonText || 
+                                     (c.Headers.ContentType?.ToString().StartsWith("text"))
+                                     .GetValueOrDefault();
+
+                return new
                 {
-                    ContentType = string.Join(" | ", c.Headers.ContentType),
-                    Disposition = string.Join(" | ", c.Headers.ContentDisposition)
-                },
-                Content = (c.Headers.ContentType!.ToString() ?? string.Empty)
-                    .StartsWith("text") || includeNonText
-                    ? c.ReadAsStringAsync().Result
-                    : "-its not text-"
+                    Headers = new
+                    {
+                        ContentType = string.Join(" | ", c.Headers.ContentType),
+                        Disposition = string.Join(" | ", c.Headers.ContentDisposition)
+                    },
+                    Content = includeContent 
+                        ? c.ReadAsStringAsync().Result
+                        : "-its not text-"
+                };
             });
         }
     }

@@ -19,6 +19,8 @@ async Task Main()
 	var destination = @"D:\Gotenberg\Dumps";
 	var p = await DoOfficeMerge(ResourcePath, destination);
 
+ResourcePath.Dump();
+
 	var info = new ProcessStartInfo { FileName = p, UseShellExecute = true };
 	Process.Start(info);
 	
@@ -31,11 +33,10 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 
 	var builder = new MergeOfficeBuilder()
 		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
-		.PrintAsLandscape()
-		//.SetPdfFormat(PdfFormats.A2b) //LibreOffice performs conversion
-		 .UseNativePdfFormat(PdfFormats.A3b) //UnoConv performs conversion
+		.SetPdfFormat(PdfFormats.A2b)
+		 .UseNativePdfFormat()
 		.ConfigureRequest(n => 
-			n.SetPageRanges("1-2")
+			n.SetPageRanges("1-3") //Only one of the files has more than 1 page.
 		);
 
 	var request = await builder.BuildAsync();

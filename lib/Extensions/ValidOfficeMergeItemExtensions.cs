@@ -6,7 +6,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
-public static class ValidOfficeMergeItemExtensions
+internal static class ValidOfficeMergeItemExtensions
 {
     internal static IEnumerable<HttpContent> ToHttpContent(this IEnumerable<ValidOfficeMergeItem> validItems)
     {

@@ -100,7 +100,7 @@ Task<UrlRequest> CreateUrlRequest()
 		{
 			  b.SetUserAgent(nameof(GotenbergSharpClient));
 		})
-		.ConfigureRequest(b => b.PageRanges("1"))
+		.ConfigureRequest(b => b.SetPageRanges("1-2"))
 		.WithDimensions(b =>
 		{
 			b.SetPaperSize(PaperSizes.A4)

@@ -7,13 +7,10 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
-public static class MergeOfficeRequestExtensions
+internal static class MergeOfficeRequestExtensions
 {
-    public static IEnumerable<HttpContent> PropertiesToHttpContent(this MergeOfficeRequest r)
+    internal static IEnumerable<HttpContent> PropertiesToHttpContent(this MergeOfficeRequest r)
     {
-        foreach (var item in r.Config.IfNullEmptyContent())
-            yield return item;
-
         if (r.PrintAsLandscape)
             yield return RequestBase.CreateFormDataItem("true", Constants.Gotenberg.FormFieldNames.Dims.Landscape);
 

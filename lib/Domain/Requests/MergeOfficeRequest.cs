@@ -23,31 +23,34 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public bool PrintAsLandscape { get; set; }
 
         /// <summary>
-        /// When used without setting <see cref="UseNativePdfFormat"/> to true
+        /// When used without setting UseNativePdfFormat to true
         /// Gotenberg has LibreOffice perform the conversion.
-        /// When this and UseNativePdfFormat are set, gotenberg has unoconv do the work.
+        /// When UseNativePdfFormat is true and Format is set,
+        /// Gotenberg has unoconv convert the file to the requested format.
         /// </summary>
         public PdfFormats Format { get; set; }
 
         /// <summary>
-        /// This tells gotenberg to use unoconv to perform the conversion.
-        /// If you specify this with a <see cref="Format"/> it'll have unoconv convert it to that. 
-        /// Note: the documentation says you can't use both together but I believe that regards the headers sent in.
-        /// Using Format alone tells Gotenberg to have LibreOffice do the conversion.
-        /// If you this prop to true and do not set <see cref="Format"/>, it'll default to PDF/A-1a
+        /// Tells gotenberg to perform the conversion with unoconv.
+        /// If you specify this with a Format the API has unoconv convert it to that. 
+        /// Note: the documentation says you can't use both together but that regards request headers.
+        /// When true and Format is not set, the client falls back to PDF/A-1a.
         /// </summary>
         public bool UseNativePdfFormat { get; set; }
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            var lazyValidityCheck = new Lazy<List<ValidOfficeMergeItem>>(this.Assets.FindValidOfficeMergeItems(_resolver).ToList);
+            var validItems = new Lazy<List<ValidOfficeMergeItem>>(this.Assets.FindValidOfficeMergeItems(_resolver).ToList);
 
-            foreach (var item in new[] { Count > 1, lazyValidityCheck.Value.Count() > 1 })
-                if (!item) yield break;
+            foreach (var vpo in new[] { Count > 1, validItems.Value.Count() > 1 })
+                if (!vpo) yield break;
 
             yield return CreateFormDataItem("true", Constants.Gotenberg.FormFieldNames.OfficeLibre.Merge);
 
-            foreach (var item in lazyValidityCheck.Value.ToHttpContent())
+            foreach (var item in validItems.Value.ToHttpContent())
+                yield return item;
+
+            foreach (var item in Config.IfNullEmptyContent())
                 yield return item;
 
             foreach (var item in this.PropertiesToHttpContent()) 

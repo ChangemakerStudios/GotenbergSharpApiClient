@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
-public static class MultiFormHeaderReflectionExtensions
+internal static class MultiFormHeaderReflectionExtensions
 {
     static readonly Type AttributeType = typeof(MultiFormHeaderAttribute);
 

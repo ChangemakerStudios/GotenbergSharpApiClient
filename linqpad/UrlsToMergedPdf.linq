@@ -8,8 +8,10 @@
   <Namespace>System.Net.Http</Namespace>
 </Query>
 
-//NOTE: You need to increase gotenberg api's timeout for this to work. 
-//e.g. pass --api-timeout=1800s
+//NOTE: You need to increase gotenberg api's timeout for this to work 
+//by passing --api-timeout=1800s when running the container.
+//FYI, latest goten, 7.5.0 errors when you run all them. e.g. 
+// "unix process error: wait for unix process: exit status 5"
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -34,7 +36,8 @@ public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 		"https://www.theaustralian.com.au",	"https://www.welt.de", 
 		"https://www.cankaoxiaoxi.com", "https://www.novinky.cz",
 		"https://www.elobservador.com.uy"}
-		.Select(u => new Uri(u));
+		.Select(u => new Uri(u))
+		.Take(6);
 		
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build());
@@ -54,7 +57,7 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 			    .SetUserAgent(nameof(GotenbergSharpClient)))
 			.ConfigureRequest(b =>
 			{
-				 b.PageRanges("1-2");
+				 b.SetPageRanges("1-2");
 			})
 			.WithDimensions(b =>
 			{

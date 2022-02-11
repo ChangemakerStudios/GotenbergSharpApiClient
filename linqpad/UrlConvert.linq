@@ -36,7 +36,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		   b.EmulateAsScreen()
 		    .SetBrowserWaitDelay(1)
 			.SetUserAgent(nameof(GotenbergSharpClient))
-		).ConfigureRequest(b => b.PageRanges("1-2"))
+		).ConfigureRequest(b => b.SetPageRanges("1-2"))
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllBytesAsync(headerPath))
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
