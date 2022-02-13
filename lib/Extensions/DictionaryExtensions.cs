@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
@@ -55,7 +56,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         static AssetDictionary RemoveInvalidOfficeDocs(this AssetDictionary unfiltered)
         {
             var filtered = unfiltered.IfNullEmpty()
-                .Where(asset => Constants.OfficeExtensions.Contains(new FileInfo(asset.Key).Extension, Comparer));
+                .Where(asset => MergeOfficeConstants.AllowedExtensions.Contains(new FileInfo(asset.Key).Extension, Comparer));
 
             return new AssetDictionary().AddRangeFluently(filtered);
         }

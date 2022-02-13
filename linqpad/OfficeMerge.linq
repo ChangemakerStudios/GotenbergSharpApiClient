@@ -40,7 +40,7 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 		);
 
 	var request = await builder.BuildAsync();
-	
+	request.ApiPath.Dump();
 	request.ToHttpContent()
 	.ToDumpFriendlyFormat().Dump();
 

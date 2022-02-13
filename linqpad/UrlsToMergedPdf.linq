@@ -10,8 +10,6 @@
 
 //NOTE: You need to increase gotenberg api's timeout for this to work 
 //by passing --api-timeout=1800s when running the container.
-//FYI, latest goten, 7.5.0 errors when you run all them. e.g. 
-// "unix process error: wait for unix process: exit status 5"
 static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
@@ -37,7 +35,7 @@ public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 		"https://www.cankaoxiaoxi.com", "https://www.novinky.cz",
 		"https://www.elobservador.com.uy"}
 		.Select(u => new Uri(u))
-		.Take(6);
+		 .Take(6);
 		
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build());
@@ -52,7 +50,6 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
 			.SetConversionBehaviors(b => 
-			   // b.SetPdfFormat(PdfFormats.A1a)
 				b.EmulateAsScreen()
 			    .SetUserAgent(nameof(GotenbergSharpClient)))
 			.ConfigureRequest(b =>
@@ -63,8 +60,7 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 			{
 				b.SetMargins(Margins.None)
 				 .MarginLeft(.3)
-				 .MarginRight(.3)
-				.SetPaperSize(PaperSizes.A4);
+				 .MarginRight(.3);
 			});
 	}
 

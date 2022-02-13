@@ -13,7 +13,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     public sealed class UrlRequest : ChromeRequest
     {
         public override string ApiPath 
-            => Constants.Gotenberg.ApiPaths.ConvertUrl;
+            => Constants.Gotenberg.Chromium.ApiPaths.ConvertUrl;
 
         public Uri Url { get; set; }
 
@@ -34,7 +34,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 .Concat(ExtraResources.IfNullEmptyContent())
                 .Concat(Assets.IfNullEmptyContent())
                 /*.Concat(GetExtraHeaderHttpContent().IfNullEmpty())*/
-                .Concat(new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.FormFieldNames.RemoteUrl) });
+                .Concat(new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.Chromium.Routes.Url.RemoteUrl) });
         }
  
     }

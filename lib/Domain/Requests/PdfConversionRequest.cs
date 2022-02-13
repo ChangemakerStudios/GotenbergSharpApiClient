@@ -15,7 +15,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 public class PdfConversionRequest: RequestBase
 {
     public override string ApiPath 
-        => Constants.Gotenberg.ApiPaths.ConvertPdf;
+        => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
     public int Count => this.Assets.IfNullEmpty().Count;
 
@@ -27,7 +27,7 @@ public class PdfConversionRequest: RequestBase
         if (ToFormat == default)
             throw new InvalidOperationException("You must set the Pdf format");
 
-        var format = $"PDF/A-{ToFormat.ToString().Substring(1, 2)}";
+      
 
         foreach (var item in this.Assets.Where(item => item.IsValid()))
         {
@@ -36,7 +36,7 @@ public class PdfConversionRequest: RequestBase
             contentItem.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                 {
-                    Name = Constants.Gotenberg.FormFieldNames.Files,
+                    Name = Constants.Gotenberg.SharedFormFieldNames.Files,
                     FileName = item.Key
                 };
 
@@ -46,7 +46,7 @@ public class PdfConversionRequest: RequestBase
             yield return contentItem;
         }
 
-        yield return CreateFormDataItem(format, Constants.Gotenberg.FormFieldNames.PdfEngines.PdfFormat);
+        yield return CreateFormDataItem(ToFormat.ToFormDataValue(), Constants.Gotenberg.PdfEngines.Routes.Convert.PdfFormat);
 
         foreach (var item in Config
                      .IfNullEmptyContent()

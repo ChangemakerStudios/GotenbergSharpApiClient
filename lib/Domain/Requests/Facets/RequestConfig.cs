@@ -55,12 +55,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
             if (this.PageRanges.IsSet())
             {
-                yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.FormFieldNames.Dims.PageRanges);
+                yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.Chromium.Shared.Dims.PageRanges);
             }
 
             if (this.ResultFileName.IsSet())
             {
-                yield return RequestBase.CreateFormDataItem(this.ResultFileName, Constants.Gotenberg.FormFieldNames.OutputFileName);
+                yield return RequestBase.CreateFormDataItem(this.ResultFileName, Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
             }
         }
 
@@ -69,20 +69,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         {
             if (this.Webhook?.TargetUrl != null)
             {
-                yield return RequestBase.CreateFormDataItem(this.Webhook.TargetUrl, Constants.Gotenberg.FormFieldNames.Webhook.Url);
+                yield return RequestBase.CreateFormDataItem(this.Webhook.TargetUrl, Constants.Gotenberg.Webhook.Url);
 
                 if (this.Webhook.HttpMethod.IsSet())
                 {
-                    yield return RequestBase.CreateFormDataItem(this.Webhook.HttpMethod, Constants.Gotenberg.FormFieldNames.Webhook.HttpMethod);
+                    yield return RequestBase.CreateFormDataItem(this.Webhook.HttpMethod, Constants.Gotenberg.Webhook.HttpMethod);
                 }
 
                 if (this.Webhook.ErrorUrl != null)
                 {
-                    yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorUrl, Constants.Gotenberg.FormFieldNames.Webhook.ErrorUrl);
+                    yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorUrl, Constants.Gotenberg.Webhook.ErrorUrl);
                     if (this.Webhook.ErrorHttpMethod.IsSet())
                     {
                         yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorHttpMethod,
-                            Constants.Gotenberg.FormFieldNames.Webhook.ErrorHttpMethod);
+                            Constants.Gotenberg.Webhook.ErrorHttpMethod);
                     }
                 }
             }

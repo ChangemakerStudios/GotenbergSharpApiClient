@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
+using Gotenberg.Sharp.API.Client.Extensions;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// have access to the page's code, you may want to wait a certain amount
     /// of time to make sure Chromium has fully rendered the page you're trying to generate.
     /// </remarks>
-    [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.WaitDelay)]
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitDelay)]
     public string WaitDelay { [UsedImplicitly] get; set; }
 
     /// <summary>
@@ -32,19 +34,19 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// </summary>
     /// <example>builder.SetBrowserWaitExpression("window.status === 'ready'")</example>
     /// <remarks>Prefer this option over waitDelay</remarks>
-    [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.WaitForExpression)]
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitForExpression)]
     public string WaitForExpression { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// Overrides the default User-Agent header
     /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.UserAgent)]
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.UserAgent)]
     public string UserAgent { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.ExtraHttpHeaders)]
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders)]
     public JObject ExtraHeaders { [UsedImplicitly] get; set; }
 
     /// <summary>
@@ -53,13 +55,13 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// <remarks>
     /// Caution: does not work if JavaScript is disabled at the container level via --chromium-disable-javascript.
     /// </remarks>
-    [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.FailOnConsoleExceptions)]
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnConsoleExceptions)]
     public bool FailOnConsoleExceptions { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// The media type to emulate, either "screen" or "print" - empty means "print".
     /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.EmulatedMediaType)]
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.EmulatedMediaType)]
     public string EmulatedMediaType { [UsedImplicitly] get; set; }
 
     /// <summary>
@@ -71,11 +73,8 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     {
         if (PdfFormat != default)
         {
-            //sloppy...   
-            var format = $"PDF/A-{PdfFormat.ToString().Substring(1,2)}";
-
-            yield return RequestBase.CreateFormDataItem(format,
-                Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.PdfFormat);
+            yield return RequestBase.CreateFormDataItem(PdfFormat.ToFormDataValue(),
+                Constants.Gotenberg.Chromium.Shared.HtmlConvert.PdfFormat);
         }
 
         foreach (var item in this.GetType().ToMultiFormPropertyItems())

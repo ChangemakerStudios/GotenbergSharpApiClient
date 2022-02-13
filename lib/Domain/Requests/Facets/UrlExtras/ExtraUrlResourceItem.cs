@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
-using urlConstants = Constants.Gotenberg.FormFieldNames.HtmlConvertBehaviors.UrlConvert;
+using urlConstants = Constants.Gotenberg.Chromium.Routes.Url;
 
 public class ExtraUrlResourceItem
 {

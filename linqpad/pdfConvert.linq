@@ -11,11 +11,10 @@
 
 
 static Random Rand = new Random(Math.Abs((int)DateTime.Now.Ticks));
-
-//Gotenberg supports only format A1a out of the box
-//To get support for A-1b, PDF/A-2b, PDF/A-3b
-//Run the Gotenberg-Ghost script module: 
-//See https://github.com/Vrex123/gotenberg-ghostscript#quick-start
+const int NumberOfFilesToGet = 1; 
+//If you get 1, the result is a pdf; get more 
+//and the API retuns a zip containing the results
+//Currently, Gotenberg supports these formats: A1a, A2b & A3b
 
 async Task Main()
 {
@@ -34,7 +33,7 @@ async Task<string> DoConversion(string destinationPath)
 	var items = Directory.GetFiles(destinationPath, "*.pdf", SearchOption.TopDirectoryOnly)
 		.Select(p => new { Info = new FileInfo(p), Path = p })
 		.OrderBy(item => item.Info.CreationTime)
-		.Take(4);
+		.Take(1);
 		
 	var toConvert = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  
@@ -47,7 +46,8 @@ async Task<string> DoConversion(string destinationPath)
 	var response = await sharpClient.ConvertPdfDocumentsAsync(request);
 
 	//If you send one in -- the result is pdf.
-	var outPath = @$"{destinationPath}\GotenbergConvertResult.zip";
+	var extension = items.Count() >1 ? "zip" : "pdf";
+	var outPath = @$"{destinationPath}\GotenbergConvertResult.{extension}";
 
 	using (var destinationStream = File.Create(outPath))
 	{

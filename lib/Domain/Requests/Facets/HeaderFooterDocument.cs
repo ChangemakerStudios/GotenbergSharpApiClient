@@ -12,10 +12,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public class HeaderFooterDocument : IConvertToHttpContent
     {
-        [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Header)]
+        [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Header)]
         public ContentItem Header { [UsedImplicitly] get; set; }
 
-        [MultiFormHeader(fileName: Constants.Gotenberg.FileNames.Footer)]
+        [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Footer)]
         public ContentItem Footer { [UsedImplicitly] get; set; }
 
         public IEnumerable<HttpContent> ToHttpContent()

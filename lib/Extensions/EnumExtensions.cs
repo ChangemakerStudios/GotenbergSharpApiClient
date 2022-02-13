@@ -9,6 +9,13 @@ namespace Gotenberg.Sharp.API.Client.Extensions
 {
     internal static class EnumExtensions
     {
+        internal static string ToFormDataValue(this PdfFormats format)
+        {
+            return format == default 
+                ? "PDF/A-1a"
+                : $"PDF/A-{format.ToString().Substring(1, 2)}";
+        }
+
         internal static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
         {
             if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))

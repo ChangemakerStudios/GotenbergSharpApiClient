@@ -17,7 +17,7 @@ internal static class ValidOfficeMergeItemExtensions
             contentItem.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                 {
-                    Name = Constants.Gotenberg.FormFieldNames.Files,
+                    Name = Constants.Gotenberg.SharedFormFieldNames.Files,
                     FileName = item.Asset.Key
                 };
 

@@ -23,8 +23,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     {
         public override string ApiPath
             => this.ContainsMarkdown
-                ? Constants.Gotenberg.ApiPaths.ConvertMarkdown
-                : Constants.Gotenberg.ApiPaths.ConvertHtml;
+                ? Constants.Gotenberg.Chromium.ApiPaths.ConvertMarkdown
+                : Constants.Gotenberg.Chromium.ApiPaths.ConvertHtml;
 
         [PublicAPI]
         public HtmlRequest(): this(false) {}

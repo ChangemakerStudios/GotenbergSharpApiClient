@@ -11,16 +11,19 @@ using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+    //Libre office has a convert route which can perform merges
     public class MergeOfficeRequest : RequestBase
     {
         readonly IResolveContentType _resolver = new ResolveContentTypeImplementation();
 
         public override string ApiPath 
-            => Constants.Gotenberg.ApiPaths.MergeOffice;
+            => Constants.Gotenberg.LibreOffice.ApiPaths.MergeOffice;
 
         public int Count => this.Assets.IfNullEmpty().Count;
 
         public bool PrintAsLandscape { get; set; }
+
+        public string PageRanges { get; set; }
 
         /// <summary>
         /// When used without setting UseNativePdfFormat to true
@@ -42,10 +45,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             var validItems = new Lazy<List<ValidOfficeMergeItem>>(this.Assets.FindValidOfficeMergeItems(_resolver).ToList);
 
-            foreach (var vpo in new[] { Count > 1, validItems.Value.Count() > 1 })
-                if (!vpo) yield break;
+            foreach (var isValid in new[] { Count > 1, validItems.Value.Count() > 1 })
+                if (!isValid) yield break;
 
-            yield return CreateFormDataItem("true", Constants.Gotenberg.FormFieldNames.OfficeLibre.Merge);
+            yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
 
             foreach (var item in validItems.Value.ToHttpContent())
                 yield return item;

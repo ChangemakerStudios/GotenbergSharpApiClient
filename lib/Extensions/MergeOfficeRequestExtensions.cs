@@ -12,7 +12,10 @@ internal static class MergeOfficeRequestExtensions
     internal static IEnumerable<HttpContent> PropertiesToHttpContent(this MergeOfficeRequest r)
     {
         if (r.PrintAsLandscape)
-            yield return RequestBase.CreateFormDataItem("true", Constants.Gotenberg.FormFieldNames.Dims.Landscape);
+            yield return RequestBase.CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
+
+        if(r.PageRanges.IsSet())
+            yield return RequestBase.CreateFormDataItem(r.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
 
         switch (r.UseNativePdfFormat)
         {
@@ -20,18 +23,14 @@ internal static class MergeOfficeRequestExtensions
                 yield break;
             case false when r.Format != default:
             {
-                var format = $"PDF/A-{r.Format.ToString().Substring(1, 2)}";
-                yield return RequestBase.CreateFormDataItem(format, Constants.Gotenberg.FormFieldNames.PdfEngines.PdfFormat);
+                yield return RequestBase.CreateFormDataItem(r.Format.ToFormDataValue(), Constants.Gotenberg.LibreOffice.Routes.Convert.PdfFormat);
                 break;
             }
             default:
             {
-                var format = r.Format == PdfFormats.None
-                    ? "PDF/A-1a"
-                    : $"PDF/A-{r.Format.ToString().Substring(1, 2)}";
-
-                yield return RequestBase.CreateFormDataItem(format,
-                    Constants.Gotenberg.FormFieldNames.OfficeLibre.NativePdfFormat);
+              
+                yield return RequestBase.CreateFormDataItem(r.Format.ToFormDataValue(),
+                    Constants.Gotenberg.LibreOffice.Routes.Convert.NativePdfFormat);
                 break;
             }
         }

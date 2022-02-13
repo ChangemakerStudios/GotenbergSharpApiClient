@@ -54,6 +54,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        [PublicAPI]
+        public MergeOfficeBuilder SetPageRanges(string pageRanges)
+        {
+            this.Request.PageRanges = pageRanges;
+            return this;
+        }
+
         /// <summary>
         /// This tells gotenberg to have OfficeLibre perform the conversion.
         /// If you set <see cref="MergeOfficeRequest.UseNativePdfFormat"/> to true

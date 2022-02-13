@@ -45,7 +45,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                     asset.Headers.ContentDisposition =
                         new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                         {
-                            Name = Constants.Gotenberg.FormFieldNames.Files,
+                            Name = Constants.Gotenberg.SharedFormFieldNames.Files,
                             FileName = item.Asset.Key
                         };
 

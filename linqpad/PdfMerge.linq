@@ -7,6 +7,7 @@
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
 </Query>
 
 async Task Main()
@@ -27,13 +28,14 @@ async Task<string> DoMerge(string destinationPath)
 		.Select(p => new { Info = new FileInfo(p), Path = p })
 		.Where(item => !item.Info.Name.Contains("GotenbergMergeResult.pdf"))
 		.OrderBy(item => item.Info.CreationTime)
-		.Take(4);
+		.Take(2);
 
 	 items.Dump("Items", 0);
 
 	var toMerge = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  
  	var builder = new MergeBuilder()
+		 .SetPdfFormat(PdfFormats.A2b)
 		.WithAssets(b => { b.AddItems(toMerge) ;});
 		
 	var request = builder.Build();

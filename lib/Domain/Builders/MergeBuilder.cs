@@ -34,6 +34,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             return this;
         }
 
+        /// <summary>
+        /// This tells gotenberg to have OfficeLibre perform the conversion.
+        /// If you set <see cref="MergeOfficeRequest.UseNativePdfFormat"/> to true
+        /// then gotenberg will hand the work off to unoconv to do the work
+        /// </summary>
+        [PublicAPI]
+        public MergeBuilder SetPdfFormat(PdfFormats format)
+        {
+            this.Request.Format = format;
+            return this;
+        }
+
         [PublicAPI]
         public MergeBuilder ConfigureRequest(Action<ConfigBuilder> action)
         {
@@ -41,6 +53,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             action(new ConfigBuilder(this.Request));
             return this;
         }
+
 
         [PublicAPI]
         public MergeRequest Build()
