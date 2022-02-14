@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
@@ -26,14 +25,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public string PageRanges { get; set; }
 
         /// <summary>
-        /// When used without setting UseNativePdfFormat to true
-        /// Gotenberg has LibreOffice perform the conversion.
-        /// When UseNativePdfFormat is true and Format is set,
-        /// Gotenberg has unoconv convert the file to the requested format.
-        /// </summary>
-        public PdfFormats Format { get; set; }
-
-        /// <summary>
         /// Tells gotenberg to perform the conversion with unoconv.
         /// If you specify this with a Format the API has unoconv convert it to that. 
         /// Note: the documentation says you can't use both together but that regards request headers.
@@ -45,7 +36,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             var validItems = new Lazy<List<ValidOfficeMergeItem>>(this.Assets.FindValidOfficeMergeItems(_resolver).ToList);
 
-            foreach (var isValid in new[] { Count > 1, validItems.Value.Count() > 1 })
+            foreach (var isValid in new[] { Count > 1, validItems.Value.Count > 1 })
                 if (!isValid) yield break;
 
             yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);

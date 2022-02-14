@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class UrlHeaderFooterBuilder : BaseBuilder<UrlRequest>
+    public sealed class UrlHeaderFooterBuilder : BaseFacetedBuilder<UrlRequest>
     {
         [PublicAPI]
         public UrlHeaderFooterBuilder(UrlRequest request)

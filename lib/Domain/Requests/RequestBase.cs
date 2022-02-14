@@ -3,8 +3,11 @@ using System.ComponentModel;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+
+using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -23,6 +26,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public RequestConfig Config { get; set; }
 
         public AssetDictionary Assets { get; set; }
+
+        public PdfFormats Format { [UsedImplicitly] get; set; }
 
         public CustomHttpHeaders CustomHeaders { get; } = new CustomHttpHeaders();
 

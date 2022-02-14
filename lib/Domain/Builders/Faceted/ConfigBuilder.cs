@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class ConfigBuilder : BaseBuilder<RequestBase>
+    public sealed class ConfigBuilder : BaseFacetedBuilder<RequestBase>
     {
         public ConfigBuilder(RequestBase request)
         {

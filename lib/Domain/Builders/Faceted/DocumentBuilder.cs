@@ -11,7 +11,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
     /// <remarks>
     ///     If you don't specify any dimensions the client sets them to Chrome's defaults
     /// </remarks>
-    public sealed class DocumentBuilder : BaseBuilder<HtmlRequest>
+    public sealed class DocumentBuilder : BaseFacetedBuilder<HtmlRequest>
     {
         public DocumentBuilder(HtmlRequest request)
         {
@@ -27,7 +27,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             this.Request.ContainsMarkdown = containsMarkdown;
             return this;
         }
-
 
         [PublicAPI]
         public DocumentBuilder SetBody(ContentItem body)

@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class UrlExtraResourcesBuilder : BaseBuilder<UrlRequest>
+public sealed class UrlExtraResourcesBuilder : BaseFacetedBuilder<UrlRequest>
 {
     public UrlExtraResourcesBuilder(UrlRequest request)
     {

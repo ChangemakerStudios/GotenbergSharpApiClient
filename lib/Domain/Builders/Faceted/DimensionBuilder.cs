@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class DimensionBuilder : BaseBuilder<ChromeRequest>
+    public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
     {
         public DimensionBuilder(ChromeRequest request)
         {

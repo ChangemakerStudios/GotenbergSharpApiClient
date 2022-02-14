@@ -3,22 +3,17 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public sealed class MergeRequest : RequestBase
+    public sealed class MergeRequest: RequestBase
     {
         public override string ApiPath 
             => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
         public int Count => this.Assets.IfNullEmpty().Count;
-
-        public PdfFormats Format { [UsedImplicitly] get; set; }
         
         public override IEnumerable<HttpContent> ToHttpContent()
         {

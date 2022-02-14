@@ -4,11 +4,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -18,13 +15,10 @@ public class PdfConversionRequest: RequestBase
         => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
     public int Count => this.Assets.IfNullEmpty().Count;
-
-    [PublicAPI] 
-    public PdfFormats ToFormat { get; set; }
-
+ 
     public override IEnumerable<HttpContent> ToHttpContent()
     {
-        if (ToFormat == default)
+        if (Format == default)
             throw new InvalidOperationException("You must set the Pdf format");
 
       
@@ -46,7 +40,7 @@ public class PdfConversionRequest: RequestBase
             yield return contentItem;
         }
 
-        yield return CreateFormDataItem(ToFormat.ToFormDataValue(), Constants.Gotenberg.PdfEngines.Routes.Convert.PdfFormat);
+        yield return CreateFormDataItem(Format.ToFormDataValue(), Constants.Gotenberg.PdfEngines.Routes.Convert.PdfFormat);
 
         foreach (var item in Config
                      .IfNullEmptyContent()

@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class HtmlConversionBehaviorBuilder : BaseBuilder<ChromeRequest>
+public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeRequest>
 {
     public HtmlConversionBehaviorBuilder(ChromeRequest request)
     {

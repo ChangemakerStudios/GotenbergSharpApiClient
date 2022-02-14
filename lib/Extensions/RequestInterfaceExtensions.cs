@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 
@@ -8,8 +7,6 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
-
-using Newtonsoft.Json;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
@@ -43,12 +40,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             }
 
             return message;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static string ToDetailedExceptionJson(this IEnumerable<HttpContent> items, bool includeNonText)
-        {
-            return JsonConvert.SerializeObject(items.ToDumpFriendlyFormat(includeNonText));
         }
 
         /// <summary>

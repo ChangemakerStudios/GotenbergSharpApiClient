@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class WebhookBuilder : BaseBuilder<RequestBase>
+    public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
     {
         public WebhookBuilder(RequestBase request)
         {

@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest>
+public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionBuilder,PdfConversionRequest>
 {
     readonly List<Task> _asyncTasks = new List<Task>();
 
@@ -24,7 +24,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest>
     {
         if (format == default) throw new ArgumentNullException(nameof(format));
 
-        this.Request.ToFormat = format;
+        this.Request.Format = format;
         
         return this;
     }

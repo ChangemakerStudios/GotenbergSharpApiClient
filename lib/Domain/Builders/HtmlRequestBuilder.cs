@@ -1,21 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public class HtmlRequestBuilder : BaseBuilder<HtmlRequest>
+    public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequestBuilder, HtmlRequest>
     {
-        readonly List<Task> _asyncTasks = new List<Task>();
-
-        protected sealed override HtmlRequest Request { get; set; }
+        protected override HtmlRequest Request { get; set; }
 
         public HtmlRequestBuilder() 
             => this.Request = new HtmlRequest();
@@ -38,63 +34,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         {
             if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
-            this._asyncTasks.Add(asyncAction(new DocumentBuilder(this.Request)));
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder WithDimensions(Action<DimensionBuilder> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-
-            action(new DimensionBuilder(this.Request));
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder WithAssets(Action<AssetBuilder> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            action(new AssetBuilder(this.Request));
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
-        {
-            if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
-            this._asyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder ConfigureRequest(Action<ConfigBuilder> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            action(new ConfigBuilder(this.Request));
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder SetConversionBehaviors(Action<HtmlConversionBehaviorBuilder> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            action(new HtmlConversionBehaviorBuilder(this.Request));
-            return this;
-        }
-
-        [PublicAPI]
-        public HtmlRequestBuilder SetConversionBehaviors(HtmlConversionBehaviors behaviors)
-        {
-            if (behaviors == null) throw new ArgumentNullException(nameof(behaviors));
-            this.Request.ConversionBehaviors = behaviors;
+            this.AsyncTasks.Add(asyncAction(new DocumentBuilder(this.Request)));
             return this;
         }
 
         [PublicAPI]
         public HtmlRequest Build()
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
+            if (AsyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (Request.Content?.Body == null)
                 throw new InvalidOperationException("Request.Content or Content.Body is null");
 
@@ -104,9 +51,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         [PublicAPI]
         public async Task<HtmlRequest> BuildAsync()
         {
-            if (_asyncTasks.Any())
+            if (AsyncTasks.Any())
             {
-                await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+                await Task.WhenAll(AsyncTasks).ConfigureAwait(false);
             }
 
             if (this.Request.Content?.Body == null)
