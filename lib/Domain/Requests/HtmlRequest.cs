@@ -33,8 +33,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public HtmlRequest(bool containsMarkdown) => 
             this.ContainsMarkdown = containsMarkdown;
 
+        [PublicAPI]
         public bool ContainsMarkdown { get; internal set; }
 
+        [PublicAPI]
         public FullDocument Content { get; set; }
 
         /// <summary>

@@ -36,23 +36,27 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Select(item => new { Asset = item, MediaType = _resolveContentType.GetContentType(item.Key) })
-                .Where(i => i.MediaType.IsSet())
-                .Select(item =>
-                {
-                    var asset = item.Asset.Value.ToHttpContentItem();
+            return this.Select(item => new
+            {
+                Asset = item, 
+                MediaType = _resolveContentType.GetContentType(item.Key)
+            })
+            .Where(i => i.MediaType.IsSet())
+            .Select(item =>
+            {
+                var asset = item.Asset.Value.ToHttpContentItem();
 
-                    asset.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                        {
-                            Name = Constants.Gotenberg.SharedFormFieldNames.Files,
-                            FileName = item.Asset.Key
-                        };
+                asset.Headers.ContentDisposition =
+                    new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                    {
+                        Name = Constants.Gotenberg.SharedFormFieldNames.Files,
+                        FileName = item.Asset.Key
+                    };
 
-                    asset.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
+                asset.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
 
-                    return asset;
-                });
+                return asset;
+            });
         }
     }
 }

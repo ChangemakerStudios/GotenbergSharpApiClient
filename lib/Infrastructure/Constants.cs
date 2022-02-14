@@ -55,7 +55,7 @@ public static class Constants
         }
 
         /// <summary>
-        /// Performs office doc conversions AND merges. It has on route however: convert
+        /// Performs office doc conversions AND merges. It has one route however: convert
         /// Merges happen when the header --form merge="true" is passed
         /// Sending more than one document for conversion results in the api returning a zip file with results
         /// https://gotenberg.dev/docs/modules/libreoffice
@@ -103,7 +103,6 @@ public static class Constants
                 public static class Merge
                 {
                     public const string PdfFormat = CrossCutting.PdfFormat;
-                    public const string NativePdfFormat = "nativePdfFormat";
                 }
 
                 public static class Convert

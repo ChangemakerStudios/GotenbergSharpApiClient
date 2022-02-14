@@ -1,4 +1,6 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests;
+﻿using System;
+
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 
@@ -6,8 +8,6 @@ using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
-using System;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 

@@ -1,15 +1,14 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
 
 using Newtonsoft.Json.Linq;
-
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-
-using Gotenberg.Sharp.API.Client.Extensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
