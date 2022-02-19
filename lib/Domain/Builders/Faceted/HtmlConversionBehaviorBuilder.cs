@@ -130,11 +130,10 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     [PublicAPI]
     public HtmlConversionBehaviorBuilder SetPdfFormat(PdfFormats format)
     {
-        if(format == default) throw new InvalidOperationException("Invalid PDF format specified");
+        if (format == default) throw new InvalidOperationException("Invalid PDF format specified");
 
         this.Request.ConversionBehaviors.PdfFormat = format;
 
         return this;
     }
- 
 }

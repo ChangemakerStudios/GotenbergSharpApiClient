@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequestBuilder, UrlRequest>
+    public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlRequestBuilder>
     {
         protected override UrlRequest Request { get; set; }
 
@@ -31,7 +31,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             if (!url.IsAbsoluteUri) throw new InvalidOperationException("url is not absolute");
             return this;
         }
- 
+
         [PublicAPI]
         public UrlRequestBuilder AddHeaderFooter(Action<UrlHeaderFooterBuilder> action)
         {
@@ -56,7 +56,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             if (action == null) throw new ArgumentNullException(nameof(action));
             action(new UrlExtraResourcesBuilder(this.Request));
             return this;
-
         }
 
         [PublicAPI]

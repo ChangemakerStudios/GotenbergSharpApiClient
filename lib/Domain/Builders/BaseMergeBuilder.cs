@@ -9,12 +9,11 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public abstract class BaseMergeBuilder<TBuilder, TRequest> : BaseBuilder<TBuilder, TRequest>
+public abstract class BaseMergeBuilder<TRequest, TBuilder> : BaseBuilder<TRequest, TBuilder>
     where TRequest : RequestBase
-    where TBuilder : BaseMergeBuilder<TBuilder, TRequest>
+    where TBuilder : BaseMergeBuilder<TRequest, TBuilder>
 {
     protected readonly List<Task> AsyncTasks = new List<Task>();
-
 
     /// <summary>
     /// This tells gotenberg to have OfficeLibre perform the conversion.
@@ -25,7 +24,7 @@ public abstract class BaseMergeBuilder<TBuilder, TRequest> : BaseBuilder<TBuilde
     public TBuilder SetPdfFormat(PdfFormats format)
     {
         this.Request.Format = format;
-        return (TBuilder)this;
+        return (TBuilder) this;
     }
 
     [PublicAPI]
@@ -33,7 +32,7 @@ public abstract class BaseMergeBuilder<TBuilder, TRequest> : BaseBuilder<TBuilde
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
         action(new AssetBuilder(this.Request));
-        return (TBuilder)this;
+        return (TBuilder) this;
     }
 
     [PublicAPI]
@@ -41,6 +40,6 @@ public abstract class BaseMergeBuilder<TBuilder, TRequest> : BaseBuilder<TBuilde
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
         this.AsyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));
-        return (TBuilder)this;
+        return (TBuilder) this;
     }
 }

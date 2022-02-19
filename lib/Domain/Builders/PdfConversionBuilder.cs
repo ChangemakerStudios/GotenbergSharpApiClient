@@ -10,11 +10,11 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionBuilder,PdfConversionRequest>
+public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>
 {
     readonly List<Task> _asyncTasks = new List<Task>();
 
-    public PdfConversionBuilder() 
+    public PdfConversionBuilder()
         => this.Request = new PdfConversionRequest();
 
     protected override PdfConversionRequest Request { get; set; }
@@ -25,7 +25,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionBuilder,PdfC
         if (format == default) throw new ArgumentNullException(nameof(format));
 
         this.Request.Format = format;
-        
+
         return this;
     }
 
@@ -53,7 +53,6 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionBuilder,PdfC
         if (Request.Count == 0) throw new InvalidOperationException("There are no items to convert");
         return Request;
     }
-
 
     [PublicAPI]
     public async Task<PdfConversionRequest> BuildAsync()

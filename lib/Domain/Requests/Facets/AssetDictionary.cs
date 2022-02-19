@@ -38,7 +38,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         {
             return this.Select(item => new
             {
-                Asset = item, 
+                Asset = item,
                 MediaType = _resolveContentType.GetContentType(item.Key)
             })
             .Where(i => i.MediaType.IsSet())

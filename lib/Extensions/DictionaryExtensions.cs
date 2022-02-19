@@ -39,7 +39,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         }
 
         internal static IEnumerable<ValidOfficeMergeItem> FindValidOfficeMergeItems(
-            this AssetDictionary assets, 
+            this AssetDictionary assets,
             IResolveContentType resolver)
         {
             return assets.RemoveInvalidOfficeDocs()

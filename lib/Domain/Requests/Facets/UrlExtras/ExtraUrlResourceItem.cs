@@ -43,5 +43,4 @@ public class ExtraUrlResourceItem
             ? JsonConvert.SerializeObject(new { src = this.Url.ToString() })
             : JsonConvert.SerializeObject(new { href = this.Url.ToString() });
     }
-    
 }

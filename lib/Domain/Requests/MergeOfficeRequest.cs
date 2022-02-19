@@ -47,9 +47,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             foreach (var item in Config.IfNullEmptyContent())
                 yield return item;
 
-            foreach (var item in this.PropertiesToHttpContent()) 
+            foreach (var item in this.PropertiesToHttpContent())
                 yield return item;
         }
-
     }
 }

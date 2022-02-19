@@ -12,11 +12,10 @@ internal static class MultiFormHeaderReflectionExtensions
     {
         return instanceType.GetProperties()
             .Where(prop => Attribute.IsDefined(prop, AttributeType))
-            .Select(p => 
+            .Select(p =>
                 new MultiFormPropertyItem {
-                    Property = p, 
+                    Property = p,
                     Attribute = (MultiFormHeaderAttribute) Attribute.GetCustomAttribute(p, AttributeType)
             });
     }
-
 }

@@ -36,6 +36,5 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 /*.Concat(GetExtraHeaderHttpContent().IfNullEmpty())*/
                 .Concat(new[] { CreateFormDataItem(this.Url, Constants.Gotenberg.Chromium.Routes.Url.RemoteUrl) });
         }
- 
     }
 }

@@ -51,7 +51,6 @@ public static class Constants
             {
                 internal const string Index = "index.html";
             }
-
         }
 
         /// <summary>
@@ -99,7 +98,6 @@ public static class Constants
 
             public static class Routes
             {
-
                 public static class Merge
                 {
                     public const string PdfFormat = CrossCutting.PdfFormat;
@@ -156,7 +154,7 @@ public static class Constants
 
                 /*public static class Markdown
                 {
-                    //Unused because MD requests are done with the HTML request
+                    //Unused because MD requests are done with through HTML request
                     //public const string IndexFile = CrossCutting.FileNames.Index;
                 }*/
             }
@@ -211,6 +209,5 @@ public static class Constants
                 }
             }
         }
-
     }
 }

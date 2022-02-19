@@ -113,5 +113,4 @@ public sealed class UrlExtraResourcesBuilder : BaseFacetedBuilder<UrlRequest>
     #endregion
 
     #endregion
-    
 }

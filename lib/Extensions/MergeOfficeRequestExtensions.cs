@@ -13,7 +13,7 @@ internal static class MergeOfficeRequestExtensions
         if (r.PrintAsLandscape)
             yield return RequestBase.CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
 
-        if(r.PageRanges.IsSet())
+        if (r.PageRanges.IsSet())
             yield return RequestBase.CreateFormDataItem(r.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
 
         switch (r.UseNativePdfFormat)
@@ -27,7 +27,6 @@ internal static class MergeOfficeRequestExtensions
             }
             default:
             {
-              
                 yield return RequestBase.CreateFormDataItem(r.Format.ToFormDataValue(),
                     Constants.Gotenberg.LibreOffice.Routes.Convert.NativePdfFormat);
                 break;

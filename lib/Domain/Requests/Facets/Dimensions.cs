@@ -57,7 +57,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginTop)]
         public double MarginTop { [UsedImplicitly] get; set; }
 
-
         /// <summary>
         /// Gets or sets the margin bottom.
         /// </summary>
@@ -67,7 +66,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginBottom)]
         public double MarginBottom { [UsedImplicitly] get; set; }
 
-
         /// <summary>
         /// Gets or sets the margin left.
         /// </summary>
@@ -76,7 +74,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginLeft)]
         public double MarginLeft { [UsedImplicitly] get; set; }
-
 
         /// <summary>
         /// Gets or sets the margin right.
@@ -107,7 +104,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PrintBackground)]
         public bool PrintBackground { [UsedImplicitly] get; set; }
-
 
         #endregion
 
@@ -173,7 +169,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
                     var contentItem = new StringContent(GetValueAsUsString(value));
 
-                    contentItem.Headers.ContentDisposition = 
+                    contentItem.Headers.ContentDisposition =
                         new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
                         {
                             Name = item.Attribute.Name

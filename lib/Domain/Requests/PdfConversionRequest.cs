@@ -21,8 +21,6 @@ public class PdfConversionRequest: RequestBase
         if (Format == default)
             throw new InvalidOperationException("You must set the Pdf format");
 
-      
-
         foreach (var item in this.Assets.Where(item => item.IsValid()))
         {
             var contentItem = item.Value.ToHttpContentItem();
@@ -48,8 +46,6 @@ public class PdfConversionRequest: RequestBase
         {
             yield return item;
         }
-
     }
-
 
 }

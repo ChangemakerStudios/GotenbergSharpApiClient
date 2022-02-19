@@ -9,12 +9,12 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    /// <remarks>
+    /// <summary>
     ///     Any non office files sent in are just ignored.
     ///     A nice surprise: Gotenberg/Chrome will merge in all sheets within a multi-sheet excel workbook.
     ///     If you send in a csv file but with an xlsx extension, it will merge it in as text.
-    /// </remarks>
-    public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeBuilder, MergeOfficeRequest>
+    /// </summary>
+    public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, MergeOfficeBuilder>
     {
         public MergeOfficeBuilder() => this.Request = new MergeOfficeRequest();
 
@@ -33,7 +33,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             this.Request.PageRanges = pageRanges;
             return this;
         }
-
 
         /// <summary>
         /// This tells gotenberg to use unoconv to perform the conversion.
@@ -65,7 +64,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
             if (Request.Count == 0) throw new InvalidOperationException("There are no items to merge");
             return Request;
         }
-
 
         [PublicAPI]
         public async Task<MergeOfficeRequest> BuildAsync()

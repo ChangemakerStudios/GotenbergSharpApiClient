@@ -84,7 +84,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
 
             var contentItem = new StringContent(value.ToString());
 
-            contentItem.Headers.ContentDisposition = 
+            contentItem.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
                 {
                     Name = item.Attribute.Name
@@ -92,6 +92,5 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
 
             yield return contentItem;
         }
-
     }
 }

@@ -36,10 +36,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         internal static StringContent CreateFormDataItem<T>(T value, string fieldName)
         {
             var item = new StringContent(value.ToString());
-            
-            item.Headers.ContentDisposition = 
+
+            item.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(DispositionType) { Name = fieldName };
-        
             return item;
         }
     }

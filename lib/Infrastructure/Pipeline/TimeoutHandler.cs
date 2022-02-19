@@ -8,7 +8,6 @@ using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
 
-
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
     [UsedImplicitly]

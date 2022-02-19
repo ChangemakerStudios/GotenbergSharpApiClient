@@ -53,7 +53,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         {
             return items.Select(c =>
             {
-                var includeContent = includeNonText || 
+                var includeContent = includeNonText ||
                                      (c.Headers.ContentType?.ToString().StartsWith("text"))
                                      .GetValueOrDefault();
 
@@ -64,7 +64,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                         ContentType = string.Join(" | ", c.Headers.ContentType),
                         Disposition = string.Join(" | ", c.Headers.ContentDisposition)
                     },
-                    Content = includeContent 
+                    Content = includeContent
                         ? c.ReadAsStringAsync().Result
                         : "-its not text-"
                 };

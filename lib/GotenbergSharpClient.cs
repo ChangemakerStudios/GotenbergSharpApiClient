@@ -12,14 +12,13 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
 
-
 namespace Gotenberg.Sharp.API.Client
 {
     /// <summary>
     /// C# Client for Gotenberg api
     /// </summary>
     /// <remarks>
-    ///     Gotenberg:
+    ///    Gotenberg:
     ///     https://gotenberg.dev
     ///     https://github.com/gotenberg/gotenberg
     /// 

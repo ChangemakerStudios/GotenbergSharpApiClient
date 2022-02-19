@@ -14,8 +14,8 @@ public enum PdfFormats
     A1b = 2,
     A2a = 3,
     A2b = 4,
-    A2u =5,
-    A3a =6,
+    A2u = 5,
+    A3a = 6,
     A3b = 7,
     A3u = 8
 }

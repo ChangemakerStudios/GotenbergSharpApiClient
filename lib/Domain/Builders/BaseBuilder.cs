@@ -8,9 +8,9 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public abstract class BaseBuilder<TBuilder, TRequest>
+    public abstract class BaseBuilder<TRequest, TBuilder>
         where TRequest : RequestBase
-        where TBuilder : BaseBuilder<TBuilder, TRequest>
+        where TBuilder : BaseBuilder<TRequest, TBuilder>
     {
         protected virtual TRequest Request { get; set; }
 
@@ -21,15 +21,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
             action(new ConfigBuilder(this.Request));
-            return (TBuilder)this;
+            return (TBuilder) this;
         }
 
         [PublicAPI]
         public TBuilder ConfigureRequest(RequestConfig config)
         {
             this.Request.Config = config ?? throw new ArgumentNullException(nameof(config));
-            return (TBuilder)this;
+            return (TBuilder) this;
         }
-
     }
 }

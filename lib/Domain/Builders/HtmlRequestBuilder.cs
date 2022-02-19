@@ -9,11 +9,11 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequestBuilder, HtmlRequest>
+    public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRequestBuilder>
     {
         protected override HtmlRequest Request { get; set; }
 
-        public HtmlRequestBuilder() 
+        public HtmlRequestBuilder()
             => this.Request = new HtmlRequest();
 
         [PublicAPI]

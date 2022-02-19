@@ -8,13 +8,13 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public sealed class MergeRequest: RequestBase
+    public sealed class MergeRequest : RequestBase
     {
-        public override string ApiPath 
+        public override string ApiPath
             => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
         public int Count => this.Assets.IfNullEmpty().Count;
-        
+
         public override IEnumerable<HttpContent> ToHttpContent()
         {
             if (Format != default)
@@ -23,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             foreach (var ci in Config.IfNullEmptyContent())
                 yield return ci;
 
-            foreach (var item in this.Assets.ToAlphabeticalOrderByIndex().Where(item=> item.IsValid()))
+            foreach (var item in this.Assets.ToAlphabeticalOrderByIndex().Where(item => item.IsValid()))
             {
                 var contentItem = item.Value.ToHttpContentItem();
 
@@ -39,7 +39,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
                 yield return contentItem;
             }
-
         }
     }
 }

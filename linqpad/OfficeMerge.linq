@@ -19,7 +19,7 @@ async Task Main()
 	var destination = @"D:\Gotenberg\Dumps";
 	var p = await DoOfficeMerge(ResourcePath, destination);
 
-ResourcePath.Dump();
+	ResourcePath.Dump();
 
 	var info = new ProcessStartInfo { FileName = p, UseShellExecute = true };
 	Process.Start(info);
@@ -41,8 +41,10 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 
 	var request = await builder.BuildAsync();
 	request.ApiPath.Dump();
+	
 	request.ToHttpContent()
-	.ToDumpFriendlyFormat().Dump();
+		   .ToDumpFriendlyFormat()
+		   .Dump();
 
 	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
 

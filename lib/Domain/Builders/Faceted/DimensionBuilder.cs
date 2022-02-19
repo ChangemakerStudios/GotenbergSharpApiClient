@@ -16,7 +16,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             Request.Dimensions ??= new Dimensions();
         }
 
-
         [PublicAPI]
         public DimensionBuilder SetMargins(Margins margins)
         {

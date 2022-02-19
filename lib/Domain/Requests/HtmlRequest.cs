@@ -27,10 +27,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 : Constants.Gotenberg.Chromium.ApiPaths.ConvertHtml;
 
         [PublicAPI]
-        public HtmlRequest(): this(false) {}
+        public HtmlRequest() : this(false) {}
 
         [PublicAPI]
-        public HtmlRequest(bool containsMarkdown) => 
+        public HtmlRequest(bool containsMarkdown) =>
             this.ContainsMarkdown = containsMarkdown;
 
         [PublicAPI]
@@ -42,8 +42,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
         public override IEnumerable<HttpContent> ToHttpContent()
         {
             if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
@@ -51,7 +49,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             return base.ToHttpContent()
                 .Concat(Content.IfNullEmptyContent())
                 .Concat(Assets.IfNullEmptyContent());
-
         }
     }
 }

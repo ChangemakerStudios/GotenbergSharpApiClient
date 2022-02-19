@@ -50,7 +50,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         // ReSharper disable once MethodTooLong
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            foreach (var httpContent in TryAddWebhookHeaders()) 
+            foreach (var httpContent in TryAddWebhookHeaders())
                 yield return httpContent;
 
             if (this.PageRanges.IsSet())

@@ -8,9 +8,9 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    /// <remarks>
-    ///     If you don't specify any dimensions the client sets them to Chrome's defaults
-    /// </remarks>
+    /// <summary>
+    ///   Note:  If you don't specify any dimensions the client sets them to Chrome's defaults
+    /// </summary>
     public sealed class DocumentBuilder : BaseFacetedBuilder<HtmlRequest>
     {
         public DocumentBuilder(HtmlRequest request)
@@ -36,15 +36,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public DocumentBuilder SetBody(string body) => 
+        public DocumentBuilder SetBody(string body) =>
             SetBody(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder SetBody(byte[] body) => 
+        public DocumentBuilder SetBody(byte[] body) =>
             SetBody(new ContentItem(body));
 
         [PublicAPI]
-        public DocumentBuilder SetBody(Stream body) => 
+        public DocumentBuilder SetBody(Stream body) =>
             SetBody(new ContentItem(body));
 
         #endregion
