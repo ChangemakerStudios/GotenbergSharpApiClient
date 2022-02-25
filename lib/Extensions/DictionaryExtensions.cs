@@ -8,6 +8,8 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
+using KeyValuePair = Gotenberg.Sharp.API.Client.Infrastructure.MultiTargetHelpers.KeyValuePair;
+
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class DictionaryExtensions

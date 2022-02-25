@@ -18,12 +18,15 @@ namespace Gotenberg.Sharp.API.Client
     /// C# Client for Gotenberg api
     /// </summary>
     /// <remarks>
-    ///    Gotenberg:
+    /// <para>
+    ///     Gotenberg:
     ///     https://gotenberg.dev
     ///     https://github.com/gotenberg/gotenberg
-    /// 
+    /// </para>
+    /// <para>
     ///     Other clients available:
     ///     https://github.com/gotenberg/awesome-gotenberg#clients
+    /// </para>
     /// </remarks>
     public sealed class GotenbergSharpClient
     {
@@ -131,11 +134,15 @@ namespace Gotenberg.Sharp.API.Client
             if (request == null) throw new ArgumentNullException(nameof(request));
             var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
 
-            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            #if NET5_0_OR_GREATER
+                return await response.Content.ReadAsStreamAsync(cancelToken);
+            #else
+                return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            #endif
         }
 
         async Task<HttpResponseMessage> SendRequest(
-            IApiRequest request, 
+            IApiRequest request,
             HttpCompletionOption option,
             CancellationToken cancelToken)
         {

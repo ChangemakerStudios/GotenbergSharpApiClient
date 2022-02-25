@@ -15,13 +15,13 @@ using Polly.Timeout;
 
 using static Polly.Extensions.Http.HttpPolicyExtensions;
 
-namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
+namespace Gotenberg.Sharp.API.Client.NetCore.Infrastructure.Pipeline
 {
     internal static class PolicyFactory
     {
         [NotNull]
         internal static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(
-            IServiceProvider sp, HttpRequestMessage request)
+            IServiceProvider sp, HttpRequestMessage _)
         {
             Contract.Ensures(Contract.Result<IAsyncPolicy<HttpResponseMessage>>() != null);
 

@@ -9,13 +9,13 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
-public class PdfConversionRequest: RequestBase
+public class PdfConversionRequest : RequestBase
 {
-    public override string ApiPath 
+    public override string ApiPath
         => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
     public int Count => this.Assets.IfNullEmpty().Count;
- 
+
     public override IEnumerable<HttpContent> ToHttpContent()
     {
         if (Format == default)
@@ -47,5 +47,4 @@ public class PdfConversionRequest: RequestBase
             yield return item;
         }
     }
-
 }
