@@ -1,4 +1,4 @@
-⭐ For Gotenberg v7 & up; does not support v6⭐
+⭐ For Gotenberg v7+⭐
 
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
 
