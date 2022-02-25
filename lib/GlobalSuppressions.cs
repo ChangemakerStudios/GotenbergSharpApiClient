@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE0042:Deconstruct variable declaration", Justification = "<Pending>", Scope = "member", Target = "~M:Gotenberg.Sharp.API.Client.Domain.Builders.Faceted.DimensionBuilder.SetPaperSize(Gotenberg.Sharp.API.Client.Domain.Builders.Faceted.PaperSizes)~Gotenberg.Sharp.API.Client.Domain.Builders.Faceted.DimensionBuilder")]
+[assembly: SuppressMessage("Roslynator", "RCS1080:Use 'Count/Length' property instead of 'Any' method.", Justification = "<Pending>", Scope = "member", Target = "~M:Gotenberg.Sharp.API.Client.Domain.Builders.MergeOfficeBuilder.Build~Gotenberg.Sharp.API.Client.Domain.Requests.MergeOfficeRequest")]
