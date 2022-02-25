@@ -17,7 +17,7 @@ public class ExtraUrlResourceItem
     const string ScriptFieldName = urlConstants.ExtraScriptTags;
 
     public ExtraUrlResourceItem(string url, ExtraUrlResourceType itemType)
-        :this(new Uri(url), itemType)
+        : this(new Uri(url), itemType)
     {
     }
 

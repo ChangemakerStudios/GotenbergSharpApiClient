@@ -16,7 +16,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
 
         /// <summary>
-        /// Only meant for internal use. Scoped as public b/c the interface defines it. 
+        /// Only meant for internal use. Scoped as public b/c the interface defines it.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public abstract string ApiPath { get; }

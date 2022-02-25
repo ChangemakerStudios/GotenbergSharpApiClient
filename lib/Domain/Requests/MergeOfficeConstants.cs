@@ -11,7 +11,7 @@ public static class MergeOfficeConstants
         ".vor", ".wps", ".epub", ".png", ".bmp", ".emf", ".eps", ".fodg", ".gif",
         ".jpg", ".jpeg", ".met", ".odd", ".otg", ".pbm", ".pct", ".pgm", ".ppm",
         ".ras", ".std", ".svg", ".svm", ".swf", ".sxd", ".sxw", ".tif", ".tiff",
-        ".xhtml",".xpm", ".odp", ".fodp", ".potm", ".pot", ".pptx", ".pps", ".ppt",
+        ".xhtml", ".xpm", ".odp", ".fodp", ".potm", ".pot", ".pptx", ".pps", ".ppt",
         ".pwp", ".sda", ".sdd", ".sti", ".sxi", ".uop", ".wmf", ".csv", ".dbf", ".dif",
         ".fods", ".ods", ".ots", ".pxl", ".sdc", ".slk", ".stc", ".sxc", ".uos", ".xls", ".xlt", ".xlsx"
     };

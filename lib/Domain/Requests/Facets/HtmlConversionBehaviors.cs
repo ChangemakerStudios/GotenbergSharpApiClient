@@ -49,7 +49,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     public JObject ExtraHeaders { [UsedImplicitly] get; set; }
 
     /// <summary>
-    /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console. 
+    /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <remarks>
     /// Caution: does not work if JavaScript is disabled at the container level via --chromium-disable-javascript.
