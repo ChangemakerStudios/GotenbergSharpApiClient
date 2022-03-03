@@ -1,7 +1,7 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
   <NuGetReference>Autofac</NuGetReference>
   <NuGetReference>Autofac.Extensions.DependencyInjection</NuGetReference>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <NuGetReference>Microsoft.Extensions.Configuration</NuGetReference>
   <NuGetReference>Microsoft.Extensions.Configuration.Json</NuGetReference>
   <NuGetReference>Microsoft.Extensions.DependencyInjection</NuGetReference>
@@ -20,9 +20,9 @@
   <Namespace>Microsoft.Extensions.DependencyInjection</Namespace>
   <Namespace>Microsoft.Extensions.DependencyInjection.Extensions</Namespace>
   <Namespace>Microsoft.Extensions.Logging</Namespace>
+  <Namespace>Microsoft.Extensions.Logging.Console</Namespace>
   <Namespace>Microsoft.Extensions.Options</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>Microsoft.Extensions.Logging.Console</Namespace>
 </Query>
 
 //Builds a simple DI container with logging enabled.

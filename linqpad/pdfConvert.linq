@@ -1,12 +1,12 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
-  <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests.Facets</Namespace>
-  <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
-  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
-  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests.Facets</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
+  <Namespace>System.Threading.Tasks</Namespace>
 </Query>
 
 
@@ -33,7 +33,7 @@ async Task<string> DoConversion(string destinationPath)
 	var items = Directory.GetFiles(destinationPath, "*.pdf", SearchOption.TopDirectoryOnly)
 		.Select(p => new { Info = new FileInfo(p), Path = p })
 		.OrderBy(item => item.Info.CreationTime)
-		.Take(1);
+		.Take(2);
 		
 	var toConvert = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  

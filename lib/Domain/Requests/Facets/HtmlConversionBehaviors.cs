@@ -82,7 +82,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
 
             if (value == null) continue;
 
-            var contentItem = new StringContent(value!.ToString());
+            var contentItem = new StringContent(value!.ToString()!);
 
             contentItem.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)

@@ -1,13 +1,13 @@
 <Query Kind="Program">
-  <Reference Relative="..\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll">C:\dev\Open\GotenbergSharpApiClient\lib\bin\Debug\netstandard2.1\Gotenberg.Sharp.API.Client.dll</Reference>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests.Facets</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
 </Query>
 
 async Task Main()

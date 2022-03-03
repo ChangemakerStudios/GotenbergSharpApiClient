@@ -15,7 +15,7 @@ using Polly.Timeout;
 
 using static Polly.Extensions.Http.HttpPolicyExtensions;
 
-namespace Gotenberg.Sharp.API.Client.NetCore.Infrastructure.Pipeline
+namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
     internal static class PolicyFactory
     {
