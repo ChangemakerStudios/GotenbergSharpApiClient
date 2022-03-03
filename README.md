@@ -1,4 +1,4 @@
-⭐ For Gotenberg v7+⭐
+⭐ For Gotenberg v7+. Alpha⭐
 
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
 
@@ -46,9 +46,10 @@ public void ConfigureServices(IServiceCollection services)
 }
 
 ```
-# Using GotenbergSharpClient
+# Using GotenbergSharpClient.
 *See the [linqPad folder](linqpad/)* for complete examples. 
-
+## Samples below are currently stale. Linqpad scripts are fresh.
+____
 ## Html To Pdf 
 *With embedded assets:*
 
