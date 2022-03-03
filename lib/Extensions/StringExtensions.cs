@@ -1,9 +1,11 @@
 ﻿namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    public static class StringExtensions
+    internal static class StringExtensions
     {
-        public static bool IsSet(this string value) => !value.IsNotSet();
+        internal static bool IsSet(this string value)
+            => !value.IsNotSet();
 
-        public static bool IsNotSet(this string value) => string.IsNullOrWhiteSpace(value);
+        internal static bool IsNotSet(this string value)
+            => string.IsNullOrWhiteSpace(value);
     }
 }

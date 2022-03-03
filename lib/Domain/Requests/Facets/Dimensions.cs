@@ -17,20 +17,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </summary>
     /// <remarks>
     ///     Paper size and margins have to be provided in inches. Same for margins.
-    ///     See unit info here: https://thecodingmachine.github.io/gotenberg/#html.paper_size_margins_orientation
+    ///     See unit info here: https://gotenberg.dev/docs/modules/chromium#routes
     ///     Paper sizes: https://www.prepressure.com/library/paper-size  
     /// </remarks>
     public sealed class Dimensions : IConvertToHttpContent
     {
-        // ReSharper disable once InconsistentNaming
-        static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
-
         #region Properties
 
         /// <summary>
         /// Gets or sets the scale. Defaults to 1.0
         /// </summary>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Scale)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.Scale)]
         public double Scale { [UsedImplicitly] get; set; } = 1.0;
 
         /// <summary>
@@ -39,7 +36,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         /// The width of the paper.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PaperWidth)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PaperWidth)]
         public double PaperWidth { [UsedImplicitly] get; set; }
 
         /// <summary>
@@ -48,7 +45,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         /// The height of the paper.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.PaperHeight)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PaperHeight)]
         public double PaperHeight { [UsedImplicitly] get; set; }
 
         /// <summary>
@@ -57,9 +54,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         /// The margin top.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginTop)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginTop)]
         public double MarginTop { [UsedImplicitly] get; set; }
-
 
         /// <summary>
         /// Gets or sets the margin bottom.
@@ -67,9 +63,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         /// The margin bottom.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginBottom)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginBottom)]
         public double MarginBottom { [UsedImplicitly] get; set; }
-
 
         /// <summary>
         /// Gets or sets the margin left.
@@ -77,9 +72,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         /// The margin left.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginLeft)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginLeft)]
         public double MarginLeft { [UsedImplicitly] get; set; }
-
 
         /// <summary>
         /// Gets or sets the margin right.
@@ -87,9 +81,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         /// The margin right.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.MarginRight)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginRight)]
         public double MarginRight { [UsedImplicitly] get; set; }
-
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Dimensions"/> is landscape.
@@ -97,8 +90,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <value>
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
         /// </value>
-        [MultiFormHeader(Constants.Gotenberg.FormFieldNames.Dims.Landscape)]
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.Landscape)]
         public bool Landscape { [UsedImplicitly] get; set; }
+
+        /// <summary>
+        /// Defines whether to prefer page size as defined by CSS (default false)
+        /// </summary>
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PreferCssPageSize)]
+        public bool PreferCssPageSize { [UsedImplicitly] get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not to print background graphics.
+        /// </summary>
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PrintBackground)]
+        public bool PrintBackground { [UsedImplicitly] get; set; }
 
         #endregion
 
@@ -118,7 +123,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         ///     Default Google Chrome printer options
         /// </summary>
         /// <remarks>
-        ///     Source: https://github.com/thecodingmachine/gotenberg/blob/master/internal/pkg/printer/chrome.go#L53
+        ///     Source: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/chromium/chromium.go#L200
         /// </remarks>
         /// <returns></returns>
         [PublicAPI]
@@ -145,7 +150,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             {
                 PaperWidth = 8.26,
                 PaperHeight = 11.69,
-                MarginBottom = .5 //Smallest value to get footer to show up is .38
+                MarginBottom = .38 //smallest value to get footer to show up is .38
             };
         }
 
@@ -155,19 +160,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.GetType().GetProperties()
-                .Where(prop => Attribute.IsDefined(prop, _attributeType))
-                .Select(p => new
-                    { Prop = p, Attrib = (MultiFormHeaderAttribute) Attribute.GetCustomAttribute(p, _attributeType) })
+            return this.GetType().ToMultiFormPropertyItems()
                 .Select(item =>
                 {
-                    var value = item.Prop.GetValue(this);
+                    var value = item.Property.GetValue(this);
 
                     if (value == null) return null;
 
                     var contentItem = new StringContent(GetValueAsUsString(value));
 
-                    contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(item.Attrib.ContentDisposition) { Name = item.Attrib.Name };
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
+                        {
+                            Name = item.Attribute.Name
+                        };
 
                     return contentItem;
                 }).WhereNotNull();

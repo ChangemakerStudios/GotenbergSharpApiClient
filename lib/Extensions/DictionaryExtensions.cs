@@ -3,28 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Infrastructure;
+
+using KeyValuePair = Gotenberg.Sharp.API.Client.Infrastructure.MultiTargetHelpers.KeyValuePair;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class DictionaryExtensions
     {
-        /// <remarks>
-        /// Source is here: https://github.com/thecodingmachine/gotenberg/blob/master/internal/app/xhttp/handler.go#L193
-        /// </remarks>
-        static readonly string[] OfficeExtensions =
-            { ".txt", ".rtf", ".fodt", ".doc", ".docx", ".odt", ".xls", ".xlsx", ".ods", ".ppt", ".pptx", ".odp" };
-
-        public static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(
-            this Dictionary<TKey, TValue> instance)
-        {
-            return instance ?? new Dictionary<TKey, TValue>();
-        }
+        static readonly StringComparer Comparer = StringComparer.InvariantCultureIgnoreCase;
 
         /// <summary>
         /// Ensures the merged documents appear in the order each was added.
         /// Gotenberg merges files in alphabetical order via the key/file name.
-        /// https://thecodingmachine.github.io/gotenberg/#merge
+        /// https://gotenberg.dev/docs/modules/pdf-engines#merge
         /// </summary>
         /// <param name="unordered"></param>
         /// <remarks>
@@ -33,20 +28,39 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         /// </remarks>
         public static AssetDictionary ToAlphabeticalOrderByIndex(this AssetDictionary unordered)
         {
-            var ordered = unordered.IfNullEmpty().Select((item, index) =>
-                KeyValuePair.Create(index.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension),
-                    item.Value));
-
-            return new AssetDictionary().FluentAddRange(ordered);
+            var ordered = unordered.IfNullEmpty()
+                .Select((item, i) =>
+                    KeyValuePair.Create(i.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension), item.Value));
+            return new AssetDictionary().AddRangeFluently(ordered);
         }
 
-        public static AssetDictionary RemoveInvalidOfficeDocs(this AssetDictionary unfiltered)
+        internal static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(
+            this Dictionary<TKey, TValue> instance)
+        {
+            return instance ?? new Dictionary<TKey, TValue>();
+        }
+
+        internal static IEnumerable<ValidOfficeMergeItem> FindValidOfficeMergeItems(
+            this AssetDictionary assets,
+            IResolveContentType resolver)
+        {
+            return assets.RemoveInvalidOfficeDocs()
+                .ToAlphabeticalOrderByIndex()
+                .Where(item => item.IsValid())
+                .Select(item => new ValidOfficeMergeItem
+                {
+                    Asset = item,
+                    MediaType = resolver.GetContentType(item.Key)
+                })
+                .Where(item => item.MediaType.IsSet());
+        }
+
+        static AssetDictionary RemoveInvalidOfficeDocs(this AssetDictionary unfiltered)
         {
             var filtered = unfiltered.IfNullEmpty()
-                .Where(asset => OfficeExtensions.Contains(new FileInfo(asset.Key).Extension,
-                    StringComparer.InvariantCultureIgnoreCase));
+                .Where(asset => MergeOfficeConstants.AllowedExtensions.Contains(new FileInfo(asset.Key).Extension, Comparer));
 
-            return new AssetDictionary().FluentAddRange(filtered);
+            return new AssetDictionary().AddRangeFluently(filtered);
         }
     }
 }

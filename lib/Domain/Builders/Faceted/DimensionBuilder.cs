@@ -8,14 +8,13 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class DimensionBuilder : BaseBuilder<ChromeRequest>
+    public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
     {
         public DimensionBuilder(ChromeRequest request)
         {
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
             Request.Dimensions ??= new Dimensions();
         }
-
 
         [PublicAPI]
         public DimensionBuilder SetMargins(Margins margins)
@@ -47,8 +46,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public DimensionBuilder SetScale(double scale)
         {
-            // ReSharper disable once ComplexConditionExpression
-            if (scale < 0.1 || scale > 2.0)
+            if (scale is < 0.1 or > 2.0)
                 throw new ArgumentOutOfRangeException(nameof(scale),
                     "Invalid scale.  Valid range is from 0.1 to 2.0 (1% through 200%)");
             this.Request.Dimensions.Scale = scale;
@@ -105,6 +103,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
+        [PublicAPI]
+        public DimensionBuilder PreferCssPageSize(bool prefer = true)
+        {
+            this.Request.Dimensions.PreferCssPageSize = prefer;
+            return this;
+        }
+
+        [PublicAPI]
+        public DimensionBuilder PrintBackground(bool printBackground = true)
+        {
+            this.Request.Dimensions.PrintBackground = printBackground;
+            return this;
+        }
+
         #region dimension instance
 
         [PublicAPI]
@@ -115,10 +127,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public DimensionBuilder UseChromeDefaults() => SetDimensions(Dimensions.ToChromeDefaults());
+        public DimensionBuilder UseChromeDefaults() =>
+            SetDimensions(Dimensions.ToChromeDefaults());
 
         [PublicAPI]
-        public DimensionBuilder UseDeliverableDefaults() => SetDimensions(Dimensions.ToDeliverableDefault());
+        public DimensionBuilder UseDeliverableDefaults() =>
+            SetDimensions(Dimensions.ToDeliverableDefault());
 
         #endregion
     }

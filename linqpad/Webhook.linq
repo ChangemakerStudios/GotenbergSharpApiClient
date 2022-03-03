@@ -1,18 +1,24 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.2.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
+
 
 async Task Main()
 {
 	//For this to work you need an api running on localhost:5000 w/ an endpoint to receive the webhook
 	
+	var resourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html";
+	
 	var destinationPath = @"D:\Gotenberg\Dumps\FromWebhook";
-	var footerPath = @"D:\Gotenberg\Resources\Html\UrlHeader.html";
-	var headerPath =@"D:\Gotenberg\Resources\Html\UrlFooter.html";
+	var footerPath = @$"{resourcePath}\UrlHeader.html";
+	var headerPath =@$"{resourcePath}\UrlFooter.html";
+	
+	headerPath.Dump();
 	
 	await CreateFromUrl(destinationPath,headerPath, footerPath);
 	
@@ -29,9 +35,8 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 			b.AddWebhook(hook =>
 			{
 				hook.SetUrl("http://host.docker.internal:5000/api/WebhookReceiver")
-					.SetTimeout(20)
 					.AddRequestHeader("custom-header", "value");
-			}).ChromeRpccBufferSize(1024);
+			});
 		})
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))
@@ -44,5 +49,6 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 		});
 
 	var request = await builder.BuildAsync();
+	
 	await sharpClient.FireWebhookAndForgetAsync(request);
 }
