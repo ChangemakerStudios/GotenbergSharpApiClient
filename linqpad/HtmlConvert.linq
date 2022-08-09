@@ -40,7 +40,7 @@ public async Task<string> CreateFromHtml(string destinationDirectory)
 	var request = await builder.BuildAsync();
 
 	var resultPath = @$"{destinationDirectory}\GotenbergFromHtml-{Rand.Next()}.pdf";
-	var response = await sharpClient.HtmlToPdfAsync(await builder.BuildAsync());
+	var response = await sharpClient.HtmlToPdfAsync(request);
 
 	using (var destinationStream = File.Create(resultPath))
 	{
