@@ -181,7 +181,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
         static string GetValueAsUsString(object value)
         {
-            var cultureInfo = CultureInfo.GetCultureInfo("en-US");
+            var cultureInfo = CultureInfo.InvariantCulture;
 
             return value switch
             {

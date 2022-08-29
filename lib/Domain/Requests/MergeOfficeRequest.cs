@@ -34,14 +34,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            var validItems = new Lazy<List<ValidOfficeMergeItem>>(this.Assets.FindValidOfficeMergeItems(_resolver).ToList);
+            var validItems = this.Assets.FindValidOfficeMergeItems(_resolver).ToList();
 
-            foreach (var isValid in new[] { Count > 1, validItems.Value.Count > 1 })
-                if (!isValid) yield break;
+            if (validItems.Count < 1)
+            {
+                throw new
+                    ArgumentException(
+                        $"No Valid Office Documents to Convert. Valid extensions: {string.Join(", ", MergeOfficeConstants.AllowedExtensions)}");
+            }
 
             yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
 
-            foreach (var item in validItems.Value.ToHttpContent())
+            foreach (var item in validItems.ToHttpContent())
                 yield return item;
 
             foreach (var item in Config.IfNullEmptyContent())
