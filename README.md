@@ -1,4 +1,4 @@
-⭐ For Gotenberg v7+. Alpha⭐
+⭐ For Gotenberg v7+. Beta⭐
 
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
 
