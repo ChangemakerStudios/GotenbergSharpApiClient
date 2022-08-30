@@ -17,9 +17,14 @@ jobs:
         
     - name: Git Version
       uses: codacy/git-version@2.5.4
+      
+    - name: get new version
+      run: |
+        NEW_VERSION=$(docker run --rm -v $(pwd):/repo codacy/git-version)
+        echo $NEW_VERSION      
         
     - name: pack
-      run: version=$(cat ./git-version); cd lib & dotnet pack -c Release --version-suffix $version
+      run: dotnet pack -c Release --version-suffix $version
         
     - name: publish
       if: github.event_name != 'pull_request' && github.ref_name == 'master'
