@@ -19,7 +19,7 @@ jobs:
       uses: codacy/git-version@2.5.4
         
     - name: pack
-      run: echo ./git-version; cd lib & dotnet pack -c Release
+      run: version=$(cat ./git-version); cd lib & dotnet pack -c Release --version-suffix $version
         
     - name: publish
       if: github.event_name != 'pull_request' && github.ref_name == 'master'
