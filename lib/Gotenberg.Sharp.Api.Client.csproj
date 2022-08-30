@@ -14,14 +14,17 @@
   <PropertyGroup Label="PackageInfo">
     <PackageVersion>$(VersionSuffix)</PackageVersion>
     <Version>$(VersionSuffix)</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
     <IncludeSymbols>True</IncludeSymbols>
-    <Authors>CaptiveAire Systems</Authors>
-    <Company>CaptiveAire Systems</Company>
     <PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
-    <Description>A C# API client for interacting with the Gotenberg micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.</Description>
+    <Description>
+      C# API client for interacting with the Gotenberg v7 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
+    </Description>
     <IncludeSymbols>True</IncludeSymbols>
+    <PackageReleaseNotes>
+      Upgraded to support Gotenberg v7.
+    </PackageReleaseNotes>    
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/lib/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
