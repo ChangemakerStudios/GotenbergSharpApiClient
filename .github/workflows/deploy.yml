@@ -12,10 +12,15 @@ jobs:
       with:
         fetch-depth: 0
  
-    - name: setup dotnet
+    - name: Setup Dotnet
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.100
+        
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: '5.5.0'        
         
     - name: GitVersion
       id: gitversion
@@ -24,10 +29,10 @@ jobs:
       #  useConfigFile: true
       #  additionalArguments: '/showConfig'   
         
-    - name: pack
+    - name: Pack
       run: dotnet pack -c Release --version-suffix ${{ steps.gitversion.outputs.nuGetVersion }}
         
-    - name: publish
+    - name: Publish
       if: github.event_name != 'pull_request' && github.ref_name == 'master'
       run: |
         dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }} --no-symbols 1 
