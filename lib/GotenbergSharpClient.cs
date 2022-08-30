@@ -132,13 +132,20 @@ namespace Gotenberg.Sharp.API.Client
         async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
 
-            #if NET5_0_OR_GREATER
-                return await response.Content.ReadAsStreamAsync(cancelToken);
-            #else
-                return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            #endif
+            using var response = await this.SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+
+            var ms = new MemoryStream();
+
+#if NET5_0_OR_GREATER
+            await response.Content.CopyToAsync(ms, cancelToken);
+#else
+            await response.Content.CopyToAsync(ms).ConfigureAwait(false);
+#endif
+
+            ms.Position = 0;
+
+            return ms;
         }
 
         async Task<HttpResponseMessage> SendRequest(
