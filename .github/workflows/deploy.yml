@@ -25,9 +25,8 @@ jobs:
     - name: GitVersion
       id: gitversion
       uses: gittools/actions/gitversion/execute@v0.9.7
-      #with:
-      #  useConfigFile: true
-      #  additionalArguments: '/showConfig'   
+      with:
+        useConfigFile: true
         
     - name: Pack
       run: dotnet pack -c Release --version-suffix ${{ steps.gitversion.outputs.nuGetVersion }}
