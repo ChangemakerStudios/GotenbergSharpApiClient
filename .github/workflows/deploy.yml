@@ -14,11 +14,13 @@ jobs:
       with:
         dotnet-version: 6.0.100
         
-    - uses: actions/setup-gitversion@v1.0.0
+    - name: setup GitVersion
+      uses: StanleyGoldman/setup-gitversion@v1.0.1
       with:
         gitversion-version: 5.1.1
     
-    - run: GitVersion
+    - name: run GitVersion
+      run: GitVersion
         
     - name: pack
       run: |
