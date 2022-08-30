@@ -7,24 +7,25 @@ jobs:
     runs-on: ubuntu-latest
         
     steps:
-    - name: git checkout
-      uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
  
     - name: setup dotnet
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.100
         
-    - name: Git Version
-      uses: codacy/git-version@2.5.4
-      
-    - name: get new version
-      run: |
-        NEW_VERSION=$(docker run --rm -v $(pwd):/repo codacy/git-version)
-        echo $NEW_VERSION      
+    - name: GitVersion
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v0.9.7
+      #with:
+      #  useConfigFile: true
+      #  additionalArguments: '/showConfig'   
         
     - name: pack
-      run: dotnet pack -c Release --version-suffix $version
+      run: dotnet pack -c Release --version-suffix ${{ steps.gitversion.outputs.nuGetVersion }}
         
     - name: publish
       if: github.event_name != 'pull_request' && github.ref_name == 'master'
