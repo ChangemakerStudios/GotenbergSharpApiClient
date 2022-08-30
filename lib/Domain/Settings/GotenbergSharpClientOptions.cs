@@ -13,7 +13,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Settings
         public Uri ServiceUrl { get; set; } = new Uri("http://localhost:3000");
 
         [UsedImplicitly]
-        public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/ping");
+        public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/health");
 
         [UsedImplicitly]
         public RetryOptions RetryPolicy { get; set; } = new RetryOptions();

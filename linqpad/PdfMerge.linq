@@ -1,7 +1,8 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.0.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests.Facets</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -12,7 +13,11 @@
 async Task Main()
 {
 	var p = await DoMerge(@"D:\Gotenberg\Dumps");
-	p.Dump();
+	
+	var info = new ProcessStartInfo { FileName = p, UseShellExecute = true };
+	Process.Start(info);
+	
+	p.Dump("Done");
 }
 
 async Task<string> DoMerge(string destinationPath)
@@ -23,25 +28,21 @@ async Task<string> DoMerge(string destinationPath)
 		.Select(p => new { Info = new FileInfo(p), Path = p })
 		.Where(item => !item.Info.Name.Contains("GotenbergMergeResult.pdf"))
 		.OrderBy(item => item.Info.CreationTime)
-		.Take(4);
+		.Take(2);
 
 	 items.Dump("Items", 0);
 
 	var toMerge = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
  
  	var builder = new MergeBuilder()
-		.WithAssets(b => {
-			b.AddItems(toMerge);
-		}).ConfigureRequest(b =>
-		{
-			b.ChromeRpccBufferSize(RequestConfig.DefaultChromeRpccBufferSize * 3)
-			 .ResultFileName("WTF.pdf")
-			 .TimeOut(55);
-		});
-		
-	var request = builder.Build();	
- 
-	 var response = await sharpClient.MergePdfsAsync(request);
+		 .SetPdfFormat(PdfFormats.A2b)
+		.WithAssets(b => { b.AddItems(toMerge) ;});
+
+	var request = builder.Build();
+	request.ToHttpContent()
+		   .ToDumpFriendlyFormat()
+		   .Dump();
+	var response = await sharpClient.MergePdfsAsync(request);
 
 	var outPath = @$"{destinationPath}\GotenbergMergeResult.pdf";
 

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Extensions;
@@ -10,36 +10,49 @@ using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+    //Libre office has a convert route which can perform merges
     public class MergeOfficeRequest : RequestBase
     {
-        readonly IResolveContentType _resolveContentType = new ResolveContentTypeImplementation();
+        readonly IResolveContentType _resolver = new ResolveContentTypeImplementation();
 
-        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergeOffice;
+        public override string ApiPath 
+            => Constants.Gotenberg.LibreOffice.ApiPaths.MergeOffice;
 
         public int Count => this.Assets.IfNullEmpty().Count;
 
+        public bool PrintAsLandscape { get; set; }
+
+        public string PageRanges { get; set; }
+
+        /// <summary>
+        /// Tells gotenberg to perform the conversion with unoconv.
+        /// If you specify this with a Format the API has unoconv convert it to that. 
+        /// Note: the documentation says you can't use both together but that regards request headers.
+        /// When true and Format is not set, the client falls back to PDF/A-1a.
+        /// </summary>
+        public bool UseNativePdfFormat { get; set; }
+
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Assets.RemoveInvalidOfficeDocs()
-                .ToAlphabeticalOrderByIndex()
-                .Where(item => item.Value != null)
-                .Select(item => new { Asset = item, MediaType = _resolveContentType.GetContentType(item.Key) })
-                .Where(item => item.MediaType.IsSet())
-                .Select(item =>
-                {
-                    var contentItem = item.Asset.Value.ToHttpContentItem();
+            var validItems = this.Assets.FindValidOfficeMergeItems(_resolver).ToList();
 
-                    contentItem.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                        {
-                            Name = Constants.Gotenberg.FormFieldNames.Files,
-                            FileName = item.Asset.Key
-                        };
+            if (validItems.Count < 1)
+            {
+                throw new
+                    ArgumentException(
+                        $"No Valid Office Documents to Convert. Valid extensions: {string.Join(", ", MergeOfficeConstants.AllowedExtensions)}");
+            }
 
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(item.MediaType);
+            yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
 
-                    return contentItem;
-                }).Concat(Config.IfNullEmptyContent());
+            foreach (var item in validItems.ToHttpContent())
+                yield return item;
+
+            foreach (var item in Config.IfNullEmptyContent())
+                yield return item;
+
+            foreach (var item in this.PropertiesToHttpContent())
+                yield return item;
         }
     }
 }

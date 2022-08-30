@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,23 +12,21 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
 
-using Microsoft.Net.Http.Headers;
-
-
 namespace Gotenberg.Sharp.API.Client
 {
     /// <summary>
     /// C# Client for Gotenberg api
     /// </summary>
     /// <remarks>
+    /// <para>
     ///     Gotenberg:
-    ///     https://thecodingmachine.github.io/gotenberg/
-    ///     https://github.com/thecodingmachine/gotenberg
-    /// 
-    ///     Other clients:
-    ///     https://github.com/thecodingmachine/gotenberg-go-client
-    ///     https://github.com/thecodingmachine/gotenberg-php-client
-    ///     https://github.com/yumauri/gotenberg-js-client
+    ///     https://gotenberg.dev
+    ///     https://github.com/gotenberg/gotenberg
+    /// </para>
+    /// <para>
+    ///     Other clients available:
+    ///     https://github.com/gotenberg/awesome-gotenberg#clients
+    /// </para>
     /// </remarks>
     public sealed class GotenbergSharpClient
     {
@@ -35,11 +34,13 @@ namespace Gotenberg.Sharp.API.Client
 
         #region ctors
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public GotenbergSharpClient(string address)
             : this(new Uri(address))
         {
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public GotenbergSharpClient(Uri address)
             : this(new HttpClient { BaseAddress = address })
         {
@@ -49,6 +50,7 @@ namespace Gotenberg.Sharp.API.Client
         /// Initializes a new instance of the <see cref="GotenbergSharpClient"/> class.
         /// </summary>
         /// <param name="innerClient"></param>
+        /// <remarks>Client was built for DI use</remarks>
         [PublicAPI]
         public GotenbergSharpClient(HttpClient innerClient)
         {
@@ -59,7 +61,7 @@ namespace Gotenberg.Sharp.API.Client
                 throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
             }
 
-            _innerClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Add(Constants.HttpContent.Headers.UserAgent, nameof(GotenbergSharpClient));
             _innerClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
         }
@@ -69,7 +71,7 @@ namespace Gotenberg.Sharp.API.Client
         #region api methods
 
         /// <summary>
-        /// For remote URL conversions. Works just like <see><cref>HtmlToPDf</cref></see>
+        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
@@ -101,16 +103,16 @@ namespace Gotenberg.Sharp.API.Client
             => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
-        ///     Converts one or more office documents into one merged pdf.
+        ///     Converts one or more office documents into a merged pdf.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
-        /// <remarks>
-        ///    Office merges fail when LibreOffice (unoconv) is disabled within the container's docker compose file
-        ///    via the DISABLE_UNOCONV: '1' Environment variable. 
-        /// </remarks>
         [PublicAPI]
         public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
+            => ExecuteRequestAsync(request, cancelToken);
+
+        [PublicAPI]
+        public Task<Stream> ConvertPdfDocumentsAsync(PdfConversionRequest request, CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         [PublicAPI]
@@ -130,12 +132,18 @@ namespace Gotenberg.Sharp.API.Client
         async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-
             var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
-            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+            #if NET5_0_OR_GREATER
+                return await response.Content.ReadAsStreamAsync(cancelToken);
+            #else
+                return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            #endif
         }
 
-        async Task<HttpResponseMessage> SendRequest(IApiRequest request, HttpCompletionOption option,
+        async Task<HttpResponseMessage> SendRequest(
+            IApiRequest request,
+            HttpCompletionOption option,
             CancellationToken cancelToken)
         {
             using var message = request.ToApiRequestMessage();

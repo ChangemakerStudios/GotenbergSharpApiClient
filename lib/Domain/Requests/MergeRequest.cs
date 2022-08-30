@@ -10,30 +10,35 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class MergeRequest : RequestBase
     {
-        public override string ApiPath => Constants.Gotenberg.ApiPaths.MergePdf;
+        public override string ApiPath
+            => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
         public int Count => this.Assets.IfNullEmpty().Count;
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.Assets.ToAlphabeticalOrderByIndex()
-                .Where(item => item.Key.IsSet() && item.Value != null)
-                .Select(item =>
-                {
-                    var contentItem = item.Value.ToHttpContentItem();
+            if (Format != default)
+                yield return CreateFormDataItem(this.Format.ToFormDataValue(), Constants.Gotenberg.PdfEngines.Routes.Merge.PdfFormat);
 
-                    contentItem.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                        {
-                            Name = Constants.Gotenberg.FormFieldNames.Files,
-                            FileName = item.Key
-                        };
+            foreach (var ci in Config.IfNullEmptyContent())
+                yield return ci;
 
-                    contentItem.Headers.ContentType =
-                        new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+            foreach (var item in this.Assets.ToAlphabeticalOrderByIndex().Where(item => item.IsValid()))
+            {
+                var contentItem = item.Value.ToHttpContentItem();
 
-                    return contentItem;
-                }).Concat(Config.IfNullEmptyContent());
+                contentItem.Headers.ContentDisposition =
+                    new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                    {
+                        Name = Constants.Gotenberg.SharedFormFieldNames.Files,
+                        FileName = item.Key
+                    };
+
+                contentItem.Headers.ContentType =
+                    new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+
+                yield return contentItem;
+            }
         }
     }
 }

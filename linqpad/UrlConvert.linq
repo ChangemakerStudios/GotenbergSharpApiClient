@@ -1,18 +1,29 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.0.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
+  <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
+
+static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
 	var destinationPath = @"D:\Gotenberg\Dumps";
- 	var headerFooterPath = @"D:\Gotenberg\Resources\Html";
- 	var file = await CreateFromUrl(destinationPath, @$"{headerFooterPath}\UrlHeader.html", @$"{headerFooterPath}\UrlFooter.html" );
-	file.Dump();
+ 	var headerFooterPath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html";;
+
+	var path = await CreateFromUrl(
+		destinationPath, 
+		@$"{headerFooterPath}\UrlHeader.html", 
+		@$"{headerFooterPath}\UrlFooter.html");
+	
+	var info = new ProcessStartInfo { FileName = path, UseShellExecute = true };
+	Process.Start(info);
+	
+	path.Dump("done");
 }
 
 public async Task<string> CreateFromUrl(string destinationPath, string headerPath, string footerPath)
@@ -21,25 +32,26 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
 	var builder = new UrlRequestBuilder()
 		.SetUrl("https://www.cnn.com")
-		.ConfigureRequest(b =>
-		{
-			b.PageRanges("1-2").ChromeRpccBufferSize(1048576);
-		})
+		.SetConversionBehaviors(b =>
+		   b.EmulateAsScreen()
+		    .SetBrowserWaitDelay(1)
+			.SetUserAgent(nameof(GotenbergSharpClient))
+		).ConfigureRequest(b => b.SetPageRanges("1-2"))
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllBytesAsync(headerPath))
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
 		)).WithDimensions(b =>
-		{
 			b.SetPaperSize(PaperSizes.A4)
-			.SetMargins(Margins.None)
-			 .LandScape()
-			 .SetScale(.90);
-		});
+			 .UseChromeDefaults()
+			 .MarginLeft(0)
+			 .MarginRight(0)
+		);
 
 	var request = await builder.BuildAsync();
+
 	var response = await sharpClient.UrlToPdfAsync(request);
 
-	var resultPath = @$"{destinationPath}\GotenbergFromUrl.pdf";
+	var resultPath = @$"{destinationPath}\GotenbergFromUrl-{Rand.Next()}.pdf";
 
 	using (var destinationStream = File.Create(resultPath))
 	{

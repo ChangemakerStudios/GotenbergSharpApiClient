@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders
 {
-    public class UrlRequestBuilder : BaseBuilder<UrlRequest>
+    public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlRequestBuilder>
     {
-        readonly List<Task> _asyncTasks = new List<Task>();
-
-        protected sealed override UrlRequest Request { get; set; }
+        protected override UrlRequest Request { get; set; }
 
         [PublicAPI]
         public UrlRequestBuilder() => this.Request = new UrlRequest();
@@ -37,14 +33,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         }
 
         [PublicAPI]
-        public UrlRequestBuilder SetRemoteUrlHeader(string name, string value)
-        {
-            if (name.IsNotSet()) throw new ArgumentException("header name is either null or empty");
-            this.Request.RemoteUrlHeader = KeyValuePair.Create(name, value);
-            return this;
-        }
-
-        [PublicAPI]
         public UrlRequestBuilder AddHeaderFooter(Action<UrlHeaderFooterBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
@@ -58,46 +46,22 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         {
             if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
-            this._asyncTasks.Add(asyncAction(new UrlHeaderFooterBuilder(this.Request)));
+            this.AsyncTasks.Add(asyncAction(new UrlHeaderFooterBuilder(this.Request)));
             return this;
         }
 
         [PublicAPI]
-        public UrlRequestBuilder WithDimensions(Dimensions dimensions)
-        {
-            this.Request.Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
-            return this;
-        }
-
-        [PublicAPI]
-        public UrlRequestBuilder WithDimensions(Action<DimensionBuilder> action)
+        public UrlRequestBuilder AddExtraResources(Action<UrlExtraResourcesBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
-
-            action(new DimensionBuilder(this.Request));
+            action(new UrlExtraResourcesBuilder(this.Request));
             return this;
         }
-
-        [PublicAPI]
-        public UrlRequestBuilder ConfigureRequest(RequestConfig config)
-        {
-            this.Request.Config = config ?? throw new ArgumentNullException(nameof(config));
-            return this;
-        }
-
-        [PublicAPI]
-        public UrlRequestBuilder ConfigureRequest(Action<ConfigBuilder> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            action(new ConfigBuilder(this.Request));
-            return this;
-        }
-
 
         [PublicAPI]
         public UrlRequest Build()
         {
-            if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
+            if (AsyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
             if (this.Request.Url == null) throw new InvalidOperationException("Request.Url is null");
             return Request;
         }
@@ -107,9 +71,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders
         {
             if (this.Request.Url == null) throw new InvalidOperationException("Request.Url is null");
 
-            if (_asyncTasks.Any())
+            if (AsyncTasks.Any())
             {
-                await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
+                await Task.WhenAll(AsyncTasks).ConfigureAwait(false);
             }
 
             return Request;

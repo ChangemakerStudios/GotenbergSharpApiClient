@@ -17,11 +17,11 @@ using static Polly.Extensions.Http.HttpPolicyExtensions;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline
 {
-    public static class PolicyFactory
+    internal static class PolicyFactory
     {
         [NotNull]
-        public static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(IServiceProvider sp,
-            HttpRequestMessage request)
+        internal static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(
+            IServiceProvider sp, HttpRequestMessage _)
         {
             Contract.Ensures(Contract.Result<IAsyncPolicy<HttpResponseMessage>>() != null);
 

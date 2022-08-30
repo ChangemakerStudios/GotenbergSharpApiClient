@@ -13,7 +13,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         /// <param name="fileName">Name of the file.</param>
         /// <param name="mediaType">The media type</param>
         // ReSharper disable once TooManyDependencies
-        public MultiFormHeaderAttribute(string name = Constants.Gotenberg.FormFieldNames.Files,
+        public MultiFormHeaderAttribute(string name = Constants.Gotenberg.SharedFormFieldNames.Files,
             string fileName = null,
             string contentDisposition = Constants.HttpContent.Disposition.Types.FormData,
             string mediaType = Constants.HttpContent.MediaTypes.TextHtml)

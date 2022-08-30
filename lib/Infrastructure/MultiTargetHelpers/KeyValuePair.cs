@@ -1,8 +1,7 @@
-﻿#if NETSTANDARD2_1
-[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Collections.Generic.KeyValuePair))]
-#else
+﻿using System.Collections.Generic;
+
 // ReSharper disable once CheckNamespace
-namespace System.Collections.Generic
+namespace Gotenberg.Sharp.API.Client.Infrastructure.MultiTargetHelpers
 {
     internal static class KeyValuePair
     {
@@ -14,7 +13,6 @@ namespace System.Collections.Generic
         /// <param name="key">   The key.</param>
         /// <param name="value"> The value.</param>
         /// <returns>
-        /// .
         /// </returns>
         internal static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value)
         {
@@ -22,4 +20,3 @@ namespace System.Collections.Generic
         }
     }
 }
-#endif

@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class AssetBuilder : BaseBuilder<RequestBase>
+    public sealed class AssetBuilder : BaseFacetedBuilder<RequestBase>
     {
         public AssetBuilder(RequestBase request)
         {

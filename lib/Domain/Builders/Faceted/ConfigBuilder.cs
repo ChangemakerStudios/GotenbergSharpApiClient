@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class ConfigBuilder : BaseBuilder<RequestBase>
+    public sealed class ConfigBuilder : BaseFacetedBuilder<RequestBase>
     {
         public ConfigBuilder(RequestBase request)
         {
@@ -16,27 +16,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             this.Request.Config ??= new RequestConfig();
         }
 
-
         [PublicAPI]
-        public ConfigBuilder TimeOut(float value)
-        {
-            this.Request.Config.TimeOut = value;
-            return this;
-        }
-
-        [PublicAPI]
-        public ConfigBuilder ChromeRpccBufferSize(int value)
-        {
-            this.Request.Config.ChromeRpccBufferSize = value;
-            return this;
-        }
-
-        [PublicAPI]
-        public ConfigBuilder PageRanges(string pageRanges)
+        public ConfigBuilder SetPageRanges(string pageRanges)
         {
             if (pageRanges.IsNotSet()) throw new ArgumentException("Cannot be null or empty", nameof(pageRanges));
             this.Request.Config.PageRanges = pageRanges;
             return this;
+        }
+
+        [PublicAPI]
+        [Obsolete("Use SetPageRanges instead. This is going away")]
+        public ConfigBuilder PageRanges(string pageRanges)
+        {
+            return SetPageRanges(pageRanges);
         }
 
         [PublicAPI]

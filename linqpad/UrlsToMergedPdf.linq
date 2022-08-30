@@ -1,32 +1,41 @@
 <Query Kind="Program">
-  <NuGetReference Version="1.0.0">Gotenberg.Sharp.API.Client</NuGetReference>
+  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Requests</Namespace>
+  <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
 </Query>
+
+//NOTE: You need to increase gotenberg api's timeout for this to work 
+//by passing --api-timeout=1800s when running the container.
+static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
 	var path = await CreateWorldNewsSummary($@"D:\NewsArchive");
+	
 	var info = new ProcessStartInfo{ FileName = path, UseShellExecute = true};
 	Process.Start(info);
-	path.Dump();
+	
+	path.Dump("Done");
 }
 
 public async Task<string> CreateWorldNewsSummary(string destinationDirectory)
 {
-	var sites = new[] {"https://www.nytimes.com","https://www.axios.com/","https://www.cnn.com",  "https://www.csmonitor.com",
-		"https://www.wsj.com", "https://www.usatoday.com",  "https://www.irishtimes.com",
-		"https://www.lemonde.fr", "https://calgaryherald.com", "https://www.bbc.com/news/uk",
-		"https://english.elpais.com/", 	"https://www.thehindu.com", "https://www.theaustralian.com.au",
-		"https://www.welt.de", "https://www.cankaoxiaoxi.com", "https://www.novinky.cz","https://www.elobservador.com.uy"}
+	var sites = new[] {
+		"https://www.nytimes.com","https://www.axios.com/",
+		"https://www.cnn.com",  "https://www.csmonitor.com",
+		"https://www.wsj.com", "https://www.usatoday.com",  
+		"https://www.irishtimes.com", "https://www.lemonde.fr", 
+		"https://calgaryherald.com", "https://www.bbc.com/news/uk",
+		"https://english.elpais.com/", 	"https://www.thehindu.com", 
+		"https://www.theaustralian.com.au",	"https://www.welt.de", 
+		"https://www.cankaoxiaoxi.com", "https://www.novinky.cz",
+		"https://www.elobservador.com.uy"}
 		.Select(u => new Uri(u));
-	
-	//when running with .net framework, you'll need to add this line:
-	// ServicePointManager.DefaultConnectionLimit = sites.Count();
-	
+		
 	var builders = CreateRequestBuilders(sites);
 	var requests = builders.Select(b => b.Build());
 
@@ -39,40 +48,40 @@ IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
 	{
 		yield return new UrlRequestBuilder()
 			.SetUrl(uri)
-			.SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
+			.SetConversionBehaviors(b => 
+				b.EmulateAsScreen()
+			    .SetUserAgent(nameof(GotenbergSharpClient)))
 			.ConfigureRequest(b =>
 			{
-				 b.PageRanges("1-3");
-			}).AddHeaderFooter(b =>
-			{
-				 b.SetFooter(GetHeadFoot(uri.ToString()));
+				 b.SetPageRanges("1-2");
 			})
 			.WithDimensions(b =>
 			{
-				b.SetPaperSize(PaperSizes.A4)
-				 .SetMargins(Margins.None)
-				 .MarginBottom(1)
-				 .LandScape();
+				b.SetMargins(Margins.None)
+				 .MarginLeft(.3)
+				 .MarginRight(.3);
 			});
 	}
 
-	static string GetHeadFoot(string heading)
-		=> "<html><head> <style> body { font-size: 8rem; } h1 { margin-left: auto; margin-right: auto; } </style></head><body><h1>" + heading + "</h1></body></html>";
 }
 
 async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory)
 {
-	var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+	var innerClient = new HttpClient {
+		 BaseAddress = new Uri("http://localhost:3000"),
+		 Timeout = TimeSpan.FromMinutes(7)
+	};
+	
+	var sharpClient = new GotenbergSharpClient(innerClient);
 
-	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r));
+	var tasks = requests.Select(r => sharpClient.UrlToPdfAsync(r, CancellationToken.None));
 	var results = await Task.WhenAll(tasks);
 
 	var mergeBuilder = new MergeBuilder()
 		.WithAssets(b =>
 		{
 			b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)));
-		})
-		.ConfigureRequest(b => b.TimeOut(1799));
+		});
 
 	var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build());
 
@@ -81,8 +90,8 @@ async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, str
 
 async Task<string> WriteFileAndGetPath(Stream responseStream, string desinationDirectory)
 {
-	var date = DateTime.Now;
-	var fullPath = @$"{desinationDirectory}\{date.ToString("yyyy-MM-MMMM-dd")}-{date.Ticks}-a4.pdf";
+	var fullPath = @$"{desinationDirectory}\{DateTime.Now.ToString("yyyy-MM-MMMM-dd")}-{Rand.Next()}.pdf";
+	
 	using (var destinationStream = File.Create(fullPath))
 	{
 		await responseStream.CopyToAsync(destinationStream);

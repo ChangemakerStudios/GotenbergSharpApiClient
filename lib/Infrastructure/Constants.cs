@@ -1,78 +1,212 @@
-// ReSharper disable All CA1034
+namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
-namespace Gotenberg.Sharp.API.Client.Infrastructure
+public static class Constants
 {
-    public static class Constants
+    //Collapse all: ctrl M, A
+    //Toggle with: ctrl M, L
+
+    public static class HttpContent
     {
-        public static class HttpContent
+        public static class Headers
         {
-            public static class MediaTypes
+            public const string UserAgent = "User-Agent";
+        }
+
+        public static class MediaTypes
+        {
+            public const string TextHtml = "text/html";
+            public const string ApplicationPdf = "application/pdf";
+        }
+
+        public static class MultipartData
+        {
+            public const string BoundaryPrefix = "--------------------------";
+        }
+
+        public static class Disposition
+        {
+            public static class Types
             {
-                public const string TextHtml = "text/html";
-                public const string ApplicationPdf = "application/pdf";
+                public const string FormData = "form-data";
+            }
+        }
+    }
+
+    public static class Gotenberg
+    {
+        public static class SharedFormFieldNames
+        {
+            public const string Files = "files";
+            public const string OutputFileName = "Gotenberg-Output-Filename";
+            //above currently only used by web-hooks. The docs put it in the API section however.
+        }
+
+        static class CrossCutting
+        {
+            internal const string Landscape = "landscape";
+            internal const string PageRanges = "nativePageRanges";
+            internal const string PdfFormat = "pdfFormat";
+
+            internal static class FileNames
+            {
+                internal const string Index = "index.html";
+            }
+        }
+
+        /// <summary>
+        /// Performs office doc conversions AND merges. It has one route however: convert
+        /// Merges happen when the header --form merge="true" is passed
+        /// Sending more than one document for conversion results in the api returning a zip file with results
+        /// https://gotenberg.dev/docs/modules/libreoffice
+        /// </summary>
+        public static class LibreOffice
+        {
+            public static class ApiPaths
+            {
+                const string Root = "forms/libreoffice";
+                public const string MergeOffice = $"{Root}/convert";
             }
 
-            public static class MultipartData
+            public static class Routes
             {
-                public const string BoundaryPrefix = "--------------------------";
-            }
-
-            public static class Disposition
-            {
-                public static class Types
+                public static class Convert
                 {
-                    public const string FormData = "form-data";
+                    public const string Landscape = CrossCutting.Landscape;
+
+                    public const string PageRanges = CrossCutting.PageRanges;
+
+                    public const string NativePdfFormat = "nativePdfFormat";
+                    public const string PdfFormat = CrossCutting.PdfFormat;
+
+                    public const string Merge = "merge";
                 }
             }
         }
 
-        public static class Gotenberg
+        /// <summary>
+        /// https://gotenberg.dev/docs/modules/pdf-engines#convert
+        /// </summary>
+        public static class PdfEngines
         {
             public static class ApiPaths
             {
-                public const string MergePdf = "merge";
-                public const string MergeOffice = "convert/office";
-                public const string ConvertHtml = "convert/html";
-                public const string UrlConvert = "convert/url";
-                public const string MarkdownConvert = "convert/markdown";
+                const string Root = "forms/pdfengines";
+
+                public const string MergePdf = $"{Root}/merge";
+                public const string ConvertPdf = $"{Root}/convert";
             }
 
-            public static class FileNames
+            public static class Routes
             {
-                public const string Header = "header.html";
-                public const string Index = "index.html";
-                public const string Footer = "footer.html";
+                public static class Merge
+                {
+                    public const string PdfFormat = CrossCutting.PdfFormat;
+                }
+
+                public static class Convert
+                {
+                    public const string PdfFormat = CrossCutting.PdfFormat;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source: https://gotenberg.dev/docs/modules/webhook#middleware
+        /// </summary>
+        /// <remarks>
+        ///     PipeDream.com can be used to test the webhook feature.
+        /// </remarks>
+        public static class Webhook
+        {
+            public const string Url = "Gotenberg-Webhook-Url";
+            public const string ErrorUrl = "Gotenberg-Webhook-Error-Url";
+            public const string HttpMethod = "Gotenberg-Webhook-Method";
+            public const string ErrorHttpMethod = "Gotenberg-Webhook-Error-Method";
+            public const string ExtraHeaders = "Gotenberg-Webhook-Extra-Http-Headers";
+        }
+
+        /// <summary>
+        /// https://gotenberg.dev/docs/modules/chromium
+        /// </summary>
+        public static class Chromium
+        {
+            public static class ApiPaths
+            {
+                const string Root = "forms/chromium";
+                public const string ConvertUrl = $"{Root}/convert/url";
+                public const string ConvertHtml = $"{Root}/convert/html";
+                public const string ConvertMarkdown = $"{Root}/convert/markdown";
             }
 
-            public static class FormFieldNames
+            public static class Routes
             {
-                public const string Files = "files";
-                public const string WaitTimeout = "waitTimeout";
-                public const string ResultFilename = "resultFilename";
-                public const string RemoteUrl = "remoteURL";
+                public static class Url
+                {
+                    public const string RemoteUrl = "url";
+                    public const string ExtraLinkTags = "extraLinkTags";
+                    public const string ExtraScriptTags = "extraScriptTags";
+                }
 
-                public const string PageRanges = "pageRanges";
-                public const string WebhookUrl = "webhookURL"; //all endpoints
-                public const string WebhookTimeout = "webhookURLTimeout";
-                public const string ChromeRpccBufferSize = "googleChromeRpccBufferSize";
+                public static class Html
+                {
+                    public const string IndexFile = CrossCutting.FileNames.Index;
+                }
 
+                /*public static class Markdown
+                {
+                    //Unused because MD requests are done with through HTML request
+                    //public const string IndexFile = CrossCutting.FileNames.Index;
+                }*/
+            }
+
+            public static class Shared
+            {
+                /// <summary>
+                /// From the header & footer tabs
+                /// </summary>
+                public static class FileNames
+                {
+                    public const string Header = "header.html";
+                    public const string Footer = "footer.html";
+                }
+
+                /// <summary>
+                /// Page properties
+                /// </summary>
                 public static class Dims
                 {
-                    public const string Scale = "scale";
                     public const string PaperWidth = "paperWidth";
                     public const string PaperHeight = "paperHeight";
                     public const string MarginTop = "marginTop";
                     public const string MarginBottom = "marginBottom";
                     public const string MarginLeft = "marginLeft";
                     public const string MarginRight = "marginRight";
-                    public const string Landscape = "landscape";
+                    public const string PreferCssPageSize = "preferCssPageSize";
+                    public const string PrintBackground = "printBackground";
+                    public const string Landscape = CrossCutting.Landscape;
+                    public const string Scale = "scale";
+                    public const string PageRanges = CrossCutting.PageRanges;
                 }
-            }
 
-            public static class CustomRemoteHeaders
-            {
-                public const string RemoteUrlKeyPrefix = "Gotenberg-Remoteurl-"; // url requests
-                public const string WebhookHeaderKeyPrefix = "Gotenberg-Webhookurl-"; //all requests
+                public static class HtmlConvert
+                {
+                    //wait
+                    public const string WaitDelay = "waitDelay";
+                    public const string WaitForExpression = "waitForExpression";
+
+                    //http headers
+                    public const string UserAgent = "userAgent";
+                    public const string ExtraHttpHeaders = "extraHttpHeaders";
+
+                    //javascript
+                    public const string FailOnConsoleExceptions = "failOnConsoleExceptions";
+
+                    //css
+                    public const string EmulatedMediaType = "emulatedMediaType";
+
+                    //pdf format
+                    public const string PdfFormat = CrossCutting.PdfFormat;
+                }
             }
         }
     }

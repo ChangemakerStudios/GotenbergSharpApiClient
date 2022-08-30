@@ -5,23 +5,29 @@ using System.Linq;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-// ReSharper disable FlagArgument
-
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    public static class EnumExtensions
+    internal static class EnumExtensions
     {
-        public static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
+        internal static string ToFormDataValue(this PdfFormats format)
+        {
+            return format == default 
+                ? "PDF/A-1a"
+                : $"PDF/A-{format.ToString().Substring(1, 2)}";
+        }
+
+        internal static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
         {
             if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
                 throw new InvalidEnumArgumentException(nameof(selectedSize), (int) selectedSize, typeof(PaperSizes));
-            if (selectedSize == PaperSizes.None)
+
+            if (selectedSize == default)
                 throw new InvalidOperationException(nameof(selectedSize));
 
             return PaperSizer.First(s => s.Size == selectedSize).Value;
         }
 
-        public static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(this Margins selected)
+        internal static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(this Margins selected)
         {
             if (!Enum.IsDefined(typeof(Margins), selected))
                 throw new InvalidEnumArgumentException(nameof(selected), (int) selected, typeof(PaperSizes));

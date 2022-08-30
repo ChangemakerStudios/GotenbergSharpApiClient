@@ -7,14 +7,16 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     {
         const int AlphabetLength = 26;
 
-        // ReSharper disable once ComplexConditionExpression
-        static readonly char[] Alphabet = Enumerable.Range('A', 'Z' - 'A' + 1).Select(c => (char) c).ToArray();
+        static readonly char[] Alphabet = Enumerable.Range('A', 'Z' - 'A' + 1)
+            .Select(c => (char) c)
+            .ToArray();
 
         /// <summary>
-        /// Returns a-z for the first 26 (0-25); then za - zz for the next; zza - zzz, etc. with the specified extension appended to the end
+        /// Returns a-z for the first 26 (0-25); then za - zz for the next;
+        /// zza - zzz, etc. with the specified extension appended to the end
         /// </summary>
         /// <remarks>
-        ///     https://thecodingmachine.github.io/gotenberg/#merge
+        ///     https://gotenberg.dev/docs/modules/pdf-engines#merge
         /// </remarks>
         /// <param name="sortNumber"></param>
         /// <param name="extension"></param>

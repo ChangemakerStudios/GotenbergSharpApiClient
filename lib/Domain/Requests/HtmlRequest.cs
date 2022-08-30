@@ -17,40 +17,38 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
     /// <remarks>
     ///     For Markdown conversions your Content.Body must contain HTML that references one or more markdown files
     ///     using the Go template function 'toHTML' within the body element. Chrome uses the function to convert the contents of a given markdown file to HTML.
-    ///     See example here: https://thecodingmachine.github.io/gotenberg/#markdown.basic
+    ///     See example here: https://gotenberg.dev/docs/modules/chromium#markdown
     /// </remarks>
     public sealed class HtmlRequest : ChromeRequest
     {
-        public override string ApiPath =>
-            this.ContainsMarkdown
-                ? Constants.Gotenberg.ApiPaths.MarkdownConvert
-                : Constants.Gotenberg.ApiPaths.ConvertHtml;
+        public override string ApiPath
+            => this.ContainsMarkdown
+                ? Constants.Gotenberg.Chromium.ApiPaths.ConvertMarkdown
+                : Constants.Gotenberg.Chromium.ApiPaths.ConvertHtml;
 
         [PublicAPI]
-        public HtmlRequest()
-        {
-        }
+        public HtmlRequest() : this(false) {}
 
         [PublicAPI]
-        public HtmlRequest(bool containsMarkdown) => this.ContainsMarkdown = containsMarkdown;
+        public HtmlRequest(bool containsMarkdown) =>
+            this.ContainsMarkdown = containsMarkdown;
 
+        [PublicAPI]
         public bool ContainsMarkdown { get; internal set; }
 
+        [PublicAPI]
         public FullDocument Content { get; set; }
 
         /// <summary>
         /// Transforms the instance to a list of HttpContent items
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>Useful for looking at the headers created via linq-pad.dump</remarks>
         public override IEnumerable<HttpContent> ToHttpContent()
         {
             if (Content?.Body == null) throw new InvalidOperationException("You need to Add at least a body");
 
-            return Content.IfNullEmptyContent()
-                .Concat(Assets.IfNullEmptyContent())
-                .Concat(Config.IfNullEmptyContent())
-                .Concat(Dimensions.IfNullEmptyContent());
+            return base.ToHttpContent()
+                .Concat(Content.IfNullEmptyContent())
+                .Concat(Assets.IfNullEmptyContent());
         }
     }
 }

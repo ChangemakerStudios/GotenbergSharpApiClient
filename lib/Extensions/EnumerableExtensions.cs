@@ -13,7 +13,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             return items.IfNullEmpty().Where(item => item != null);
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         internal static IEnumerable<T> IfNullEmpty<T>([CanBeNull] this IEnumerable<T> items)
         {
             return items ?? Enumerable.Empty<T>();
