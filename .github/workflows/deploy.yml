@@ -33,6 +33,6 @@ jobs:
       run: dotnet pack -c Release --version-suffix ${{ steps.gitversion.outputs.nuGetVersion }}
         
     - name: Publish
-      if: github.event_name != 'pull_request' && github.ref_name == 'master'
+      if: github.event_name != 'pull_request' && (github.ref_name == 'master' || github.ref_name == 'develop')
       run: |
-        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.nuget }} --no-symbols 1 
+        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.NUGETKEY }} --no-symbols 1 
