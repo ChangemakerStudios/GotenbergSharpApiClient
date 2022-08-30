@@ -1,12 +1,11 @@
-⭐ For Gotenberg v7+. Beta⭐
-
 # <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client) [![Build status](https://ci.appveyor.com/api/projects/status/s8lvj93xewlsylxh?svg=true)](https://ci.appveyor.com/project/Jaben/gotenbergsharpapiclient) [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
 
-.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
+⭐ For Gotenberg v7+.⭐
 
-*As of version [2.0.0-alpha0002](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client/2.0.0-alpha0002#supportedframeworks-tab) Gotenberg.Sharp.API.Client targets net6.0, net5.0; netstandard 2.0 and 2.1* 
+.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) v7 micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
+
 
 # Getting Started
 *Pull the image from dockerhub.com*
@@ -17,11 +16,15 @@
 ```powershell
 docker run --name gotenbee7x --rm -p 3000:3000 gotenberg/gotenberg:latest gotenberg --api-timeout=1800s --log-level=debug
 ```
+
 # .NET Core Project Setup
 *Install nuget package into your project*
 ```powershell
 PM> Install-Package Gotenberg.Sharp.Api.Client
 ```
+
+*Note: Use v1.x nugets for Gotenberg v6.*
+
 ## AppSettings
 ```json
   "GotenbergSharpClient": {
