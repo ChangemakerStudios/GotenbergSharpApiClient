@@ -88,7 +88,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         {
             if (name.IsNotSet()) throw new ArgumentException("request header name is null || empty", nameof(name));
 
-            this.Request.CustomHeaders.Add(Constants.Gotenberg.Webhook.ExtraHeaders, values);
+            this.Request.CustomHeaders.Add(name, values);
 
             return this;
         }

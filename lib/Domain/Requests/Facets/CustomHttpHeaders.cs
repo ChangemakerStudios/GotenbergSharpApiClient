@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Gotenberg.Sharp.API.Client.Extensions;
+using Newtonsoft.Json;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -12,6 +13,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             if (name.IsNotSet()) throw new ArgumentException("Header name is null or empty");
 
             this.Add(name, new[] { value });
+        }
+
+        public string ToJsonFormat()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

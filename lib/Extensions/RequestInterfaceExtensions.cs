@@ -34,9 +34,9 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 Content = formContent
             };
 
-            foreach (var item in request.CustomHeaders.IfNullEmpty())
+            if (request.CustomHeaders?.Any() is true)
             {
-                message.Headers.Add(item.Key, item.Value);
+                message.Headers.Add(Constants.Gotenberg.Webhook.ExtraHeaders, request.CustomHeaders.ToJsonFormat());
             }
 
             return message;
