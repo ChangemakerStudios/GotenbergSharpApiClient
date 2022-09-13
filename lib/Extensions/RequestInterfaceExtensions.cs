@@ -34,6 +34,14 @@ namespace Gotenberg.Sharp.API.Client.Extensions
                 Content = formContent
             };
 
+            if (request.IsWebhookRequest)
+            {
+                foreach (var header in request.GetWebhookHeaders())
+                {
+                    message.Headers.Add(header.Key, header.Value);
+                }
+            }
+
             if (request.CustomHeaders?.Any() is true)
             {
                 message.Headers.Add(Constants.Gotenberg.Webhook.ExtraHeaders, request.CustomHeaders.ToJsonFormat());

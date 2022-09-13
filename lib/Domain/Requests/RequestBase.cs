@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
@@ -41,5 +42,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 new ContentDispositionHeaderValue(DispositionType) { Name = fieldName };
             return item;
         }
+
+        public IEnumerable<KeyValuePair<string, string>> GetWebhookHeaders() =>
+            new Dictionary<string, string>
+            {
+                { Constants.Gotenberg.Webhook.Url, Config.Webhook.TargetUrl?.ToString() },
+                { Constants.Gotenberg.Webhook.HttpMethod, Config.Webhook.HttpMethod },
+                { Constants.Gotenberg.Webhook.ErrorUrl, Config.Webhook.ErrorUrl?.ToString() },
+                { Constants.Gotenberg.Webhook.ErrorHttpMethod, Config.Webhook.ErrorHttpMethod }
+            }.Where(entry => !string.IsNullOrWhiteSpace(entry.Value));
     }
 }
