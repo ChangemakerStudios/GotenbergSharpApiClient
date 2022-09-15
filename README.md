@@ -158,8 +158,7 @@ public async Task<Stream> CreateFromMarkdown()
          {
              reqBuilder.AddWebhook(hook =>
                  {
-                     hook.SetTimeout(20)
-                         .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
+                     hook.SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
                          .SetErrorUrl("http://host.docker.internal:5000/api/your/webhookReceiver/error")
                          .AddExtraHeader("custom-header", "value");
                  })
