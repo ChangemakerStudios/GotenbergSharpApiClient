@@ -1,4 +1,19 @@
-﻿using System.Collections.Generic;
+﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+//  and GotenbergSharpApiClient Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System.Collections.Generic;
 using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -8,29 +23,27 @@ namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class MergeOfficeRequestExtensions
 {
-    internal static IEnumerable<HttpContent> PropertiesToHttpContent(this MergeOfficeRequest r)
+    internal static IEnumerable<HttpContent> PropertiesToHttpContent(this MergeOfficeRequest request)
     {
-        if (r.PrintAsLandscape)
-            yield return RequestBase.CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
+        if (request.PrintAsLandscape)
+            yield return RequestBase.CreateFormDataItem(
+                "true",
+                Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
 
-        if (r.PageRanges.IsSet())
-            yield return RequestBase.CreateFormDataItem(r.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
+        if (request.PageRanges.IsSet())
+            yield return RequestBase.CreateFormDataItem(
+                request.PageRanges,
+                Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
 
-        switch (r.UseNativePdfFormat)
-        {
-            case false when r.Format == default:
-                yield break;
-            case false when r.Format != default:
-            {
-                yield return RequestBase.CreateFormDataItem(r.Format.ToFormDataValue(), Constants.Gotenberg.LibreOffice.Routes.Convert.PdfFormat);
-                break;
-            }
-            default:
-            {
-                yield return RequestBase.CreateFormDataItem(r.Format.ToFormDataValue(),
-                    Constants.Gotenberg.LibreOffice.Routes.Convert.NativePdfFormat);
-                break;
-            }
-        }
+        if (!request.UseNativePdfFormat && request.Format == default) yield break;
+
+        if (!request.UseNativePdfFormat && request.Format != default)
+            yield return RequestBase.CreateFormDataItem(
+                request.Format.ToFormDataValue(),
+                Constants.Gotenberg.LibreOffice.Routes.Convert.PdfFormat);
+        else
+            yield return RequestBase.CreateFormDataItem(
+                request.Format.ToFormDataValue(),
+                Constants.Gotenberg.LibreOffice.Routes.Convert.NativePdfFormat);
     }
 }

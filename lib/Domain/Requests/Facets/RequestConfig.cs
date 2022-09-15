@@ -1,8 +1,23 @@
-﻿using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
+﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+//  and GotenbergSharpApiClient Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 using System.Collections.Generic;
 using System.Net.Http;
+
+using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -11,6 +26,32 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </summary>
     public sealed class RequestConfig : IConvertToHttpContent
     {
+        #region ToHttpContent
+
+        /// <summary>
+        /// Converts the instance to a collection of http content items
+        /// </summary>
+        /// <returns></returns>
+        // ReSharper disable once MethodTooLong
+        public IEnumerable<HttpContent> ToHttpContent()
+        {
+            if (this.PageRanges.IsSet())
+            {
+                yield return RequestBase.CreateFormDataItem(
+                    this.PageRanges,
+                    Constants.Gotenberg.Chromium.Shared.Dims.PageRanges);
+            }
+
+            if (this.ResultFileName.IsSet())
+            {
+                yield return RequestBase.CreateFormDataItem(
+                    this.ResultFileName,
+                    Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
+            }
+        }
+
+        #endregion
+
         #region Basic settings
 
         /// <summary>
@@ -38,28 +79,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </summary>
         /// <remarks>All request types support web hooks</remarks>
         public Webhook Webhook { get; set; }
-
-        #endregion
-
-        #region ToHttpContent
-
-        /// <summary>
-        /// Converts the instance to a collection of http content items
-        /// </summary>
-        /// <returns></returns>
-        // ReSharper disable once MethodTooLong
-        public IEnumerable<HttpContent> ToHttpContent()
-        {
-            if (this.PageRanges.IsSet())
-            {
-                yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.Chromium.Shared.Dims.PageRanges);
-            }
-
-            if (this.ResultFileName.IsSet())
-            {
-                yield return RequestBase.CreateFormDataItem(this.ResultFileName, Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
-            }
-        }
 
         #endregion
     }

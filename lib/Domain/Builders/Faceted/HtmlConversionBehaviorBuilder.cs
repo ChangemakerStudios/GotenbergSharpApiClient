@@ -1,4 +1,19 @@
-﻿using System;
+﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+//  and GotenbergSharpApiClient Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System;
 
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
@@ -16,15 +31,15 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     public HtmlConversionBehaviorBuilder(ChromeRequest request)
     {
         this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        Request.ConversionBehaviors ??= new HtmlConversionBehaviors();
+        this.Request.ConversionBehaviors ??= new HtmlConversionBehaviors();
     }
 
     /// <summary>
-    ///  Sets the wait duration when loading an HTML document before converting it to PDF
+    ///     Sets the wait duration when loading an HTML document before converting it to PDF
     /// </summary>
     /// <param name="seconds"></param>
     /// <returns></returns>
-    /// <remarks>Prefer <see cref="SetBrowserWaitExpression"/> over waitDelay.</remarks> 
+    /// <remarks>Prefer <see cref="SetBrowserWaitExpression" /> over waitDelay.</remarks>
     [PublicAPI]
     public HtmlConversionBehaviorBuilder SetBrowserWaitDelay(int seconds)
     {
@@ -34,7 +49,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     }
 
     /// <summary>
-    /// Sets a java-script expression to wait before converting an HTML document to PDF until it returns true
+    ///     Sets a java-script expression to wait before converting an HTML document to PDF until it returns true
     /// </summary>
     /// <param name="expression">The expression to set</param>
     /// <returns></returns>
@@ -51,7 +66,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     }
 
     /// <summary>
-    ///  Overrides the default User-Agent extraHeaders
+    ///     Overrides the default User-Agent extraHeaders
     /// </summary>
     /// <param name="userAgent"></param>
     /// <returns></returns>
@@ -66,7 +81,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     }
 
     /// <summary>
-    /// Sets extra HTTP headers that Chromium will send when loading the HTML
+    ///     Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     /// <param name="headerName"></param>
     /// <param name="headerValue"></param>
@@ -76,13 +91,17 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     [PublicAPI]
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(string headerName, string headerValue)
     {
-        var header = string.Format("{0}{2}{1}", "{", "}", $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
+        var header = string.Format(
+            "{0}{2}{1}",
+            "{",
+            "}",
+            $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
 
-        return AddAdditionalHeaders(JObject.Parse(header));
+        return this.AddAdditionalHeaders(JObject.Parse(header));
     }
 
     /// <summary>
-    ///   Sets extra HTTP headers that Chromium will send when loading the HTML
+    ///     Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     /// <param name="extraHeaders"></param>
     /// <returns></returns>
@@ -98,7 +117,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     }
 
     /// <summary>
-    ///  Tells gotenberg to return a 409 response if there are exceptions in the Chromium console. 
+    ///     Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <returns></returns>
     [PublicAPI]
@@ -110,7 +129,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     }
 
     /// <summary>
-    ///  Configures gotenberg to emulate html loading as screen. By default it loads it as print
+    ///     Configures gotenberg to emulate html loading as screen. By default it loads it as print
     /// </summary>
     /// <returns></returns>
     [PublicAPI]
@@ -122,7 +141,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     }
 
     /// <summary>
-    /// Sets the format of the resulting PDF document
+    ///     Sets the format of the resulting PDF document
     /// </summary>
     /// <param name="format"></param>
     /// <returns></returns>

@@ -1,4 +1,19 @@
-﻿using System;
+﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+//  and GotenbergSharpApiClient Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
@@ -61,9 +76,12 @@ namespace Gotenberg.Sharp.API.Client
                 throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
             }
 
-            _innerClient.DefaultRequestHeaders.Add(Constants.HttpContent.Headers.UserAgent, nameof(GotenbergSharpClient));
+            _innerClient.DefaultRequestHeaders.Add(
+                Constants.HttpContent.Headers.UserAgent,
+                nameof(GotenbergSharpClient));
             _innerClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf));
+                new MediaTypeWithQualityHeaderValue(
+                    Constants.HttpContent.MediaTypes.ApplicationPdf));
         }
 
         #endregion
@@ -77,7 +95,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         [PublicAPI]
-        public Task<Stream> UrlToPdfAsync(UrlRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> UrlToPdfAsync(
+            UrlRequest request,
+            CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
@@ -88,7 +108,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public Task<Stream> HtmlToPdfAsync(HtmlRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> HtmlToPdfAsync(
+            HtmlRequest request,
+            CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
@@ -99,7 +121,9 @@ namespace Gotenberg.Sharp.API.Client
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         [PublicAPI]
-        public Task<Stream> MergePdfsAsync(MergeRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> MergePdfsAsync(
+            MergeRequest request,
+            CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         /// <summary>
@@ -108,21 +132,31 @@ namespace Gotenberg.Sharp.API.Client
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
         [PublicAPI]
-        public Task<Stream> MergeOfficeDocsAsync(MergeOfficeRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> MergeOfficeDocsAsync(
+            MergeOfficeRequest request,
+            CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         [PublicAPI]
-        public Task<Stream> ConvertPdfDocumentsAsync(PdfConversionRequest request, CancellationToken cancelToken = default)
+        public Task<Stream> ConvertPdfDocumentsAsync(
+            PdfConversionRequest request,
+            CancellationToken cancelToken = default)
             => ExecuteRequestAsync(request, cancelToken);
 
         [PublicAPI]
-        public async Task FireWebhookAndForgetAsync(IApiRequest request, CancellationToken cancelToken = default)
+        public async Task FireWebhookAndForgetAsync(
+            IApiRequest request,
+            CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (!request.IsWebhookRequest)
-                throw new InvalidOperationException("Only call this for webhook configured requests");
+                throw new InvalidOperationException(
+                    "Only call this for webhook configured requests");
 
-            using var response = await SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+            using var response = await SendRequest(
+                request,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancelToken);
         }
 
         #endregion
@@ -133,7 +167,10 @@ namespace Gotenberg.Sharp.API.Client
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            using var response = await this.SendRequest(request, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+            using var response = await this.SendRequest(
+                request,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancelToken);
 
             var ms = new MemoryStream();
 
