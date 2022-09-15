@@ -160,9 +160,10 @@ public async Task<Stream> CreateFromMarkdown()
                  {
                      hook.SetTimeout(20)
                          .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
-                         .AddRequestHeader("custom-header", "value");
+                         .SetErrorUrl("http://host.docker.internal:5000/api/your/webhookReceiver/error")
+                         .AddExtraHeader("custom-header", "value");
                  })
-                 .PageRanges("1-2");
+                 .SetPageRanges("1-2");
          })
          .AddAsyncHeaderFooter(async
              b => b.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
