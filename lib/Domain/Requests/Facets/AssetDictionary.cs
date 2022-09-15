@@ -77,5 +77,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
             return this;
         }
+
+        public void Validate()
+        {
+            if (this.Count == 0) throw new InvalidOperationException("Must add at least one asset");
+        }
     }
 }

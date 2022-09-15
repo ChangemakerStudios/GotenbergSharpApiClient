@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll">C:\Projects\GotenbergSharpApiClient\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -16,7 +16,7 @@ static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\R
 
 async Task Main()
 {
-	var destination = @"D:\Gotenberg\Dumps";
+	var destination = @"C:\Temp\Gotenberg\Dumps";
 	var p = await DoOfficeMerge(ResourcePath, destination);
 
 	ResourcePath.Dump();
@@ -32,6 +32,7 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 	var client = new GotenbergSharpClient("http://localhost:3000");
 
 	var builder = new MergeOfficeBuilder()
+		.ConfigureRequest(c => c.SetTrace("LinqPad"))
 		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
 		.SetPdfFormat(PdfFormats.A2b)
 		 .UseNativePdfFormat()

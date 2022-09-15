@@ -29,14 +29,12 @@ public class PdfConversionRequest : RequestBase
     public override string ApiPath
         => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
-    public int Count => this.Assets.IfNullEmpty().Count;
-
     public override IEnumerable<HttpContent> ToHttpContent()
     {
         if (Format == default)
             throw new InvalidOperationException("You must set the Pdf format");
 
-        foreach (var item in this.Assets.Where(item => item.IsValid()))
+        foreach (var item in this.Assets.IfNullEmpty().Where(item => item.IsValid()))
         {
             var contentItem = item.Value.ToHttpContentItem();
 
@@ -63,12 +61,5 @@ public class PdfConversionRequest : RequestBase
         {
             yield return item;
         }
-    }
-
-    public override void Validate()
-    {
-        base.Validate();
-
-        if (this.Count == 0) throw new InvalidOperationException("There are no items to convert");
     }
 }

@@ -23,6 +23,8 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
+using JetBrains.Annotations;
+
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 public static class DictionaryExtensions
@@ -39,7 +41,7 @@ public static class DictionaryExtensions
     ///     Note: For merges only. Embedded assets for html docs have
     ///     key values with whatever extension the html references: .md, .css, .jpg, etc
     /// </remarks>
-    public static AssetDictionary ToAlphabeticalOrderByIndex(this AssetDictionary unordered)
+    public static AssetDictionary ToAlphabeticalOrderByIndex([CanBeNull] this AssetDictionary unordered)
     {
         var ordered = unordered.IfNullEmpty()
             .Select(

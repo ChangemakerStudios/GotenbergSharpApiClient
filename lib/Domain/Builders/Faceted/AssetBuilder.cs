@@ -31,7 +31,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         public AssetBuilder(RequestBase request)
         {
             this.Request = request ?? throw new ArgumentNullException(nameof(request));
-            Request.Assets ??= new AssetDictionary();
+            this.Request.Assets ??= new AssetDictionary();
         }
 
         #region one asset
@@ -48,7 +48,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
                     "Asset names must be relative file names with extensions");
             }
 
-            this.Request.Assets.Add(name, value ?? throw new ArgumentNullException(nameof(value)));
+            this.Request.Assets!.Add(name, value ?? throw new ArgumentNullException(nameof(value)));
 
             return this;
         }

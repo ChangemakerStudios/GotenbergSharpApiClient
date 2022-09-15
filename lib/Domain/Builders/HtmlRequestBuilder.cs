@@ -36,8 +36,6 @@ public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRe
         this.Request = new HtmlRequest(containsMarkdown);
     }
 
-    protected override HtmlRequest Request { get; set; }
-
     [PublicAPI]
     public HtmlRequestBuilder AddDocument(Action<DocumentBuilder> action)
     {

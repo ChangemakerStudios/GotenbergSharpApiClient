@@ -23,6 +23,4 @@ public sealed class MergeBuilder : BaseMergeBuilder<MergeRequest, MergeBuilder>
     {
         this.Request = new MergeRequest();
     }
-
-    protected override MergeRequest Request { get; set; }
 }

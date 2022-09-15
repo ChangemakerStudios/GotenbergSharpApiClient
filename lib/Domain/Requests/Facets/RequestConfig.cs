@@ -50,6 +50,11 @@ public sealed class RequestConfig : IConvertToHttpContent
 
     #endregion
 
+    public void Validate()
+    {
+        this.Webhook?.Validate();
+    }
+
     public IEnumerable<KeyValuePair<string, string>> GetHeaders()
     {
         if (this.Trace.IsSet())

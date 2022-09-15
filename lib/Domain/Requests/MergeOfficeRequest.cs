@@ -33,8 +33,6 @@ public class MergeOfficeRequest : RequestBase
     public override string ApiPath
         => Constants.Gotenberg.LibreOffice.ApiPaths.MergeOffice;
 
-    public int Count => this.Assets.IfNullEmpty().Count;
-
     public bool PrintAsLandscape { get; set; }
 
     public string PageRanges { get; set; }
@@ -68,12 +66,5 @@ public class MergeOfficeRequest : RequestBase
 
         foreach (var item in this.PropertiesToHttpContent())
             yield return item;
-    }
-
-    public override void Validate()
-    {
-        if (this.Count == 0) throw new InvalidOperationException("There are no items to merge");
-
-        base.Validate();
     }
 }

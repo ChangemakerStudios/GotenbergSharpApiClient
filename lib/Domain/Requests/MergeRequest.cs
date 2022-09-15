@@ -29,8 +29,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public override string ApiPath
             => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
-        public int Count => this.Assets.IfNullEmpty().Count;
-
         public override IEnumerable<HttpContent> ToHttpContent()
         {
             if (Format != default)
@@ -59,13 +57,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
                 yield return contentItem;
             }
-        }
-
-        public override void Validate()
-        {
-            if (this.Count == 0) throw new InvalidOperationException("There are no items to merge");
-
-            base.Validate();
         }
     }
 }

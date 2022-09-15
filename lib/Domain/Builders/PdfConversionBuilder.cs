@@ -30,8 +30,6 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
         this.Request = new PdfConversionRequest();
     }
 
-    protected override PdfConversionRequest Request { get; set; }
-
     [PublicAPI]
     public PdfConversionBuilder SetFormat(PdfFormats format)
     {

@@ -32,8 +32,6 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
         this.Request = new UrlRequest();
     }
 
-    protected override UrlRequest Request { get; set; }
-
     [PublicAPI]
     public UrlRequestBuilder SetUrl(string url)
     {

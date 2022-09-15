@@ -32,8 +32,6 @@ public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, Me
         this.Request = new MergeOfficeRequest();
     }
 
-    protected override MergeOfficeRequest Request { get; set; }
-
     [PublicAPI]
     public MergeOfficeBuilder PrintAsLandscape()
     {

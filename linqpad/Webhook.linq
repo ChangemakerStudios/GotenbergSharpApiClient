@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll">C:\Projects\GotenbergSharpApiClient\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -14,7 +14,7 @@ async Task Main()
 	
 	var resourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html";
 	
-	var destinationPath = @"D:\Gotenberg\Dumps\FromWebhook";
+	var destinationPath = @"C:\Temp\Gotenberg\Dumps\FromWebhook";
 	var footerPath = @$"{resourcePath}\UrlHeader.html";
 	var headerPath =@$"{resourcePath}\UrlFooter.html";
 	
@@ -35,8 +35,9 @@ public async Task CreateFromUrl(string destinationPath, string headerPath, strin
 			b.AddWebhook(hook =>
 			{
 				hook.SetUrl("http://host.docker.internal:5000/api/WebhookReceiver")
-					.AddRequestHeader("custom-header", "value");
-			});
+					.SetErrorUrl("http://host.docker.internal:5000/api/WebhookReceiver")
+					.AddExtraHeader("custom-header", "value");
+			}).SetPageRanges("1-2");
 		})
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllTextAsync(headerPath))

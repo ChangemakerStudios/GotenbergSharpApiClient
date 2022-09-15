@@ -36,7 +36,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         {
             if (pageRanges.IsNotSet())
                 throw new ArgumentException("Cannot be null or empty", nameof(pageRanges));
-            this.Request.Config.PageRanges = pageRanges;
+            this.Request.Config!.PageRanges = pageRanges;
             return this;
         }
 
@@ -52,7 +52,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         {
             if (resultFileName.IsNotSet())
                 throw new ArgumentException("Cannot be null or empty", nameof(resultFileName));
-            this.Request.Config.ResultFileName = resultFileName;
+            this.Request.Config!.ResultFileName = resultFileName;
             return this;
         }
 
@@ -61,7 +61,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         {
             if (trace.IsNotSet())
                 throw new ArgumentException("Trace cannot be null or empty", nameof(trace));
-            this.Request.Config.Trace = trace;
+            this.Request.Config!.Trace = trace;
             return this;
         }
 
@@ -76,7 +76,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public ConfigBuilder AddWebhook(Webhook webhook)
         {
-            this.Request.Config.Webhook =
+            this.Request.Config!.Webhook =
                 webhook ?? throw new ArgumentNullException(nameof(webhook));
             if (!webhook.TargetUrl.IsAbsoluteUri)
                 throw new InvalidOperationException("Webhook must have an absolute url");

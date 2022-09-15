@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll">C:\Projects\GotenbergSharpApiClient\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Extensions</Namespace>
@@ -14,7 +14,7 @@ static string ResourcePath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\R
 
 async Task Main()
 {
-	var path = await CreateFromMarkdown(@"D:\Gotenberg\Dumps");
+	var path = await CreateFromMarkdown(@"C:\Temp\Gotenberg\Dumps");
 	
 	var info = new ProcessStartInfo { FileName = path, UseShellExecute = true };
 	Process.Start(info);

@@ -21,6 +21,7 @@ using System.Net.Http.Headers;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
@@ -31,9 +32,13 @@ public abstract class RequestBase : IApiRequest
 {
     private const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
 
+    [CanBeNull]
     public RequestConfig Config { get; set; }
 
+    [CanBeNull]
     public AssetDictionary Assets { get; set; }
+
+    public int AssetCount => this.Assets?.Count ?? 0;
 
     public PdfFormats Format { [UsedImplicitly] get; set; }
 
@@ -43,9 +48,9 @@ public abstract class RequestBase : IApiRequest
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract string ApiPath { get; }
 
-    public bool IsWebhookRequest => this.Config.Webhook?.IsConfigured() ?? false;
+    public bool IsWebhookRequest => this.Config?.Webhook?.IsConfigured() ?? false;
 
-    public virtual ILookup<string, string> Headers => this.Config.GetHeaders()
+    public virtual ILookup<string, string> Headers => (this.Config?.GetHeaders()).IfNullEmpty()
         .ToLookup(s => s.Key, s => s.Value);
 
     public abstract IEnumerable<HttpContent> ToHttpContent();
@@ -62,6 +67,7 @@ public abstract class RequestBase : IApiRequest
 
     public virtual void Validate()
     {
-        this.Config.Webhook?.Validate();
+        this.Config?.Validate();
+        this.Assets?.Validate();
     }
 }
