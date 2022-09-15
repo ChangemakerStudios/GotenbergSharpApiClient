@@ -43,9 +43,10 @@ public abstract class RequestBase : IApiRequest
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract string ApiPath { get; }
 
-    public bool IsWebhookRequest => this.Config.Webhook.IsConfigured();
+    public bool IsWebhookRequest => this.Config.Webhook?.IsConfigured() ?? false;
 
-    public virtual ILookup<string, string> Headers => this.Config.Webhook.GetHeaders().ToLookup(s => s.Key, s => s.Value);
+    public virtual ILookup<string, string> Headers => this.Config.GetHeaders()
+        .ToLookup(s => s.Key, s => s.Value);
 
     public abstract IEnumerable<HttpContent> ToHttpContent();
 
@@ -61,6 +62,6 @@ public abstract class RequestBase : IApiRequest
 
     public virtual void Validate()
     {
-        this.Config.Webhook.Validate();
+        this.Config.Webhook?.Validate();
     }
 }

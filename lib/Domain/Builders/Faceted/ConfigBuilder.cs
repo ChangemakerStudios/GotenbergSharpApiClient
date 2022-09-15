@@ -57,6 +57,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
+        public ConfigBuilder SetTrace(string trace)
+        {
+            if (trace.IsNotSet())
+                throw new ArgumentException("Trace cannot be null or empty", nameof(trace));
+            this.Request.Config.Trace = trace;
+            return this;
+        }
+
+        [PublicAPI]
         public ConfigBuilder AddWebhook(Action<WebhookBuilder> action)
         {
             if (action == null) throw new ArgumentNullException(nameof(action));

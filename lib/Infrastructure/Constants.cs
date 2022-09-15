@@ -50,6 +50,11 @@ public static class Constants
 
     public static class Gotenberg
     {
+        public static class All
+        {
+            public const string Trace = "Gotenberg-Trace";
+        }
+
         public static class SharedFormFieldNames
         {
             public const string Files = "files";

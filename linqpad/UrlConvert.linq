@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll">C:\Projects\GotenbergSharpApiClient\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -12,7 +12,7 @@ static Random Rand = new Random(Math.Abs( (int) DateTime.Now.Ticks));
 
 async Task Main()
 {
-	var destinationPath = @"D:\Gotenberg\Dumps";
+	var destinationPath = @"C:\Temp\Gotenberg\Dumps";
  	var headerFooterPath = @$"{Path.GetDirectoryName(Util.CurrentQueryPath)}\Resources\Html";;
 
 	var path = await CreateFromUrl(
@@ -36,7 +36,7 @@ public async Task<string> CreateFromUrl(string destinationPath, string headerPat
 		   b.EmulateAsScreen()
 		    .SetBrowserWaitDelay(1)
 			.SetUserAgent(nameof(GotenbergSharpClient))
-		).ConfigureRequest(b => b.SetPageRanges("1-2"))
+		).ConfigureRequest(b => b.SetTrace("Linqpad").SetPageRanges("1-2"))
 		.AddAsyncHeaderFooter(async
 			b => b.SetHeader(await File.ReadAllBytesAsync(headerPath))
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
