@@ -1,4 +1,5 @@
-﻿using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+﻿using System.Collections.Generic;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -7,5 +8,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         string ApiPath { get; }
         bool IsWebhookRequest { get; }
         CustomHttpHeaders CustomHeaders { get; }
+        IEnumerable<KeyValuePair<string, string>> GetWebhookHeaders();
     }
 }

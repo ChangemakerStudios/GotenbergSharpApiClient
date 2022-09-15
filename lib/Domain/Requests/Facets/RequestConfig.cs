@@ -50,9 +50,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         // ReSharper disable once MethodTooLong
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            foreach (var httpContent in TryAddWebhookHeaders())
-                yield return httpContent;
-
             if (this.PageRanges.IsSet())
             {
                 yield return RequestBase.CreateFormDataItem(this.PageRanges, Constants.Gotenberg.Chromium.Shared.Dims.PageRanges);
@@ -61,30 +58,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             if (this.ResultFileName.IsSet())
             {
                 yield return RequestBase.CreateFormDataItem(this.ResultFileName, Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
-            }
-        }
-
-        //TODO Move to an extension method
-        IEnumerable<HttpContent> TryAddWebhookHeaders()
-        {
-            if (this.Webhook?.TargetUrl != null)
-            {
-                yield return RequestBase.CreateFormDataItem(this.Webhook.TargetUrl, Constants.Gotenberg.Webhook.Url);
-
-                if (this.Webhook.HttpMethod.IsSet())
-                {
-                    yield return RequestBase.CreateFormDataItem(this.Webhook.HttpMethod, Constants.Gotenberg.Webhook.HttpMethod);
-                }
-
-                if (this.Webhook.ErrorUrl != null)
-                {
-                    yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorUrl, Constants.Gotenberg.Webhook.ErrorUrl);
-                    if (this.Webhook.ErrorHttpMethod.IsSet())
-                    {
-                        yield return RequestBase.CreateFormDataItem(this.Webhook.ErrorHttpMethod,
-                            Constants.Gotenberg.Webhook.ErrorHttpMethod);
-                    }
-                }
             }
         }
 
