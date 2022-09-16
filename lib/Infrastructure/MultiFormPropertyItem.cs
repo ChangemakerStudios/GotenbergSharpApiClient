@@ -13,13 +13,40 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
 internal class MultiFormPropertyItem
 {
-    public PropertyInfo Property { get; set; }
+    private static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
 
-    public MultiFormHeaderAttribute Attribute { get; set; }
+    public MultiFormPropertyItem(PropertyInfo property, MultiFormHeaderAttribute attribute)
+    {
+        this.Property = property ?? throw new ArgumentNullException(nameof(property));
+        this.Attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
+    }
+
+    public PropertyInfo Property { get; }
+
+    public MultiFormHeaderAttribute Attribute { get; }
+
+    internal static IEnumerable<MultiFormPropertyItem> FromType(Type instanceType)
+    {
+        if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
+
+        var propertyInfos = instanceType.GetProperties()
+            .Where(prop => System.Attribute.IsDefined(prop, _attributeType)).ToList();
+
+        foreach (var propertyInfo in propertyInfos)
+            if (System.Attribute.GetCustomAttribute(
+                    propertyInfo,
+                    _attributeType) is MultiFormHeaderAttribute multiFormHeaderAttribute)
+                yield return new MultiFormPropertyItem(
+                    propertyInfo,
+                    multiFormHeaderAttribute);
+    }
 }

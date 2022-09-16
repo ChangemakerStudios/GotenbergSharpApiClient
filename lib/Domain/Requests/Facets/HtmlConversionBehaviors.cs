@@ -92,7 +92,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
                 Constants.Gotenberg.Chromium.Shared.HtmlConvert.PdfFormat);
         }
 
-        foreach (var item in this.GetType().ToMultiFormPropertyItems())
+        foreach (var item in MultiFormPropertyItem.FromType(this.GetType()))
         {
             var value = item.Property.GetValue(this);
 

@@ -30,7 +30,7 @@ public sealed class MultiFormHeaderAttribute : Attribute
     // ReSharper disable once TooManyDependencies
     public MultiFormHeaderAttribute(
         string name = Constants.Gotenberg.SharedFormFieldNames.Files,
-        string fileName = null,
+        string? fileName = null,
         string contentDisposition = Constants.HttpContent.Disposition.Types.FormData,
         string mediaType = Constants.HttpContent.MediaTypes.TextHtml)
     {
@@ -62,7 +62,7 @@ public sealed class MultiFormHeaderAttribute : Attribute
     /// <value>
     ///     The name of the file.
     /// </value>
-    public string FileName { get; }
+    public string? FileName { get; }
 
     /// <summary>
     ///     Gets the type of the media.

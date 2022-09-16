@@ -43,7 +43,7 @@ internal static class PolicyFactory
 
         var retryOps = GetRetryOptions(sp);
 
-        if (!retryOps.Enabled) return Policy.NoOpAsync<HttpResponseMessage>();
+        if (!(retryOps?.Enabled ?? false)) return Policy.NoOpAsync<HttpResponseMessage>();
 
         return HandleTransientHttpError()
             .Or<TimeoutRejectedException>()
@@ -70,7 +70,7 @@ internal static class PolicyFactory
             .WithPolicyKey(nameof(GotenbergSharpClient));
     }
 
-    private static RetryOptions GetRetryOptions(IServiceProvider sp)
+    private static RetryOptions? GetRetryOptions(IServiceProvider sp)
     {
         return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value
             ?.RetryPolicy;

@@ -26,6 +26,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     public sealed class FullDocument : HeaderFooterDocument
     {
         [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Routes.Html.IndexFile)]
-        public ContentItem Body { [UsedImplicitly] get; set; }
+        public ContentItem? Body { [UsedImplicitly] get; set; }
     }
 }

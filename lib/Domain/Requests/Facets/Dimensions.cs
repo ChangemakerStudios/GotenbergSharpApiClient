@@ -175,7 +175,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// <returns></returns>
         public IEnumerable<HttpContent> ToHttpContent()
         {
-            return this.GetType().ToMultiFormPropertyItems()
+            return MultiFormPropertyItem.FromType(this.GetType())
                 .Select(
                     item =>
                     {

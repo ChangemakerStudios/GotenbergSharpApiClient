@@ -60,7 +60,7 @@ public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
     }
 
     [PublicAPI]
-    public WebhookBuilder SetUrl([NotNull] Uri url, HttpMethod method = null)
+    public WebhookBuilder SetUrl(Uri url, HttpMethod method = null)
     {
         if (url == null) throw new ArgumentNullException(nameof(url));
         if (!url.IsAbsoluteUri)

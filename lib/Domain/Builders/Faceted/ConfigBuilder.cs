@@ -76,10 +76,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public ConfigBuilder AddWebhook(Webhook webhook)
         {
-            this.Request.Config!.Webhook =
-                webhook ?? throw new ArgumentNullException(nameof(webhook));
-            if (!webhook.TargetUrl.IsAbsoluteUri)
-                throw new InvalidOperationException("Webhook must have an absolute url");
+            this.Request.Config!.Webhook = webhook ?? throw new ArgumentNullException(nameof(webhook));
 
             return this;
         }
