@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -41,7 +42,7 @@ public static class DictionaryExtensions
     ///     Note: For merges only. Embedded assets for html docs have
     ///     key values with whatever extension the html references: .md, .css, .jpg, etc
     /// </remarks>
-    public static AssetDictionary ToAlphabeticalOrderByIndex([CanBeNull] this AssetDictionary unordered)
+    public static AssetDictionary ToAlphabeticalOrderByIndex(this AssetDictionary? unordered)
     {
         var ordered = unordered.IfNullEmpty()
             .Select(
@@ -49,11 +50,11 @@ public static class DictionaryExtensions
                     KeyValuePair.Create(
                         i.ToAlphabeticallySortableFileName(new FileInfo(item.Key).Extension),
                         item.Value));
+
         return new AssetDictionary().AddRangeFluently(ordered);
     }
 
-    internal static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(
-        this Dictionary<TKey, TValue> instance)
+    internal static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(this Dictionary<TKey, TValue>? instance)
     {
         return instance ?? new Dictionary<TKey, TValue>();
     }

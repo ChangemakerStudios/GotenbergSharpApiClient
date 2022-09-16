@@ -72,11 +72,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         #region from dictionaries
 
         [PublicAPI]
-        public AssetBuilder AddItems(Dictionary<string, ContentItem> items)
+        public AssetBuilder AddItems(Dictionary<string, ContentItem>? items)
         {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-
-            foreach (var item in items)
+            foreach (var item in items.IfNullEmpty())
             {
                 this.AddItem(item.Key, item.Value);
             }
@@ -85,15 +83,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         }
 
         [PublicAPI]
-        public AssetBuilder AddItems(Dictionary<string, string> assets) =>
+        public AssetBuilder AddItems(Dictionary<string, string>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         [PublicAPI]
-        public AssetBuilder AddItems(Dictionary<string, byte[]> assets) =>
+        public AssetBuilder AddItems(Dictionary<string, byte[]>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         [PublicAPI]
-        public AssetBuilder AddItems(Dictionary<string, Stream> assets) =>
+        public AssetBuilder AddItems(Dictionary<string, Stream>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
         #endregion

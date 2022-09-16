@@ -50,9 +50,9 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
 
         public HttpStatusCode StatusCode { get; }
 
-        public Uri RequestUri { get; }
+        public Uri? RequestUri { get; }
 
-        public string ReasonPhrase { get; }
+        public string? ReasonPhrase { get; }
 
         public static GotenbergApiException Create(
             IApiRequest request,

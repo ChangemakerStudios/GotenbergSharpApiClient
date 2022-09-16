@@ -23,5 +23,5 @@ public interface IApiRequest : IConvertToHttpContent
 
     bool IsWebhookRequest { get; }
 
-    ILookup<string, string> Headers { get; }
+    ILookup<string, string?> Headers { get; }
 }

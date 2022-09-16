@@ -30,7 +30,7 @@ public static class RequestInterfaceExtensions
     private const string BoundaryPrefix = Constants.HttpContent.MultipartData.BoundaryPrefix;
 
     public static IEnumerable<HttpContent> IfNullEmptyContent(
-        this IConvertToHttpContent converter)
+        this IConvertToHttpContent? converter)
     {
         return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
     }

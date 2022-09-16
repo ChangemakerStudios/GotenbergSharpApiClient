@@ -41,7 +41,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// of time to make sure Chromium has fully rendered the page you're trying to generate.
     /// </remarks>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitDelay)]
-    public string WaitDelay { [UsedImplicitly] get; set; }
+    public string? WaitDelay { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// The JavaScript expression to wait before converting an HTML document to PDF until it returns true
@@ -49,19 +49,19 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// <example>builder.SetBrowserWaitExpression("window.status === 'ready'")</example>
     /// <remarks>Prefer this option over waitDelay</remarks>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitForExpression)]
-    public string WaitForExpression { [UsedImplicitly] get; set; }
+    public string? WaitForExpression { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// Overrides the default User-Agent header
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.UserAgent)]
-    public string UserAgent { [UsedImplicitly] get; set; }
+    public string? UserAgent { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders)]
-    public JObject ExtraHeaders { [UsedImplicitly] get; set; }
+    public JObject? ExtraHeaders { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
@@ -76,7 +76,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// The media type to emulate, either "screen" or "print" - empty means "print".
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.EmulatedMediaType)]
-    public string EmulatedMediaType { [UsedImplicitly] get; set; }
+    public string? EmulatedMediaType { [UsedImplicitly] get; set; }
 
     /// <summary>
     /// After a Chromium conversion, the PDF engines will convert the resulting PDF to a specific format.

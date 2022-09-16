@@ -42,13 +42,11 @@ public sealed class ExtraHttpHeaders
         this._headers.Add(name, values.ToArray());
     }
 
-    internal IEnumerable<KeyValuePair<string, string>> GetHeaders()
+    internal IEnumerable<(string Name, string? Value)> GetHeaders()
     {
         if (!this._headers.Any()) yield break;
 
-        yield return KeyValuePair.Create(
-            Constants.Gotenberg.Webhook.ExtraHeaders,
-            this.ToJson());
+        yield return (Constants.Gotenberg.Webhook.ExtraHeaders, this.ToJson());
     }
 
     internal string ToJson()

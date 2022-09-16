@@ -34,6 +34,7 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
         if (action == null) throw new ArgumentNullException(nameof(action));
 
         action(new DimensionBuilder(this.Request));
+
         return (TBuilder)this;
     }
 

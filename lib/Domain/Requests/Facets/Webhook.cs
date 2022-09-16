@@ -23,9 +23,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 public sealed class Webhook
 {
-    private Uri _errorUrl;
+    private Uri? _errorUrl;
 
-    private Uri _targetUrl;
+    private Uri? _targetUrl;
 
     /// <summary>
     ///     If set the Gotenberg API will send the resulting PDF file in a POST with
@@ -37,7 +37,7 @@ public sealed class Webhook
     ///     running on localhost to receive the posts, use http://host.docker.internal
     ///     Reference: https://docs.docker.com/desktop/windows/networking/#known-limitations-use-cases-and-workarounds
     /// </remarks>
-    public Uri TargetUrl
+    public Uri? TargetUrl
     {
         get => this._targetUrl;
         set
@@ -53,12 +53,12 @@ public sealed class Webhook
     /// <summary>
     ///     The HTTP method to use. Defaults to post if nothing is set.
     /// </summary>
-    public string HttpMethod { get; set; }
+    public string? HttpMethod { get; set; }
 
     /// <summary>
     ///     The callback url to use if an error occurs
     /// </summary>
-    public Uri ErrorUrl
+    public Uri? ErrorUrl
     {
         get => this._errorUrl;
         set
@@ -74,7 +74,7 @@ public sealed class Webhook
     /// <summary>
     ///     The HTTP method to use when an error occurs. Defaults to post if nothing is set.
     /// </summary>
-    public string ErrorHttpMethod { get; set; }
+    public string? ErrorHttpMethod { get; set; }
 
     public ExtraHttpHeaders ExtraHttpHeaders { get; } = new();
 
@@ -97,16 +97,16 @@ public sealed class Webhook
         return this.TargetUrl != null && this.ErrorUrl != null;
     }
 
-    public IEnumerable<KeyValuePair<string, string>> GetHeaders()
+    public IEnumerable<(string, string?)> GetHeaders()
     {
-        if (!this.IsConfigured()) return Enumerable.Empty<KeyValuePair<string, string>>();
+        if (!this.IsConfigured()) return Enumerable.Empty<(string, string?)>();
 
-        var webHookHeaders = new Dictionary<string, string>
+        var webHookHeaders = new List<(string Name, string? Value)>
         {
-            { Constants.Gotenberg.Webhook.Url, this.TargetUrl?.ToString() },
-            { Constants.Gotenberg.Webhook.HttpMethod, this.HttpMethod },
-            { Constants.Gotenberg.Webhook.ErrorUrl, this.ErrorUrl?.ToString() },
-            { Constants.Gotenberg.Webhook.ErrorHttpMethod, this.ErrorHttpMethod }
+            (Constants.Gotenberg.Webhook.Url, this.TargetUrl?.ToString()),
+            (Constants.Gotenberg.Webhook.HttpMethod, this.HttpMethod),
+            (Constants.Gotenberg.Webhook.ErrorUrl, this.ErrorUrl?.ToString()),
+            (Constants.Gotenberg.Webhook.ErrorHttpMethod, this.ErrorHttpMethod)
         };
 
         return webHookHeaders.Concat(this.ExtraHttpHeaders.GetHeaders())

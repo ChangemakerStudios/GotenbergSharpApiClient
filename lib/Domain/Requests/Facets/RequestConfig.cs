@@ -19,8 +19,6 @@ using System.Net.Http;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 /// <summary>
@@ -55,10 +53,10 @@ public sealed class RequestConfig : IConvertToHttpContent
         this.Webhook?.Validate();
     }
 
-    public IEnumerable<KeyValuePair<string, string>> GetHeaders()
+    public IEnumerable<(string Name, string? Value)> GetHeaders()
     {
         if (this.Trace.IsSet())
-            yield return KeyValuePair.Create(Constants.Gotenberg.All.Trace, this.Trace);
+            yield return (Constants.Gotenberg.All.Trace, this.Trace);
 
         foreach (var header in (this.Webhook?.GetHeaders()).IfNullEmpty()) yield return header;
     }
@@ -72,7 +70,7 @@ public sealed class RequestConfig : IConvertToHttpContent
     ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
     ///     This may move...
     /// </remarks>
-    public string PageRanges { get; set; }
+    public string? PageRanges { get; set; }
 
     /// <summary>
     ///     If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is
@@ -82,7 +80,7 @@ public sealed class RequestConfig : IConvertToHttpContent
     ///     Attention: this feature does not work if the form field webHookURL is given.
     /// </remarks>
     // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
-    public string ResultFileName { get; set; }
+    public string? ResultFileName { get; set; }
 
     /// <summary>
     ///     If provided, the API will send the resulting PDF file in a POST request with the application/pdf Content-Type to
@@ -91,14 +89,13 @@ public sealed class RequestConfig : IConvertToHttpContent
     ///     call FireWebhookAndForgetAsync on the client which returns nothing.
     /// </summary>
     /// <remarks>All request types support web hooks</remarks>
-    [CanBeNull]
-    public Webhook Webhook { get; set; }
+    public Webhook? Webhook { get; set; }
 
     /// <summary>
     ///     If provided, the trace, or request ID, header will be added to the request.
     ///     If you're using the webhook feature, it also adds the header to each request to your callbacks.
     /// </summary>
-    public string Trace { get; set; }
+    public string? Trace { get; set; }
 
     #endregion
 }

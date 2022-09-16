@@ -126,7 +126,7 @@ public sealed class UrlExtraResourcesBuilder : BaseFacetedBuilder<UrlRequest>
     [PublicAPI]
     public UrlExtraResourcesBuilder AddItems(IEnumerable<ExtraUrlResourceItem> items)
     {
-        this.Request.ExtraResources.Items.AddRange(items.IfNullEmpty());
+        this.Request.ExtraResources!.Items.AddRange(items.IfNullEmpty());
         return this;
     }
 

@@ -32,11 +32,9 @@ public abstract class RequestBase : IApiRequest
 {
     private const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
 
-    [CanBeNull]
-    public RequestConfig Config { get; set; }
+    public RequestConfig? Config { get; set; }
 
-    [CanBeNull]
-    public AssetDictionary Assets { get; set; }
+    public AssetDictionary? Assets { get; set; }
 
     public int AssetCount => this.Assets?.Count ?? 0;
 
@@ -50,8 +48,8 @@ public abstract class RequestBase : IApiRequest
 
     public bool IsWebhookRequest => this.Config?.Webhook?.IsConfigured() ?? false;
 
-    public virtual ILookup<string, string> Headers => (this.Config?.GetHeaders()).IfNullEmpty()
-        .ToLookup(s => s.Key, s => s.Value);
+    public virtual ILookup<string, string?> Headers => (this.Config?.GetHeaders()).IfNullEmpty()
+        .ToLookup(s => s.Name, s => s.Value);
 
     public abstract IEnumerable<HttpContent> ToHttpContent();
 

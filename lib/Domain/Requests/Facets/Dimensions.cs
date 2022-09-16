@@ -183,7 +183,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
                         if (value == null) return null;
 
-                        var contentItem = new StringContent(GetValueAsUsString(value));
+                        var contentItem = new StringContent(GetValueAsInvariantCultureString(value));
 
                         contentItem.Headers.ContentDisposition =
                             new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
@@ -195,8 +195,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                     }).WhereNotNull();
         }
 
-        static string GetValueAsUsString(object value)
+        static string? GetValueAsInvariantCultureString(object value)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
             var cultureInfo = CultureInfo.InvariantCulture;
 
             return value switch
@@ -207,7 +209,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                 int i => i.ToString(cultureInfo),
                 long l => l.ToString(cultureInfo),
                 DateTime date => date.ToString(cultureInfo),
-                _ => value?.ToString()
+                _ => value.ToString()
             };
         }
 

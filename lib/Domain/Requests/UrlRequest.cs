@@ -30,14 +30,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public override string ApiPath
             => Constants.Gotenberg.Chromium.ApiPaths.ConvertUrl;
 
-        public Uri Url { get; set; }
+        public Uri? Url { get; set; }
 
         /// <summary>
         ///  Requires top/bottom margin set to appear   
         /// </summary>
-        public HeaderFooterDocument Content { get; set; }
+        public HeaderFooterDocument? Content { get; set; }
 
-        public ExtraUrlResources ExtraResources { get; set; }
+        public ExtraUrlResources? ExtraResources { get; set; }
 
         public override IEnumerable<HttpContent> ToHttpContent()
         {

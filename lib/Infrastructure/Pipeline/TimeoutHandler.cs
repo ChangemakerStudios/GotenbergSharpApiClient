@@ -34,7 +34,7 @@ public sealed class TimeoutHandler : DelegatingHandler
     ///     Initializes a new instance of the <see cref="TimeoutHandler" /> class.
     /// </summary>
     /// <param name="innerHandler">The inner handler which is responsible for processing the HTTP response messages.</param>
-    public TimeoutHandler(HttpMessageHandler innerHandler = null)
+    public TimeoutHandler(HttpMessageHandler? innerHandler = null)
         : base(innerHandler ?? new HttpClientHandler())
     {
     }
@@ -72,7 +72,7 @@ public sealed class TimeoutHandler : DelegatingHandler
         }
     }
 
-    private CancellationTokenSource GetCancelTokenSource(
+    private CancellationTokenSource? GetCancelTokenSource(
         HttpRequestMessage request,
         CancellationToken cancelToken)
     {

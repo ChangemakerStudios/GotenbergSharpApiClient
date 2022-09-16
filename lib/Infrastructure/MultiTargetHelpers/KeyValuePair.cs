@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#if NETSTANDARD2_0
 // ReSharper disable once CheckNamespace
 namespace System.Collections.Generic;
 
@@ -33,3 +33,5 @@ internal static class KeyValuePair
         return new KeyValuePair<TKey, TValue>(key, value);
     }
 }
+
+#endif
