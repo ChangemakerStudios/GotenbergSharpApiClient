@@ -30,7 +30,7 @@ public class ExtraUrlResources : IConvertToHttpContent
         foreach (var g in Items.GroupBy(i => i.FormDataFieldName))
         {
             var groupValue = string.Join(", ", g.Select(gi => gi!.ToJson()));
-            yield return RequestBase.CreateFormDataItem($"[{groupValue}]", g.Key);
+            yield return BuildRequestBase.CreateFormDataItem($"[{groupValue}]", g.Key);
         }
     }
 }

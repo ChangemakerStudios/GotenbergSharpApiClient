@@ -35,27 +35,6 @@ public static class RequestInterfaceExtensions
         return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
     }
 
-    public static HttpRequestMessage ToApiRequestMessage([NotNull] this IApiRequest request)
-    {
-        if (request == null) throw new ArgumentNullException(nameof(request));
-
-        var formContent =
-            new MultipartFormDataContent($"{BoundaryPrefix}{DateTime.Now.Ticks}");
-
-        foreach (var item in request.ToHttpContent()) formContent.Add(item);
-
-        var message = new HttpRequestMessage(HttpMethod.Post, request.ApiPath)
-        {
-            Content = formContent
-        };
-
-        if (request.Headers.Any())
-            foreach (var header in request.Headers)
-                message.Headers.Add(header.Key, header);
-
-        return message;
-    }
-
     /// <summary>
     ///     A helper method for the linqPad scripts
     /// </summary>

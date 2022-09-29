@@ -24,12 +24,12 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
-public class PdfConversionRequest : RequestBase
+public class PdfConversionRequest : BuildRequestBase
 {
-    public override string ApiPath
+    protected override string ApiPath
         => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
-    public override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent()
     {
         if (Format == default)
             throw new InvalidOperationException("You must set the Pdf format");

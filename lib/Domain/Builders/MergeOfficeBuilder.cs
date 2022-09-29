@@ -28,8 +28,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, MergeOfficeBuilder>
 {
     public MergeOfficeBuilder()
+        : base(new MergeOfficeRequest())
     {
-        this.Request = new MergeOfficeRequest();
     }
 
     [PublicAPI]

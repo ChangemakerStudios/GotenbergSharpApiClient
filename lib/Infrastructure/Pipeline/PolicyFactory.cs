@@ -34,7 +34,6 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
 internal static class PolicyFactory
 {
-    [NotNull]
     internal static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(
         IServiceProvider sp,
         HttpRequestMessage _)
@@ -72,7 +71,7 @@ internal static class PolicyFactory
 
     private static RetryOptions? GetRetryOptions(IServiceProvider sp)
     {
-        return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value
+        return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value
             ?.RetryPolicy;
     }
 }

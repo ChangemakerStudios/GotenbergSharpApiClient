@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 using JetBrains.Annotations;
 
@@ -25,9 +26,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
 public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>
 {
-    public PdfConversionBuilder()
+    public PdfConversionBuilder() : base(new PdfConversionRequest())
     {
-        this.Request = new PdfConversionRequest();
     }
 
     [PublicAPI]
@@ -45,7 +45,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        action(new AssetBuilder(this.Request));
+        action(new AssetBuilder(this.Request.Assets ??= new AssetDictionary()));
 
         return this;
     }
@@ -55,7 +55,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
-        this.AsyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));
+        this.BuildTasks.Add(asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
 
         return this;
     }

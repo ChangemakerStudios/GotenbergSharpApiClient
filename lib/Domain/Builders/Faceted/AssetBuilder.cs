@@ -26,15 +26,14 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
-    public sealed class AssetBuilder : BaseFacetedBuilder<RequestBase>
+    public sealed class AssetBuilder
     {
-        public AssetBuilder(RequestBase request)
-        {
-            this.Request = request ?? throw new ArgumentNullException(nameof(request));
-            this.Request.Assets ??= new AssetDictionary();
-        }
+        private readonly AssetDictionary _assets;
 
-        #region one asset
+        internal AssetBuilder(AssetDictionary assets)
+        {
+            this._assets = assets;
+        }
 
         [PublicAPI]
         public AssetBuilder AddItem(string name, ContentItem value)
@@ -48,7 +47,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
                     "Asset names must be relative file names with extensions");
             }
 
-            this.Request.Assets!.Add(name, value ?? throw new ArgumentNullException(nameof(value)));
+            this._assets.Add(name, value ?? throw new ArgumentNullException(nameof(value)));
 
             return this;
         }
@@ -64,8 +63,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
         [PublicAPI]
         public AssetBuilder AddItem(string name, Stream value) =>
             AddItem(name, new ContentItem(value));
-
-        #endregion
 
         #region 'n' assets
 

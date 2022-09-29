@@ -24,12 +24,12 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public sealed class MergeRequest : RequestBase
+    public sealed class MergeRequest : BuildRequestBase
     {
-        public override string ApiPath
+        protected override string ApiPath
             => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
-        public override IEnumerable<HttpContent> ToHttpContent()
+        protected override IEnumerable<HttpContent> ToHttpContent()
         {
             if (Format != default)
                 yield return CreateFormDataItem(

@@ -36,12 +36,12 @@ public sealed class RequestConfig : IConvertToHttpContent
     public IEnumerable<HttpContent> ToHttpContent()
     {
         if (this.PageRanges.IsSet())
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 this.PageRanges,
                 Constants.Gotenberg.Chromium.Shared.Dims.PageRanges);
 
         if (this.ResultFileName.IsSet())
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 this.ResultFileName,
                 Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
     }

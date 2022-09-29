@@ -183,7 +183,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
                         if (value == null) return null;
 
-                        var contentItem = new StringContent(GetValueAsInvariantCultureString(value));
+                        var contentItem = new StringContent(GetValueAsInvariantCultureString(value) ?? "");
 
                         contentItem.Headers.ContentDisposition =
                             new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)

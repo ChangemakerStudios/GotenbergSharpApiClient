@@ -21,7 +21,13 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
 public class ValidOfficeMergeItem
 {
-    public string? MediaType { get; set; }
+    public ValidOfficeMergeItem(KeyValuePair<string, ContentItem> asset, string mediaType)
+    {
+        this.MediaType = mediaType;
+        this.Asset = asset;
+    }
 
-    public KeyValuePair<string, ContentItem> Asset { get; set; }
+    public string MediaType { get; }
+
+    public KeyValuePair<string, ContentItem> Asset { get; }
 }

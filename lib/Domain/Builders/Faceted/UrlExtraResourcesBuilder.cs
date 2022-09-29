@@ -25,12 +25,13 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class UrlExtraResourcesBuilder : BaseFacetedBuilder<UrlRequest>
+public sealed class UrlExtraResourcesBuilder
 {
-    public UrlExtraResourcesBuilder(UrlRequest request)
+    private readonly ExtraUrlResources _extraUrlResources;
+
+    public UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources)
     {
-        this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.ExtraResources ??= new ExtraUrlResources();
+        this._extraUrlResources = extraUrlResources;
     }
 
     #region add one
@@ -126,7 +127,7 @@ public sealed class UrlExtraResourcesBuilder : BaseFacetedBuilder<UrlRequest>
     [PublicAPI]
     public UrlExtraResourcesBuilder AddItems(IEnumerable<ExtraUrlResourceItem> items)
     {
-        this.Request.ExtraResources!.Items.AddRange(items.IfNullEmpty());
+        this._extraUrlResources.Items.AddRange(items.IfNullEmpty());
         return this;
     }
 

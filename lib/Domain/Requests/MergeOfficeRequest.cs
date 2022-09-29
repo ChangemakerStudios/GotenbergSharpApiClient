@@ -26,16 +26,16 @@ using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 //Libre office has a convert route which can perform merges
-public class MergeOfficeRequest : RequestBase
+public class MergeOfficeRequest : BuildRequestBase
 {
     private readonly IResolveContentType _resolver = new ResolveContentTypeImplementation();
 
-    public override string ApiPath
+    protected override string ApiPath
         => Constants.Gotenberg.LibreOffice.ApiPaths.MergeOffice;
 
     public bool PrintAsLandscape { get; set; }
 
-    public string PageRanges { get; set; }
+    public string? PageRanges { get; set; }
 
     /// <summary>
     ///     Tells gotenberg to perform the conversion with unoconv.
@@ -45,9 +45,10 @@ public class MergeOfficeRequest : RequestBase
     /// </summary>
     public bool UseNativePdfFormat { get; set; }
 
-    public override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent()
     {
-        var validItems = this.Assets.FindValidOfficeMergeItems(this._resolver).ToList();
+        var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty()
+            .ToList();
 
         if (validItems.Count < 1)
             throw new

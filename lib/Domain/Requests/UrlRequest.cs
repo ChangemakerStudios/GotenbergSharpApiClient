@@ -27,7 +27,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class UrlRequest : ChromeRequest
     {
-        public override string ApiPath
+        protected override string ApiPath
             => Constants.Gotenberg.Chromium.ApiPaths.ConvertUrl;
 
         public Uri? Url { get; set; }
@@ -39,7 +39,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public ExtraUrlResources? ExtraResources { get; set; }
 
-        public override IEnumerable<HttpContent> ToHttpContent()
+        protected override IEnumerable<HttpContent> ToHttpContent()
         {
             if (this.Url == null) throw new InvalidOperationException("Url is null");
             if (!this.Url.IsAbsoluteUri)
@@ -59,7 +59,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                     });
         }
 
-        public override void Validate()
+        protected override void Validate()
         {
             if (this.Url == null) throw new InvalidOperationException("Request.Url is null");
 

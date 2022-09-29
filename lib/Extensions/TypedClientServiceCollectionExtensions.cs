@@ -31,7 +31,7 @@ public static class TypedClientServiceCollectionExtensions
 {
     [PublicAPI]
     public static IHttpClientBuilder AddGotenbergSharpClient(
-        [NotNull] this IServiceCollection services)
+        this IServiceCollection services)
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
 
@@ -67,6 +67,6 @@ public static class TypedClientServiceCollectionExtensions
 
     private static GotenbergSharpClientOptions GetOptions(IServiceProvider sp)
     {
-        return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>()?.Value;
+        return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value;
     }
 }

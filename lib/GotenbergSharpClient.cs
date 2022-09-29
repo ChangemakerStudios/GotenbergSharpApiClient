@@ -98,7 +98,7 @@ namespace Gotenberg.Sharp.API.Client
         public Task<Stream> UrlToPdfAsync(
             UrlRequest request,
             CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+            => ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
 
         /// <summary>
         ///    Converts the specified request to a PDF document.
@@ -111,7 +111,7 @@ namespace Gotenberg.Sharp.API.Client
         public Task<Stream> HtmlToPdfAsync(
             HtmlRequest request,
             CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+            => ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
 
         /// <summary>
         /// Merges items specified by the request
@@ -124,7 +124,7 @@ namespace Gotenberg.Sharp.API.Client
         public Task<Stream> MergePdfsAsync(
             MergeRequest request,
             CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+            => ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
 
         /// <summary>
         ///     Converts one or more office documents into a merged pdf.
@@ -135,13 +135,13 @@ namespace Gotenberg.Sharp.API.Client
         public Task<Stream> MergeOfficeDocsAsync(
             MergeOfficeRequest request,
             CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+            => ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
 
         [PublicAPI]
         public Task<Stream> ConvertPdfDocumentsAsync(
             PdfConversionRequest request,
             CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+            => ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
 
         [PublicAPI]
         public async Task FireWebhookAndForgetAsync(

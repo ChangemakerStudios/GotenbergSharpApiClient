@@ -27,21 +27,30 @@ using JetBrains.Annotations;
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
 public abstract class BaseBuilder<TRequest, TBuilder>
-    where TRequest : RequestBase
+    where TRequest : BuildRequestBase
     where TBuilder : BaseBuilder<TRequest, TBuilder>
 {
+    protected BaseBuilder(TRequest request)
+    {
+        this.Request = request;
+    }
+
     protected const string CallBuildAsyncErrorMessage =
         "Request has asynchronous items. Call BuildAsync instead.";
 
-    protected readonly List<Task> AsyncTasks = new();
+    protected readonly List<Task> BuildTasks = new();
 
-    protected virtual TRequest Request { get; set; }
+    protected virtual TRequest Request { get; }
 
     [PublicAPI]
     public TBuilder ConfigureRequest(Action<ConfigBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
-        action(new ConfigBuilder(this.Request));
+
+        this.Request.Config ??= new RequestConfig();
+
+        action(new ConfigBuilder(this.Request.Config));
+
         return (TBuilder)this;
     }
 
@@ -49,26 +58,23 @@ public abstract class BaseBuilder<TRequest, TBuilder>
     public TBuilder ConfigureRequest(RequestConfig config)
     {
         this.Request.Config = config ?? throw new ArgumentNullException(nameof(config));
+
         return (TBuilder)this;
     }
 
     [PublicAPI]
-    public virtual TRequest Build()
+    public virtual IApiRequest Build()
     {
-        this.Request.Validate();
+        if (this.BuildTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
 
-        if (this.AsyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
-
-        return this.Request;
+        return this.Request.CreateApiRequest();
     }
 
     [PublicAPI]
-    public virtual async Task<TRequest> BuildAsync()
+    public virtual async Task<IApiRequest> BuildAsync()
     {
-        this.Request.Validate();
+        if (this.BuildTasks.Any()) await Task.WhenAll(this.BuildTasks).ConfigureAwait(false);
 
-        if (this.AsyncTasks.Any()) await Task.WhenAll(this.AsyncTasks).ConfigureAwait(false);
-
-        return this.Request;
+        return this.Request.CreateApiRequest();
     }
 }

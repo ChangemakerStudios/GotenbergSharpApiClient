@@ -23,22 +23,23 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
+public sealed class DimensionBuilder
 {
-    public DimensionBuilder(ChromeRequest request)
+    private Dimensions _dimensions;
+
+    public DimensionBuilder(Dimensions dimensions)
     {
-        this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.Dimensions ??= new Dimensions();
+        this._dimensions = dimensions;
     }
 
     [PublicAPI]
     public DimensionBuilder SetMargins(Margins margins)
     {
         var selected = margins.ToSelectedMargins();
-        this.Request.Dimensions.MarginLeft = selected.Left;
-        this.Request.Dimensions.MarginRight = selected.Right;
-        this.Request.Dimensions.MarginTop = selected.Top;
-        this.Request.Dimensions.MarginBottom = selected.Bottom;
+        this._dimensions.MarginLeft = selected.Left;
+        this._dimensions.MarginRight = selected.Right;
+        this._dimensions.MarginTop = selected.Top;
+        this._dimensions.MarginBottom = selected.Bottom;
 
         return this;
     }
@@ -47,8 +48,8 @@ public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
     public DimensionBuilder SetPaperSize(PaperSizes sizes)
     {
         var selected = sizes.ToSelectedSize();
-        this.Request.Dimensions.PaperWidth = selected.Width;
-        this.Request.Dimensions.PaperHeight = selected.Height;
+        this._dimensions.PaperWidth = selected.Width;
+        this._dimensions.PaperHeight = selected.Height;
 
         return this;
     }
@@ -65,7 +66,7 @@ public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
             throw new ArgumentOutOfRangeException(
                 nameof(scale),
                 "Invalid scale.  Valid range is from 0.1 to 2.0 (1% through 200%)");
-        this.Request.Dimensions.Scale = scale;
+        this._dimensions.Scale = scale;
 
         return this;
     }
@@ -73,63 +74,63 @@ public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
     [PublicAPI]
     public DimensionBuilder PaperWidth(double width)
     {
-        this.Request.Dimensions.PaperWidth = width;
+        this._dimensions.PaperWidth = width;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder PaperHeight(double height)
     {
-        this.Request.Dimensions.PaperHeight = height;
+        this._dimensions.PaperHeight = height;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder MarginTop(double marginTop)
     {
-        this.Request.Dimensions.MarginTop = marginTop;
+        this._dimensions.MarginTop = marginTop;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder MarginBottom(double marginBottom)
     {
-        this.Request.Dimensions.MarginBottom = marginBottom;
+        this._dimensions.MarginBottom = marginBottom;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder MarginLeft(double marginLeft)
     {
-        this.Request.Dimensions.MarginLeft = marginLeft;
+        this._dimensions.MarginLeft = marginLeft;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder MarginRight(double marginRight)
     {
-        this.Request.Dimensions.MarginRight = marginRight;
+        this._dimensions.MarginRight = marginRight;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder LandScape(bool landscape = true)
     {
-        this.Request.Dimensions.Landscape = landscape;
+        this._dimensions.Landscape = landscape;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder PreferCssPageSize(bool prefer = true)
     {
-        this.Request.Dimensions.PreferCssPageSize = prefer;
+        this._dimensions.PreferCssPageSize = prefer;
         return this;
     }
 
     [PublicAPI]
     public DimensionBuilder PrintBackground(bool printBackground = true)
     {
-        this.Request.Dimensions.PrintBackground = printBackground;
+        this._dimensions.PrintBackground = printBackground;
         return this;
     }
 
@@ -138,7 +139,7 @@ public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
     [PublicAPI]
     public DimensionBuilder SetDimensions(Dimensions dims)
     {
-        this.Request.Dimensions = dims ?? throw new ArgumentNullException(nameof(dims));
+        this._dimensions = dims ?? throw new ArgumentNullException(nameof(dims));
         return this;
     }
 
@@ -155,4 +156,6 @@ public sealed class DimensionBuilder : BaseFacetedBuilder<ChromeRequest>
     }
 
     #endregion
+
+    internal Dimensions GetDimensions() => this._dimensions;
 }

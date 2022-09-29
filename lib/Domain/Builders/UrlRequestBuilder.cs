@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using JetBrains.Annotations;
@@ -28,8 +30,8 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
 {
     [PublicAPI]
     public UrlRequestBuilder()
+        : base(new UrlRequest())
     {
-        this.Request = new UrlRequest();
     }
 
     [PublicAPI]
@@ -52,7 +54,7 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        action(new UrlHeaderFooterBuilder(this.Request));
+        action(new UrlHeaderFooterBuilder(this.Request.Content ??= new HeaderFooterDocument()));
         return this;
     }
 
@@ -61,7 +63,7 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
-        this.AsyncTasks.Add(asyncAction(new UrlHeaderFooterBuilder(this.Request)));
+        this.BuildTasks.Add(asyncAction(new UrlHeaderFooterBuilder(this.Request.Content ??= new HeaderFooterDocument())));
         return this;
     }
 
@@ -69,7 +71,7 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
     public UrlRequestBuilder AddExtraResources(Action<UrlExtraResourcesBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
-        action(new UrlExtraResourcesBuilder(this.Request));
+        action(new UrlExtraResourcesBuilder(this.Request.ExtraResources ??= new ExtraUrlResources()));
         return this;
     }
 }
