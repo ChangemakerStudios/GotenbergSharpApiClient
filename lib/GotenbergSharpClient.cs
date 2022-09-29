@@ -195,7 +195,7 @@ namespace Gotenberg.Sharp.API.Client
         }
 
         /// <summary>
-        /// Send an api reuqest
+        /// Send an Api Request
         /// </summary>
         /// <param name="request"></param>
         /// <param name="option"></param>
