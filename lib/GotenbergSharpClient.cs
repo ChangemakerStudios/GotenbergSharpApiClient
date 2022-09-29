@@ -163,7 +163,16 @@ namespace Gotenberg.Sharp.API.Client
 
         #region exec
 
-        async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
+        /// <summary>
+        /// Support custom request type
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        [PublicAPI]
+        public async Task<Stream> ExecuteRequestAsync(IApiRequest request, 
+            CancellationToken cancelToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
