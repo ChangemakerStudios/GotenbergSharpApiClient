@@ -43,7 +43,7 @@ namespace Gotenberg.Sharp.API.Client
     ///     https://github.com/gotenberg/awesome-gotenberg#clients
     /// </para>
     /// </remarks>
-    public sealed class GotenbergSharpClient
+    public class GotenbergSharpClient
     {
         readonly HttpClient _innerClient;
 
