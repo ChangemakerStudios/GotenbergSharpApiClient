@@ -153,7 +153,7 @@ namespace Gotenberg.Sharp.API.Client
                 throw new InvalidOperationException(
                     "Only call this for webhook configured requests");
 
-            using var response = await SendRequest(
+            using var response = await SendRequestAsync(
                 request,
                 HttpCompletionOption.ResponseHeadersRead,
                 cancelToken);
@@ -164,7 +164,7 @@ namespace Gotenberg.Sharp.API.Client
         #region exec
 
         /// <summary>
-        /// Support custom request type
+        /// Execute an Api Request
         /// </summary>
         /// <param name="request"></param>
         /// <param name="cancelToken"></param>
@@ -176,7 +176,7 @@ namespace Gotenberg.Sharp.API.Client
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            using var response = await this.SendRequest(
+            using var response = await this.SendRequestAsync(
                 request,
                 HttpCompletionOption.ResponseHeadersRead,
                 cancelToken);
@@ -194,7 +194,15 @@ namespace Gotenberg.Sharp.API.Client
             return ms;
         }
 
-        async Task<HttpResponseMessage> SendRequest(
+        /// <summary>
+        /// Send an api reuqest
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="option"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        [PublicAPI]
+        public async Task<HttpResponseMessage> SendRequestAsync(
             IApiRequest request,
             HttpCompletionOption option,
             CancellationToken cancelToken)
