@@ -29,7 +29,7 @@ jobs:
         useConfigFile: true
         
     - name: Pack
-      run: dotnet pack -c Release --version-suffix ${{ steps.gitversion.outputs.nuGetVersion }}
+      run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
         
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')

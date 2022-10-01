@@ -13,7 +13,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<PackageVersion>2.0.0</PackageVersion>
+		<PackageVersion>2.1.1</PackageVersion>
 		<PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
@@ -26,7 +26,7 @@
 		<PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
 		<PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/lib/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
-		<PackageIcon>gotenbergSharpClient.PNG</PackageIcon>
+		<PackageIcon>gotenbergSharpClient-large.PNG</PackageIcon>
 		<RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -77,8 +77,8 @@
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\"/>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
-		<None Include="Resources\gotenbergSharpClient.PNG" Pack="true" PackagePath="\" />
-		<Resource Include="Resources\gotenbergSharpClient.PNG" Pack="true" PackagePath="\" />
+		<None Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
+		<Resource Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
