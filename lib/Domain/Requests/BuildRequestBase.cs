@@ -14,7 +14,6 @@
 //  limitations under the License.
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -28,30 +27,19 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
-public abstract class RequestBase : IApiRequest
+public abstract class BuildRequestBase
 {
     private const string DispositionType = Constants.HttpContent.Disposition.Types.FormData;
 
-    public RequestConfig? Config { get; set; }
+    internal RequestConfig? Config { get; set; }
 
-    public AssetDictionary? Assets { get; set; }
+    internal AssetDictionary? Assets { get; set; }
 
-    public int AssetCount => this.Assets?.Count ?? 0;
+    internal PdfFormats Format { [UsedImplicitly] get; set; }
 
-    public PdfFormats Format { [UsedImplicitly] get; set; }
+    protected abstract string ApiPath { get; }
 
-    /// <summary>
-    ///     Only meant for internal use. Scoped as public b/c the interface defines it.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract string ApiPath { get; }
-
-    public bool IsWebhookRequest => this.Config?.Webhook?.IsConfigured() ?? false;
-
-    public virtual ILookup<string, string?> Headers => (this.Config?.GetHeaders()).IfNullEmpty()
-        .ToLookup(s => s.Name, s => s.Value);
-
-    public abstract IEnumerable<HttpContent> ToHttpContent();
+    protected abstract IEnumerable<HttpContent> ToHttpContent();
 
     internal static StringContent CreateFormDataItem<T>(T value, string fieldName)
     {
@@ -63,9 +51,21 @@ public abstract class RequestBase : IApiRequest
         return item;
     }
 
-    public virtual void Validate()
+    protected virtual void Validate()
     {
         this.Config?.Validate();
         this.Assets?.Validate();
+    }
+
+    public virtual IApiRequest CreateApiRequest()
+    {
+        this.Validate();
+
+        var isWebHook = this.Config?.Webhook?.IsConfigured() ?? false;
+
+        var headers = (this.Config?.GetHeaders()).IfNullEmpty()
+            .ToLookup(s => s.Name, s => s.Value);
+
+        return new ApiRequestImplementation(this.ToHttpContent, this.ApiPath, headers, isWebHook);
     }
 }

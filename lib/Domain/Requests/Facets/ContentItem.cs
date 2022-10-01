@@ -32,20 +32,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             _getHttpContent = getHttpContent;
         }
 
-        public ContentItem([NotNull] byte[] bytes)
+        public ContentItem(byte[] bytes)
             : this(() => new ByteArrayContent(bytes))
         {
             if (bytes == null) throw new ArgumentNullException(nameof(bytes));
         }
 
-        public ContentItem([NotNull] string str)
+        public ContentItem(string str)
             : this(() => new StringContent(str))
         {
             if (str.IsNotSet())
                 throw new ArgumentOutOfRangeException(nameof(str), "Must not be null or empty");
         }
 
-        public ContentItem([NotNull] Stream stream)
+        public ContentItem(Stream stream)
             : this(() => new StreamContent(stream))
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));

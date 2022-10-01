@@ -24,8 +24,6 @@ using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public sealed class AssetDictionary : Dictionary<string, ContentItem>, IConvertToHttpContent
@@ -61,7 +59,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         }
 
         public AssetDictionary AddRangeFluently(
-            [NotNull] IEnumerable<KeyValuePair<string, ContentItem>> items)
+            IEnumerable<KeyValuePair<string, ContentItem>> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 

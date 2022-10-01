@@ -22,7 +22,7 @@ using Gotenberg.Sharp.API.Client.Extensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public abstract class ChromeRequest : RequestBase
+    public abstract class ChromeRequest : BuildRequestBase
     {
         public Dimensions Dimensions { get; set; }
             = Dimensions.ToChromeDefaults();
@@ -30,7 +30,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public HtmlConversionBehaviors ConversionBehaviors { get; set; }
             = new HtmlConversionBehaviors();
 
-        public override IEnumerable<HttpContent> ToHttpContent()
+        protected override IEnumerable<HttpContent> ToHttpContent()
             => Config.IfNullEmptyContent()
                 .Concat(Dimensions.IfNullEmptyContent())
                 .Concat(ConversionBehaviors.IfNullEmptyContent());

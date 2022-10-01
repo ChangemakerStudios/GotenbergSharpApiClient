@@ -26,14 +26,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRequestBuilder>
 {
     public HtmlRequestBuilder()
+        : this(false)
     {
-        this.Request = new HtmlRequest();
     }
 
     [PublicAPI]
     public HtmlRequestBuilder(bool containsMarkdown)
+        : base(new HtmlRequest(containsMarkdown))
     {
-        this.Request = new HtmlRequest(containsMarkdown);
     }
 
     [PublicAPI]
@@ -41,7 +41,7 @@ public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRe
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        action(new DocumentBuilder(this.Request));
+        action(new DocumentBuilder(this.Request.Content, (v) => this.Request.ContainsMarkdown = v));
 
         return this;
     }
@@ -51,7 +51,11 @@ public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRe
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
-        this.AsyncTasks.Add(asyncAction(new DocumentBuilder(this.Request)));
+        this.BuildTasks.Add(
+            asyncAction(
+                new DocumentBuilder(
+                    this.Request.Content,
+                    (v) => this.Request.ContainsMarkdown = v)));
 
         return this;
     }

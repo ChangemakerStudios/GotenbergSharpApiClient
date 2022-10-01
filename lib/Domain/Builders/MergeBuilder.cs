@@ -20,7 +20,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 public sealed class MergeBuilder : BaseMergeBuilder<MergeRequest, MergeBuilder>
 {
     public MergeBuilder()
+        : base(new MergeRequest())
     {
-        this.Request = new MergeRequest();
     }
 }

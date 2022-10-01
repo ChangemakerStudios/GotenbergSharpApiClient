@@ -28,12 +28,21 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
     where TRequest : ChromeRequest
     where TBuilder : BaseChromiumBuilder<TRequest, TBuilder>
 {
+    protected BaseChromiumBuilder([NotNull] TRequest request)
+        : base(request)
+    {
+    }
+
     [PublicAPI]
     public TBuilder WithDimensions(Action<DimensionBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        action(new DimensionBuilder(this.Request));
+        var builder = new DimensionBuilder(this.Request.Dimensions);
+
+        action(builder);
+
+        this.Request.Dimensions = builder.GetDimensions();
 
         return (TBuilder)this;
     }
@@ -49,7 +58,7 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
     public TBuilder WithAssets(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
-        action(new AssetBuilder(this.Request));
+        action(new AssetBuilder(this.Request.Assets ??= new AssetDictionary()));
         return (TBuilder)this;
     }
 
@@ -57,7 +66,7 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
     public TBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
-        this.AsyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));
+        this.BuildTasks.Add(asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
         return (TBuilder)this;
     }
 
@@ -65,7 +74,7 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
     public TBuilder SetConversionBehaviors(Action<HtmlConversionBehaviorBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
-        action(new HtmlConversionBehaviorBuilder(this.Request));
+        action(new HtmlConversionBehaviorBuilder(this.Request.ConversionBehaviors));
         return (TBuilder)this;
     }
 

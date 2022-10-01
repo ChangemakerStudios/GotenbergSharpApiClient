@@ -26,23 +26,23 @@ internal static class MergeOfficeRequestExtensions
     internal static IEnumerable<HttpContent> PropertiesToHttpContent(this MergeOfficeRequest request)
     {
         if (request.PrintAsLandscape)
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 "true",
                 Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
 
         if (request.PageRanges.IsSet())
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 request.PageRanges,
                 Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
 
         if (!request.UseNativePdfFormat && request.Format == default) yield break;
 
         if (!request.UseNativePdfFormat && request.Format != default)
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 request.Format.ToFormDataValue(),
                 Constants.Gotenberg.LibreOffice.Routes.Convert.PdfFormat);
         else
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 request.Format.ToFormDataValue(),
                 Constants.Gotenberg.LibreOffice.Routes.Convert.NativePdfFormat);
     }

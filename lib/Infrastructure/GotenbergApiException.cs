@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 
@@ -44,7 +45,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             this._request = request;
             this._response = response;
             this.StatusCode = _response.StatusCode;
-            this.RequestUri = _response.RequestMessage.RequestUri;
+            this.RequestUri = _response.RequestMessage?.RequestUri;
             this.ReasonPhrase = _response.ReasonPhrase;
         }
 
@@ -70,15 +71,22 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         {
             using (_response)
             {
+                IEnumerable<object>? clientRequestFormContent = null;
+
+                if (includeRequestContent
+                    && this._request is IConvertToHttpContent convertToHttpContent)
+                {
+                    clientRequestFormContent = convertToHttpContent.IfNullEmptyContent()
+                        .ToDumpFriendlyFormat(false);
+                }
+
                 return JsonConvert.SerializeObject(
                     new
                     {
                         GotenbergMessage = Message,
                         GotenbergResponseReceived = includeGotenbergResponse ? _response : null,
                         ClientRequestSent = _request,
-                        ClientRequestFormContent = includeRequestContent
-                            ? _request.IfNullEmptyContent().ToDumpFriendlyFormat(false)
-                            : null
+                        ClientRequestFormContent = clientRequestFormContent
                     },
                     new JsonSerializerSettings
                     {

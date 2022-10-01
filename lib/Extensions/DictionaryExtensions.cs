@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -23,8 +22,6 @@ using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
@@ -54,7 +51,9 @@ public static class DictionaryExtensions
         return new AssetDictionary().AddRangeFluently(ordered);
     }
 
-    internal static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(this Dictionary<TKey, TValue>? instance)
+    internal static Dictionary<TKey, TValue> IfNullEmpty<TKey, TValue>(
+        this Dictionary<TKey, TValue>? instance)
+        where TKey : notnull
     {
         return instance ?? new Dictionary<TKey, TValue>();
     }
@@ -66,12 +65,7 @@ public static class DictionaryExtensions
         return assets.RemoveInvalidOfficeDocs()
             .ToAlphabeticalOrderByIndex()
             .Where(item => item.IsValid())
-            .Select(
-                item => new ValidOfficeMergeItem
-                {
-                    Asset = item,
-                    MediaType = resolver.GetContentType(item.Key)
-                })
+            .Select(item => new ValidOfficeMergeItem(item, resolver.GetContentType(item.Key)))
             .Where(item => item.MediaType.IsSet());
     }
 

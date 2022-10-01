@@ -21,189 +21,308 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client
+namespace Gotenberg.Sharp.API.Client;
+
+/// <summary>
+///     C# Client for Gotenberg api
+/// </summary>
+/// <remarks>
+///     <para>
+///         Gotenberg:
+///         https://gotenberg.dev
+///         https://github.com/gotenberg/gotenberg
+///     </para>
+///     <para>
+///         Other clients available:
+///         https://github.com/gotenberg/awesome-gotenberg#clients
+///     </para>
+/// </remarks>
+public class GotenbergSharpClient
 {
-    /// <summary>
-    /// C# Client for Gotenberg api
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    ///     Gotenberg:
-    ///     https://gotenberg.dev
-    ///     https://github.com/gotenberg/gotenberg
-    /// </para>
-    /// <para>
-    ///     Other clients available:
-    ///     https://github.com/gotenberg/awesome-gotenberg#clients
-    /// </para>
-    /// </remarks>
-    public sealed class GotenbergSharpClient
+    protected HttpClient HttpClient { get; }
+
+    #region ctors
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public GotenbergSharpClient(string address)
+        : this(new Uri(address))
     {
-        readonly HttpClient _innerClient;
+    }
 
-        #region ctors
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public GotenbergSharpClient(Uri address)
+        : this(new HttpClient { BaseAddress = address })
+    {
+    }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public GotenbergSharpClient(string address)
-            : this(new Uri(address))
-        {
-        }
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GotenbergSharpClient" /> class.
+    /// </summary>
+    /// <param name="innerClient"></param>
+    /// <remarks>Client was built for DI use</remarks>
+    [PublicAPI]
+    public GotenbergSharpClient(HttpClient innerClient)
+    {
+        this.HttpClient = innerClient ?? throw new ArgumentNullException(nameof(innerClient));
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public GotenbergSharpClient(Uri address)
-            : this(new HttpClient { BaseAddress = address })
-        {
-        }
+        if (this.HttpClient.BaseAddress == null)
+            throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GotenbergSharpClient"/> class.
-        /// </summary>
-        /// <param name="innerClient"></param>
-        /// <remarks>Client was built for DI use</remarks>
-        [PublicAPI]
-        public GotenbergSharpClient(HttpClient innerClient)
-        {
-            this._innerClient = innerClient ?? throw new ArgumentNullException(nameof(innerClient));
+        this.HttpClient.DefaultRequestHeaders.Add(
+            Constants.HttpContent.Headers.UserAgent,
+            nameof(GotenbergSharpClient));
 
-            if (this._innerClient.BaseAddress == null)
-            {
-                throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
-            }
+        this.HttpClient.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue(
+                Constants.HttpContent.MediaTypes.ApplicationPdf));
+    }
 
-            _innerClient.DefaultRequestHeaders.Add(
-                Constants.HttpContent.Headers.UserAgent,
-                nameof(GotenbergSharpClient));
-            _innerClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue(
-                    Constants.HttpContent.MediaTypes.ApplicationPdf));
-        }
+    #endregion
 
-        #endregion
+    #region api methods
 
-        #region api methods
+    /// <summary>
+    ///     For remote URL conversions. Works just like <see cref="HtmlToPdfAsync" />
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    [PublicAPI]
+    public virtual Task<Stream> UrlToPdfAsync(
+        UrlRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
 
-        /// <summary>
-        /// For remote URL conversions. Works just like <see cref="HtmlToPdfAsync"/>
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <returns></returns>
-        [PublicAPI]
-        public Task<Stream> UrlToPdfAsync(
-            UrlRequest request,
-            CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
 
-        /// <summary>
-        ///    Converts the specified request to a PDF document.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        [PublicAPI]
-        public Task<Stream> HtmlToPdfAsync(
-            HtmlRequest request,
-            CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+    /// <summary>
+    ///     For remote URL conversions. Works just like <see cref="HtmlToPdfAsync" />
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    [PublicAPI]
+    public virtual async Task<Stream> UrlToPdfAsync(
+        UrlRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        /// <summary>
-        /// Merges items specified by the request
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        [PublicAPI]
-        public Task<Stream> MergePdfsAsync(
-            MergeRequest request,
-            CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+        var urlRequest = await builder.BuildAsync().ConfigureAwait(false);
 
-        /// <summary>
-        ///     Converts one or more office documents into a merged pdf.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancelToken"></param>
-        [PublicAPI]
-        public Task<Stream> MergeOfficeDocsAsync(
-            MergeOfficeRequest request,
-            CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+        return await this.UrlToPdfAsync(urlRequest, cancelToken).ConfigureAwait(false);
+    }
 
-        [PublicAPI]
-        public Task<Stream> ConvertPdfDocumentsAsync(
-            PdfConversionRequest request,
-            CancellationToken cancelToken = default)
-            => ExecuteRequestAsync(request, cancelToken);
+    /// <summary>
+    ///     Converts the specified request to a PDF document.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    [PublicAPI]
+    public virtual Task<Stream> HtmlToPdfAsync(
+        HtmlRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
 
-        [PublicAPI]
-        public async Task FireWebhookAndForgetAsync(
-            IApiRequest request,
-            CancellationToken cancelToken = default)
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            if (!request.IsWebhookRequest)
-                throw new InvalidOperationException(
-                    "Only call this for webhook configured requests");
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
 
-            using var response = await SendRequest(
-                request,
-                HttpCompletionOption.ResponseHeadersRead,
-                cancelToken);
-        }
+    /// <summary>
+    ///     Converts the specified request to a PDF document.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    [PublicAPI]
+    public virtual async Task<Stream> HtmlToPdfAsync(
+        HtmlRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        #endregion
+        var htmlRequest = await builder.BuildAsync().ConfigureAwait(false);
 
-        #region exec
+        return await this.HtmlToPdfAsync(htmlRequest, cancelToken).ConfigureAwait(false);
+    }
 
-        async Task<Stream> ExecuteRequestAsync(IApiRequest request, CancellationToken cancelToken)
-        {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+    /// <summary>
+    ///     Merges items specified by the request
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    [PublicAPI]
+    public virtual Task<Stream> MergePdfsAsync(
+        MergeRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
 
-            using var response = await this.SendRequest(
-                request,
-                HttpCompletionOption.ResponseHeadersRead,
-                cancelToken);
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
 
-            var ms = new MemoryStream();
+    /// <summary>
+    ///     Converts one or more office documents into a merged pdf.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancelToken"></param>
+    [PublicAPI]
+    public virtual Task<Stream> MergeOfficeDocsAsync(
+        MergeOfficeRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    ///     Converts one or more office documents into a merged pdf.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="cancelToken"></param>
+    [PublicAPI]
+    public virtual async Task<Stream> MergeOfficeDocsAsync(
+        MergeOfficeBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var mergeOfficeRequest = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.MergeOfficeDocsAsync(mergeOfficeRequest, cancelToken);
+    }
+
+    [PublicAPI]
+    public virtual Task<Stream> ConvertPdfDocumentsAsync(
+        PdfConversionRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    [PublicAPI]
+    public virtual async Task<Stream> ConvertPdfDocumentsAsync(
+        PdfConversionBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken)
+            .ConfigureAwait(false);
+    }
+
+    [PublicAPI]
+    public virtual async Task FireWebhookAndForgetAsync<TBuilder, TRequest>(
+        BaseBuilder<TBuilder, TRequest> builder,
+        CancellationToken cancelToken = default)
+        where TBuilder : BuildRequestBase where TRequest : BaseBuilder<TBuilder, TRequest>
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        await this.FireWebhookAndForgetAsync(request, cancelToken);
+    }
+
+    [PublicAPI]
+    public virtual async Task FireWebhookAndForgetAsync(
+        BuildRequestBase request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var apiRequest = request.CreateApiRequest();
+
+        await this.FireWebhookAndForgetAsync(apiRequest, cancelToken);
+    }
+
+    [PublicAPI]
+    public virtual async Task FireWebhookAndForgetAsync(
+        IApiRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+        if (!request.IsWebhookRequest)
+            throw new InvalidOperationException(
+                "Only call this for webhook configured requests");
+
+        using var response = await this.SendRequestAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancelToken);
+    }
+
+    #endregion
+
+    #region exec
+
+    protected virtual async Task<Stream> ExecuteRequestAsync(
+        IApiRequest request,
+        CancellationToken cancelToken)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        using var response = await this.SendRequestAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancelToken);
+
+        var ms = new MemoryStream();
 
 #if NET5_0_OR_GREATER
-            await response.Content.CopyToAsync(ms, cancelToken);
+        await response.Content.CopyToAsync(ms, cancelToken);
 #else
-            await response.Content.CopyToAsync(ms).ConfigureAwait(false);
+        await response.Content.CopyToAsync(ms).ConfigureAwait(false);
 #endif
 
-            ms.Position = 0;
+        ms.Position = 0;
 
-            return ms;
-        }
-
-        async Task<HttpResponseMessage> SendRequest(
-            IApiRequest request,
-            HttpCompletionOption option,
-            CancellationToken cancelToken)
-        {
-            using var message = request.ToApiRequestMessage();
-
-            var response = await this._innerClient
-                .SendAsync(message, option, cancelToken)
-                .ConfigureAwait(false);
-
-            cancelToken.ThrowIfCancellationRequested();
-
-            if (response.IsSuccessStatusCode)
-                return response;
-
-            throw GotenbergApiException.Create(request, response);
-        }
-
-        #endregion
+        return ms;
     }
+
+    /// <summary>
+    ///     Send the API request
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="option"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    protected virtual async Task<HttpResponseMessage> SendRequestAsync(
+        IApiRequest request,
+        HttpCompletionOption option,
+        CancellationToken cancelToken)
+    {
+        using var message = request.ToApiRequestMessage();
+
+        var response = await this.HttpClient
+            .SendAsync(message, option, cancelToken)
+            .ConfigureAwait(false);
+
+        cancelToken.ThrowIfCancellationRequested();
+
+        if (response.IsSuccessStatusCode)
+            return response;
+
+        throw GotenbergApiException.Create(request, response);
+    }
+
+    #endregion
 }

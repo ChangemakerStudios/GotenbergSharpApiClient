@@ -26,12 +26,18 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 /// <summary>
 ///     Note:  If you don't specify any dimensions the client sets them to Chrome's defaults
 /// </summary>
-public sealed class DocumentBuilder : BaseFacetedBuilder<HtmlRequest>
+public sealed class DocumentBuilder
 {
-    public DocumentBuilder(HtmlRequest request)
+    private readonly FullDocument _content;
+
+    private readonly Action<bool> _setContainsMarkdown;
+
+    public DocumentBuilder(FullDocument content, Action<bool> setContainsMarkdown)
     {
-        this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.Content ??= new FullDocument();
+        if (content == null) throw new ArgumentNullException(nameof(content));
+
+        this._content = content;
+        this._setContainsMarkdown = setContainsMarkdown;
     }
 
     #region body
@@ -39,14 +45,14 @@ public sealed class DocumentBuilder : BaseFacetedBuilder<HtmlRequest>
     [PublicAPI]
     public DocumentBuilder ContainsMarkdown(bool containsMarkdown = true)
     {
-        this.Request.ContainsMarkdown = containsMarkdown;
+        this._setContainsMarkdown(containsMarkdown);
         return this;
     }
 
     [PublicAPI]
     public DocumentBuilder SetBody(ContentItem body)
     {
-        this.Request.Content.Body = body ?? throw new ArgumentNullException(nameof(body));
+        this._content.Body = body ?? throw new ArgumentNullException(nameof(body));
         return this;
     }
 
@@ -75,7 +81,7 @@ public sealed class DocumentBuilder : BaseFacetedBuilder<HtmlRequest>
     [PublicAPI]
     public DocumentBuilder SetHeader(ContentItem header)
     {
-        this.Request.Content.Header = header ?? throw new ArgumentNullException(nameof(header));
+        this._content.Header = header ?? throw new ArgumentNullException(nameof(header));
         return this;
     }
 
@@ -104,7 +110,7 @@ public sealed class DocumentBuilder : BaseFacetedBuilder<HtmlRequest>
     [PublicAPI]
     public DocumentBuilder SetFooter(ContentItem footer)
     {
-        this.Request.Content.Footer = footer ?? throw new ArgumentNullException(nameof(footer));
+        this._content.Footer = footer ?? throw new ArgumentNullException(nameof(footer));
         return this;
     }
 

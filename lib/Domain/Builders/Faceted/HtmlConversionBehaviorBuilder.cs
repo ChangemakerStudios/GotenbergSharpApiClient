@@ -26,12 +26,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeRequest>
+public sealed class HtmlConversionBehaviorBuilder
 {
-    public HtmlConversionBehaviorBuilder(ChromeRequest request)
+    private readonly HtmlConversionBehaviors _htmlConversionBehaviors;
+
+    internal HtmlConversionBehaviorBuilder(HtmlConversionBehaviors htmlConversionBehaviors)
     {
-        this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.ConversionBehaviors ??= new HtmlConversionBehaviors();
+        this._htmlConversionBehaviors = htmlConversionBehaviors;
     }
 
     /// <summary>
@@ -43,7 +44,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     [PublicAPI]
     public HtmlConversionBehaviorBuilder SetBrowserWaitDelay(int seconds)
     {
-        this.Request.ConversionBehaviors.WaitDelay = $"{seconds}s";
+        this._htmlConversionBehaviors.WaitDelay = $"{seconds}s";
 
         return this;
     }
@@ -60,7 +61,8 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     public HtmlConversionBehaviorBuilder SetBrowserWaitExpression(string expression)
     {
         if (expression.IsNotSet()) throw new InvalidOperationException("expression is not set");
-        this.Request.ConversionBehaviors.WaitForExpression = expression;
+
+        this._htmlConversionBehaviors.WaitForExpression = expression;
 
         return this;
     }
@@ -75,7 +77,8 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     public HtmlConversionBehaviorBuilder SetUserAgent(string userAgent)
     {
         if (userAgent.IsNotSet()) throw new InvalidOperationException("headerName is not set");
-        this.Request.ConversionBehaviors.UserAgent = userAgent;
+
+        this._htmlConversionBehaviors.UserAgent = userAgent;
 
         return this;
     }
@@ -111,7 +114,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     {
         if (extraHeaders == null) throw new InvalidOperationException("headerValue is null");
 
-        this.Request.ConversionBehaviors.ExtraHeaders = extraHeaders;
+        this._htmlConversionBehaviors.ExtraHeaders = extraHeaders;
 
         return this;
     }
@@ -123,7 +126,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     [PublicAPI]
     public HtmlConversionBehaviorBuilder FailOnConsoleExceptions()
     {
-        this.Request.ConversionBehaviors.FailOnConsoleExceptions = true;
+        this._htmlConversionBehaviors.FailOnConsoleExceptions = true;
 
         return this;
     }
@@ -135,7 +138,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     [PublicAPI]
     public HtmlConversionBehaviorBuilder EmulateAsScreen()
     {
-        this.Request.ConversionBehaviors.EmulatedMediaType = "screen";
+        this._htmlConversionBehaviors.EmulatedMediaType = "screen";
 
         return this;
     }
@@ -151,7 +154,7 @@ public sealed class HtmlConversionBehaviorBuilder : BaseFacetedBuilder<ChromeReq
     {
         if (format == default) throw new InvalidOperationException("Invalid PDF format specified");
 
-        this.Request.ConversionBehaviors.PdfFormat = format;
+        this._htmlConversionBehaviors.PdfFormat = format;
 
         return this;
     }

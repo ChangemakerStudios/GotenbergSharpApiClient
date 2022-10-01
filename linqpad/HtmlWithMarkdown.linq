@@ -39,7 +39,7 @@ public async Task<string> CreateFromMarkdown(string destinationDirectory)
 			 .SetScale(.90);
 		}).WithAsyncAssets(async
 			b => b.AddItems(await GetMarkdownAssets())
-		).ConfigureRequest(b => b.ResultFileName("hello.pdf")
+		).ConfigureRequest(b => b.SetResultFileName("hello.pdf")
 		).SetConversionBehaviors(b => b.SetBrowserWaitDelay(2));
 
 	var request = await builder.BuildAsync();

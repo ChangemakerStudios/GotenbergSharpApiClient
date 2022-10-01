@@ -23,37 +23,36 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using JetBrains.Annotations;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+
+public class HeaderFooterDocument : IConvertToHttpContent
 {
-    public class HeaderFooterDocument : IConvertToHttpContent
+    [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Header)]
+    public ContentItem? Header { [UsedImplicitly] get; internal set; }
+
+    [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Footer)]
+    public ContentItem? Footer { [UsedImplicitly] get; internal set; }
+
+    public IEnumerable<HttpContent> ToHttpContent()
     {
-        [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Header)]
-        public ContentItem Header { [UsedImplicitly] get; set; }
+        return MultiFormPropertyItem.FromType(this.GetType())
+            .Select(
+                item =>
+                {
+                    var value = (ContentItem?)item.Property.GetValue(this);
 
-        [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Footer)]
-        public ContentItem Footer { [UsedImplicitly] get; set; }
+                    if (value == null) return null;
 
-        public IEnumerable<HttpContent> ToHttpContent()
-        {
-            return MultiFormPropertyItem.FromType(this.GetType())
-                .Select(
-                    item =>
-                    {
-                        var value = (ContentItem)item.Property.GetValue(this);
+                    var contentItem = value.ToHttpContentItem();
 
-                        if (value == null) return null;
+                    contentItem.Headers.ContentType =
+                        new MediaTypeHeaderValue(item.Attribute.MediaType);
 
-                        var contentItem = value.ToHttpContentItem();
+                    contentItem.Headers.ContentDisposition =
+                        new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
+                            { Name = item.Attribute.Name, FileName = item.Attribute.FileName };
 
-                        contentItem.Headers.ContentType =
-                            new MediaTypeHeaderValue(item.Attribute.MediaType);
-
-                        contentItem.Headers.ContentDisposition =
-                            new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
-                                { Name = item.Attribute.Name, FileName = item.Attribute.FileName };
-
-                        return contentItem;
-                    }).WhereNotNull();
-        }
+                    return contentItem;
+                }).WhereNotNull();
     }
 }

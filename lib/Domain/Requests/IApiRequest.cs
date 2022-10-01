@@ -14,14 +14,13 @@
 //  limitations under the License.
 
 using System.Linq;
+using System.Net.Http;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
-public interface IApiRequest : IConvertToHttpContent
+public interface IApiRequest
 {
-    string ApiPath { get; }
+    HttpRequestMessage ToApiRequestMessage();
 
     bool IsWebhookRequest { get; }
-
-    ILookup<string, string?> Headers { get; }
 }

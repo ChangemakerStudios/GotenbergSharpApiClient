@@ -16,20 +16,20 @@
 using System;
 using System.IO;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class UrlHeaderFooterBuilder : BaseFacetedBuilder<UrlRequest>
+public sealed class UrlHeaderFooterBuilder
 {
+    private readonly HeaderFooterDocument _headerFooterDocument;
+
     [PublicAPI]
-    public UrlHeaderFooterBuilder(UrlRequest request)
+    public UrlHeaderFooterBuilder(HeaderFooterDocument headerFooterDocument)
     {
-        this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.Content ??= new HeaderFooterDocument();
+        this._headerFooterDocument = headerFooterDocument;
     }
 
     #region header
@@ -37,7 +37,8 @@ public sealed class UrlHeaderFooterBuilder : BaseFacetedBuilder<UrlRequest>
     [PublicAPI]
     public UrlHeaderFooterBuilder SetHeader(ContentItem header)
     {
-        this.Request.Content.Header = header ?? throw new ArgumentNullException(nameof(header));
+        this._headerFooterDocument.Header =
+            header ?? throw new ArgumentNullException(nameof(header));
         return this;
     }
 
@@ -66,7 +67,8 @@ public sealed class UrlHeaderFooterBuilder : BaseFacetedBuilder<UrlRequest>
     [PublicAPI]
     public UrlHeaderFooterBuilder SetFooter(ContentItem footer)
     {
-        this.Request.Content.Footer = footer ?? throw new ArgumentNullException(nameof(footer));
+        this._headerFooterDocument.Footer =
+            footer ?? throw new ArgumentNullException(nameof(footer));
         return this;
     }
 

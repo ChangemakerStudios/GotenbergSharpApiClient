@@ -87,7 +87,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     {
         if (PdfFormat != default)
         {
-            yield return RequestBase.CreateFormDataItem(
+            yield return BuildRequestBase.CreateFormDataItem(
                 PdfFormat.ToFormDataValue(),
                 Constants.Gotenberg.Chromium.Shared.HtmlConvert.PdfFormat);
         }

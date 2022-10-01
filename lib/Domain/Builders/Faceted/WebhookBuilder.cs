@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Extensions;
 
@@ -25,22 +24,13 @@ using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
+public sealed class WebhookBuilder
 {
-    public WebhookBuilder(RequestBase request)
-    {
-        this.Request = request ?? throw new ArgumentNullException(nameof(request));
-        this.Request.Config ??= new RequestConfig();
-        this.Request.Config.Webhook ??= new Webhook();
-    }
+    private readonly Webhook _webhook;
 
-    [PublicAPI]
-    public WebhookBuilder Set(Webhook webhook)
+    internal WebhookBuilder(Webhook webhook)
     {
-        if (webhook?.TargetUrl == null) throw new ArgumentNullException(nameof(webhook));
-        this.Request.Config.Webhook = webhook;
-
-        return this;
+        this._webhook = webhook;
     }
 
     /// <summary>
@@ -52,7 +42,7 @@ public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
     /// <param name="method"></param>
     /// <returns></returns>
     [PublicAPI]
-    public WebhookBuilder SetUrl(string url, HttpMethod method = null)
+    public WebhookBuilder SetUrl(string url, HttpMethod? method = null)
     {
         if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
 
@@ -60,20 +50,20 @@ public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
     }
 
     [PublicAPI]
-    public WebhookBuilder SetUrl(Uri url, HttpMethod method = null)
+    public WebhookBuilder SetUrl(Uri url, HttpMethod? method = null)
     {
         if (url == null) throw new ArgumentNullException(nameof(url));
         if (!url.IsAbsoluteUri)
             throw new InvalidOperationException("Url base href is not absolute");
 
-        this.Request.Config.Webhook!.TargetUrl = url;
-        this.Request.Config.Webhook!.HttpMethod = method?.ToString();
+        this._webhook.TargetUrl = url;
+        this._webhook.HttpMethod = method?.ToString();
 
         return this;
     }
 
     [PublicAPI]
-    public WebhookBuilder SetErrorUrl(string errorUrl, HttpMethod method = null)
+    public WebhookBuilder SetErrorUrl(string errorUrl, HttpMethod? method = null)
     {
         if (errorUrl.IsNotSet()) throw new ArgumentException("url is either null or empty");
 
@@ -81,14 +71,14 @@ public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
     }
 
     [PublicAPI]
-    public WebhookBuilder SetErrorUrl([NotNull] Uri url, HttpMethod method = null)
+    public WebhookBuilder SetErrorUrl([NotNull] Uri url, HttpMethod? method = null)
     {
         if (url == null) throw new ArgumentNullException(nameof(url));
         if (!url.IsAbsoluteUri)
             throw new InvalidOperationException("Url base href is not absolute");
 
-        this.Request.Config.Webhook!.ErrorUrl = url;
-        this.Request.Config.Webhook.ErrorHttpMethod = method?.ToString();
+        this._webhook.ErrorUrl = url;
+        this._webhook.ErrorHttpMethod = method?.ToString();
 
         return this;
     }
@@ -111,7 +101,7 @@ public sealed class WebhookBuilder : BaseFacetedBuilder<RequestBase>
         if (name.IsNotSet())
             throw new ArgumentException("extra header name is null || empty", nameof(name));
 
-        this.Request.Config.Webhook!.ExtraHttpHeaders.Add(name, values);
+        this._webhook.ExtraHttpHeaders.Add(name, values);
 
         return this;
     }

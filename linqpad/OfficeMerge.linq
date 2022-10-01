@@ -35,19 +35,12 @@ public async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 		.ConfigureRequest(c => c.SetTrace("LinqPad"))
 		.WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
 		.SetPdfFormat(PdfFormats.A2b)
-		 .UseNativePdfFormat()
+		.UseNativePdfFormat()
 		.ConfigureRequest(n => 
 			n.SetPageRanges("1-3") //Only one of the files has more than 1 page.
 		);
 
-	var request = await builder.BuildAsync();
-	request.ApiPath.Dump();
-	
-	request.ToHttpContent()
-		   .ToDumpFriendlyFormat()
-		   .Dump();
-
-	var response = await client.MergeOfficeDocsAsync(request).ConfigureAwait(false);
+	var response = await client.MergeOfficeDocsAsync(builder).ConfigureAwait(false);
 
 	var mergeResultPath = @$"{destinationDirectory}\GotenbergOfficeMerge-{Rand.Next()}.pdf";
 	
