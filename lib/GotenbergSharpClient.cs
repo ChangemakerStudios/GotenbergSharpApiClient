@@ -98,6 +98,8 @@ public class GotenbergSharpClient
         UrlRequest request,
         CancellationToken cancelToken = default)
     {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
     }
 
@@ -112,6 +114,8 @@ public class GotenbergSharpClient
         UrlRequestBuilder builder,
         CancellationToken cancelToken = default)
     {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
         var urlRequest = await builder.BuildAsync().ConfigureAwait(false);
 
         return await this.UrlToPdfAsync(urlRequest, cancelToken).ConfigureAwait(false);
@@ -129,6 +133,8 @@ public class GotenbergSharpClient
         HtmlRequest request,
         CancellationToken cancelToken = default)
     {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
     }
 
@@ -144,6 +150,8 @@ public class GotenbergSharpClient
         HtmlRequestBuilder builder,
         CancellationToken cancelToken = default)
     {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
         var htmlRequest = await builder.BuildAsync().ConfigureAwait(false);
 
         return await this.HtmlToPdfAsync(htmlRequest, cancelToken).ConfigureAwait(false);
@@ -161,6 +169,8 @@ public class GotenbergSharpClient
         MergeRequest request,
         CancellationToken cancelToken = default)
     {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
     }
 
@@ -174,6 +184,8 @@ public class GotenbergSharpClient
         MergeOfficeRequest request,
         CancellationToken cancelToken = default)
     {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
     }
 
@@ -187,6 +199,8 @@ public class GotenbergSharpClient
         MergeOfficeBuilder builder,
         CancellationToken cancelToken = default)
     {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
         var mergeOfficeRequest = await builder.BuildAsync().ConfigureAwait(false);
 
         return await this.MergeOfficeDocsAsync(mergeOfficeRequest, cancelToken);
@@ -197,7 +211,47 @@ public class GotenbergSharpClient
         PdfConversionRequest request,
         CancellationToken cancelToken = default)
     {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    [PublicAPI]
+    public virtual async Task<Stream> ConvertPdfDocumentsAsync(
+        PdfConversionBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken)
+            .ConfigureAwait(false);
+    }
+
+    [PublicAPI]
+    public virtual async Task FireWebhookAndForgetAsync<TBuilder, TRequest>(
+        BaseBuilder<TBuilder, TRequest> builder,
+        CancellationToken cancelToken = default)
+        where TBuilder : BuildRequestBase where TRequest : BaseBuilder<TBuilder, TRequest>
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        await this.FireWebhookAndForgetAsync(request, cancelToken);
+    }
+
+    [PublicAPI]
+    public virtual async Task FireWebhookAndForgetAsync(
+        BuildRequestBase request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var apiRequest = request.CreateApiRequest();
+
+        await this.FireWebhookAndForgetAsync(apiRequest, cancelToken);
     }
 
     [PublicAPI]
@@ -245,7 +299,7 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    /// Send the API request
+    ///     Send the API request
     /// </summary>
     /// <param name="request"></param>
     /// <param name="option"></param>
