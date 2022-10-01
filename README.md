@@ -56,8 +56,6 @@ public void ConfigureServices(IServiceCollection services)
 # Using GotenbergSharpClient.
 *See the [linqPad folder](linqpad/)* for complete examples. 
 
-### Note: Samples below are currently stale. Linqpad scripts are fresh.
-
 ## Html To Pdf 
 *With embedded assets:*
 
