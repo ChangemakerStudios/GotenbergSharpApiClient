@@ -63,18 +63,18 @@ public abstract class BaseBuilder<TRequest, TBuilder>
     }
 
     [PublicAPI]
-    public virtual IApiRequest Build()
+    public virtual TRequest Build()
     {
         if (this.BuildTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
 
-        return this.Request.CreateApiRequest();
+        return this.Request;
     }
 
     [PublicAPI]
-    public virtual async Task<IApiRequest> BuildAsync()
+    public virtual async Task<TRequest> BuildAsync()
     {
         if (this.BuildTasks.Any()) await Task.WhenAll(this.BuildTasks).ConfigureAwait(false);
 
-        return this.Request.CreateApiRequest();
+        return this.Request;
     }
 }
