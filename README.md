@@ -210,8 +210,7 @@ IEnumerable<UrlRequestBuilder> CreateBuilders(IEnumerable<Uri> uris)
     {
         yield return new UrlRequestBuilder()
             .SetUrl(uri)
-            .SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
-            .ConfigureRequest(req => { req.PageRanges("1-2"); })
+            .ConfigureRequest(req => { req.SetPageRanges("1-2"); })
             .AddHeaderFooter(docBuilder =>
             {
                 docBuilder.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
