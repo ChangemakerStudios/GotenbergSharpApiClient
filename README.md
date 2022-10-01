@@ -8,7 +8,6 @@
 
 .NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) v7 micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
 
-
 # Getting Started
 *Pull the image from dockerhub.com*
 ```powershell
@@ -53,10 +52,10 @@ public void ConfigureServices(IServiceCollection services)
 }
 
 ```
-# Using GotenbergSharpClient.
+# Using GotenbergSharpClient
 *See the [linqPad folder](linqpad/)* for complete examples. 
 
-## Html To Pdf 
+### Html To Pdf 
 *With embedded assets:*
 
 ```csharp
@@ -81,7 +80,7 @@ public void ConfigureServices(IServiceCollection services)
  }
 ```
 
-## Url To Pdf
+### Url To Pdf
 *Url to Pdf with custom page range, header & footer:*
 
 ```csharp
@@ -121,7 +120,7 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 	return await _sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
-## Markdown to Pdf
+### Markdown to Pdf
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
@@ -144,7 +143,7 @@ public async Task<Stream> CreateFromMarkdown()
 	return await _sharpClient.HtmlToPdfAsync(request);
 }
 ```
-## Webhook
+### Webhook
 *All request types support webhooks*
 
 ```csharp
@@ -179,7 +178,7 @@ public async Task<Stream> CreateFromMarkdown()
  }
 
 ```
-## Merge 15 Urls to one pdf
+### Merge 15 Urls to one pdf
 *Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
 ```csharp
