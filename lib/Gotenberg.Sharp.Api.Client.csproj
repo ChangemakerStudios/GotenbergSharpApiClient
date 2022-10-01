@@ -26,7 +26,7 @@
 		<PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
 		<PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/lib/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
-		<PackageIcon>gotenbergSharpClient.PNG</PackageIcon>
+		<PackageIcon>gotenbergSharpClient-large.PNG</PackageIcon>
 		<RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -77,8 +77,8 @@
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\"/>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
-		<None Include="Resources\gotenbergSharpClient.PNG" Pack="true" PackagePath="\" />
-		<Resource Include="Resources\gotenbergSharpClient.PNG" Pack="true" PackagePath="\" />
+		<None Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
+		<Resource Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
