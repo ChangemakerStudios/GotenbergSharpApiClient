@@ -1,4 +1,4 @@
-# <img src="https://github.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG" width="24" height="24" /> Gotenberg.Sharp.Api.Client
+# ![gotenberg icon](https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/develop/lib/Resources/gotenbergSharpClient.PNG) Gotenberg.Sharp.Api.Client
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
@@ -7,7 +7,6 @@
 ⭐ For Gotenberg v7+.⭐
 
 .NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) v7 micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
-
 
 # Getting Started
 *Pull the image from dockerhub.com*
@@ -53,12 +52,10 @@ public void ConfigureServices(IServiceCollection services)
 }
 
 ```
-# Using GotenbergSharpClient.
+# Using GotenbergSharpClient
 *See the [linqPad folder](linqpad/)* for complete examples. 
 
-### Note: Samples below are currently stale. Linqpad scripts are fresh.
-
-## Html To Pdf 
+### Html To Pdf 
 *With embedded assets:*
 
 ```csharp
@@ -83,7 +80,7 @@ public void ConfigureServices(IServiceCollection services)
  }
 ```
 
-## Url To Pdf
+### Url To Pdf
 *Url to Pdf with custom page range, header & footer:*
 
 ```csharp
@@ -93,7 +90,7 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 		.SetUrl("https://www.cnn.com")
 		.ConfigureRequest(config =>
 		{
-			config.PageRanges("1-2");
+			config.SetPageRanges("1-2");
 		})
 		.AddAsyncHeaderFooter(async
 			doc => doc.SetHeader(await File.ReadAllTextAsync(headerPath))
@@ -123,7 +120,7 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 	return await _sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
-## Markdown to Pdf
+### Markdown to Pdf
 *Markdown to Pdf conversion with embedded assets:*
 
 ```csharp
@@ -146,7 +143,7 @@ public async Task<Stream> CreateFromMarkdown()
 	return await _sharpClient.HtmlToPdfAsync(request);
 }
 ```
-## Webhook
+### Webhook
 *All request types support webhooks*
 
 ```csharp
@@ -158,11 +155,11 @@ public async Task<Stream> CreateFromMarkdown()
          {
              reqBuilder.AddWebhook(hook =>
                  {
-                     hook.SetTimeout(20)
-                         .SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
-                         .AddRequestHeader("custom-header", "value");
+                     hook.SetUrl("http://host.docker.internal:5000/api/your/webhookReceiver")
+                         .SetErrorUrl("http://host.docker.internal:5000/api/your/webhookReceiver/error")
+                         .AddExtraHeader("custom-header", "value");
                  })
-                 .PageRanges("1-2");
+                 .SetPageRanges("1-2");
          })
          .AddAsyncHeaderFooter(async
              b => b.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
@@ -181,7 +178,7 @@ public async Task<Stream> CreateFromMarkdown()
  }
 
 ```
-## Merge 15 Urls to one pdf
+### Merge 15 Urls to one pdf
 *Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
 ```csharp
@@ -210,8 +207,7 @@ IEnumerable<UrlRequestBuilder> CreateBuilders(IEnumerable<Uri> uris)
     {
         yield return new UrlRequestBuilder()
             .SetUrl(uri)
-            .SetRemoteUrlHeader("gotenberg-sharp-news-summary", $"{DateTime.Now.ToShortDateString()}")
-            .ConfigureRequest(req => { req.PageRanges("1-2"); })
+            .ConfigureRequest(req => { req.SetPageRanges("1-2"); })
             .AddHeaderFooter(docBuilder =>
             {
                 docBuilder.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))

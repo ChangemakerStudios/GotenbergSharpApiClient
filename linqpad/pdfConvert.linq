@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference Version="2.0.0-alpha0002" Prerelease="true">Gotenberg.Sharp.API.Client</NuGetReference>
+  <Reference Relative="..\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll">C:\Projects\GotenbergSharpApiClient\lib\bin\Debug\net5.0\Gotenberg.Sharp.API.Client.dll</Reference>
   <Namespace>Gotenberg.Sharp.API.Client</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders</Namespace>
   <Namespace>Gotenberg.Sharp.API.Client.Domain.Builders.Faceted</Namespace>
@@ -18,7 +18,7 @@ const int NumberOfFilesToGet = 1;
 
 async Task Main()
 {
-	var p = await DoConversion(@"D:\Gotenberg\Delivs");
+	var p = await DoConversion(@"C:\Temp\Gotenberg\Delivs");
 	
 	var info = new ProcessStartInfo { FileName = p, UseShellExecute = true };
 	Process.Start(info);

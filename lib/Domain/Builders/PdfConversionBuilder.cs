@@ -1,10 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+//  and GotenbergSharpApiClient Contributors
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System;
 using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 using JetBrains.Annotations;
 
@@ -12,12 +26,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
 public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>
 {
-    readonly List<Task> _asyncTasks = new List<Task>();
-
-    public PdfConversionBuilder()
-        => this.Request = new PdfConversionRequest();
-
-    protected override PdfConversionRequest Request { get; set; }
+    public PdfConversionBuilder() : base(new PdfConversionRequest())
+    {
+    }
 
     [PublicAPI]
     public PdfConversionBuilder SetFormat(PdfFormats format)
@@ -33,7 +44,8 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
     public PdfConversionBuilder WithPdfs(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
-        action(new AssetBuilder(this.Request));
+
+        action(new AssetBuilder(this.Request.Assets ??= new AssetDictionary()));
 
         return this;
     }
@@ -42,26 +54,9 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
     public PdfConversionBuilder WithPdfsAsync(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
-        this._asyncTasks.Add(asyncAction(new AssetBuilder(this.Request)));
+
+        this.BuildTasks.Add(asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
+
         return this;
-    }
-
-    [PublicAPI]
-    public PdfConversionRequest Build()
-    {
-        if (_asyncTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
-        if (Request.Count == 0) throw new InvalidOperationException("There are no items to convert");
-        return Request;
-    }
-
-    [PublicAPI]
-    public async Task<PdfConversionRequest> BuildAsync()
-    {
-        if (_asyncTasks.Any())
-        {
-            await Task.WhenAll(_asyncTasks).ConfigureAwait(false);
-        }
-
-        return Request;
     }
 }
