@@ -93,7 +93,7 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 		.SetUrl("https://www.cnn.com")
 		.ConfigureRequest(config =>
 		{
-			config.PageRanges("1-2");
+			config.SetPageRanges("1-2");
 		})
 		.AddAsyncHeaderFooter(async
 			doc => doc.SetHeader(await File.ReadAllTextAsync(headerPath))
