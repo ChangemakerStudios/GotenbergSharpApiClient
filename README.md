@@ -1,4 +1,4 @@
-# ![gotenberg icon](https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/raw/master/lib/Resources/gotenbergSharpClient.PNG) Gotenberg.Sharp.Api.Client
+# ![gotenberg icon](https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/develop/lib/Resources/gotenbergSharpClient.PNG) Gotenberg.Sharp.Api.Client
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
