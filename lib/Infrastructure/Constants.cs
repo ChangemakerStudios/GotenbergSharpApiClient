@@ -253,6 +253,8 @@ public static class Constants
                     //css
                     public const string EmulatedMediaType = "emulatedMediaType";
 
+                    public const string SkipNetworkIdleEvent = "skipNetworkIdleEvent";
+
                     //pdf format
                     public const string PdfFormat = CrossCutting.PdfFormat;
                 }
