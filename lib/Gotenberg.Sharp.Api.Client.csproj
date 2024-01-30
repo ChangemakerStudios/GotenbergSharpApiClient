@@ -13,7 +13,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<PackageVersion>2.2.1</PackageVersion>
+		<PackageVersion>2.2.2</PackageVersion>
 		<PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
