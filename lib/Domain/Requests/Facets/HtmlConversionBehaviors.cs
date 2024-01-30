@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -54,6 +55,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// <summary>
     /// Overrides the default User-Agent header
     /// </summary>
+    [Obsolete("Deprecated in Gotenberg v8+")]
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.UserAgent)]
     public string? UserAgent { [UsedImplicitly] get; set; }
 
@@ -79,7 +81,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     public string? EmulatedMediaType { [UsedImplicitly] get; set; }
 
     /// <summary>
-    /// Do not wait for chromium network idle event before converting.
+    /// Do not wait for chromium network idle event before converting. (Gotenberg v8+)
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.SkipNetworkIdleEvent)]
     public bool SkipNetworkIdleEvent { [UsedImplicitly] get; set; }

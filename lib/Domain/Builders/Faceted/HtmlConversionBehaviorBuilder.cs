@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -144,7 +144,7 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    ///     Configures gotenberg to not wait for Chromium network to be idle
+    ///     Gotenberg 8+ ONLY: Configures gotenberg to not wait for Chromium network to be idle. 
     /// </summary>
     /// <returns></returns>
     [PublicAPI]
