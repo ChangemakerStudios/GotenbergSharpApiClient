@@ -144,6 +144,18 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
+    ///     Configures gotenberg to not wait for Chromium network to be idle
+    /// </summary>
+    /// <returns></returns>
+    [PublicAPI]
+    public HtmlConversionBehaviorBuilder SkipNetworkIdleEvent()
+    {
+        this._htmlConversionBehaviors.SkipNetworkIdleEvent = true;
+
+        return this;
+    }
+
+    /// <summary>
     ///     Sets the format of the resulting PDF document
     /// </summary>
     /// <param name="format"></param>

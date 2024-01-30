@@ -79,6 +79,12 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     public string? EmulatedMediaType { [UsedImplicitly] get; set; }
 
     /// <summary>
+    /// Do not wait for chromium network idle event before converting.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.SkipNetworkIdleEvent)]
+    public bool SkipNetworkIdleEvent { [UsedImplicitly] get; set; }
+
+    /// <summary>
     /// After a Chromium conversion, the PDF engines will convert the resulting PDF to a specific format.
     /// </summary>
     public PdfFormats PdfFormat { get; set; }
