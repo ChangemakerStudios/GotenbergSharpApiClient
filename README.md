@@ -4,9 +4,9 @@
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
 ![Build status](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/actions/workflows/deploy.yml/badge.svg)
 
-⭐ For Gotenberg v7+.⭐
+⭐ For Gotenberg v7 & v8 ⭐
 
-.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) v7 micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
+.NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) v7 & v8 micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
 
 # Getting Started
 *Pull the image from dockerhub.com*
@@ -15,7 +15,7 @@
 ```
 *Create & start a container*
 ```powershell
-docker run --name gotenbee7x --rm -p 3000:3000 gotenberg/gotenberg:latest gotenberg --api-timeout=1800s --log-level=debug
+docker run --name gotenbee8x --rm -p 3000:3000 gotenberg/gotenberg:latest gotenberg --api-timeout=1800s --log-level=debug
 ```
 
 # .NET Core Project Setup

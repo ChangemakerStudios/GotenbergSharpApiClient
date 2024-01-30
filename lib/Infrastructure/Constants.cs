@@ -1,4 +1,4 @@
-//  Copyright 2019-2022 Chris Mohan, Jaben Cargman
+//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -252,6 +252,8 @@ public static class Constants
 
                     //css
                     public const string EmulatedMediaType = "emulatedMediaType";
+
+                    public const string SkipNetworkIdleEvent = "skipNetworkIdleEvent";
 
                     //pdf format
                     public const string PdfFormat = CrossCutting.PdfFormat;
