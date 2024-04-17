@@ -23,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 /// <summary>
 ///     Any non office files sent in are just ignored.
 ///     A nice surprise: Gotenberg/Chrome will merge in all sheets within a multi-sheet excel workbook.
-///     If you send in a csv file but with an xlsx extension, it will merge it in as text.
+///     If you send in a csv file but with a xlsx extension, it will merge it in as text.
 /// </summary>
 public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, MergeOfficeBuilder>
 {
@@ -39,10 +39,31 @@ public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, Me
         return this;
     }
 
+    /// <summary>
+    ///     If provided, the API will return a pdf containing the pages in the specified range.
+    /// </summary>
+    /// <remarks>
+    ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
+    ///     This may move...
+    /// </remarks>
     [PublicAPI]
     public MergeOfficeBuilder SetPageRanges(string pageRanges)
     {
         this.Request.PageRanges = pageRanges;
+        return this;
+    }
+    
+    /// <summary>
+    /// Set whether to export the form fields or to use the inputted/selected
+    /// content of the fields. Default is TRUE.
+    /// </summary>
+    /// <remarks>
+    /// Gotenberg v8.3+
+    /// </remarks>
+    [PublicAPI]
+    public MergeOfficeBuilder SetExportFormFields(bool exportFormFields)
+    {
+        this.Request.ExportFormFields = exportFormFields;
         return this;
     }
 

@@ -35,7 +35,23 @@ public class MergeOfficeRequest : BuildRequestBase
 
     public bool PrintAsLandscape { get; set; }
 
+    /// <summary>
+    ///     If provided, the API will return a pdf containing the pages in the specified range.
+    /// </summary>
+    /// <remarks>
+    ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
+    ///     This may move...
+    /// </remarks>
     public string? PageRanges { get; set; }
+    
+    /// <summary>
+    /// Set whether to export the form fields or to use the inputted/selected
+    /// content of the fields. Default is TRUE.
+    /// </summary>
+    /// <remarks>
+    /// Gotenberg v8.3+
+    /// </remarks>
+    public bool? ExportFormFields { get; set; }
 
     /// <summary>
     ///     Tells gotenberg to perform the conversion with unoconv.
