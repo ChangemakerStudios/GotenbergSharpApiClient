@@ -74,6 +74,7 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     [PublicAPI]
+    [Obsolete("Deprecated in Gotenberg v8+")]
     public HtmlConversionBehaviorBuilder SetUserAgent(string userAgent)
     {
         if (userAgent.IsNotSet()) throw new InvalidOperationException("headerName is not set");
