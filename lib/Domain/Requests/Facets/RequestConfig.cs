@@ -79,7 +79,7 @@ public sealed class RequestConfig : IConvertToHttpContent
     /// <remarks>
     ///     Attention: this feature does not work if the form field webHookURL is given.
     /// </remarks>
-    // Not sure this is useful with the way this client is used, although.. maybe Webhook requests honor it?
+    // Not sure if this is useful with the way this client is used, although.. maybe Webhook requests honor it?
     public string? ResultFileName { get; set; }
 
     /// <summary>

@@ -99,6 +99,8 @@ public static class Constants
                     public const string Landscape = CrossCutting.Landscape;
 
                     public const string PageRanges = CrossCutting.PageRanges;
+                    
+                    public const string ExportFormFields = "exportFormFields";
 
                     public const string NativePdfFormat = "nativePdfFormat";
 
