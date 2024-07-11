@@ -40,6 +40,11 @@ internal static class MergeOfficeRequestExtensions
                 request.ExportFormFields.Value,
                 Constants.Gotenberg.LibreOffice.Routes.Convert.ExportFormFields);
 
+        if (request.EnablePdfUa)
+            yield return BuildRequestBase.CreateFormDataItem(
+                "true",
+                Constants.Gotenberg.LibreOffice.Routes.Convert.PdfUa);
+
         if (!request.UseNativePdfFormat && request.Format == default) yield break;
 
         if (!request.UseNativePdfFormat && request.Format != default)
