@@ -13,35 +13,22 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
-using Gotenberg.Sharp.API.Client.Extensions;
 
-using JetBrains.Annotations;
+
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlRequestBuilder>
+public sealed class UrlRequestBuilder()
+    : BaseChromiumBuilder<UrlRequest, UrlRequestBuilder>(new UrlRequest())
 {
-    [PublicAPI]
-    public UrlRequestBuilder()
-        : base(new UrlRequest())
-    {
-    }
-
-    [PublicAPI]
     public UrlRequestBuilder SetUrl(string url)
     {
         if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
         return this.SetUrl(new Uri(url));
     }
 
-    [PublicAPI]
+    
     public UrlRequestBuilder SetUrl(Uri url)
     {
         this.Request.Url = url ?? throw new ArgumentNullException(nameof(url));
@@ -49,7 +36,7 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
         return this;
     }
 
-    [PublicAPI]
+    
     public UrlRequestBuilder AddHeaderFooter(Action<UrlHeaderFooterBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -58,7 +45,7 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
         return this;
     }
 
-    [PublicAPI]
+    
     public UrlRequestBuilder AddAsyncHeaderFooter(Func<UrlHeaderFooterBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
@@ -67,7 +54,7 @@ public sealed class UrlRequestBuilder : BaseChromiumBuilder<UrlRequest, UrlReque
         return this;
     }
 
-    [PublicAPI]
+    
     public UrlRequestBuilder AddExtraResources(Action<UrlExtraResourcesBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));

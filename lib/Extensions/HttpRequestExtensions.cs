@@ -13,14 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Net.Http;
-
-using JetBrains.Annotations;
-#if NET5_0_OR_GREATER
-using System.Collections.Generic;
-#endif
-
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class HttpRequestExtensions
@@ -33,7 +25,6 @@ internal static class HttpRequestExtensions
     /// <param name="request">The request.</param>
     /// <param name="timeout">The timeout.</param>
     /// <exception cref="ArgumentOutOfRangeException">request</exception>
-    [UsedImplicitly]
     internal static void SetTimeout(this HttpRequestMessage request, TimeSpan? timeout)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));

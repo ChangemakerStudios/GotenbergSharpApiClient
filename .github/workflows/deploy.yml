@@ -5,17 +5,20 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [8.x]
         
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
- 
+
     - name: Setup Dotnet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: ${{ matrix.dotnet-version }}
         
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v1.1.1
@@ -34,4 +37,5 @@ jobs:
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')
       run: |
-        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.NUGETKEY }} --no-symbols 1 
+        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate
+        dotnet nuget push **/*.snupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate        

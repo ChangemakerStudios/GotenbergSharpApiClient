@@ -13,19 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
 using System.ComponentModel;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client;
 
@@ -45,10 +35,6 @@ namespace Gotenberg.Sharp.API.Client;
 /// </remarks>
 public class GotenbergSharpClient
 {
-    protected HttpClient HttpClient { get; }
-
-    #region ctors
-
     [EditorBrowsable(EditorBrowsableState.Never)]
     public GotenbergSharpClient(string address)
         : this(new Uri(address))
@@ -66,7 +52,6 @@ public class GotenbergSharpClient
     /// </summary>
     /// <param name="innerClient"></param>
     /// <remarks>Client was built for DI use</remarks>
-    [PublicAPI]
     public GotenbergSharpClient(HttpClient innerClient)
     {
         this.HttpClient = innerClient ?? throw new ArgumentNullException(nameof(innerClient));
@@ -83,9 +68,7 @@ public class GotenbergSharpClient
                 Constants.HttpContent.MediaTypes.ApplicationPdf));
     }
 
-    #endregion
-
-    #region api methods
+    protected HttpClient HttpClient { get; }
 
     /// <summary>
     ///     For remote URL conversions. Works just like <see cref="HtmlToPdfAsync" />
@@ -93,7 +76,6 @@ public class GotenbergSharpClient
     /// <param name="request"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-    [PublicAPI]
     public virtual Task<Stream> UrlToPdfAsync(
         UrlRequest request,
         CancellationToken cancelToken = default)
@@ -109,7 +91,6 @@ public class GotenbergSharpClient
     /// <param name="builder"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-    [PublicAPI]
     public virtual async Task<Stream> UrlToPdfAsync(
         UrlRequestBuilder builder,
         CancellationToken cancelToken = default)
@@ -128,7 +109,6 @@ public class GotenbergSharpClient
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [PublicAPI]
     public virtual Task<Stream> HtmlToPdfAsync(
         HtmlRequest request,
         CancellationToken cancelToken = default)
@@ -145,7 +125,6 @@ public class GotenbergSharpClient
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [PublicAPI]
     public virtual async Task<Stream> HtmlToPdfAsync(
         HtmlRequestBuilder builder,
         CancellationToken cancelToken = default)
@@ -164,7 +143,6 @@ public class GotenbergSharpClient
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [PublicAPI]
     public virtual Task<Stream> MergePdfsAsync(
         MergeRequest request,
         CancellationToken cancelToken = default)
@@ -179,7 +157,6 @@ public class GotenbergSharpClient
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancelToken"></param>
-    [PublicAPI]
     public virtual Task<Stream> MergeOfficeDocsAsync(
         MergeOfficeRequest request,
         CancellationToken cancelToken = default)
@@ -194,7 +171,6 @@ public class GotenbergSharpClient
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="cancelToken"></param>
-    [PublicAPI]
     public virtual async Task<Stream> MergeOfficeDocsAsync(
         MergeOfficeBuilder builder,
         CancellationToken cancelToken = default)
@@ -206,7 +182,6 @@ public class GotenbergSharpClient
         return await this.MergeOfficeDocsAsync(mergeOfficeRequest, cancelToken);
     }
 
-    [PublicAPI]
     public virtual Task<Stream> ConvertPdfDocumentsAsync(
         PdfConversionRequest request,
         CancellationToken cancelToken = default)
@@ -216,7 +191,6 @@ public class GotenbergSharpClient
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
     }
 
-    [PublicAPI]
     public virtual async Task<Stream> ConvertPdfDocumentsAsync(
         PdfConversionBuilder builder,
         CancellationToken cancelToken = default)
@@ -229,7 +203,6 @@ public class GotenbergSharpClient
             .ConfigureAwait(false);
     }
 
-    [PublicAPI]
     public virtual async Task FireWebhookAndForgetAsync<TBuilder, TRequest>(
         BaseBuilder<TBuilder, TRequest> builder,
         CancellationToken cancelToken = default)
@@ -242,7 +215,6 @@ public class GotenbergSharpClient
         await this.FireWebhookAndForgetAsync(request, cancelToken);
     }
 
-    [PublicAPI]
     public virtual async Task FireWebhookAndForgetAsync(
         BuildRequestBase request,
         CancellationToken cancelToken = default)
@@ -254,7 +226,6 @@ public class GotenbergSharpClient
         await this.FireWebhookAndForgetAsync(apiRequest, cancelToken);
     }
 
-    [PublicAPI]
     public virtual async Task FireWebhookAndForgetAsync(
         IApiRequest request,
         CancellationToken cancelToken = default)
@@ -269,10 +240,6 @@ public class GotenbergSharpClient
             HttpCompletionOption.ResponseHeadersRead,
             cancelToken);
     }
-
-    #endregion
-
-    #region exec
 
     protected virtual async Task<Stream> ExecuteRequestAsync(
         IApiRequest request,
@@ -323,6 +290,4 @@ public class GotenbergSharpClient
 
         throw GotenbergApiException.Create(request, response);
     }
-
-    #endregion
 }

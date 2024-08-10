@@ -13,32 +13,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
-using Gotenberg.Sharp.API.Client.Extensions;
 
-using JetBrains.Annotations;
+
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class UrlExtraResourcesBuilder
+public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources)
 {
-    private readonly ExtraUrlResources _extraUrlResources;
-
-    public UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources)
-    {
-        this._extraUrlResources = extraUrlResources;
-    }
-
     #region add one
 
     #region link tag
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddLinkTag(string url)
     {
         if (url.IsNotSet()) throw new InvalidOperationException(nameof(url));
@@ -46,7 +33,7 @@ public sealed class UrlExtraResourcesBuilder
         return this.AddLinkTag(new Uri(url));
     }
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddLinkTag(Uri url)
     {
         return this.AddItem(new ExtraUrlResourceItem(url, ExtraUrlResourceType.LinkTag));
@@ -56,7 +43,7 @@ public sealed class UrlExtraResourcesBuilder
 
     #region script tag
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddScriptTag(string url)
     {
         if (url.IsNotSet()) throw new InvalidOperationException(nameof(url));
@@ -64,7 +51,7 @@ public sealed class UrlExtraResourcesBuilder
         return this.AddScriptTag(new Uri(url));
     }
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddScriptTag(Uri url)
     {
         return this.AddItem(new ExtraUrlResourceItem(url, ExtraUrlResourceType.ScriptTag));
@@ -74,7 +61,7 @@ public sealed class UrlExtraResourcesBuilder
 
     #region caller specifies type
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddItem(ExtraUrlResourceItem item)
     {
         return this.AddItems(new[] { item ?? throw new ArgumentNullException(nameof(item)) });
@@ -88,13 +75,13 @@ public sealed class UrlExtraResourcesBuilder
 
     #region link tags
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddLinkTags(IEnumerable<string> urls)
     {
         return this.AddLinkTags(urls.IfNullEmpty().Select(u => new Uri(u)));
     }
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddLinkTags(IEnumerable<Uri> urls)
     {
         return this.AddItems(
@@ -106,13 +93,13 @@ public sealed class UrlExtraResourcesBuilder
 
     #region script tags
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddScriptTags(IEnumerable<string> urls)
     {
         return this.AddScriptTags(urls.IfNullEmpty().Select(u => new Uri(u)));
     }
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddScriptTags(IEnumerable<Uri> urls)
     {
         return this.AddItems(
@@ -124,10 +111,10 @@ public sealed class UrlExtraResourcesBuilder
 
     #region caller specifies type
 
-    [PublicAPI]
+    
     public UrlExtraResourcesBuilder AddItems(IEnumerable<ExtraUrlResourceItem> items)
     {
-        this._extraUrlResources.Items.AddRange(items.IfNullEmpty());
+        extraUrlResources.Items.AddRange(items.IfNullEmpty());
         return this;
     }
 

@@ -13,36 +13,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public abstract class BaseBuilder<TRequest, TBuilder>
+public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
     where TRequest : BuildRequestBase
     where TBuilder : BaseBuilder<TRequest, TBuilder>
 {
-    protected BaseBuilder(TRequest request)
-    {
-        this.Request = request;
-    }
-
     protected const string CallBuildAsyncErrorMessage =
         "Request has asynchronous items. Call BuildAsync instead.";
 
     protected readonly List<Task> BuildTasks = new();
 
-    protected virtual TRequest Request { get; }
+    protected virtual TRequest Request { get; } = request;
 
-    [PublicAPI]
     public TBuilder ConfigureRequest(Action<ConfigBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -54,7 +37,6 @@ public abstract class BaseBuilder<TRequest, TBuilder>
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public TBuilder ConfigureRequest(RequestConfig config)
     {
         this.Request.Config = config ?? throw new ArgumentNullException(nameof(config));
@@ -62,7 +44,6 @@ public abstract class BaseBuilder<TRequest, TBuilder>
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public virtual TRequest Build()
     {
         if (this.BuildTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
@@ -70,7 +51,6 @@ public abstract class BaseBuilder<TRequest, TBuilder>
         return this.Request;
     }
 
-    [PublicAPI]
     public virtual async Task<TRequest> BuildAsync()
     {
         if (this.BuildTasks.Any()) await Task.WhenAll(this.BuildTasks).ConfigureAwait(false);

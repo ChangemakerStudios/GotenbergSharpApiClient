@@ -13,10 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
-using Gotenberg.Sharp.API.Client.Extensions;
 
 using MimeMapping;
 

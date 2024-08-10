@@ -13,12 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Extensions;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
@@ -31,7 +26,7 @@ public sealed class ConfigBuilder
         this._requestConfig = requestConfig;
     }
 
-    [PublicAPI]
+    
     public ConfigBuilder SetPageRanges(string pageRanges)
     {
         if (pageRanges.IsNotSet())
@@ -42,14 +37,14 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     [Obsolete("Renamed: Use SetPageRanges")]
     public ConfigBuilder PageRanges(string pageRanges)
     {
         return this.SetPageRanges(pageRanges);
     }
 
-    [PublicAPI]
+    
     public ConfigBuilder SetResultFileName(string resultFileName)
     {
         if (resultFileName.IsNotSet())
@@ -60,14 +55,14 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     [Obsolete("Renamed: Use SetResultFileName")]
     public ConfigBuilder ResultFileName(string resultFileName)
     {
         return this.SetResultFileName(resultFileName);
     }
 
-    [PublicAPI]
+    
     public ConfigBuilder SetTrace(string trace)
     {
         if (trace.IsNotSet())
@@ -78,7 +73,7 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     public ConfigBuilder AddWebhook(Action<WebhookBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -90,7 +85,7 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     public ConfigBuilder SetWebhook(Webhook webhook)
     {
         this._requestConfig.Webhook = webhook ?? throw new ArgumentNullException(nameof(webhook));
@@ -98,7 +93,7 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     [Obsolete("Renamed: Use SetWebhook instead.")]
     public ConfigBuilder AddWebhook(Webhook webhook)
     {

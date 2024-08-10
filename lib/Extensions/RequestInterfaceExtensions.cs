@@ -13,15 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
@@ -41,7 +33,7 @@ public static class RequestInterfaceExtensions
     /// <param name="items"></param>
     /// <param name="includeNonText"></param>
     /// <returns></returns>
-    [PublicAPI]
+    
     public static IEnumerable<object> ToDumpFriendlyFormat(
         this IEnumerable<HttpContent> items,
         bool includeNonText = false)

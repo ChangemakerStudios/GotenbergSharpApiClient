@@ -13,14 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -60,6 +53,11 @@ public class MergeOfficeRequest : BuildRequestBase
     ///     When true and Format is not set, the client falls back to PDF/A-1a.
     /// </summary>
     public bool UseNativePdfFormat { get; set; }
+
+    /// <summary>
+    ///    This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    public bool EnablePdfUa { get; set; }
 
     protected override IEnumerable<HttpContent> ToHttpContent()
     {

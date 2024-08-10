@@ -13,12 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Generic;
-using System.Net.Http;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class MergeOfficeRequestExtensions
@@ -39,6 +33,11 @@ internal static class MergeOfficeRequestExtensions
             yield return BuildRequestBase.CreateFormDataItem(
                 request.ExportFormFields.Value,
                 Constants.Gotenberg.LibreOffice.Routes.Convert.ExportFormFields);
+
+        if (request.EnablePdfUa)
+            yield return BuildRequestBase.CreateFormDataItem(
+                "true",
+                Constants.Gotenberg.LibreOffice.Routes.Convert.PdfUa);
 
         if (!request.UseNativePdfFormat && request.Format == default) yield break;
 

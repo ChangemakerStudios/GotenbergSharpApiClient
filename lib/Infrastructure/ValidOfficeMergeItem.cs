@@ -13,21 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Generic;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
-public class ValidOfficeMergeItem
+public class ValidOfficeMergeItem(KeyValuePair<string, ContentItem> asset, string mediaType)
 {
-    public ValidOfficeMergeItem(KeyValuePair<string, ContentItem> asset, string mediaType)
-    {
-        this.MediaType = mediaType;
-        this.Asset = asset;
-    }
+    public string MediaType { get; } = mediaType;
 
-    public string MediaType { get; }
-
-    public KeyValuePair<string, ContentItem> Asset { get; }
+    public KeyValuePair<string, ContentItem> Asset { get; } = asset;
 }

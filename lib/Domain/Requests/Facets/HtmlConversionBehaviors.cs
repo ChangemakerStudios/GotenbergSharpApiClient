@@ -13,16 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 using Newtonsoft.Json.Linq;
 
@@ -42,7 +33,7 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// of time to make sure Chromium has fully rendered the page you're trying to generate.
     /// </remarks>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitDelay)]
-    public string? WaitDelay { [UsedImplicitly] get; set; }
+    public string? WaitDelay {  get; set; }
 
     /// <summary>
     /// The JavaScript expression to wait before converting an HTML document to PDF until it returns true
@@ -50,20 +41,20 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// <example>builder.SetBrowserWaitExpression("window.status === 'ready'")</example>
     /// <remarks>Prefer this option over waitDelay</remarks>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitForExpression)]
-    public string? WaitForExpression { [UsedImplicitly] get; set; }
+    public string? WaitForExpression {  get; set; }
 
     /// <summary>
     /// Overrides the default User-Agent header
     /// </summary>
     [Obsolete("Deprecated in Gotenberg v8+")]
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.UserAgent)]
-    public string? UserAgent { [UsedImplicitly] get; set; }
+    public string? UserAgent {  get; set; }
 
     /// <summary>
     /// Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders)]
-    public JObject? ExtraHeaders { [UsedImplicitly] get; set; }
+    public JObject? ExtraHeaders {  get; set; }
 
     /// <summary>
     /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
@@ -72,19 +63,19 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// Caution: does not work if JavaScript is disabled at the container level via --chromium-disable-javascript.
     /// </remarks>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnConsoleExceptions)]
-    public bool FailOnConsoleExceptions { [UsedImplicitly] get; set; }
+    public bool FailOnConsoleExceptions {  get; set; }
 
     /// <summary>
     /// The media type to emulate, either "screen" or "print" - empty means "print".
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.EmulatedMediaType)]
-    public string? EmulatedMediaType { [UsedImplicitly] get; set; }
+    public string? EmulatedMediaType {  get; set; }
 
     /// <summary>
     /// Do not wait for chromium network idle event before converting. (Gotenberg v8+)
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.SkipNetworkIdleEvent)]
-    public bool SkipNetworkIdleEvent { [UsedImplicitly] get; set; }
+    public bool SkipNetworkIdleEvent {  get; set; }
 
     /// <summary>
     /// After a Chromium conversion, the PDF engines will convert the resulting PDF to a specific format.

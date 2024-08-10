@@ -13,30 +13,18 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRequestBuilder>
+public sealed class HtmlRequestBuilder(bool containsMarkdown)
+    : BaseChromiumBuilder<HtmlRequest, HtmlRequestBuilder>(new HtmlRequest(containsMarkdown))
 {
     public HtmlRequestBuilder()
         : this(false)
     {
     }
 
-    [PublicAPI]
-    public HtmlRequestBuilder(bool containsMarkdown)
-        : base(new HtmlRequest(containsMarkdown))
-    {
-    }
-
-    [PublicAPI]
     public HtmlRequestBuilder AddDocument(Action<DocumentBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -46,7 +34,7 @@ public sealed class HtmlRequestBuilder : BaseChromiumBuilder<HtmlRequest, HtmlRe
         return this;
     }
 
-    [PublicAPI]
+    
     public HtmlRequestBuilder AddAsyncDocument(Func<DocumentBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));

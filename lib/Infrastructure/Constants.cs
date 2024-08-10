@@ -107,6 +107,8 @@ public static class Constants
                     public const string PdfFormat = CrossCutting.PdfFormat;
 
                     public const string Merge = "merge";
+
+                    public const string PdfUa = "pdfua";
                 }
             }
         }

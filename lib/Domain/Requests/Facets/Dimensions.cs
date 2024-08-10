@@ -13,17 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -43,7 +35,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// Gets or sets the scale. Defaults to 1.0
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.Scale)]
-        public double Scale { [UsedImplicitly] get; set; } = 1.0;
+        public double Scale {  get; set; } = 1.0;
 
         /// <summary>
         /// Gets or sets the width of the paper.
@@ -52,7 +44,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The width of the paper.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PaperWidth)]
-        public double PaperWidth { [UsedImplicitly] get; set; }
+        public double PaperWidth {  get; set; }
 
         /// <summary>
         /// Gets or sets the height of the paper.
@@ -61,7 +53,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The height of the paper.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PaperHeight)]
-        public double PaperHeight { [UsedImplicitly] get; set; }
+        public double PaperHeight {  get; set; }
 
         /// <summary>
         /// Gets or sets the margin top.
@@ -70,7 +62,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin top.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginTop)]
-        public double MarginTop { [UsedImplicitly] get; set; }
+        public double MarginTop {  get; set; }
 
         /// <summary>
         /// Gets or sets the margin bottom.
@@ -79,7 +71,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin bottom.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginBottom)]
-        public double MarginBottom { [UsedImplicitly] get; set; }
+        public double MarginBottom {  get; set; }
 
         /// <summary>
         /// Gets or sets the margin left.
@@ -88,7 +80,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin left.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginLeft)]
-        public double MarginLeft { [UsedImplicitly] get; set; }
+        public double MarginLeft {  get; set; }
 
         /// <summary>
         /// Gets or sets the margin right.
@@ -97,7 +89,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin right.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.MarginRight)]
-        public double MarginRight { [UsedImplicitly] get; set; }
+        public double MarginRight {  get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Dimensions"/> is landscape.
@@ -106,25 +98,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         ///   <c>true</c> if landscape; otherwise, <c>false</c>.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.Landscape)]
-        public bool Landscape { [UsedImplicitly] get; set; }
+        public bool Landscape {  get; set; }
 
         /// <summary>
         /// Defines whether to prefer page size as defined by CSS (default false)
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PreferCssPageSize)]
-        public bool PreferCssPageSize { [UsedImplicitly] get; set; }
+        public bool PreferCssPageSize {  get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether or not to print background graphics.
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.Dims.PrintBackground)]
-        public bool PrintBackground { [UsedImplicitly] get; set; }
+        public bool PrintBackground {  get; set; }
 
         #endregion
 
         #region public methods
 
-        [PublicAPI]
+        
         public static Dimensions ToA4WithNoMargins()
         {
             return new Dimensions
@@ -141,7 +133,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         ///     Source: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/chromium/chromium.go#L200
         /// </remarks>
         /// <returns></returns>
-        [PublicAPI]
+        
         public static Dimensions ToChromeDefaults()
         {
             return new Dimensions

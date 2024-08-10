@@ -13,18 +13,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
+
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-[PublicAPI]
+
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum PdfFormats
 {
-    [UsedImplicitly]
+    
     None = 0,
 
     [Obsolete("Beginning with version Gotenberg 7.6, LibreOffice has discontinued support for PDF/A-1a: https://gotenberg.dev/docs/troubleshooting#pdfa-1a")]

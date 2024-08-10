@@ -13,13 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Extensions;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class ChromeRequest : BuildRequestBase

@@ -13,13 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
 using System.Diagnostics.Contracts;
-using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 
-using JetBrains.Annotations;
+
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

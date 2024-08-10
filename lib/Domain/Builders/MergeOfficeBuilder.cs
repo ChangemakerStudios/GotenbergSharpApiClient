@@ -13,10 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-
-using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
@@ -25,14 +22,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 ///     A nice surprise: Gotenberg/Chrome will merge in all sheets within a multi-sheet excel workbook.
 ///     If you send in a csv file but with a xlsx extension, it will merge it in as text.
 /// </summary>
-public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, MergeOfficeBuilder>
+public sealed class MergeOfficeBuilder()
+    : BaseMergeBuilder<MergeOfficeRequest, MergeOfficeBuilder>(new MergeOfficeRequest())
 {
-    public MergeOfficeBuilder()
-        : base(new MergeOfficeRequest())
-    {
-    }
-
-    [PublicAPI]
     public MergeOfficeBuilder PrintAsLandscape()
     {
         this.Request.PrintAsLandscape = true;
@@ -46,21 +38,19 @@ public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, Me
     ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
     ///     This may move...
     /// </remarks>
-    [PublicAPI]
     public MergeOfficeBuilder SetPageRanges(string pageRanges)
     {
         this.Request.PageRanges = pageRanges;
         return this;
     }
-    
+
     /// <summary>
-    /// Set whether to export the form fields or to use the inputted/selected
-    /// content of the fields. Default is TRUE.
+    ///     Set whether to export the form fields or to use the inputted/selected
+    ///     content of the fields. Default is TRUE.
     /// </summary>
     /// <remarks>
-    /// Gotenberg v8.3+
+    ///     Gotenberg v8.3+
     /// </remarks>
-    [PublicAPI]
     public MergeOfficeBuilder SetExportFormFields(bool exportFormFields)
     {
         this.Request.ExportFormFields = exportFormFields;
@@ -71,7 +61,6 @@ public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, Me
     ///     This tells gotenberg to use unoconv to perform the conversion.
     ///     When <see cref="MergeOfficeRequest.Format" /> is not set it defaults to using PDF/A-1a
     /// </summary>
-    [PublicAPI]
     public MergeOfficeBuilder UseNativePdfFormat()
     {
         this.Request.UseNativePdfFormat = true;
@@ -81,11 +70,20 @@ public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, Me
     /// <summary>
     ///     This tells gotenberg to use unoconv to perform the conversion in the specified format.
     /// </summary>
-    [PublicAPI]
     public MergeOfficeBuilder UseNativePdfFormat(PdfFormats format)
     {
         this.Request.UseNativePdfFormat = true;
         this.Request.Format = format;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    public MergeOfficeBuilder EnablePdfUa()
+    {
+        this.Request.EnablePdfUa = true;
 
         return this;
     }
