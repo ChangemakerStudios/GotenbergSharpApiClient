@@ -13,17 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
 public class ExtraUrlResources : IConvertToHttpContent
 {
-    public List<ExtraUrlResourceItem> Items { get; [UsedImplicitly] set; } = new();
+    public List<ExtraUrlResourceItem> Items { get;  set; } = new();
 
     public IEnumerable<HttpContent> ToHttpContent()
     {

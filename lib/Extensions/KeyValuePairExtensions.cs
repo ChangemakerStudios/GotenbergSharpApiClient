@@ -13,8 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Generic;
-
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class KeyValuePairExtensions

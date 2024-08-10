@@ -13,14 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
 using System.ComponentModel;
 
-using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using JetBrains.Annotations;
-
-using Newtonsoft.Json;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
@@ -49,10 +44,10 @@ public class ExtraUrlResourceItem
             itemType == ExtraUrlResourceType.LinkTag ? LinkFieldName : ScriptFieldName;
     }
 
-    [PublicAPI]
+    
     public Uri Url { get; }
 
-    [PublicAPI]
+    
     public ExtraUrlResourceType ItemType { get; }
 
     internal string FormDataFieldName { get; }

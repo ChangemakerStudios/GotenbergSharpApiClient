@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE0042:Deconstruct variable declaration")]
 [assembly: SuppressMessage("Roslynator", "RCS1080:Use 'Count/Length' property instead of 'Any' method.")]
+[assembly: SuppressMessage("ReSharper", "UnusedMember.Global")]

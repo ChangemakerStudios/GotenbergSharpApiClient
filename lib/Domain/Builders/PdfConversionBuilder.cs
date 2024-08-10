@@ -13,24 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>
+public sealed class PdfConversionBuilder()
+    : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>(new PdfConversionRequest())
 {
-    public PdfConversionBuilder() : base(new PdfConversionRequest())
-    {
-    }
-
-    [PublicAPI]
     public PdfConversionBuilder SetFormat(PdfFormats format)
     {
         if (format == default) throw new ArgumentNullException(nameof(format));
@@ -40,7 +29,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
         return this;
     }
 
-    [PublicAPI]
+    
     public PdfConversionBuilder WithPdfs(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -50,7 +39,7 @@ public sealed class PdfConversionBuilder : BaseBuilder<PdfConversionRequest, Pdf
         return this;
     }
 
-    [PublicAPI]
+    
     public PdfConversionBuilder WithPdfsAsync(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));

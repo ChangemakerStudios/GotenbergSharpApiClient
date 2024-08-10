@@ -13,27 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
-using JetBrains.Annotations;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TRequest, TBuilder>
+public abstract class BaseChromiumBuilder<TRequest, TBuilder>(TRequest request)
+    : BaseBuilder<TRequest, TBuilder>(request)
     where TRequest : ChromeRequest
     where TBuilder : BaseChromiumBuilder<TRequest, TBuilder>
 {
-    protected BaseChromiumBuilder([NotNull] TRequest request)
-        : base(request)
-    {
-    }
-
-    [PublicAPI]
     public TBuilder WithDimensions(Action<DimensionBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -47,14 +33,12 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public TBuilder WithDimensions(Dimensions dimensions)
     {
         this.Request.Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public TBuilder WithAssets(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -62,15 +46,14 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public TBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
-        this.BuildTasks.Add(asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
+        this.BuildTasks.Add(
+            asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public TBuilder SetConversionBehaviors(Action<HtmlConversionBehaviorBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -78,7 +61,6 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder> : BaseBuilder<TReq
         return (TBuilder)this;
     }
 
-    [PublicAPI]
     public TBuilder SetConversionBehaviors(HtmlConversionBehaviors behaviors)
     {
         this.Request.ConversionBehaviors =

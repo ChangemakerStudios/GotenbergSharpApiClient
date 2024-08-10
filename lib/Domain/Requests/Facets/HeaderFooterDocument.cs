@@ -13,25 +13,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 public class HeaderFooterDocument : IConvertToHttpContent
 {
     [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Header)]
-    public ContentItem? Header { [UsedImplicitly] get; internal set; }
+    public ContentItem? Header {  get; internal set; }
 
     [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Footer)]
-    public ContentItem? Footer { [UsedImplicitly] get; internal set; }
+    public ContentItem? Footer {  get; internal set; }
 
     public IEnumerable<HttpContent> ToHttpContent()
     {

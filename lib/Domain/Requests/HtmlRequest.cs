@@ -13,16 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -35,19 +26,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 ///     of a given markdown file to HTML.
 ///     See example here: https://gotenberg.dev/docs/modules/chromium#markdown
 /// </remarks>
-public sealed class HtmlRequest : ChromeRequest
+public sealed class HtmlRequest(bool containsMarkdown) : ChromeRequest
 {
-    [PublicAPI]
+    
     public HtmlRequest()
         : this(false)
     {
-    }
-
-    [PublicAPI]
-    public HtmlRequest(bool containsMarkdown)
-    {
-        this.ContainsMarkdown = containsMarkdown;
-        this.Content = new FullDocument();
     }
 
     protected override string ApiPath
@@ -55,11 +39,10 @@ public sealed class HtmlRequest : ChromeRequest
             ? Constants.Gotenberg.Chromium.ApiPaths.ConvertMarkdown
             : Constants.Gotenberg.Chromium.ApiPaths.ConvertHtml;
 
-    [PublicAPI]
-    public bool ContainsMarkdown { get; internal set; }
+    
+    public bool ContainsMarkdown { get; internal set; } = containsMarkdown;
 
-    [PublicAPI]
-    public FullDocument Content { get; internal set; }
+    public FullDocument Content { get; internal set; } = new();
 
     /// <summary>
     ///     Transforms the instance to a list of HttpContent items

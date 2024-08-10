@@ -13,48 +13,35 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.IO;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
-public sealed class UrlHeaderFooterBuilder
+public sealed class UrlHeaderFooterBuilder(HeaderFooterDocument headerFooterDocument)
 {
-    private readonly HeaderFooterDocument _headerFooterDocument;
-
-    [PublicAPI]
-    public UrlHeaderFooterBuilder(HeaderFooterDocument headerFooterDocument)
-    {
-        this._headerFooterDocument = headerFooterDocument;
-    }
-
     #region header
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetHeader(ContentItem header)
     {
-        this._headerFooterDocument.Header =
+        headerFooterDocument.Header =
             header ?? throw new ArgumentNullException(nameof(header));
         return this;
     }
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetHeader(string header)
     {
         return this.SetHeader(new ContentItem(header));
     }
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetHeader(byte[] header)
     {
         return this.SetHeader(new ContentItem(header));
     }
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetHeader(Stream header)
     {
         return this.SetHeader(new ContentItem(header));
@@ -64,27 +51,27 @@ public sealed class UrlHeaderFooterBuilder
 
     #region footer
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetFooter(ContentItem footer)
     {
-        this._headerFooterDocument.Footer =
+        headerFooterDocument.Footer =
             footer ?? throw new ArgumentNullException(nameof(footer));
         return this;
     }
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetFooter(string footer)
     {
         return this.SetFooter(new ContentItem(footer));
     }
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetFooter(byte[] footer)
     {
         return this.SetFooter(new ContentItem(footer));
     }
 
-    [PublicAPI]
+    
     public UrlHeaderFooterBuilder SetFooter(Stream footer)
     {
         return this.SetFooter(new ContentItem(footer));

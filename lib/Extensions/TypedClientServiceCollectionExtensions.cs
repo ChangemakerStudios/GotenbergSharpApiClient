@@ -13,14 +13,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
 using System.Net;
-using System.Net.Http;
 
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
-using JetBrains.Annotations;
+
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -29,7 +27,7 @@ namespace Gotenberg.Sharp.API.Client.Extensions;
 
 public static class TypedClientServiceCollectionExtensions
 {
-    [PublicAPI]
+    
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services)
     {
@@ -44,7 +42,7 @@ public static class TypedClientServiceCollectionExtensions
             });
     }
 
-    [PublicAPI]
+    
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services,
         Action<IServiceProvider, HttpClient> configureClient)

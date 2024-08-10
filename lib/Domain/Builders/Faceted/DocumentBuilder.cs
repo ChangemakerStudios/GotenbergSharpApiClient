@@ -13,13 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.IO;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
@@ -42,33 +36,33 @@ public sealed class DocumentBuilder
 
     #region body
 
-    [PublicAPI]
+    
     public DocumentBuilder ContainsMarkdown(bool containsMarkdown = true)
     {
         this._setContainsMarkdown(containsMarkdown);
         return this;
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetBody(ContentItem body)
     {
         this._content.Body = body ?? throw new ArgumentNullException(nameof(body));
         return this;
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetBody(string body)
     {
         return this.SetBody(new ContentItem(body));
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetBody(byte[] body)
     {
         return this.SetBody(new ContentItem(body));
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetBody(Stream body)
     {
         return this.SetBody(new ContentItem(body));
@@ -78,26 +72,26 @@ public sealed class DocumentBuilder
 
     #region header
 
-    [PublicAPI]
+    
     public DocumentBuilder SetHeader(ContentItem header)
     {
         this._content.Header = header ?? throw new ArgumentNullException(nameof(header));
         return this;
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetHeader(string header)
     {
         return this.SetHeader(new ContentItem(header));
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetHeader(byte[] header)
     {
         return this.SetHeader(new ContentItem(header));
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetHeader(Stream header)
     {
         return this.SetHeader(new ContentItem(header));
@@ -107,26 +101,26 @@ public sealed class DocumentBuilder
 
     #region footer
 
-    [PublicAPI]
+    
     public DocumentBuilder SetFooter(ContentItem footer)
     {
         this._content.Footer = footer ?? throw new ArgumentNullException(nameof(footer));
         return this;
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetFooter(string footer)
     {
         return this.SetFooter(new ContentItem(footer));
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetFooter(byte[] footer)
     {
         return this.SetFooter(new ContentItem(footer));
     }
 
-    [PublicAPI]
+    
     public DocumentBuilder SetFooter(Stream footer)
     {
         return this.SetFooter(new ContentItem(footer));

@@ -13,8 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
 [AttributeUsage(AttributeTargets.Property)]
@@ -27,7 +25,6 @@ public sealed class MultiFormHeaderAttribute : Attribute
     /// <param name="name">The name.</param>
     /// <param name="fileName">Name of the file.</param>
     /// <param name="mediaType">The media type</param>
-    // ReSharper disable once TooManyDependencies
     public MultiFormHeaderAttribute(
         string name = Constants.Gotenberg.SharedFormFieldNames.Files,
         string? fileName = null,

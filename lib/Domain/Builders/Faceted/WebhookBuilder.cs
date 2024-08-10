@@ -13,14 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Extensions;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
@@ -41,7 +34,7 @@ public sealed class WebhookBuilder
     /// <param name="url"></param>
     /// <param name="method"></param>
     /// <returns></returns>
-    [PublicAPI]
+    
     public WebhookBuilder SetUrl(string url, HttpMethod? method = null)
     {
         if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
@@ -49,7 +42,7 @@ public sealed class WebhookBuilder
         return this.SetUrl(new Uri(url), method);
     }
 
-    [PublicAPI]
+    
     public WebhookBuilder SetUrl(Uri url, HttpMethod? method = null)
     {
         if (url == null) throw new ArgumentNullException(nameof(url));
@@ -62,7 +55,7 @@ public sealed class WebhookBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     public WebhookBuilder SetErrorUrl(string errorUrl, HttpMethod? method = null)
     {
         if (errorUrl.IsNotSet()) throw new ArgumentException("url is either null or empty");
@@ -70,8 +63,8 @@ public sealed class WebhookBuilder
         return this.SetErrorUrl(new Uri(errorUrl), method);
     }
 
-    [PublicAPI]
-    public WebhookBuilder SetErrorUrl([NotNull] Uri url, HttpMethod? method = null)
+    
+    public WebhookBuilder SetErrorUrl( Uri url, HttpMethod? method = null)
     {
         if (url == null) throw new ArgumentNullException(nameof(url));
         if (!url.IsAbsoluteUri)
@@ -83,19 +76,19 @@ public sealed class WebhookBuilder
         return this;
     }
 
-    [PublicAPI]
+    
     public WebhookBuilder AddExtraHeader(string name, string value)
     {
         return this.AddExtraHeader(name, new[] { value });
     }
 
-    [PublicAPI]
+    
     public WebhookBuilder AddExtraHeader(KeyValuePair<string, string> header)
     {
         return this.AddExtraHeader(header.Key, new[] { header.Value });
     }
 
-    [PublicAPI]
+    
     public WebhookBuilder AddExtraHeader(string name, IEnumerable<string> values)
     {
         if (name.IsNotSet())

@@ -13,16 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Extensions;
-
-using JetBrains.Annotations;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
@@ -35,7 +26,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             this._assets = assets;
         }
 
-        [PublicAPI]
+        
         public AssetBuilder AddItem(string name, ContentItem value)
         {
             // ReSharper disable once ComplexConditionExpression
@@ -52,15 +43,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
-        [PublicAPI]
+        
         public AssetBuilder AddItem(string name, string value) =>
             AddItem(name, new ContentItem(value));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItem(string name, byte[] value) =>
             AddItem(name, new ContentItem(value));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItem(string name, Stream value) =>
             AddItem(name, new ContentItem(value));
 
@@ -68,7 +59,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 
         #region from dictionaries
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(Dictionary<string, ContentItem>? items)
         {
             foreach (var item in items.IfNullEmpty())
@@ -79,15 +70,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(Dictionary<string, string>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(Dictionary<string, byte[]>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(Dictionary<string, Stream>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
@@ -95,27 +86,27 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 
         #region from KVP enumerables
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
             AddItems(
                 new Dictionary<string, ContentItem>(
                     assets?.ToDictionary(a => a.Key, a => a.Value) ??
                     throw new ArgumentNullException(nameof(assets))));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
             AddItems(
                 new Dictionary<string, ContentItem>(
                     assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
                     throw new ArgumentNullException(nameof(assets))));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
             AddItems(
                 assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
                 throw new ArgumentNullException(nameof(assets)));
 
-        [PublicAPI]
+        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
             AddItems(
                 assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ??

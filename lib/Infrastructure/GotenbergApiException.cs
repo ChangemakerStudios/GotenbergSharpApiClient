@@ -13,17 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Extensions;
-
-using JetBrains.Annotations;
-
-using Newtonsoft.Json;
 
 // ReSharper disable All CA1032
 // ReSharper disable All CA1822 
@@ -63,7 +53,6 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             return new GotenbergApiException(message, request, response);
         }
 
-        [PublicAPI]
         public string ToVerboseJson(
             bool includeGotenbergResponse = true,
             bool includeRequestContent = true,

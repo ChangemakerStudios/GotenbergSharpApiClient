@@ -13,14 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.Requests;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class MergeBuilder : BaseMergeBuilder<MergeRequest, MergeBuilder>
-{
-    public MergeBuilder()
-        : base(new MergeRequest())
-    {
-    }
-}
+public sealed class MergeBuilder()
+    : BaseMergeBuilder<MergeRequest, MergeBuilder>(new MergeRequest());

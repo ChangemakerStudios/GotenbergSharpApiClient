@@ -13,14 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Gotenberg.Sharp.API.Client.Infrastructure;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
