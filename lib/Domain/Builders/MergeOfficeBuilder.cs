@@ -89,4 +89,15 @@ public sealed class MergeOfficeBuilder : BaseMergeBuilder<MergeOfficeRequest, Me
 
         return this;
     }
+
+    /// <summary>
+    ///     This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    [PublicAPI]
+    public MergeOfficeBuilder EnablePdfUa()
+    {
+        this.Request.EnablePdfUa = true;
+
+        return this;
+    }
 }

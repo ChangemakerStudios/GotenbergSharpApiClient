@@ -61,6 +61,11 @@ public class MergeOfficeRequest : BuildRequestBase
     /// </summary>
     public bool UseNativePdfFormat { get; set; }
 
+    /// <summary>
+    ///    This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    public bool EnablePdfUa { get; set; }
+
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
         var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty()
