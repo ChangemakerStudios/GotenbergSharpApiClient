@@ -137,7 +137,7 @@ public async Task<Stream> CreateFromMarkdown()
 			dims.UseChromeDefaults().LandScape().SetScale(.90);
 		}).WithAsyncAssets(async
 			a => a.AddItems(await GetMarkdownAssets())
-		));
+		);
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.HtmlToPdfAsync(request);
