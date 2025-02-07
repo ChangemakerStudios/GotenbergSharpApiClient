@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -56,6 +56,6 @@ public abstract class BuildRequestBase
         var headers = (this.Config?.GetHeaders()).IfNullEmpty()
             .ToLookup(s => s.Name, s => s.Value);
 
-        return new ApiRequestImplementation(this.ToHttpContent, this.ApiPath, headers, isWebHook);
+        return new PostApiRequestImpl(this.ToHttpContent, this.ApiPath, headers, isWebHook);
     }
 }

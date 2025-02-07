@@ -65,9 +65,9 @@ public void ConfigureServices(IServiceCollection services)
      var builder = new HtmlRequestBuilder()
          .AddDocument(doc => 
              doc.SetBody(GetBody()).SetFooter(GetFooter())
-         ).WithDimensions(dims =>
+         ).WithPageProperties(pp =>
          {
-             dims.SetPaperSize(PaperSizes.A3)
+             pp.SetPaperSize(PaperSizes.A3)
                  .SetMargins(Margins.None)
                  .SetScale(.99);
          }).WithAsyncAssets(async assets => assets.AddItem("some-image.jpg", await GetImageBytes()));
@@ -95,12 +95,12 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 		.AddAsyncHeaderFooter(async
 			doc => doc.SetHeader(await File.ReadAllTextAsync(headerPath))
 				  .SetFooter(await File.ReadAllBytesAsync(footerPath)
-		)).WithDimensions(dims =>
+		)).WithPageProperties(pp =>
 		{
-			dims.SetPaperSize(PaperSizes.A4)
+			pp.SetPaperSize(PaperSizes.A4)
 			 .SetMargins(Margins.None)
 			 .SetScale(.90)
-			 .LandScape();
+			 .SetLandscape();
 		});
 
 	var request = await builder.BuildAsync();
@@ -130,14 +130,14 @@ public async Task<Stream> CreateFromMarkdown()
 		.AddAsyncDocument(async
 			doc => doc.SetHeader(await this.GetHeaderAsync())
 				  .SetBody(await GetBodyAsync())
-				  .ContainsMarkdown()
+				  .SetContainsMarkdown()
 				  .SetFooter(await GetFooterAsync())
-		).WithDimensions(dims =>
+		).WithPageProperties(pp =>
 		{
-			dims.UseChromeDefaults().LandScape().SetScale(.90);
+			pp.UseChromeDefaults().SetLandscape().SetScale(.90);
 		}).WithAsyncAssets(async
 			a => a.AddItems(await GetMarkdownAssets())
-		));
+		);
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.HtmlToPdfAsync(request);
@@ -169,7 +169,7 @@ public async Task<Stream> CreateFromMarkdown()
              dimBuilder.SetPaperSize(PaperSizes.A4)
                  .SetMargins(Margins.None)
                  .SetScale(.90)
-                 .LandScape();
+                 .SetLandscape();
          });
 
      var request = await builder.BuildAsync();
@@ -217,9 +217,9 @@ IEnumerable<UrlRequestBuilder> CreateBuilders(IEnumerable<Uri> uris)
             {
                 dimBuilder.UseChromeDefaults()
                     .SetScale(.90)
-                    .LandScape()
-                    .MarginLeft(.5)
-                    .MarginRight(.5);
+                    .SetLandscape()
+                    .SetMarginLeft(.5)
+                    .SetMarginRight(.5);
             });
     }
 

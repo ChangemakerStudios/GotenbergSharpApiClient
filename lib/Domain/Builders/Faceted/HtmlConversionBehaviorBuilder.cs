@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,6 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-
-
 
 using Newtonsoft.Json.Linq;
 
@@ -34,7 +32,6 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="seconds"></param>
     /// <returns></returns>
     /// <remarks>Prefer <see cref="SetBrowserWaitExpression" /> over waitDelay.</remarks>
-    
     public HtmlConversionBehaviorBuilder SetBrowserWaitDelay(int seconds)
     {
         this._htmlConversionBehaviors.WaitDelay = $"{seconds}s";
@@ -50,7 +47,6 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <remarks>Prefer this option over waitDelay.</remarks>
     /// <example>SetBrowserWaitExpression("window.status === 'ready'")</example>
     /// <exception cref="InvalidOperationException"></exception>
-    
     public HtmlConversionBehaviorBuilder SetBrowserWaitExpression(string expression)
     {
         if (expression.IsNotSet()) throw new InvalidOperationException("expression is not set");
@@ -66,7 +62,6 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="userAgent"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    
     [Obsolete("Deprecated in Gotenberg v8+")]
     public HtmlConversionBehaviorBuilder SetUserAgent(string userAgent)
     {
@@ -85,14 +80,9 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="JsonReaderException"></exception>
-    
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(string headerName, string headerValue)
     {
-        var header = string.Format(
-            "{0}{2}{1}",
-            "{",
-            "}",
-            $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
+        var header = string.Format("{0}{2}{1}", "{", "}", $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
 
         return this.AddAdditionalHeaders(JObject.Parse(header));
     }
@@ -103,7 +93,6 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="extraHeaders"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JObject extraHeaders)
     {
         if (extraHeaders == null) throw new InvalidOperationException("headerValue is null");
@@ -117,7 +106,6 @@ public sealed class HtmlConversionBehaviorBuilder
     ///     Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <returns></returns>
-    
     public HtmlConversionBehaviorBuilder FailOnConsoleExceptions()
     {
         this._htmlConversionBehaviors.FailOnConsoleExceptions = true;
@@ -126,10 +114,9 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    ///     Configures gotenberg to emulate html loading as screen. By default it loads it as print
+    ///     Configures gotenberg to emulate html loading as screen. By default, it loads it as print
     /// </summary>
     /// <returns></returns>
-    
     public HtmlConversionBehaviorBuilder EmulateAsScreen()
     {
         this._htmlConversionBehaviors.EmulatedMediaType = "screen";
@@ -141,7 +128,6 @@ public sealed class HtmlConversionBehaviorBuilder
     ///     Gotenberg 8+ ONLY: Configures gotenberg to not wait for Chromium network to be idle. 
     /// </summary>
     /// <returns></returns>
-    
     public HtmlConversionBehaviorBuilder SkipNetworkIdleEvent()
     {
         this._htmlConversionBehaviors.SkipNetworkIdleEvent = true;
@@ -155,7 +141,6 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="format"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    
     public HtmlConversionBehaviorBuilder SetPdfFormat(PdfFormats format)
     {
         if (format == default) throw new InvalidOperationException("Invalid PDF format specified");

@@ -1,4 +1,4 @@
-//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,6 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-
-
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
@@ -29,21 +27,17 @@ public sealed class HtmlRequestBuilder(bool containsMarkdown)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        action(new DocumentBuilder(this.Request.Content, (v) => this.Request.ContainsMarkdown = v));
+        action(new DocumentBuilder(this.Request.Content, v => this.Request.ContainsMarkdown = v));
 
         return this;
     }
 
-    
     public HtmlRequestBuilder AddAsyncDocument(Func<DocumentBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
         this.BuildTasks.Add(
-            asyncAction(
-                new DocumentBuilder(
-                    this.Request.Content,
-                    (v) => this.Request.ContainsMarkdown = v)));
+            asyncAction(new DocumentBuilder(this.Request.Content, v => this.Request.ContainsMarkdown = v)));
 
         return this;
     }

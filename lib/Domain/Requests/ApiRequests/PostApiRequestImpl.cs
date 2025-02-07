@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,53 +13,46 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests;
+namespace Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
-internal sealed class ApiRequestImplementation : IApiRequest, IConvertToHttpContent
+internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent
 {
     private readonly Func<IEnumerable<HttpContent>> _toHttpContent;
 
-    internal ApiRequestImplementation(
+    internal PostApiRequestImpl(
         Func<IEnumerable<HttpContent>> toHttpContent,
         string apiPath,
-        ILookup<string, string?> headers,
+        ILookup<string, string?>? headers,
         bool isWebhookRequest)
     {
-        this._toHttpContent = toHttpContent;
-        this.ApiPath = apiPath;
-        this.IsWebhookRequest = isWebhookRequest;
-        this.Headers = headers;
-    }
-
-    public IEnumerable<HttpContent> ToHttpContent()
-    {
-        return this._toHttpContent();
+        _toHttpContent = toHttpContent;
+        ApiPath = apiPath;
+        IsWebhookRequest = isWebhookRequest;
+        Headers = headers;
     }
 
     public string ApiPath { get; }
 
-    public bool IsWebhookRequest { get; }
-
-    public ILookup<string, string?> Headers { get; }
+    public ILookup<string, string?>? Headers { get; }
 
     private const string BoundaryPrefix = Constants.HttpContent.MultipartData.BoundaryPrefix;
 
+    public bool IsWebhookRequest { get; }
+
     public HttpRequestMessage ToApiRequestMessage()
     {
-        var formContent =
-            new MultipartFormDataContent($"{BoundaryPrefix}{DateTime.Now.Ticks}");
+        var formContent = new MultipartFormDataContent($"{BoundaryPrefix}{DateTime.Now.Ticks}");
 
-        foreach (var item in this.ToHttpContent()) formContent.Add(item);
+        foreach (var item in ToHttpContent()) formContent.Add(item);
 
-        var message = new HttpRequestMessage(HttpMethod.Post, this.ApiPath)
-        {
-            Content = formContent
-        };
+        var message = new HttpRequestMessage(HttpMethod.Post, ApiPath) { Content = formContent };
 
-        if (this.Headers.Any())
-            foreach (var header in this.Headers)
+        if (Headers?.Any() ?? false)
+            foreach (var header in Headers)
                 message.Headers.Add(header.Key, header);
 
         return message;
     }
+
+    public IEnumerable<HttpContent> ToHttpContent() => _toHttpContent();
 }

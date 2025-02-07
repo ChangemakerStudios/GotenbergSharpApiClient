@@ -20,22 +20,44 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder>(TRequest request)
     where TRequest : ChromeRequest
     where TBuilder : BaseChromiumBuilder<TRequest, TBuilder>
 {
-    public TBuilder WithDimensions(Action<DimensionBuilder> action)
+    [Obsolete("Use WithPageProperties")]
+    public TBuilder WithDimensions(Action<PagePropertyBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        var builder = new DimensionBuilder(this.Request.Dimensions);
+        var builder = new PagePropertyBuilder(this.Request.PageProperties);
 
         action(builder);
 
-        this.Request.Dimensions = builder.GetDimensions();
+        this.Request.PageProperties = builder.GetPageProperties();
 
         return (TBuilder)this;
     }
 
-    public TBuilder WithDimensions(Dimensions dimensions)
+    [Obsolete("Use WithPageProperties")]
+    public TBuilder WithDimensions(PageProperties pageProperties)
     {
-        this.Request.Dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
+        this.Request.PageProperties = pageProperties ?? throw new ArgumentNullException(nameof(pageProperties));
+        return (TBuilder)this;
+    }
+
+    public TBuilder WithPageProperties(Action<PagePropertyBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        var builder = new PagePropertyBuilder(this.Request.PageProperties);
+
+        action(builder);
+
+        this.Request.PageProperties = builder.GetPageProperties();
+
+        return (TBuilder)this;
+    }
+
+    public TBuilder WithPageProperties(PageProperties pageProperties)
+    {
+        this.Request.PageProperties = pageProperties ?? throw new ArgumentNullException(nameof(pageProperties));
+
         return (TBuilder)this;
     }
 
