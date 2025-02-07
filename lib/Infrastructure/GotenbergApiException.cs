@@ -15,6 +15,8 @@
 
 using System.Net;
 
+using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
+
 // ReSharper disable All CA1032
 // ReSharper disable All CA1822 
 namespace Gotenberg.Sharp.API.Client.Infrastructure

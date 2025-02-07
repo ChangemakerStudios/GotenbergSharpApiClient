@@ -53,6 +53,15 @@ public static class Constants
         public static class All
         {
             public const string Trace = "Gotenberg-Trace";
+
+            public static class ApiPaths
+            {
+                public const string Version = "version";
+
+                public const string Debug = "debug";
+
+                public const string Health = "health";
+            }
         }
 
         public static class SharedFormFieldNames

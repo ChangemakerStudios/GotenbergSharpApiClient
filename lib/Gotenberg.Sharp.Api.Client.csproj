@@ -14,13 +14,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<PackageVersion>2.4.0</PackageVersion>
+		<PackageVersion>2.5</PackageVersion>
 		<PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
 		</Description>
 		<IncludeSymbols>True</IncludeSymbols>
 		<PackageReleaseNotes>
+			v2.5 - Renamed "Dimentions" to "PageProperties". Added support for 'GenerateDocumentOutline' and 'OmitBackground.'
 			v2.4 - Updated dependencies. Removed Annotations. Add support for PDF/UA form field. Thank you for the PR @lennartb-!
 			v2.3 - Added Convert Page 'ExportFormFields' flag support (Gotenberg v8.3+ Only). Added .NET 8 target.
 			v2.2 - Added 'SkipNetworkIdle' flag support (Gotenberg v8+ Only). Thank you for the PR @guillaumeduhr! Upgraded nugets to latest. Added .NET 7.0 support.

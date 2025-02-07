@@ -16,6 +16,7 @@
 using System.ComponentModel;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 namespace Gotenberg.Sharp.API.Client;
 
@@ -201,6 +202,31 @@ public class GotenbergSharpClient
 
         return await this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken)
             .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the current version of Gotenberg.
+    /// Custom variants of Gotenberg may not print a strict semver version.
+    /// For instance, the live demo prints 8.17.0-live-demo-snapshot.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public virtual async Task<string?> GetVersion(CancellationToken token = default)
+    {
+        var request = new GetApiRequestImpl(Constants.Gotenberg.All.ApiPaths.Version);
+
+        var response = await SendRequestAsync(request, HttpCompletionOption.ResponseContentRead, token);
+
+        if (response.IsSuccessStatusCode)
+        {
+#if NET5_0_OR_GREATER
+            return await response.Content.ReadAsStringAsync(token);
+#else
+            return await response.Content.ReadAsStringAsync();
+#endif
+        }
+
+        return null;
     }
 
     public virtual async Task FireWebhookAndForgetAsync<TBuilder, TRequest>(

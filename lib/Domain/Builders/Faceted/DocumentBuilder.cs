@@ -34,7 +34,14 @@ public sealed class DocumentBuilder
 
     #region body
 
+    [Obsolete("Use SetContainsMarkdown()")]
     public DocumentBuilder ContainsMarkdown(bool containsMarkdown = true)
+    {
+        this._setContainsMarkdown(containsMarkdown);
+        return this;
+    }
+
+    public DocumentBuilder SetContainsMarkdown(bool containsMarkdown = true)
     {
         this._setContainsMarkdown(containsMarkdown);
         return this;

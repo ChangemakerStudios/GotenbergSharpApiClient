@@ -56,43 +56,85 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
         return this;
     }
 
+    [Obsolete("Use SetPaperWidth")]
     public PagePropertyBuilder PaperWidth(double width)
     {
         this._pageProperties.PaperWidth = width;
         return this;
     }
 
+    [Obsolete("Use SetPaperHeight")]
     public PagePropertyBuilder PaperHeight(double height)
     {
         this._pageProperties.PaperHeight = height;
         return this;
     }
 
+    [Obsolete("Use SetMarginTop")]
     public PagePropertyBuilder MarginTop(double marginTop)
     {
         this._pageProperties.MarginTop = marginTop;
         return this;
     }
 
+    [Obsolete("Use SetMarginBottom")]
     public PagePropertyBuilder MarginBottom(double marginBottom)
     {
         this._pageProperties.MarginBottom = marginBottom;
         return this;
     }
 
+    [Obsolete("Use SetMarginLeft")]
     public PagePropertyBuilder MarginLeft(double marginLeft)
     {
         this._pageProperties.MarginLeft = marginLeft;
         return this;
     }
 
+    [Obsolete("Use SetMarginRight")]
     public PagePropertyBuilder MarginRight(double marginRight)
     {
         this._pageProperties.MarginRight = marginRight;
         return this;
     }
 
-    [Obsolete("Use Landscape()")]
+    public PagePropertyBuilder SetPaperWidth(double width)
+    {
+        this._pageProperties.PaperWidth = width;
+        return this;
+    }
+
+    public PagePropertyBuilder SetPaperHeight(double height)
+    {
+        this._pageProperties.PaperHeight = height;
+        return this;
+    }
+
+    public PagePropertyBuilder SetMarginTop(double marginTop)
+    {
+        this._pageProperties.MarginTop = marginTop;
+        return this;
+    }
+
+    public PagePropertyBuilder SetMarginBottom(double marginBottom)
+    {
+        this._pageProperties.MarginBottom = marginBottom;
+        return this;
+    }
+
+    public PagePropertyBuilder SetMarginLeft(double marginLeft)
+    {
+        this._pageProperties.MarginLeft = marginLeft;
+        return this;
+    }
+
+    public PagePropertyBuilder SetMarginRight(double marginRight)
+    {
+        this._pageProperties.MarginRight = marginRight;
+        return this;
+    }
+
+    [Obsolete("Use SetLandscape()")]
     public PagePropertyBuilder LandScape(bool landscape = true)
     {
         this._pageProperties.Landscape = landscape;
@@ -104,7 +146,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     /// </summary>
     /// <param name="landscape"></param>
     /// <returns></returns>
-    public PagePropertyBuilder Landscape(bool landscape = true)
+    public PagePropertyBuilder SetLandscape(bool landscape = true)
     {
         this._pageProperties.Landscape = landscape;
         return this;
@@ -115,7 +157,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     /// </summary>
     /// <param name="prefer"></param>
     /// <returns></returns>
-    public PagePropertyBuilder PreferCssPageSize(bool prefer = true)
+    public PagePropertyBuilder SetPreferCssPageSize(bool prefer = true)
     {
         this._pageProperties.PreferCssPageSize = prefer;
         return this;
@@ -126,7 +168,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     /// </summary>
     /// <param name="omitBackground"></param>
     /// <returns></returns>
-    public PagePropertyBuilder OmitBackground(bool omitBackground = true)
+    public PagePropertyBuilder SetOmitBackground(bool omitBackground = true)
     {
         this._pageProperties.OmitBackground = omitBackground;
         return this;
@@ -137,7 +179,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     /// </summary>
     /// <param name="printBackground"></param>
     /// <returns></returns>
-    public PagePropertyBuilder PrintBackground(bool printBackground = true)
+    public PagePropertyBuilder SetPrintBackground(bool printBackground = true)
     {
         this._pageProperties.PrintBackground = printBackground;
         return this;
@@ -148,7 +190,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     /// </summary>
     /// <param name="generateDocumentOutline"></param>
     /// <returns></returns>
-    public PagePropertyBuilder GenerateDocumentOutline(bool generateDocumentOutline = true)
+    public PagePropertyBuilder SetGenerateDocumentOutline(bool generateDocumentOutline = true)
     {
         this._pageProperties.GenerateDocumentOutline = generateDocumentOutline;
         return this;
