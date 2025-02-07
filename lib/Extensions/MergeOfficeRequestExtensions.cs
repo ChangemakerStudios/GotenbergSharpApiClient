@@ -28,7 +28,7 @@ internal static class MergeOfficeRequestExtensions
             yield return BuildRequestBase.CreateFormDataItem(
                 request.PageRanges,
                 Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
-        
+
         if (request.ExportFormFields.HasValue)
             yield return BuildRequestBase.CreateFormDataItem(
                 request.ExportFormFields.Value,

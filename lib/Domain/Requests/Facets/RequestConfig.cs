@@ -32,7 +32,7 @@ public sealed class RequestConfig : IConvertToHttpContent
         if (this.PageRanges.IsSet())
             yield return BuildRequestBase.CreateFormDataItem(
                 this.PageRanges,
-                Constants.Gotenberg.Chromium.Shared.Dims.PageRanges);
+                Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
 
         if (this.ResultFileName.IsSet())
             yield return BuildRequestBase.CreateFormDataItem(

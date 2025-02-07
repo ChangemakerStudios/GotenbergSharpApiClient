@@ -214,7 +214,7 @@ public static class Constants
                 /// <summary>
                 ///     Page properties
                 /// </summary>
-                public static class Dims
+                public static class PageProperties
                 {
                     public const string PaperWidth = "paperWidth";
 
@@ -231,6 +231,10 @@ public static class Constants
                     public const string PreferCssPageSize = "preferCssPageSize";
 
                     public const string PrintBackground = "printBackground";
+
+                    public const string OmitBackground = "omitBackground";
+
+                    public const string GenerateDocumentOutline = "generateDocumentOutline";
 
                     public const string Landscape = CrossCutting.Landscape;
 

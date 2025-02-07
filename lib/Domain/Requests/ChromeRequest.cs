@@ -17,15 +17,15 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class ChromeRequest : BuildRequestBase
     {
-        public Dimensions Dimensions { get; set; }
-            = Dimensions.ToChromeDefaults();
+        public PageProperties PageProperties { get; set; }
+            = PageProperties.ToChromeDefaults();
 
         public HtmlConversionBehaviors ConversionBehaviors { get; set; }
             = new HtmlConversionBehaviors();
 
         protected override IEnumerable<HttpContent> ToHttpContent()
             => Config.IfNullEmptyContent()
-                .Concat(Dimensions.IfNullEmptyContent())
+                .Concat(this.PageProperties.IfNullEmptyContent())
                 .Concat(ConversionBehaviors.IfNullEmptyContent());
     }
 }
