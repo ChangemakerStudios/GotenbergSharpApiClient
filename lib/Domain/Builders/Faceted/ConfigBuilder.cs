@@ -1,4 +1,4 @@
-//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,6 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-
-
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
@@ -61,7 +59,6 @@ public sealed class ConfigBuilder
     {
         return this.SetResultFileName(resultFileName);
     }
-
     
     public ConfigBuilder SetTrace(string trace)
     {
@@ -73,7 +70,6 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    
     public ConfigBuilder AddWebhook(Action<WebhookBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -85,14 +81,12 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    
     public ConfigBuilder SetWebhook(Webhook webhook)
     {
         this._requestConfig.Webhook = webhook ?? throw new ArgumentNullException(nameof(webhook));
 
         return this;
     }
-
     
     [Obsolete("Renamed: Use SetWebhook instead.")]
     public ConfigBuilder AddWebhook(Webhook webhook)

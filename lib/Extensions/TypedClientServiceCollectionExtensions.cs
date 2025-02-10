@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ namespace Gotenberg.Sharp.API.Client.Extensions;
 
 public static class TypedClientServiceCollectionExtensions
 {
-    
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services)
     {
