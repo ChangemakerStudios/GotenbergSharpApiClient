@@ -103,6 +103,35 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
+    /// Sets the document metadata.
+    /// Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
+    /// </summary>
+    /// <param name="dictionary"></param>
+    /// <returns></returns>
+    public HtmlConversionBehaviorBuilder SetMetadata(IDictionary<string, object> dictionary)
+    {
+        SetMetadata(new JObject(dictionary));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the document metadata.
+    /// Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
+    /// </summary>
+    /// <param name="metadata"></param>
+    /// <returns></returns>
+
+    public HtmlConversionBehaviorBuilder SetMetadata(JObject metadata)
+    {
+        if (metadata == null) throw new InvalidOperationException("metadata is null");
+
+        this._htmlConversionBehaviors.MetaData = metadata;
+
+        return this;
+    }
+
+    /// <summary>
     ///     Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <returns></returns>

@@ -93,7 +93,7 @@ public sealed class Webhook
 
     public IEnumerable<(string, string?)> GetHeaders()
     {
-        if (!this.IsConfigured()) return Enumerable.Empty<(string, string?)>();
+        if (!this.IsConfigured()) return [];
 
         var webHookHeaders = new List<(string Name, string? Value)>
         {

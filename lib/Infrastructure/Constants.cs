@@ -264,6 +264,8 @@ public static class Constants
 
                     public const string ExtraHttpHeaders = "extraHttpHeaders";
 
+                    public const string MetaData = "metadata";
+
                     //javascript
                     public const string FailOnConsoleExceptions = "failOnConsoleExceptions";
 

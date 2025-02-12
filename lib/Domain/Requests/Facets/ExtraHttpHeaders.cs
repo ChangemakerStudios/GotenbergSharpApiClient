@@ -23,7 +23,7 @@ public sealed class ExtraHttpHeaders
     {
         if (name.IsNotSet()) throw new ArgumentException("Header name is null or empty");
 
-        this._headers.Add(name, new[] { value });
+        this._headers.Add(name, [value]);
     }
 
     public void Add(string name, IEnumerable<string> values)

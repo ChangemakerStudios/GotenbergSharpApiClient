@@ -57,6 +57,14 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     public JObject? ExtraHeaders {  get; set; }
 
     /// <summary>
+    /// The metadata to write to the PDF (JSON format).
+    /// Not all metadata are writable.
+    /// Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.MetaData)]
+    public JObject? MetaData {  get; set; }
+
+    /// <summary>
     /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <remarks>
