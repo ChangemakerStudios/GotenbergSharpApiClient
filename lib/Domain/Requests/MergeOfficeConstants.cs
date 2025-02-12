@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +18,23 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 public static class MergeOfficeConstants
 {
     /// <summary>
-    ///  Source is here: https://github.com/gotenberg/gotenberg/blob/main/pkg/modules/libreoffice/uno/uno.go
+    ///  Docs are here: https://gotenberg.dev/docs/routes#office-documents-into-pdfs-route
+    /// Last updated 2/12/2025
     /// </summary>
     public static readonly string[] AllowedExtensions =
-    {
-        ".bib", ".doc", ".xml", ".docx", ".fodt", ".html", ".ltx", ".txt", ".odt",
-        ".ott", ".pdb", ".pdf", ".psw", ".rtf", ".sdw", ".stw", ".sxw", ".uot",
-        ".vor", ".wps", ".epub", ".png", ".bmp", ".emf", ".eps", ".fodg", ".gif",
-        ".jpg", ".jpeg", ".met", ".odd", ".otg", ".pbm", ".pct", ".pgm", ".ppm",
-        ".ras", ".std", ".svg", ".svm", ".swf", ".sxd", ".sxw", ".tif", ".tiff",
-        ".xhtml", ".xpm", ".odp", ".fodp", ".potm", ".pot", ".pptx", ".pps", ".ppt",
-        ".pwp", ".sda", ".sdd", ".sti", ".sxi", ".uop", ".wmf", ".csv", ".dbf", ".dif",
-        ".fods", ".ods", ".ots", ".pxl", ".sdc", ".slk", ".stc", ".sxc", ".uos", ".xls", ".xlt",
-        ".xlsx"
-    };
+    [
+        ".123", ".602", ".abw", ".bib", ".bmp", ".cdr", ".cgm", ".cmx", ".csv", ".cwk",
+        ".dbf", ".dif", ".doc", ".docm", ".docx", ".dot", ".dotm", ".dotx", ".dxf", ".emf",
+        ".eps", ".epub", ".fodg", ".fodp", ".fods", ".fodt", ".fopd", ".gif", ".htm", ".html",
+        ".hwp", ".jpeg", ".jpg", ".key", ".ltx", ".lwp", ".mcw", ".met", ".mml", ".mw",
+        ".numbers", ".odd", ".odg", ".odm", ".odp", ".ods", ".odt", ".otg", ".oth", ".otp",
+        ".ots", ".ott", ".pages", ".pbm", ".pcd", ".pct", ".pcx", ".pdb", ".pdf", ".pgm",
+        ".png", ".pot", ".potm", ".potx", ".ppm", ".pps", ".ppt", ".pptm", ".pptx", ".psd",
+        ".psw", ".pub", ".pwp", ".pxl", ".ras", ".rtf", ".sda", ".sdc", ".sdd", ".sdp",
+        ".sdw", ".sgl", ".slk", ".smf", ".stc", ".std", ".sti", ".stw", ".svg", ".svm",
+        ".swf", ".sxc", ".sxd", ".sxg", ".sxi", ".sxm", ".sxw", ".tga", ".tif", ".tiff",
+        ".txt", ".uof", ".uop", ".uos", ".uot", ".vdx", ".vor", ".vsd", ".vsdm", ".vsdx",
+        ".wb2", ".wk1", ".wks", ".wmf", ".wpd", ".wpg", ".wps", ".xbm", ".xhtml", ".xls",
+        ".xlsb", ".xlsm", ".xlsx", ".xlt", ".xltm", ".xltx", ".xlw", ".xml", ".xpm", ".zabw"
+    ];
 }
