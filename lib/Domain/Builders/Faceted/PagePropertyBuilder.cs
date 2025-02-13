@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Dimensions;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 public sealed class PagePropertyBuilder(PageProperties pageProperties)
@@ -56,83 +58,83 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
         return this;
     }
 
+    #region Obsolete Helper Functions
+
     [Obsolete("Use SetPaperWidth")]
-    public PagePropertyBuilder PaperWidth(double width)
-    {
-        this._pageProperties.PaperWidth = width;
-        return this;
-    }
+    public PagePropertyBuilder PaperWidth(double width) => SetPaperWidth(width);
 
     [Obsolete("Use SetPaperHeight")]
-    public PagePropertyBuilder PaperHeight(double height)
-    {
-        this._pageProperties.PaperHeight = height;
-        return this;
-    }
+    public PagePropertyBuilder PaperHeight(double height) => SetPaperHeight(height);
 
     [Obsolete("Use SetMarginTop")]
-    public PagePropertyBuilder MarginTop(double marginTop)
-    {
-        this._pageProperties.MarginTop = marginTop;
-        return this;
-    }
+    public PagePropertyBuilder MarginTop(double marginTop) => SetMarginTop(marginTop);
 
     [Obsolete("Use SetMarginBottom")]
-    public PagePropertyBuilder MarginBottom(double marginBottom)
-    {
-        this._pageProperties.MarginBottom = marginBottom;
-        return this;
-    }
+    public PagePropertyBuilder MarginBottom(double marginBottom) => SetMarginBottom(marginBottom);
 
     [Obsolete("Use SetMarginLeft")]
-    public PagePropertyBuilder MarginLeft(double marginLeft)
-    {
-        this._pageProperties.MarginLeft = marginLeft;
-        return this;
-    }
+    public PagePropertyBuilder MarginLeft(double marginLeft) => SetMarginLeft(marginLeft);
 
     [Obsolete("Use SetMarginRight")]
-    public PagePropertyBuilder MarginRight(double marginRight)
-    {
-        this._pageProperties.MarginRight = marginRight;
-        return this;
-    }
+    public PagePropertyBuilder MarginRight(double marginRight) => SetMarginRight(marginRight);
 
-    public PagePropertyBuilder SetPaperWidth(double width)
+    #endregion
+
+    #region Dimension Helpers for Inches
+
+    public PagePropertyBuilder SetPaperWidth(double widthInches) => SetPaperWidth(Dimension.FromInches(widthInches));
+
+    public PagePropertyBuilder SetPaperHeight(double heightInches) => SetPaperHeight(Dimension.FromInches(heightInches));
+
+    public PagePropertyBuilder SetMarginTop(double marginTopInches) => SetMarginTop(Dimension.FromInches(marginTopInches));
+
+    public PagePropertyBuilder SetMarginBottom(double marginBottomInches) => SetMarginBottom(Dimension.FromInches(marginBottomInches));
+
+    public PagePropertyBuilder SetMarginLeft(double marginLeftInches) => SetMarginLeft(Dimension.FromInches(marginLeftInches));
+
+    public PagePropertyBuilder SetMarginRight(double marginRightInches) => SetMarginRight(Dimension.FromInches(marginRightInches)); 
+
+    #endregion
+
+    #region Dimension Helpers
+
+    public PagePropertyBuilder SetPaperWidth(Dimension width)
     {
         this._pageProperties.PaperWidth = width;
         return this;
     }
 
-    public PagePropertyBuilder SetPaperHeight(double height)
+    public PagePropertyBuilder SetPaperHeight(Dimension height)
     {
         this._pageProperties.PaperHeight = height;
         return this;
     }
 
-    public PagePropertyBuilder SetMarginTop(double marginTop)
+    public PagePropertyBuilder SetMarginTop(Dimension marginTop)
     {
         this._pageProperties.MarginTop = marginTop;
         return this;
     }
 
-    public PagePropertyBuilder SetMarginBottom(double marginBottom)
+    public PagePropertyBuilder SetMarginBottom(Dimension marginBottom)
     {
         this._pageProperties.MarginBottom = marginBottom;
         return this;
     }
 
-    public PagePropertyBuilder SetMarginLeft(double marginLeft)
+    public PagePropertyBuilder SetMarginLeft(Dimension marginLeft)
     {
         this._pageProperties.MarginLeft = marginLeft;
         return this;
     }
 
-    public PagePropertyBuilder SetMarginRight(double marginRight)
+    public PagePropertyBuilder SetMarginRight(Dimension marginRight)
     {
         this._pageProperties.MarginRight = marginRight;
         return this;
-    }
+    } 
+
+    #endregion
 
     [Obsolete("Use SetLandscape()")]
     public PagePropertyBuilder LandScape(bool landscape = true)

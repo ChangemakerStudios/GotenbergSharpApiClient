@@ -14,30 +14,30 @@
 //  limitations under the License.
 
 using System.ComponentModel;
+using System.Reflection;
+using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class EnumExtensions
 {
-    private static readonly IEnumerable<(Margins MarginType,
-        (double Left, double Right, double Top, double Bottom) Value)> MarginSizer = new[]
-    {
-        (Margins.None, (Left: 0.0, Right: 0.0, Top: 0.0, Bottom: 0.0)),
-        (Margins.Normal, (Left: 1.0, Right: 1.0, Top: 1.0, Bottom: 1.0)),
-        (Margins.Large, (Left: 2.0, Right: 2.0, Top: 2.0, Bottom: 2.0))
-    };
+    private static readonly IEnumerable<(Margins MarginType, (Dimension Left, Dimension Right, Dimension Top, Dimension Bottom) Value)> MarginSizer =
+    [
+        (Margins.None, (Left: Dimension.FromInches(0.0), Right: Dimension.FromInches(0.0), Top: Dimension.FromInches(0.0), Bottom: Dimension.FromInches(0.0))),
+        (Margins.Normal, (Left: Dimension.FromInches(1.0), Right: Dimension.FromInches(1.0), Top: Dimension.FromInches(1.0), Bottom: Dimension.FromInches(1.0))),
+        (Margins.Large, (Left: Dimension.FromInches(2.0), Right: Dimension.FromInches(2.0), Top: Dimension.FromInches(2.0), Bottom: Dimension.FromInches(2.0)))
+    ];
 
-    private static readonly IEnumerable<(PaperSizes Size, (double Width, double Height) Value)>
-        PaperSizer = new[]
-        {
-            (PaperSizes.A3, (Width: 11.7, Height: 16.5)),
-            (PaperSizes.A4, (Width: 8.27, Height: 11.7)),
-            (PaperSizes.A5, (Width: 5.8, Height: 8.2)),
-            (PaperSizes.A6, (Width: 4.1, Height: 5.8)),
-            (PaperSizes.Letter, (Width: 8.5, Height: 11.0)),
-            (PaperSizes.Legal, (Width: 8.5, Height: 14.0)),
-            (PaperSizes.Tabloid, (Width: 11.0, Height: 17.0))
-        };
+    private static readonly IEnumerable<(PaperSizes Size, (Dimension Width, Dimension Height) Value)> PaperSizer =
+    [
+        (PaperSizes.A3, (Width: Dimension.FromInches(11.7), Height: Dimension.FromInches(16.5))),
+        (PaperSizes.A4, (Width: Dimension.FromInches(8.27), Height: Dimension.FromInches(11.7))),
+        (PaperSizes.A5, (Width: Dimension.FromInches(5.8), Height: Dimension.FromInches(8.2))),
+        (PaperSizes.A6, (Width: Dimension.FromInches(4.1), Height: Dimension.FromInches(5.8))),
+        (PaperSizes.Letter, (Width: Dimension.FromInches(8.5), Height: Dimension.FromInches(11.0))),
+        (PaperSizes.Legal, (Width: Dimension.FromInches(8.5), Height: Dimension.FromInches(14.0))),
+        (PaperSizes.Tabloid, (Width: Dimension.FromInches(11.0), Height: Dimension.FromInches(17.0)))
+    ];
 
     internal static string ToFormDataValue(this PdfFormats format)
     {
@@ -46,7 +46,7 @@ internal static class EnumExtensions
             : $"PDF/A-{format.ToString().Substring(1, 2)}";
     }
 
-    internal static (double Width, double Height) ToSelectedSize(this PaperSizes selectedSize)
+    internal static (Dimension Width, Dimension Height) ToSelectedSize(this PaperSizes selectedSize)
     {
         if (!Enum.IsDefined(typeof(PaperSizes), selectedSize))
             throw new InvalidEnumArgumentException(
@@ -60,7 +60,7 @@ internal static class EnumExtensions
         return PaperSizer.First(s => s.Size == selectedSize).Value;
     }
 
-    internal static (double Left, double Right, double Top, double Bottom) ToSelectedMargins(
+    internal static (Dimension Left, Dimension Right, Dimension Top, Dimension Bottom) ToSelectedMargins(
         this Margins selected)
     {
         if (!Enum.IsDefined(typeof(Margins), selected))
@@ -70,5 +70,13 @@ internal static class EnumExtensions
                 typeof(PaperSizes));
 
         return MarginSizer.First(m => m.MarginType == selected).Value;
+    }
+
+    public static string GetDescription(this Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString())!;
+        DescriptionAttribute? attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+        return attribute?.Description ?? value.ToString();
     }
 }

@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.Globalization;
+using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
@@ -22,7 +23,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </summary>
     /// <remarks>
     ///     Paper size and margins have to be provided in inches. Same for margins.
-    ///     See unit info here: https://gotenberg.dev/docs/modules/chromium#routes
+    ///     See unitType info here: https://gotenberg.dev/docs/modules/chromium#routes
     ///     Paper sizes: https://www.prepressure.com/library/paper-size
     /// </remarks>
     public sealed class PageProperties : IConvertToHttpContent
@@ -42,7 +43,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The width of the paper.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.PaperWidth)]
-        public double PaperWidth { get; set; }
+        public Dimension? PaperWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the height of the paper.
@@ -51,7 +52,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The height of the paper.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.PaperHeight)]
-        public double PaperHeight { get; set; }
+        public Dimension? PaperHeight { get; set; }
 
         /// <summary>
         /// Gets or sets the margin top.
@@ -60,7 +61,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin top.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginTop)]
-        public double MarginTop { get; set; }
+        public Dimension? MarginTop { get; set; }
 
         /// <summary>
         /// Gets or sets the margin bottom.
@@ -69,7 +70,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin bottom.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginBottom)]
-        public double MarginBottom { get; set; }
+        public Dimension? MarginBottom { get; set; }
 
         /// <summary>
         /// Gets or sets the margin left.
@@ -78,7 +79,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin left.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginLeft)]
-        public double MarginLeft { get; set; }
+        public Dimension? MarginLeft { get; set; }
 
         /// <summary>
         /// Gets or sets the margin right.
@@ -87,7 +88,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin right.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginRight)]
-        public double MarginRight { get; set; }
+        public Dimension? MarginRight { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="PageProperties"/> is landscape.
@@ -126,7 +127,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 
         #region public methods
 
-        public static PageProperties ToA4WithNoMargins() => new() { PaperWidth = 8.27, PaperHeight = 11.7 };
+        public static PageProperties ToA4WithNoMargins() => new()
+            { PaperWidth = Dimension.FromInches(8.27), PaperHeight = Dimension.FromInches(11.7) };
 
         /// <summary>
         ///     Default Google Chrome printer options
@@ -139,12 +141,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         {
             return new PageProperties
             {
-                PaperWidth = 8.27,
-                PaperHeight = 11.7,
-                MarginTop = 1,
-                MarginBottom = 1,
-                MarginLeft = 1,
-                MarginRight = 1
+                PaperWidth = Dimension.FromInches(8.27),
+                PaperHeight = Dimension.FromInches(11.7),
+                MarginTop = Dimension.FromInches(1),
+                MarginBottom = Dimension.FromInches(1),
+                MarginLeft = Dimension.FromInches(1),
+                MarginRight = Dimension.FromInches(1)
             };
         }
 
@@ -156,9 +158,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         {
             return new PageProperties
             {
-                PaperWidth = 8.26,
-                PaperHeight = 11.69,
-                MarginBottom = .38 //smallest value to get footer to show up is .38
+                PaperWidth = Dimension.FromInches(8.26),
+                PaperHeight = Dimension.FromInches(11.69),
+                MarginBottom = Dimension.FromInches(.38) //smallest value to get footer to show up is .38
             };
         }
 
