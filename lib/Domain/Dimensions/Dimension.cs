@@ -20,6 +20,37 @@ using System.Text.RegularExpressions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Dimensions;
 
+/// <summary>
+/// Represents a numeric dimension and its corresponding unit type (e.g., points, pixels, inches, etc.).
+/// This class is primarily used to specify size values like page dimensions and margins.
+/// 
+/// <para>
+/// Example usage:
+/// <code>
+/// var dim1 = Dimension.Parse("200px");       // Parses from string
+/// var dim2 = Dimension.FromInches(8.5);      // Creates a dimension in inches
+/// var dim3 = new Dimension(21.0, DimensionUnitType.Centimeters);
+/// </code>
+/// </para>
+/// 
+/// <para>
+/// Dimensions are immutable, meaning both <see cref="Value"/> and <see cref="UnitType"/>
+/// cannot be changed after instantiation. The class implements <see cref="IEquatable{Dimension}"/>
+/// to facilitate comparisons.
+/// </para>
+/// 
+/// <para>
+/// Supported unit strings when parsing are: "pt", "px", "in", "mm", "cm", and "pc".
+/// An <see cref="ArgumentException"/> will be thrown if an unsupported or malformed dimension string is provided.
+/// </para>
+/// 
+/// <para>
+/// Use the static convenience methods (e.g., <see cref="FromPoints(double)"/>,
+/// <see cref="FromPixels(double)"/>, <see cref="FromInches(double)"/>, etc.) to create instances
+/// in a specific unit type. The <see cref="Parse(string)"/> method can be used to parse a dimension
+/// string directly, ensuring validation of both the numeric value and the unit type.
+/// </para>
+/// </summary>
 public sealed class Dimension(double value, DimensionUnitType unitType) : IEquatable<Dimension?>
 {
     private static readonly Regex ValidDimensionRegex =
