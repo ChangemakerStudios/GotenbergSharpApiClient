@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Pages;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 /// <summary>
@@ -29,7 +31,7 @@ public sealed class RequestConfig : IConvertToHttpContent
     // ReSharper disable once MethodTooLong
     public IEnumerable<HttpContent> ToHttpContent()
     {
-        if (this.PageRanges.IsSet())
+        if (this.PageRanges?.Pages.Any() ?? false)
             yield return BuildRequestBase.CreateFormDataItem(
                 this.PageRanges,
                 Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
@@ -64,7 +66,7 @@ public sealed class RequestConfig : IConvertToHttpContent
     ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
     ///     This may move...
     /// </remarks>
-    public string? PageRanges { get; set; }
+    public PageRanges? PageRanges { get; set; }
 
     /// <summary>
     ///     If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is

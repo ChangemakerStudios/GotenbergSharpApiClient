@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Pages;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 public sealed class ConfigBuilder
@@ -25,12 +27,16 @@ public sealed class ConfigBuilder
     }
 
     
-    public ConfigBuilder SetPageRanges(string pageRanges)
+    public ConfigBuilder SetPageRanges(string? pageRanges)
     {
-        if (pageRanges.IsNotSet())
-            throw new ArgumentException("Cannot be null or empty", nameof(pageRanges));
+        this._requestConfig.PageRanges = Pages.PageRanges.Create(pageRanges);
 
-        this._requestConfig.PageRanges = pageRanges;
+        return this;
+    }
+
+    public ConfigBuilder SetPageRanges(PageRanges? pageRanges)
+    {
+        this._requestConfig.PageRanges = pageRanges ?? Pages.PageRanges.All;
 
         return this;
     }
