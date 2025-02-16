@@ -14,13 +14,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<PackageVersion>2.5</PackageVersion>
+		<PackageVersion>2.6</PackageVersion>
 		<PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
 		</Description>
 		<IncludeSymbols>True</IncludeSymbols>
 		<PackageReleaseNotes>
+			v2.6 - Updated office Extensions. Added document metadata support. Add Dimension.FromUnit() support for dimensional values.
 			v2.5 - Renamed "Dimentions" to "PageProperties". Added support for 'GenerateDocumentOutline' and 'OmitBackground.'
 			v2.4 - Updated dependencies. Removed Annotations. Add support for PDF/UA form field. Thank you for the PR @lennartb-!
 			v2.3 - Added Convert Page 'ExportFormFields' flag support (Gotenberg v8.3+ Only). Added .NET 8 target.
@@ -41,6 +42,7 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -60,6 +62,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">

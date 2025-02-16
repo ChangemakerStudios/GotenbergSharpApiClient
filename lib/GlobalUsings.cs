@@ -1,4 +1,4 @@
-// Copyright 2019-2024 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");

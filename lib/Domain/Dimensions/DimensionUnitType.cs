@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests
+using System.ComponentModel;
+
+namespace Gotenberg.Sharp.API.Client.Domain.Dimensions
 {
-    public interface IConvertToHttpContent
+    public enum DimensionUnitType
     {
-        IEnumerable<HttpContent> ToHttpContent();
+        [Description("pt")] Points, // Points
+        [Description("px")] Pixels, // Pixels
+        [Description("in")] Inches, // Inches
+        [Description("mm")] Millimeters, // Millimeters
+        [Description("cm")] Centimeters, // Centimeters
+        [Description("pc")] Picas // Picas
     }
 }

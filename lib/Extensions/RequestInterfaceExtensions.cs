@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,49 +13,47 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
-namespace Gotenberg.Sharp.API.Client.Extensions;
-
-public static class RequestInterfaceExtensions
+namespace Gotenberg.Sharp.API.Client.Extensions
 {
-    private const string BoundaryPrefix = Constants.HttpContent.MultipartData.BoundaryPrefix;
-
-    public static IEnumerable<HttpContent> IfNullEmptyContent(
-        this IConvertToHttpContent? converter)
+    public static class RequestInterfaceExtensions
     {
-        return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
-    }
+        private const string BoundaryPrefix = Constants.HttpContent.MultipartData.BoundaryPrefix;
 
-    /// <summary>
-    ///     A helper method for the linqPad scripts
-    /// </summary>
-    /// <param name="items"></param>
-    /// <param name="includeNonText"></param>
-    /// <returns></returns>
-    
-    public static IEnumerable<object> ToDumpFriendlyFormat(
-        this IEnumerable<HttpContent> items,
-        bool includeNonText = false)
-    {
-        return items.Select(
-            c =>
-            {
-                var includeContent = includeNonText ||
-                                     (c.Headers.ContentType?.ToString().StartsWith("text"))
-                                     .GetValueOrDefault();
+        public static IEnumerable<HttpContent> IfNullEmptyContent(
+            this IConvertToHttpContent? converter)
+        {
+            return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
+        }
 
-                return new
+        /// <summary>
+        ///     A helper method for the linqPad scripts
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="includeNonText"></param>
+        /// <returns></returns>
+        public static IEnumerable<object> ToDumpFriendlyFormat(
+            this IEnumerable<HttpContent> items,
+            bool includeNonText = false)
+        {
+            return items.Select(
+                c =>
                 {
-                    Headers = new
+                    var includeContent = includeNonText ||
+                                         (c.Headers.ContentType?.ToString().StartsWith("text"))
+                                         .GetValueOrDefault();
+
+                    return new
                     {
-                        ContentType = string.Join(" | ", c.Headers.ContentType),
-                        Disposition = string.Join(" | ", c.Headers.ContentDisposition)
-                    },
-                    Content = includeContent
-                        ? c.ReadAsStringAsync().Result
-                        : "-its not text-"
-                };
-            });
+                        Headers = new
+                        {
+                            ContentType = string.Join(" | ", c.Headers.ContentType),
+                            Disposition = string.Join(" | ", c.Headers.ContentDisposition)
+                        },
+                        Content = includeContent
+                            ? c.ReadAsStringAsync().Result
+                            : "-its not text-"
+                    };
+                });
+        }
     }
 }

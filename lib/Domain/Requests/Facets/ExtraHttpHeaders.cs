@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ public sealed class ExtraHttpHeaders
     {
         if (name.IsNotSet()) throw new ArgumentException("Header name is null or empty");
 
-        this._headers.Add(name, new[] { value });
+        this._headers.Add(name, [value]);
     }
 
     public void Add(string name, IEnumerable<string> values)

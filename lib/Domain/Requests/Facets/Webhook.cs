@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,7 +93,7 @@ public sealed class Webhook
 
     public IEnumerable<(string, string?)> GetHeaders()
     {
-        if (!this.IsConfigured()) return Enumerable.Empty<(string, string?)>();
+        if (!this.IsConfigured()) return [];
 
         var webHookHeaders = new List<(string Name, string? Value)>
         {

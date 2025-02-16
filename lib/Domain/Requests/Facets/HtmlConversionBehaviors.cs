@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2024 Chris Mohan, Jaben Cargman
+﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +55,14 @@ public class HtmlConversionBehaviors : IConvertToHttpContent
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders)]
     public JObject? ExtraHeaders {  get; set; }
+
+    /// <summary>
+    /// The metadata to write to the PDF (JSON format).
+    /// Not all metadata are writable.
+    /// Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.MetaData)]
+    public JObject? MetaData {  get; set; }
 
     /// <summary>
     /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
