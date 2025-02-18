@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -147,7 +148,7 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
 
     public override string ToString()
     {
-        return $"{Value}{UnitType.GetDescription()}";
+        return $"{Value.ToString(CultureInfo.InvariantCulture)}{UnitType.GetDescription()}";
     }
 
     public override bool Equals(object? obj)

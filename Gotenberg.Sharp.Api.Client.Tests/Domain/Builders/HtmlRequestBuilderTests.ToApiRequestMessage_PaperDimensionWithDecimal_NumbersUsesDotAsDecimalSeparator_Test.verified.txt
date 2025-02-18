@@ -1,0 +1,60 @@
+﻿Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=scale
+
+1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=paperWidth
+
+8.5in
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=paperHeight
+
+12.2in
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=marginTop
+
+1in
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=marginBottom
+
+1in
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=marginLeft
+
+1in
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=marginRight
+
+1in
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=landscape
+
+False
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=preferCssPageSize
+
+False
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=printBackground
+
+False
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=omitBackground
+
+False
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=generateDocumentOutline
+
+False
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=failOnConsoleExceptions
+
+False
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=skipNetworkIdleEvent
+
+False
+Content-Type: text/html
+Content-Disposition: form-data; name=files; filename=index.html
+
+<h1>Hello</h1>

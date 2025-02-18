@@ -288,3 +288,6 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
+# Verify
+*.received.*
+*.received/
