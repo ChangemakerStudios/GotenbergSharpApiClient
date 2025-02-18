@@ -164,9 +164,9 @@ public async Task<Stream> CreateFromMarkdown()
          .AddAsyncHeaderFooter(async
              b => b.SetHeader(await System.IO.File.ReadAllTextAsync(headerPath))
                    .SetFooter(await System.IO.File.ReadAllBytesAsync(footerPath))
-         ).WithDimensions(dimBuilder =>
+         ).WithPageProperties(pp =>
          {
-             dimBuilder.SetPaperSize(PaperSizes.A4)
+             pp.SetPaperSize(PaperSizes.A4)
                  .SetMargins(Margins.None)
                  .SetScale(.90)
                  .SetLandscape();
@@ -213,9 +213,9 @@ IEnumerable<UrlRequestBuilder> CreateBuilders(IEnumerable<Uri> uris)
                 docBuilder.SetHeader(GetHeadFoot(uri.Host.Replace("www.", string.Empty).ToUpper()))
                    .SetFooter(GetHeadFoot(uri.ToString()));
             })
-            .WithDimensions(dimBuilder =>
+            .WithPageProperties(pp =>
             {
-                dimBuilder.UseChromeDefaults()
+                pp.UseChromeDefaults()
                     .SetScale(.90)
                     .SetLandscape()
                     .SetMarginLeft(.5)
