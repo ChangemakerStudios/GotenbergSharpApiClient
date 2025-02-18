@@ -54,7 +54,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Dimensions;
 public sealed class Dimension(double value, DimensionUnitType unitType) : IEquatable<Dimension?>
 {
     private static readonly Regex ValidDimensionRegex =
-        new(@"^\s*(\d+(\.\d+)?)\s*(pt|px|in|mm|cm|pc)\s*$", RegexOptions.IgnoreCase);
+        new(@"^\s*(\d+(\.\d+)?)\s*(pt|px|in|mm|cm|pc)?\s*$", RegexOptions.IgnoreCase);
 
     /// <summary>
     ///     UnitType value
@@ -73,29 +73,28 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
                UnitType == other.UnitType;
     }
 
+    /// <summary>
+    /// Parses a string like "200px", "11in", or defaults to inches if no unit is provided (e.g., "3.4").
+    /// </summary>
+    /// <param name="dimension"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public static Dimension Parse(string dimension)
     {
         if (string.IsNullOrWhiteSpace(dimension))
-        {
-            throw new ArgumentException("Dimension cannot be null or empty.",
-                nameof(dimension));
-        }
+            throw new ArgumentException("Dimension cannot be null or empty.", nameof(dimension));
 
         var match = ValidDimensionRegex.Match(dimension);
         if (!match.Success)
-        {
-            throw new ArgumentException(
-                "Invalid dimension format. Expected formats: '200px', '11in', etc.",
-                nameof(dimension));
-        }
+            throw new ArgumentException("Invalid dimension format. Expected formats: '200px', '11in', or default to inches.", nameof(dimension));
 
-        var value = double.Parse(match.Groups[1].Value);
-        var unitStr = match.Groups[3].Value.ToLower();
+        double value = double.Parse(match.Groups[1].Value);
+        string? unitStr = match.Groups[3].Success ? match.Groups[3].Value.ToLower() : null;
 
-        if (!TryParseUnit(unitStr, out var unit))
-        {
-            throw new ArgumentException($"Unknown unitType '{unitStr}'", nameof(dimension));
-        }
+        // Default to Inches if no unit is provided
+        DimensionUnitType unit = unitStr is not null && TryParseUnit(unitStr, out var parsedUnit) 
+            ? parsedUnit 
+            : DimensionUnitType.Inches;
 
         return new Dimension(value, unit);
     }
@@ -147,7 +146,10 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
 
     public override string ToString()
     {
-        return $"{Value}{UnitType.GetDescription()}";
+        // if it's inches, don't supply anything.
+        var unitType = UnitType == DimensionUnitType.Inches ? "" : UnitType.GetDescription();
+
+        return $"{Value}{unitType}";
     }
 
     public override bool Equals(object? obj)
