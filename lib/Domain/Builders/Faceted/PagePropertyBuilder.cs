@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Security.Cryptography.X509Certificates;
+
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
@@ -21,9 +23,18 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
 {
     PageProperties _pageProperties = pageProperties;
 
+    /// <summary>
+    /// Set Margins to "default" values:
+    /// None: '0 0 0 0'
+    /// Normal: '1in 1in 1in 1in'
+    /// Large: '2in 2in 2in 2in'
+    /// </summary>
+    /// <param name="margins"></param>
+    /// <returns></returns>
     public PagePropertyBuilder SetMargins(Margins margins)
     {
         var selected = margins.ToSelectedMargins();
+
         this._pageProperties.MarginLeft = selected.Left;
         this._pageProperties.MarginRight = selected.Right;
         this._pageProperties.MarginTop = selected.Top;
@@ -35,6 +46,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     public PagePropertyBuilder SetPaperSize(PaperSizes sizes)
     {
         var selected = sizes.ToSelectedSize();
+
         this._pageProperties.PaperWidth = selected.Width;
         this._pageProperties.PaperHeight = selected.Height;
 
@@ -92,7 +104,7 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
 
     public PagePropertyBuilder SetMarginLeft(double marginLeftInches) => SetMarginLeft(Dimension.FromInches(marginLeftInches));
 
-    public PagePropertyBuilder SetMarginRight(double marginRightInches) => SetMarginRight(Dimension.FromInches(marginRightInches)); 
+    public PagePropertyBuilder SetMarginRight(double marginRightInches) => SetMarginRight(Dimension.FromInches(marginRightInches));
 
     #endregion
 
@@ -107,6 +119,59 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
     public PagePropertyBuilder SetPaperHeight(Dimension height)
     {
         this._pageProperties.PaperHeight = height;
+        return this;
+    }
+
+    /// <summary>
+    /// Set margins like the CSS style '1.0in 0.25in 1.0in 0.25in'. (top, right, bottom, left) or
+    /// '1.0in 25.in' (top and bottom, right and left).
+    /// </summary>
+    /// <param name="margins"></param>
+    /// <returns></returns>
+    public PagePropertyBuilder SetMargins(string margins)
+    {
+        var parsedMargins = margins.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+
+        var dimensions = parsedMargins.Select(Dimension.Parse).ToList();
+
+        if (dimensions.Count == 2)
+        {
+            // set top/bottom and right/left
+            SetMargins(dimensions[0], dimensions[1]);
+        }
+
+        if (dimensions.Count == 4)
+        {
+            SetMargins(dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
+        }
+
+        return this;
+    }
+
+    public PagePropertyBuilder SetMargins(
+        Dimension marginTopBottom,
+        Dimension marginRightLeft)
+    {
+        this.SetMarginTop(marginTopBottom);
+        this.SetMarginBottom(marginTopBottom);
+
+        this.SetMarginRight(marginRightLeft);
+        this.SetMarginLeft(marginRightLeft);
+
+        return this;
+    }
+
+    public PagePropertyBuilder SetMargins(
+        Dimension marginTop,
+        Dimension marginRight,
+        Dimension marginBottom,
+        Dimension marginLeft)
+    {
+        this.SetMarginTop(marginTop);
+        this.SetMarginRight(marginTop);
+        this.SetMarginBottom(marginTop);
+        this.SetMarginLeft(marginTop);
+
         return this;
     }
 
