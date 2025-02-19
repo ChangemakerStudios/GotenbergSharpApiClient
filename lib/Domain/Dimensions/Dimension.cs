@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -88,7 +89,7 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
         if (!match.Success)
             throw new ArgumentException("Invalid dimension format. Expected formats: '200px', '11in', or default to inches.", nameof(dimension));
 
-        double value = double.Parse(match.Groups[1].Value);
+        double value = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
         string? unitStr = match.Groups[3].Success ? match.Groups[3].Value.ToLower() : null;
 
         // Default to Inches if no unit is provided
@@ -149,7 +150,7 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
         // if it's inches, don't supply anything.
         var unitType = UnitType == DimensionUnitType.Inches ? "" : UnitType.GetDescription();
 
-        return $"{Value}{unitType}";
+        return $"{Value.ToString("G", CultureInfo.InvariantCulture)}{unitType}";
     }
 
     public override bool Equals(object? obj)
