@@ -92,22 +92,6 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
 
     #endregion
 
-    #region Dimension Helpers for Inches
-
-    public PagePropertyBuilder SetPaperWidth(double widthInches) => SetPaperWidth(Dimension.FromInches(widthInches));
-
-    public PagePropertyBuilder SetPaperHeight(double heightInches) => SetPaperHeight(Dimension.FromInches(heightInches));
-
-    public PagePropertyBuilder SetMarginTop(double marginTopInches) => SetMarginTop(Dimension.FromInches(marginTopInches));
-
-    public PagePropertyBuilder SetMarginBottom(double marginBottomInches) => SetMarginBottom(Dimension.FromInches(marginBottomInches));
-
-    public PagePropertyBuilder SetMarginLeft(double marginLeftInches) => SetMarginLeft(Dimension.FromInches(marginLeftInches));
-
-    public PagePropertyBuilder SetMarginRight(double marginRightInches) => SetMarginRight(Dimension.FromInches(marginRightInches));
-
-    #endregion
-
     #region Dimension Helpers
 
     public PagePropertyBuilder SetPaperWidth(Dimension width)
