@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Pages;
@@ -92,12 +93,12 @@ public sealed class PageRanges : IEquatable<PageRanges>
             }
             else
             {
-                ranges.Add(start == end ? start.ToString() : $"{start}-{end}");
+                ranges.Add(start == end ? start.ToString(CultureInfo.InvariantCulture) : $"{start}-{end}");
                 start = end = page;
             }
         }
 
-        ranges.Add(start == end ? start.ToString() : $"{start}-{end}");
+        ranges.Add(start == end ? start.ToString(CultureInfo.InvariantCulture) : $"{start}-{end}");
         return string.Join(", ", ranges);
     }
 
