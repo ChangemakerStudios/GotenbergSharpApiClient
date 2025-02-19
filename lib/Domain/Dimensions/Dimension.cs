@@ -192,4 +192,8 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
     {
         return !Equals(left, right);
     }
+
+    // Implicit conversions from double and int to Dimension (defaulting to Inches)
+    public static implicit operator Dimension(double value) => new(value, DimensionUnitType.Inches);
+    public static implicit operator Dimension(int value) => new(value, DimensionUnitType.Inches);
 }

@@ -19,7 +19,9 @@ public enum Margins
 {
     None = 0,
 
-    Normal = 1,
+    Default = 1,
 
-    Large = 2
+    Normal = 2,
+
+    Large = 3
 }

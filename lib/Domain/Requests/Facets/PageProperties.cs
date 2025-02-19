@@ -28,6 +28,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     /// </remarks>
     public sealed class PageProperties : IConvertToHttpContent
     {
+        public PageProperties()
+        {
+            var defaultPaperSize = PaperSizes.Letter.ToSelectedSize();
+
+            PaperWidth = defaultPaperSize.Width;
+            PaperHeight = defaultPaperSize.Height;
+
+            var defaultMargins = Margins.Default.ToSelectedMargins();
+
+            MarginTop = defaultMargins.Top;
+            MarginBottom = defaultMargins.Bottom;
+            MarginLeft = defaultMargins.Left;
+            MarginRight = defaultMargins.Right;
+        }
+
         #region Properties
 
         /// <summary>
@@ -43,7 +58,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The width of the paper.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.PaperWidth)]
-        public Dimension? PaperWidth { get; set; }
+        public Dimension PaperWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the height of the paper.
@@ -52,7 +67,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The height of the paper.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.PaperHeight)]
-        public Dimension? PaperHeight { get; set; }
+        public Dimension PaperHeight { get; set; }
 
         /// <summary>
         /// Gets or sets the margin top.
@@ -61,7 +76,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin top.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginTop)]
-        public Dimension? MarginTop { get; set; }
+        public Dimension MarginTop { get; set; }
 
         /// <summary>
         /// Gets or sets the margin bottom.
@@ -70,7 +85,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin bottom.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginBottom)]
-        public Dimension? MarginBottom { get; set; }
+        public Dimension MarginBottom { get; set; }
 
         /// <summary>
         /// Gets or sets the margin left.
@@ -79,7 +94,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin left.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginLeft)]
-        public Dimension? MarginLeft { get; set; }
+        public Dimension MarginLeft { get; set; }
 
         /// <summary>
         /// Gets or sets the margin right.
@@ -88,7 +103,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// The margin right.
         /// </value>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.MarginRight)]
-        public Dimension? MarginRight { get; set; }
+        public Dimension MarginRight { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="PageProperties"/> is landscape.
