@@ -36,7 +36,9 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             (PaperSizes.A6, (Width: 4.1, Height: 5.8)),
             (PaperSizes.Letter, (Width: 8.5, Height: 11.0)),
             (PaperSizes.Legal, (Width: 8.5, Height: 14.0)),
-            (PaperSizes.Tabloid, (Width: 11.0, Height: 17.0))
+            (PaperSizes.Tabloid, (Width: 11.0, Height: 17.0)),
+            (PaperSizes.D, (Width: 22.0, Height: 34.0)),
+            (PaperSizes.E, (Width: 34.0, Height: 44.0))
         ];
 
         internal static (Dimension Width, Dimension Height) ToSelectedSize(this PaperSizes selectedSize)
