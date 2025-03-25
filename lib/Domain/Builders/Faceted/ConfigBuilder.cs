@@ -1,4 +1,4 @@
-//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ public sealed class ConfigBuilder
         this._requestConfig = requestConfig;
     }
 
-    
     public ConfigBuilder SetPageRanges(string? pageRanges)
     {
         this._requestConfig.PageRanges = Pages.PageRanges.Create(pageRanges);
@@ -41,14 +40,12 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    
     [Obsolete("Renamed: Use SetPageRanges")]
     public ConfigBuilder PageRanges(string pageRanges)
     {
         return this.SetPageRanges(pageRanges);
     }
 
-    
     public ConfigBuilder SetResultFileName(string resultFileName)
     {
         if (resultFileName.IsNotSet())
@@ -59,13 +56,12 @@ public sealed class ConfigBuilder
         return this;
     }
 
-    
     [Obsolete("Renamed: Use SetResultFileName")]
     public ConfigBuilder ResultFileName(string resultFileName)
     {
         return this.SetResultFileName(resultFileName);
     }
-    
+
     public ConfigBuilder SetTrace(string trace)
     {
         if (trace.IsNotSet())
@@ -93,7 +89,7 @@ public sealed class ConfigBuilder
 
         return this;
     }
-    
+
     [Obsolete("Renamed: Use SetWebhook instead.")]
     public ConfigBuilder AddWebhook(Webhook webhook)
     {

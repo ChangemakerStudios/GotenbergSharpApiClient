@@ -15,17 +15,15 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
-    public sealed class MergeRequest : BuildRequestBase
+    public sealed class MergeRequest : PdfRequestBase
     {
         protected override string ApiPath
             => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
         protected override IEnumerable<HttpContent> ToHttpContent()
         {
-            if (Format != default)
-                yield return CreateFormDataItem(
-                    this.Format.ToFormDataValue(),
-                    Constants.Gotenberg.PdfEngines.Routes.Merge.PdfFormat);
+            foreach (var ci in base.ToHttpContent())
+                yield return ci;
 
             foreach (var ci in Config.IfNullEmptyContent())
                 yield return ci;

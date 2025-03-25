@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,14 @@ using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
-//Libre office has a convert route which can perform merges
-public class MergeOfficeRequest : BuildRequestBase
+/// <summary>
+/// Libre off ice has a convert route which can perform merges
+/// </summary>
+public class MergeOfficeRequest : PdfRequestBase
 {
     private readonly IResolveContentType _resolver = new ResolveContentTypeImplementation();
 
-    protected override string ApiPath
-        => Constants.Gotenberg.LibreOffice.ApiPaths.MergeOffice;
+    protected override string ApiPath => Constants.Gotenberg.LibreOffice.ApiPaths.MergeOffice;
 
     public bool PrintAsLandscape { get; set; }
 
@@ -36,42 +37,18 @@ public class MergeOfficeRequest : BuildRequestBase
     ///     This may move...
     /// </remarks>
     public string? PageRanges { get; set; }
-    
-    /// <summary>
-    /// Set whether to export the form fields or to use the inputted/selected
-    /// content of the fields. Default is TRUE.
-    /// </summary>
-    /// <remarks>
-    /// Gotenberg v8.3+
-    /// </remarks>
-    public bool? ExportFormFields { get; set; }
-
-    /// <summary>
-    ///     Tells gotenberg to perform the conversion with unoconv.
-    ///     If you specify this with a Format the API has unoconv convert it to that.
-    ///     Note: the documentation says you can't use both together but that regards request headers.
-    ///     When true and Format is not set, the client falls back to PDF/A-1a.
-    /// </summary>
-    public bool UseNativePdfFormat { get; set; }
-
-    /// <summary>
-    ///    This tells gotenberg to enable Universal Access for the resulting PDF.
-    /// </summary>
-    public bool EnablePdfUa { get; set; }
 
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
-        var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty()
-            .ToList();
+        var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty().ToList();
 
         if (validItems.Count < 1)
-            throw new
-                ArgumentException(
-                    $"No Valid Office Documents to Convert. Valid extensions: {string.Join(", ", MergeOfficeConstants.AllowedExtensions)}");
+            throw new ArgumentException(
+                $"No Valid Office Documents to Convert. Valid extensions: {string.Join(
+                    ", ",
+                    MergeOfficeConstants.AllowedExtensions)}");
 
-        yield return CreateFormDataItem(
-            "true",
-            Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
+        yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
 
         foreach (var item in validItems.ToHttpContent())
             yield return item;
@@ -79,7 +56,12 @@ public class MergeOfficeRequest : BuildRequestBase
         foreach (var item in this.Config.IfNullEmptyContent())
             yield return item;
 
-        foreach (var item in this.PropertiesToHttpContent())
-            yield return item;
+        if (this.PrintAsLandscape)
+            yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
+
+        if (this.PageRanges.IsSet())
+            yield return CreateFormDataItem(this.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
+
+        foreach (var content in base.ToHttpContent()) yield return content;
     }
 }

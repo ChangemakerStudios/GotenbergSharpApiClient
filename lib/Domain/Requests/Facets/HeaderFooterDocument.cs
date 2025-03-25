@@ -1,4 +1,4 @@
-//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,38 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
-public class HeaderFooterDocument : IConvertToHttpContent
+public class HeaderFooterDocument : FacetBase
 {
     [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Header)]
-    public ContentItem? Header {  get; internal set; }
+    public ContentItem? Header { get; internal set; }
 
     [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Shared.FileNames.Footer)]
-    public ContentItem? Footer {  get; internal set; }
-
-    public IEnumerable<HttpContent> ToHttpContent()
-    {
-        return MultiFormPropertyItem.FromType(this.GetType())
-            .Select(
-                item =>
-                {
-                    var value = (ContentItem?)item.Property.GetValue(this);
-
-                    if (value == null) return null;
-
-                    var contentItem = value.ToHttpContentItem();
-
-                    contentItem.Headers.ContentType =
-                        new MediaTypeHeaderValue(item.Attribute.MediaType);
-
-                    contentItem.Headers.ContentDisposition =
-                        new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
-                            { Name = item.Attribute.Name, FileName = item.Attribute.FileName };
-
-                    return contentItem;
-                }).WhereNotNull();
-    }
+    public ContentItem? Footer { get; internal set; }
 }

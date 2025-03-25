@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>
@@ -28,18 +26,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 /// </remarks>
 public sealed class HtmlRequest(bool containsMarkdown) : ChromeRequest
 {
-    
     public HtmlRequest()
         : this(false)
     {
     }
 
-    protected override string ApiPath
-        => this.ContainsMarkdown
+    protected override string ApiPath =>
+        this.ContainsMarkdown
             ? Constants.Gotenberg.Chromium.ApiPaths.ConvertMarkdown
             : Constants.Gotenberg.Chromium.ApiPaths.ConvertHtml;
 
-    
     public bool ContainsMarkdown { get; internal set; } = containsMarkdown;
 
     public FullDocument Content { get; internal set; } = new();
@@ -52,9 +48,7 @@ public sealed class HtmlRequest(bool containsMarkdown) : ChromeRequest
         if (this.Content.Body == null)
             throw new InvalidOperationException("You need to Add at least a body");
 
-        return base.ToHttpContent()
-            .Concat(this.Content.IfNullEmptyContent())
-            .Concat(this.Assets.IfNullEmptyContent());
+        return base.ToHttpContent().Concat(this.Content.IfNullEmptyContent()).Concat(this.Assets.IfNullEmptyContent());
     }
 
     protected override void Validate()

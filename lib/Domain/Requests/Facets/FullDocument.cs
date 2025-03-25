@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     /// <summary>
@@ -24,6 +22,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     public sealed class FullDocument : HeaderFooterDocument
     {
         [MultiFormHeader(fileName: Constants.Gotenberg.Chromium.Routes.Html.IndexFile)]
-        public ContentItem? Body {  get; internal set; }
+        public ContentItem? Body { get; internal set; }
     }
 }

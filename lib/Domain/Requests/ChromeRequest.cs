@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +17,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class ChromeRequest : BuildRequestBase
     {
-        public PageProperties PageProperties { get; set; }
-            = PageProperties.ToChromeDefaults();
+        public PageProperties PageProperties { get; set; } = PageProperties.ToChromeDefaults();
 
-        public HtmlConversionBehaviors ConversionBehaviors { get; set; }
-            = new HtmlConversionBehaviors();
+        public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
-        protected override IEnumerable<HttpContent> ToHttpContent()
-            => Config.IfNullEmptyContent()
+        protected override IEnumerable<HttpContent> ToHttpContent() =>
+            Config.IfNullEmptyContent()
                 .Concat(this.PageProperties.IfNullEmptyContent())
                 .Concat(ConversionBehaviors.IfNullEmptyContent());
     }

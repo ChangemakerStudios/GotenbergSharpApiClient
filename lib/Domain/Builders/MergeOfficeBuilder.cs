@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,6 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-
-using System.Diagnostics.CodeAnalysis;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
@@ -45,46 +43,29 @@ public sealed class MergeOfficeBuilder()
     }
 
     /// <summary>
-    ///     Set whether to export the form fields or to use the inputted/selected
-    ///     content of the fields. Default is TRUE.
+    ///     Convert the resulting PDF into the given PDF/A format.
     /// </summary>
-    /// <remarks>
-    ///     Gotenberg v8.3+
-    /// </remarks>
-    public MergeOfficeBuilder SetExportFormFields(bool exportFormFields)
+    public MergeOfficeBuilder SetPdfFormat(LibrePdfFormats format)
     {
-        this.Request.ExportFormFields = exportFormFields;
+        this.Request.PdfFormat = format;
         return this;
     }
 
     /// <summary>
-    ///     This tells gotenberg to use unoconv to perform the conversion.
-    ///     When <see cref="MergeOfficeRequest.Format" /> is not set it defaults to using PDF/A-1a
+    /// 	Flatten the resulting PDF.
     /// </summary>
-    public MergeOfficeBuilder UseNativePdfFormat()
+    public MergeOfficeBuilder SetFlatten(bool enableFlatten = true)
     {
-        this.Request.UseNativePdfFormat = true;
-        return this;
-    }
-
-    /// <summary>
-    ///     This tells gotenberg to use unoconv to perform the conversion in the specified format.
-    /// </summary>
-    public MergeOfficeBuilder UseNativePdfFormat(PdfFormats format)
-    {
-        this.Request.UseNativePdfFormat = true;
-        this.Request.Format = format;
-
+        this.Request.EnableFlatten = enableFlatten;
         return this;
     }
 
     /// <summary>
     ///     This tells gotenberg to enable Universal Access for the resulting PDF.
     /// </summary>
-    public MergeOfficeBuilder EnablePdfUa()
+    public MergeOfficeBuilder SetPdfUa(bool enablePdfUa = true)
     {
-        this.Request.EnablePdfUa = true;
-
+        this.Request.EnablePdfUa = enablePdfUa;
         return this;
     }
 }
