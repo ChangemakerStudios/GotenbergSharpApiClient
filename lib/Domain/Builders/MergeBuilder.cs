@@ -15,5 +15,32 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public sealed class MergeBuilder()
-    : BaseMergeBuilder<MergeRequest, MergeBuilder>(new MergeRequest());
+public sealed class MergeBuilder() : BaseMergeBuilder<MergeRequest, MergeBuilder>(new MergeRequest())
+{
+    /// <summary>
+    ///     Convert the resulting PDF into the given PDF/A format.
+    /// </summary>
+    public MergeBuilder SetPdfFormat(LibrePdfFormats format)
+    {
+        this.Request.PdfFormat = format;
+        return this;
+    }
+
+    /// <summary>
+    /// 	Flatten the resulting PDF.
+    /// </summary>
+    public MergeBuilder SetFlatten(bool enableFlatten = true)
+    {
+        this.Request.EnableFlatten = enableFlatten;
+        return this;
+    }
+
+    /// <summary>
+    ///     This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    public MergeBuilder SetPdfUa(bool enablePdfUa = true)
+    {
+        this.Request.EnablePdfUa = enablePdfUa;
+        return this;
+    }
+}

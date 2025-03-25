@@ -1,4 +1,4 @@
-//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 public sealed class UrlRequest : ChromeRequest
 {
-    protected override string ApiPath
-        => Constants.Gotenberg.Chromium.ApiPaths.ConvertUrl;
+    protected override string ApiPath => Constants.Gotenberg.Chromium.ApiPaths.ConvertUrl;
 
     public Uri? Url { get; set; }
 
@@ -31,23 +30,56 @@ public sealed class UrlRequest : ChromeRequest
 
     public ExtraUrlResources? ExtraResources { get; set; }
 
+    /// <summary>
+    /// Convert the resulting PDF into the given PDF/A format.
+    /// </summary>
+    public ConversionPdfFormats? PdfFormat { get; set; }
+
+    /// <summary>
+    ///    This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    public bool? EnablePdfUa { get; set; }
+
+    HttpContent? PdfUaContent()
+    {
+        if (this.EnablePdfUa is null)
+        {
+            return null;
+        }
+
+        return CreateFormDataItem("true", Constants.Gotenberg.Chromium.Shared.UrlConvert.PdfUa);
+    }
+
+    HttpContent? PdfFormatContent()
+    {
+        if (this.PdfFormat is null or ConversionPdfFormats.None)
+        {
+            return null;
+        }
+
+        return CreateFormDataItem(
+            this.PdfFormat.Value.ToFormDataValue(),
+            Constants.Gotenberg.Chromium.Shared.UrlConvert.PdfFormat);
+    }
+
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
         if (this.Url == null) throw new InvalidOperationException("Url is null");
         if (!this.Url.IsAbsoluteUri)
             throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
+        HttpContent?[] items = [this.PdfFormatContent(), this.PdfUaContent()];
+
         return base.ToHttpContent()
             .Concat(Content.IfNullEmptyContent())
             .Concat(ExtraResources.IfNullEmptyContent())
             .Concat(Assets.IfNullEmptyContent())
-            /*.Concat(GetExtraHeaderHttpContent().IfNullEmpty())*/
+            .Concat(items)
             .Concat(
             [
-                CreateFormDataItem(
-                        this.Url,
-                        Constants.Gotenberg.Chromium.Routes.Url.RemoteUrl)
-            ]);
+                CreateFormDataItem(this.Url, Constants.Gotenberg.Chromium.Routes.Url.RemoteUrl)
+            ])
+            .WhereNotNull();
     }
 
     protected override void Validate()

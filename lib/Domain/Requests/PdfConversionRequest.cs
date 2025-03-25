@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,16 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
-public class PdfConversionRequest : BuildRequestBase
+public class PdfConversionRequest : PdfRequestBase
 {
-    protected override string ApiPath
-        => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
+    protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
-        if (Format == default)
-            throw new InvalidOperationException("You must set the Pdf format");
+        foreach (var content in base.ToHttpContent())
+        {
+            yield return content;
+        }
 
         foreach (var item in this.Assets.IfNullEmpty().Where(item => item.IsValid()))
         {
@@ -32,23 +33,15 @@ public class PdfConversionRequest : BuildRequestBase
             contentItem.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                 {
-                    Name = Constants.Gotenberg.SharedFormFieldNames.Files,
-                    FileName = item.Key
+                    Name = Constants.Gotenberg.SharedFormFieldNames.Files, FileName = item.Key
                 };
 
-            contentItem.Headers.ContentType =
-                new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
+            contentItem.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationPdf);
 
             yield return contentItem;
         }
 
-        yield return CreateFormDataItem(
-            Format.ToFormDataValue(),
-            Constants.Gotenberg.PdfEngines.Routes.Convert.PdfFormat);
-
-        foreach (var item in Config
-                     .IfNullEmptyContent()
-                     .Concat(this.Assets.IfNullEmptyContent()))
+        foreach (var item in Config.IfNullEmptyContent().Concat(this.Assets.IfNullEmptyContent()))
         {
             yield return item;
         }

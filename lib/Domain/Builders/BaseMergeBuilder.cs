@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,28 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
-public abstract class BaseMergeBuilder<TRequest, TBuilder>(TRequest request)
-    : BaseBuilder<TRequest, TBuilder>(request)
-    where TRequest : BuildRequestBase
-    where TBuilder : BaseMergeBuilder<TRequest, TBuilder>
+public abstract class BaseMergeBuilder<TRequest, TBuilder>(TRequest request) : BaseBuilder<TRequest, TBuilder>(request)
+    where TRequest : BuildRequestBase where TBuilder : BaseMergeBuilder<TRequest, TBuilder>
 {
-    /// <summary>
-    ///     This tells gotenberg to have OfficeLibre perform the conversion.
-    ///     If you set <see cref="MergeOfficeRequest.UseNativePdfFormat" /> to true
-    ///     then gotenberg will hand the work off to unoconv to do the work
-    /// </summary>
-    
-    public TBuilder SetPdfFormat(PdfFormats format)
-    {
-        this.Request.Format = format;
-        return (TBuilder)this;
-    }
-
-    
     public TBuilder WithAssets(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -44,13 +27,11 @@ public abstract class BaseMergeBuilder<TRequest, TBuilder>(TRequest request)
         return (TBuilder)this;
     }
 
-    
     public TBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
-        this.BuildTasks.Add(
-            asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
+        this.BuildTasks.Add(asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
 
         return (TBuilder)this;
     }

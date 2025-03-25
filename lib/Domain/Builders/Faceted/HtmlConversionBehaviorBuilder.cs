@@ -110,7 +110,7 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns></returns>
     public HtmlConversionBehaviorBuilder SetMetadata(IDictionary<string, object> dictionary)
     {
-        SetMetadata(new JObject(dictionary));
+        SetMetadata(JObject.FromObject(dictionary));
 
         return this;
     }
@@ -121,7 +121,6 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     /// <param name="metadata"></param>
     /// <returns></returns>
-
     public HtmlConversionBehaviorBuilder SetMetadata(JObject metadata)
     {
         if (metadata == null) throw new InvalidOperationException("metadata is null");
@@ -170,11 +169,21 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="format"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public HtmlConversionBehaviorBuilder SetPdfFormat(PdfFormats format)
+    public HtmlConversionBehaviorBuilder SetPdfFormat(ConversionPdfFormats format)
     {
         if (format == default) throw new InvalidOperationException("Invalid PDF format specified");
 
         this._htmlConversionBehaviors.PdfFormat = format;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// </summary>
+    public HtmlConversionBehaviorBuilder SetPdfUa(bool enablePdfUa = true)
+    {
+        this._htmlConversionBehaviors.EnablePdfUa = enablePdfUa;
 
         return this;
     }

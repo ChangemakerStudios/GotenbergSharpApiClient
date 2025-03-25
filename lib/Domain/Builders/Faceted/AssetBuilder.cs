@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 {
     public sealed class AssetBuilder
@@ -26,12 +24,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             this._assets = assets;
         }
 
-        
         public AssetBuilder AddItem(string name, ContentItem value)
         {
             // ReSharper disable once ComplexConditionExpression
-            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet()
-                                || name.LastIndexOf('/') >= 0)
+            if (name.IsNotSet() || new FileInfo(name).Extension.IsNotSet() || name.LastIndexOf('/') >= 0)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(name),
@@ -43,23 +39,16 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
-        
-        public AssetBuilder AddItem(string name, string value) =>
-            AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, string value) => AddItem(name, new ContentItem(value));
 
-        
-        public AssetBuilder AddItem(string name, byte[] value) =>
-            AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, byte[] value) => AddItem(name, new ContentItem(value));
 
-        
-        public AssetBuilder AddItem(string name, Stream value) =>
-            AddItem(name, new ContentItem(value));
+        public AssetBuilder AddItem(string name, Stream value) => AddItem(name, new ContentItem(value));
 
         #region 'n' assets
 
         #region from dictionaries
 
-        
         public AssetBuilder AddItems(Dictionary<string, ContentItem>? items)
         {
             foreach (var item in items.IfNullEmpty())
@@ -70,15 +59,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
             return this;
         }
 
-        
         public AssetBuilder AddItems(Dictionary<string, string>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
-        
         public AssetBuilder AddItems(Dictionary<string, byte[]>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
-        
         public AssetBuilder AddItems(Dictionary<string, Stream>? assets) =>
             AddItems(assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)));
 
@@ -86,31 +72,26 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
 
         #region from KVP enumerables
 
-        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, ContentItem>> assets) =>
             AddItems(
                 new Dictionary<string, ContentItem>(
-                    assets?.ToDictionary(a => a.Key, a => a.Value) ??
-                    throw new ArgumentNullException(nameof(assets))));
+                    assets?.ToDictionary(a => a.Key, a => a.Value) ?? throw new ArgumentNullException(nameof(assets))));
 
-        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, string>> assets) =>
             AddItems(
                 new Dictionary<string, ContentItem>(
-                    assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
-                    throw new ArgumentNullException(nameof(assets))));
+                    assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value))
+                    ?? throw new ArgumentNullException(nameof(assets))));
 
-        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, byte[]>> assets) =>
             AddItems(
-                assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentNullException(nameof(assets)));
+                assets?.ToDictionary(a => a.Key, a => new ContentItem(a.Value))
+                ?? throw new ArgumentNullException(nameof(assets)));
 
-        
         public AssetBuilder AddItems(IEnumerable<KeyValuePair<string, Stream>> assets) =>
             AddItems(
-                assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value)) ??
-                throw new ArgumentNullException(nameof(assets)));
+                assets?.ToDictionary(s => s.Key, a => new ContentItem(a.Value))
+                ?? throw new ArgumentNullException(nameof(assets)));
 
         #endregion
 

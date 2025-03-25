@@ -13,7 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Globalization;
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
@@ -26,7 +25,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
     ///     See unitType info here: https://gotenberg.dev/docs/modules/chromium#routes
     ///     Paper sizes: https://www.prepressure.com/library/paper-size
     /// </remarks>
-    public sealed class PageProperties : IConvertToHttpContent
+    public class PageProperties : FacetBase
     {
         public PageProperties()
         {
@@ -162,65 +161,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
                 MarginBottom = Dimension.FromInches(1),
                 MarginLeft = Dimension.FromInches(1),
                 MarginRight = Dimension.FromInches(1)
-            };
-        }
-
-        /// <summary>
-        /// Defaults used for deliverables
-        /// </summary>
-        /// <returns></returns>
-        public static PageProperties ToDeliverableDefault()
-        {
-            return new PageProperties
-            {
-                PaperWidth = Dimension.FromInches(8.26),
-                PaperHeight = Dimension.FromInches(11.69),
-                MarginBottom = Dimension.FromInches(.38) //smallest value to get footer to show up is .38
-            };
-        }
-
-        /// <summary>
-        /// Transforms the instance to a list of StringContent items
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<HttpContent> ToHttpContent()
-        {
-            return MultiFormPropertyItem.FromType(this.GetType())
-                .Select(
-                    item =>
-                    {
-                        var value = item.Property.GetValue(this);
-
-                        if (value == null) return null;
-
-                        var contentItem = new StringContent(GetValueAsInvariantCultureString(value) ?? "");
-
-                        contentItem.Headers.ContentDisposition =
-                            new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
-                            {
-                                Name = item.Attribute.Name
-                            };
-
-                        return contentItem;
-                    })
-                .WhereNotNull();
-        }
-
-        static string? GetValueAsInvariantCultureString(object value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
-            var cultureInfo = CultureInfo.InvariantCulture;
-
-            return value switch
-            {
-                float f => f.ToString(cultureInfo),
-                double d => d.ToString(cultureInfo),
-                decimal c => c.ToString(cultureInfo),
-                int i => i.ToString(cultureInfo),
-                long l => l.ToString(cultureInfo),
-                DateTime date => date.ToString(cultureInfo),
-                _ => value.ToString()
             };
         }
 

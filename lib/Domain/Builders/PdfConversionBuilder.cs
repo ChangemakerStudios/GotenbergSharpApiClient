@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,23 +13,50 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
-
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
 public sealed class PdfConversionBuilder()
     : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>(new PdfConversionRequest())
 {
-    public PdfConversionBuilder SetFormat(PdfFormats format)
+    /// <summary>
+    /// Convert the resulting PDF into the given PDF/A format.
+    /// </summary>
+    /// <param name="format"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public PdfConversionBuilder SetPdfFormat(LibrePdfFormats format)
     {
         if (format == default) throw new ArgumentNullException(nameof(format));
 
-        this.Request.Format = format;
+        this.Request.PdfFormat = format;
 
         return this;
     }
 
-    
+    /// <summary>
+    /// Flatten the resulting PDF.
+    /// </summary>
+    /// <param name="enableFlatten"></param>
+    /// <returns></returns>
+    public PdfConversionBuilder EnableFlatten(bool enableFlatten = true)
+    {
+        this.Request.EnableFlatten = enableFlatten;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Enable PDF for Universal Access for optimal accessibility.
+    /// </summary>
+    /// <param name="enablePdfUa"></param>
+    /// <returns></returns>
+    public PdfConversionBuilder EnablePdfUa(bool enablePdfUa = true)
+    {
+        this.Request.EnablePdfUa = enablePdfUa;
+
+        return this;
+    }
+
     public PdfConversionBuilder WithPdfs(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -39,7 +66,6 @@ public sealed class PdfConversionBuilder()
         return this;
     }
 
-    
     public PdfConversionBuilder WithPdfsAsync(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));

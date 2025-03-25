@@ -14,17 +14,21 @@
 //  limitations under the License.
 
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class EnumExtensions
 {
-    internal static string ToFormDataValue(this PdfFormats format)
+    internal static string ToFormDataValue(this LibrePdfFormats format)
     {
-        return format == default
-            ? "PDF/A-1a"
-            : $"PDF/A-{format.ToString().Substring(1, 2)}";
+        return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";
+    }
+
+    internal static string ToFormDataValue(this ConversionPdfFormats format)
+    {
+        return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";
     }
 
     public static string GetDescription(this Enum value)

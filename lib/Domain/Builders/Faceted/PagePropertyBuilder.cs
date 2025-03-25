@@ -269,10 +269,5 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
         return this.SetPageProperties(PageProperties.ToChromeDefaults());
     }
 
-    public PagePropertyBuilder UseDeliverableDefaults()
-    {
-        return this.SetPageProperties(PageProperties.ToDeliverableDefault());
-    }
-
     #endregion
 }
