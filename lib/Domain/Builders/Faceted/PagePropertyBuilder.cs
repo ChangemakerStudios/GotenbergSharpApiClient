@@ -152,9 +152,9 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
         Dimension marginLeft)
     {
         this.SetMarginTop(marginTop);
-        this.SetMarginRight(marginTop);
-        this.SetMarginBottom(marginTop);
-        this.SetMarginLeft(marginTop);
+        this.SetMarginRight(marginRight);
+        this.SetMarginBottom(marginBottom);
+        this.SetMarginLeft(marginLeft);
 
         return this;
     }
