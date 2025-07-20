@@ -16,6 +16,7 @@
 using System.ComponentModel;
 
 using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 namespace Gotenberg.Sharp.API.Client;
@@ -227,6 +228,74 @@ public class GotenbergSharpClient
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Captures a screenshot of the specified URL.
+    /// </summary>
+    /// <param name="request">The URL screenshot request</param>
+    /// <param name="cancelToken">Cancellation token</param>
+    /// <returns>A stream containing the screenshot image</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public virtual Task<Stream> UrlToScreenshotAsync(
+        UrlScreenshotRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of the specified URL.
+    /// </summary>
+    /// <param name="builder">The URL screenshot request builder</param>
+    /// <param name="cancelToken">Cancellation token</param>
+    /// <returns>A stream containing the screenshot image</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public virtual async Task<Stream> UrlToScreenshotAsync(
+        UrlScreenshotRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var urlScreenshotRequest = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.UrlToScreenshotAsync(urlScreenshotRequest, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of the specified HTML content.
+    /// </summary>
+    /// <param name="request">The HTML screenshot request</param>
+    /// <param name="cancelToken">Cancellation token</param>
+    /// <returns>A stream containing the screenshot image</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public virtual Task<Stream> HtmlToScreenshotAsync(
+        HtmlScreenshotRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of the specified HTML content.
+    /// </summary>
+    /// <param name="builder">The HTML screenshot request builder</param>
+    /// <param name="cancelToken">Cancellation token</param>
+    /// <returns>A stream containing the screenshot image</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public virtual async Task<Stream> HtmlToScreenshotAsync(
+        HtmlScreenshotRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var htmlScreenshotRequest = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.HtmlToScreenshotAsync(htmlScreenshotRequest, cancelToken).ConfigureAwait(false);
     }
 
     public virtual async Task FireWebhookAndForgetAsync<TBuilder, TRequest>(

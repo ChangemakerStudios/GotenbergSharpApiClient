@@ -107,6 +107,58 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 	return await _sharpClient.UrlToPdfAsync(request);
 }
 ```
+
+### Screenshot Capture
+*Capture screenshots from URLs or HTML content:*
+
+#### URL to Screenshot
+```csharp
+public async Task<Stream> CreateUrlScreenshot()
+{
+    var builder = new UrlScreenshotRequestBuilder()
+        .SetUrl("https://www.example.com")
+        .SetScreenshotBehaviors(b =>
+        {
+            b.SetDimensions(1920, 1080)
+             .SetFormat(ScreenshotImageFormat.Png)
+             .SetClip(true)
+             .SetOmitBackground(false);
+        })
+        .SetConversionBehaviors(b =>
+        {
+            b.EmulateAsScreen()
+             .AddAdditionalHeaders("User-Agent", "GotenbergScreenshotBot/1.0");
+        });
+
+    var request = await builder.BuildAsync();
+    return await _sharpClient.UrlToScreenshotAsync(request);
+}
+```
+
+#### HTML to Screenshot
+```csharp
+public async Task<Stream> CreateHtmlScreenshot()
+{
+    var builder = new HtmlScreenshotRequestBuilder()
+        .AddAsyncDocument(async doc =>
+            doc.SetBody(await GetHtmlContentAsync())
+        )
+        .SetScreenshotBehaviors(b =>
+        {
+            b.SetDimensions(1200, 800)
+             .SetFormat(ScreenshotImageFormat.Jpeg)
+             .SetQuality(90)
+             .SetOptimizeForSpeed(true);
+        })
+        .WithAsyncAssets(async assets =>
+            assets.AddItems(await GetAssetFilesAsync())
+        );
+
+    var request = await builder.BuildAsync();
+    return await _sharpClient.HtmlToScreenshotAsync(request);
+}
+```
+
 ## Merge Office Docs
 *Merges office documents and configures the request time-out:*
 

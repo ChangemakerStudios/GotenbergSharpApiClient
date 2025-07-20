@@ -15,6 +15,8 @@
 
 using System.Globalization;
 
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
 {
     public abstract class FacetBase : IConvertToHttpContent
@@ -70,6 +72,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             {
                 LibrePdfFormats format => format.ToFormDataValue(),
                 ConversionPdfFormats format => format.ToFormDataValue(),
+                ScreenshotImageFormat format => format.ToFormDataValue(),
                 float f => f.ToString(cultureInfo),
                 double d => d.ToString(cultureInfo),
                 decimal c => c.ToString(cultureInfo),

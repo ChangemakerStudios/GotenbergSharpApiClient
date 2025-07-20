@@ -17,6 +17,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class EnumExtensions
@@ -29,6 +31,17 @@ internal static class EnumExtensions
     internal static string ToFormDataValue(this ConversionPdfFormats format)
     {
         return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";
+    }
+
+    internal static string ToFormDataValue(this ScreenshotImageFormat format)
+    {
+        return format switch
+        {
+            ScreenshotImageFormat.Png => "png",
+            ScreenshotImageFormat.Jpeg => "jpeg", 
+            ScreenshotImageFormat.Webp => "webp",
+            _ => "png"
+        };
     }
 
     public static string GetDescription(this Enum value)

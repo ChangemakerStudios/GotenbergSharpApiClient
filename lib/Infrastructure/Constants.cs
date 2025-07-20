@@ -183,6 +183,12 @@ public static class Constants
                 public const string ConvertHtml = $"{Root}/convert/html";
 
                 public const string ConvertMarkdown = $"{Root}/convert/markdown";
+
+                public const string ScreenshotUrl = $"{Root}/screenshot/url";
+
+                public const string ScreenshotHtml = $"{Root}/screenshot/html";
+
+                public const string ScreenshotMarkdown = $"{Root}/screenshot/markdown";
             }
 
             public static class Routes
@@ -211,7 +217,7 @@ public static class Constants
             public static class Shared
             {
                 /// <summary>
-                ///     From the header & footer tabs
+                /// From the header and footer tabs
                 /// </summary>
                 public static class FileNames
                 {
@@ -285,6 +291,25 @@ public static class Constants
                     public const string PdfFormat = CrossCutting.PdfFormat;
 
                     public const string PdfUa = CrossCutting.PdfUa;
+                }
+
+                public static class Screenshot
+                {
+                    public const string Width = "width";
+
+                    public const string Height = "height";
+
+                    public const string Clip = "clip";
+
+                    public const string Format = "format";
+
+                    public const string Quality = "quality";
+
+                    public const string OmitBackground = "omitBackground";
+
+                    public const string OptimizeForSpeed = "optimizeForSpeed";
+
+                    public const string SkipNetworkIdleEvent = "skipNetworkIdleEvent";
                 }
             }
         }
