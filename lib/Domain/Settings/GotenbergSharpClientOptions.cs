@@ -21,6 +21,10 @@ public class GotenbergSharpClientOptions
 
     public Uri ServiceUrl { get; set; } = new Uri("http://localhost:3000");
 
+    /// <summary>
+    /// Convenience property for specifying a health check URL.
+    /// Note: This property is not currently used by the library.
+    /// </summary>
     public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/health");
 
     public RetryOptions RetryPolicy { get; set; } = new RetryOptions();
