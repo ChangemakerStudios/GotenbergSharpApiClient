@@ -42,6 +42,12 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
 
         return this;
     }
+    
+    public PagePropertyBuilder SetSinglePage(bool singlePage = true)
+    {
+        this._pageProperties.SinglePage = singlePage;
+        return this;
+    }
 
     public PagePropertyBuilder SetPaperSize(PaperSizes sizes)
     {

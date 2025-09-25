@@ -137,6 +137,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.GenerateDocumentOutline)]
         public bool GenerateDocumentOutline { get; set; }
 
+        /// <summary>
+        /// Get or set a value indicating whether the PDF should be generated as a single page. (Will override the paper size)
+        /// </summary>
+        [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.SinglePage)]
+        public bool SinglePage { get; set; }
+        
         #endregion
 
         #region public methods
