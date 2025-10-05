@@ -9,27 +9,27 @@ jobs:
       matrix:
         dotnet-version: [8.x]
 
-    services:
-      gotenberg:
-        image: gotenberg/gotenberg:8
-        ports:
-          - 3000:3000
-        env:
-          GOTENBERG_API_BASIC_AUTH_USERNAME: testuser
-          GOTENBERG_API_BASIC_AUTH_PASSWORD: testpass
-        options: >-
-          --health-cmd "curl -f http://localhost:3000/health || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        volumes:
-          - ${{ github.workspace }}:/workspace
-
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Start Gotenberg with Basic Auth
+      run: |
+        docker run -d \
+          --name gotenberg \
+          -p 3000:3000 \
+          -e GOTENBERG_API_BASIC_AUTH_USERNAME=testuser \
+          -e GOTENBERG_API_BASIC_AUTH_PASSWORD=testpass \
+          gotenberg/gotenberg:8 \
+          gotenberg \
+          --api-enable-basic-auth \
+          --api-timeout=1800s \
+          --log-level=debug
+
+        # Wait for Gotenberg to be ready
+        timeout 30 bash -c 'until curl -f http://localhost:3000/health; do sleep 1; done'
 
     - name: Setup Dotnet
       uses: actions/setup-dotnet@v4
