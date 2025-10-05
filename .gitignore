@@ -289,3 +289,4 @@ __pycache__/
 *.xsd.cs
 
 settings.local.json
+examples/**/output

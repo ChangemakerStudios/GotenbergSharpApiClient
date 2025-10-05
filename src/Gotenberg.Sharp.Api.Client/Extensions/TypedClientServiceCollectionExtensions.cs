@@ -52,18 +52,9 @@ public static class TypedClientServiceCollectionExtensions
                 var ops = GetOptions(sp);
                 client.Timeout = ops.TimeOut;
                 client.BaseAddress = ops.ServiceUrl;
-
-                // Add basic auth header if credentials are provided
-                if (!string.IsNullOrWhiteSpace(ops.BasicAuthUsername) &&
-                    !string.IsNullOrWhiteSpace(ops.BasicAuthPassword))
-                {
-                    var credentials = Convert.ToBase64String(
-                        System.Text.Encoding.ASCII.GetBytes($"{ops.BasicAuthUsername}:{ops.BasicAuthPassword}"));
-                    client.DefaultRequestHeaders.Authorization =
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-                }
             });
     }
+
 
     /// <summary>
     /// Registers GotenbergSharpClient with dependency injection using a custom HttpClient configuration.
@@ -82,7 +73,7 @@ public static class TypedClientServiceCollectionExtensions
     {
         if (configureClient == null) throw new ArgumentNullException(nameof(configureClient));
 
-        return services
+        var builder = services
             .AddHttpClient(nameof(GotenbergSharpClient), configureClient)
             .AddTypedClient<GotenbergSharpClient>()
             .ConfigurePrimaryHttpMessageHandler(
@@ -92,8 +83,33 @@ public static class TypedClientServiceCollectionExtensions
                         AutomaticDecompression = DecompressionMethods.GZip
                                                  | DecompressionMethods.Deflate
                     }))
+            .AddHttpMessageHandler(sp =>
+            {
+                var ops = GetOptions(sp);
+
+                var hasUsername = !string.IsNullOrWhiteSpace(ops.BasicAuthUsername);
+                var hasPassword = !string.IsNullOrWhiteSpace(ops.BasicAuthPassword);
+
+                // Validate that both username and password are provided together
+                if (hasUsername ^ hasPassword)
+                {
+                    throw new InvalidOperationException(
+                        "BasicAuth configuration is incomplete. Both BasicAuthUsername and BasicAuthPassword must be set, or neither should be set.");
+                }
+
+                // Add basic auth handler if credentials are configured
+                if (hasUsername && hasPassword)
+                {
+                    return new BasicAuthHandler(ops.BasicAuthUsername!, ops.BasicAuthPassword!);
+                }
+
+                // Return a pass-through handler if no auth is configured
+                return new PassThroughHandler();
+            })
             .AddPolicyHandler(PolicyFactory.CreatePolicyFromSettings)
             .SetHandlerLifetime(TimeSpan.FromMinutes(6));
+
+        return builder;
     }
 
     private static GotenbergSharpClientOptions GetOptions(IServiceProvider sp)

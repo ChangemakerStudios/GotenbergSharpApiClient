@@ -93,7 +93,7 @@ public void ConfigureServices(IServiceCollection services)
 
 ```
 # Using GotenbergSharpClient
-*See the [linqPad folder](linqpad/)* for complete examples.
+*See the [examples folder](examples/)* for complete working examples as console applications.
 
 ## Required Using Statements
 ```csharp
