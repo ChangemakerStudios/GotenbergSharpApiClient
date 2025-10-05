@@ -15,13 +15,28 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
+/// <summary>
+/// Predefined margin sizes for PDF page properties. All values are in inches.
+/// </summary>
 public enum Margins
 {
+    /// <summary>
+    /// No margins (0 inches on all sides).
+    /// </summary>
     None = 0,
 
+    /// <summary>
+    /// Default margins (0.39 inches on all sides).
+    /// </summary>
     Default = 1,
 
+    /// <summary>
+    /// Normal margins (1 inch on all sides).
+    /// </summary>
     Normal = 2,
 
+    /// <summary>
+    /// Large margins (2 inches on all sides).
+    /// </summary>
     Large = 3
 }

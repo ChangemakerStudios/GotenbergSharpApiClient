@@ -17,13 +17,39 @@ using System.ComponentModel;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Dimensions
 {
+    /// <summary>
+    /// Units of measurement for PDF page dimensions and margins.
+    /// </summary>
     public enum DimensionUnitType
     {
-        [Description("pt")] Points, // Points
-        [Description("px")] Pixels, // Pixels
-        [Description("in")] Inches, // Inches
-        [Description("mm")] Millimeters, // Millimeters
-        [Description("cm")] Centimeters, // Centimeters
-        [Description("pc")] Picas // Picas
+        /// <summary>
+        /// Points (1/72 of an inch). Common in typography and print design.
+        /// </summary>
+        [Description("pt")] Points,
+
+        /// <summary>
+        /// Pixels (assumes 96 DPI). Common for screen dimensions.
+        /// </summary>
+        [Description("px")] Pixels,
+
+        /// <summary>
+        /// Inches. Common in US print specifications.
+        /// </summary>
+        [Description("in")] Inches,
+
+        /// <summary>
+        /// Millimeters. Common in international print specifications.
+        /// </summary>
+        [Description("mm")] Millimeters,
+
+        /// <summary>
+        /// Centimeters. Common in international specifications.
+        /// </summary>
+        [Description("cm")] Centimeters,
+
+        /// <summary>
+        /// Picas (1/6 of an inch). Common in typography and print design.
+        /// </summary>
+        [Description("pc")] Picas
     }
 }

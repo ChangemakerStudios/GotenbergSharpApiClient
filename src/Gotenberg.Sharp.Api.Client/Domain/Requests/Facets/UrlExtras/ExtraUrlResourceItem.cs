@@ -21,17 +21,34 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
 using urlConstants = Constants.Gotenberg.Chromium.Routes.Url;
 
+/// <summary>
+/// Represents an external resource (CSS stylesheet or JavaScript file) to inject into URL-based PDF conversions.
+/// </summary>
 public class ExtraUrlResourceItem
 {
     const string LinkFieldName = urlConstants.ExtraLinkTags;
 
     const string ScriptFieldName = urlConstants.ExtraScriptTags;
 
+    /// <summary>
+    /// Creates an extra resource item from a URL string.
+    /// </summary>
+    /// <param name="url">Absolute URL of the CSS or JavaScript resource.</param>
+    /// <param name="itemType">Type of resource (LinkTag for CSS, ScriptTag for JavaScript).</param>
+    /// <exception cref="InvalidOperationException">Thrown when URL is not absolute.</exception>
     public ExtraUrlResourceItem(string url, ExtraUrlResourceType itemType)
         : this(new Uri(url), itemType)
     {
     }
 
+    /// <summary>
+    /// Creates an extra resource item from a URI.
+    /// </summary>
+    /// <param name="url">Absolute URI of the CSS or JavaScript resource.</param>
+    /// <param name="itemType">Type of resource (LinkTag for CSS, ScriptTag for JavaScript).</param>
+    /// <exception cref="ArgumentNullException">Thrown when URL is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when URL is not absolute.</exception>
+    /// <exception cref="InvalidEnumArgumentException">Thrown when itemType is not valid.</exception>
     public ExtraUrlResourceItem(Uri url, ExtraUrlResourceType itemType)
     {
         Url = url ?? throw new ArgumentNullException(nameof(url));
@@ -44,10 +61,14 @@ public class ExtraUrlResourceItem
             itemType == ExtraUrlResourceType.LinkTag ? LinkFieldName : ScriptFieldName;
     }
 
-    
+    /// <summary>
+    /// Gets the URL of the resource to inject.
+    /// </summary>
     public Uri Url { get; }
 
-    
+    /// <summary>
+    /// Gets the type of resource (LinkTag for CSS, ScriptTag for JavaScript).
+    /// </summary>
     public ExtraUrlResourceType ItemType { get; }
 
     internal string FormDataFieldName { get; }

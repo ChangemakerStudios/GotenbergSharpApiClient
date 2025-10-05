@@ -16,13 +16,20 @@
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
 /// <summary>
-///     Any non office files sent in are just ignored.
-///     A nice surprise: Gotenberg/Chrome will merge in all sheets within a multi-sheet excel workbook.
-///     If you send in a csv file but with a xlsx extension, it will merge it in as text.
+/// Builds requests for converting and merging Office documents (Word, Excel, PowerPoint, etc.) into a single PDF
+/// using Gotenberg's LibreOffice module. Supports over 100 file formats including .docx, .xlsx, .pptx, and more.
 /// </summary>
+/// <remarks>
+/// Non-Office files are ignored. Excel workbooks with multiple sheets will have all sheets merged into the PDF.
+/// CSV files with .xlsx extension will be merged as text content.
+/// </remarks>
 public sealed class MergeOfficeBuilder()
     : BaseMergeBuilder<MergeOfficeRequest, MergeOfficeBuilder>(new MergeOfficeRequest())
 {
+    /// <summary>
+    /// Sets the page orientation to landscape for all documents in the merge.
+    /// </summary>
+    /// <returns>The builder instance for method chaining.</returns>
     public MergeOfficeBuilder PrintAsLandscape()
     {
         this.Request.PrintAsLandscape = true;
@@ -30,12 +37,10 @@ public sealed class MergeOfficeBuilder()
     }
 
     /// <summary>
-    ///     If provided, the API will return a pdf containing the pages in the specified range.
+    /// Specifies which pages to include in the resulting PDF. Uses the same format as Chrome print options (e.g., "1-5,8,11-13").
     /// </summary>
-    /// <remarks>
-    ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
-    ///     This may move...
-    /// </remarks>
+    /// <param name="pageRanges">Page range specification string.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public MergeOfficeBuilder SetPageRanges(string pageRanges)
     {
         this.Request.PageRanges = pageRanges;
@@ -43,8 +48,10 @@ public sealed class MergeOfficeBuilder()
     }
 
     /// <summary>
-    ///     Convert the resulting PDF into the given PDF/A format.
+    /// Converts the resulting merged PDF to the specified PDF/A format for long-term archival.
     /// </summary>
+    /// <param name="format">PDF/A format (A1a, A1b, A2a, A2b, A2u, A3a, A3b, or A3u).</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public MergeOfficeBuilder SetPdfFormat(LibrePdfFormats format)
     {
         this.Request.PdfFormat = format;
@@ -52,8 +59,10 @@ public sealed class MergeOfficeBuilder()
     }
 
     /// <summary>
-    /// 	Flatten the resulting PDF.
+    /// Flattens the resulting PDF by removing interactive form fields and annotations, converting them to static content.
     /// </summary>
+    /// <param name="enableFlatten">True to flatten the PDF.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public MergeOfficeBuilder SetFlatten(bool enableFlatten = true)
     {
         this.Request.EnableFlatten = enableFlatten;
@@ -61,8 +70,10 @@ public sealed class MergeOfficeBuilder()
     }
 
     /// <summary>
-    ///     This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// Enables PDF/UA (Universal Access) for enhanced accessibility compliance in the merged PDF.
     /// </summary>
+    /// <param name="enablePdfUa">True to enable PDF/UA compliance.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public MergeOfficeBuilder SetPdfUa(bool enablePdfUa = true)
     {
         this.Request.EnablePdfUa = enablePdfUa;

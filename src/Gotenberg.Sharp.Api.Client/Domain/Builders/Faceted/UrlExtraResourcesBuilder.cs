@@ -19,13 +19,26 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
+/// <summary>
+/// Injects additional CSS stylesheets or JavaScript files into a URL-based PDF conversion before rendering.
+/// Useful for adding custom styling or scripts to pages you don't control.
+/// </summary>
+/// <remarks>
+/// Link tags inject CSS stylesheets (&lt;link rel="stylesheet"&gt;).
+/// Script tags inject JavaScript files (&lt;script src="..."&gt;).
+/// </remarks>
 public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources)
 {
     #region add one
 
     #region link tag
 
-    
+    /// <summary>
+    /// Injects a CSS stylesheet link tag into the page before rendering.
+    /// </summary>
+    /// <param name="url">URL of the CSS stylesheet to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when URL is null or empty.</exception>
     public UrlExtraResourcesBuilder AddLinkTag(string url)
     {
         if (url.IsNotSet()) throw new InvalidOperationException(nameof(url));
@@ -33,7 +46,11 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
         return this.AddLinkTag(new Uri(url));
     }
 
-    
+    /// <summary>
+    /// Injects a CSS stylesheet link tag into the page before rendering.
+    /// </summary>
+    /// <param name="url">URI of the CSS stylesheet to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddLinkTag(Uri url)
     {
         return this.AddItem(new ExtraUrlResourceItem(url, ExtraUrlResourceType.LinkTag));
@@ -43,7 +60,12 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
 
     #region script tag
 
-    
+    /// <summary>
+    /// Injects a JavaScript script tag into the page before rendering.
+    /// </summary>
+    /// <param name="url">URL of the JavaScript file to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when URL is null or empty.</exception>
     public UrlExtraResourcesBuilder AddScriptTag(string url)
     {
         if (url.IsNotSet()) throw new InvalidOperationException(nameof(url));
@@ -51,7 +73,11 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
         return this.AddScriptTag(new Uri(url));
     }
 
-    
+    /// <summary>
+    /// Injects a JavaScript script tag into the page before rendering.
+    /// </summary>
+    /// <param name="url">URI of the JavaScript file to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddScriptTag(Uri url)
     {
         return this.AddItem(new ExtraUrlResourceItem(url, ExtraUrlResourceType.ScriptTag));
@@ -61,7 +87,11 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
 
     #region caller specifies type
 
-    
+    /// <summary>
+    /// Adds a single extra resource with explicit type specification.
+    /// </summary>
+    /// <param name="item">Resource item with URL and type (LinkTag or ScriptTag).</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddItem(ExtraUrlResourceItem item)
     {
         return this.AddItems(new[] { item ?? throw new ArgumentNullException(nameof(item)) });
@@ -75,13 +105,21 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
 
     #region link tags
 
-    
+    /// <summary>
+    /// Injects multiple CSS stylesheet link tags into the page.
+    /// </summary>
+    /// <param name="urls">Collection of CSS stylesheet URLs to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddLinkTags(IEnumerable<string> urls)
     {
         return this.AddLinkTags(urls.IfNullEmpty().Select(u => new Uri(u)));
     }
 
-    
+    /// <summary>
+    /// Injects multiple CSS stylesheet link tags into the page.
+    /// </summary>
+    /// <param name="urls">Collection of CSS stylesheet URIs to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddLinkTags(IEnumerable<Uri> urls)
     {
         return this.AddItems(
@@ -93,13 +131,21 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
 
     #region script tags
 
-    
+    /// <summary>
+    /// Injects multiple JavaScript script tags into the page.
+    /// </summary>
+    /// <param name="urls">Collection of JavaScript file URLs to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddScriptTags(IEnumerable<string> urls)
     {
         return this.AddScriptTags(urls.IfNullEmpty().Select(u => new Uri(u)));
     }
 
-    
+    /// <summary>
+    /// Injects multiple JavaScript script tags into the page.
+    /// </summary>
+    /// <param name="urls">Collection of JavaScript file URIs to inject.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddScriptTags(IEnumerable<Uri> urls)
     {
         return this.AddItems(
@@ -111,7 +157,11 @@ public sealed class UrlExtraResourcesBuilder(ExtraUrlResources extraUrlResources
 
     #region caller specifies type
 
-    
+    /// <summary>
+    /// Adds multiple extra resources with explicit type specifications.
+    /// </summary>
+    /// <param name="items">Collection of resource items with URLs and types.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlExtraResourcesBuilder AddItems(IEnumerable<ExtraUrlResourceItem> items)
     {
         extraUrlResources.Items.AddRange(items.IfNullEmpty());

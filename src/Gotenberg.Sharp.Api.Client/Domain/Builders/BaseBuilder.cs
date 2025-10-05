@@ -15,6 +15,11 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
+/// <summary>
+/// Base class for all Gotenberg request builders. Provides core functionality for building and configuring requests.
+/// </summary>
+/// <typeparam name="TRequest">The type of request being built.</typeparam>
+/// <typeparam name="TBuilder">The concrete builder type for fluent interface chaining.</typeparam>
 public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
     where TRequest : BuildRequestBase
     where TBuilder : BaseBuilder<TRequest, TBuilder>
@@ -26,6 +31,11 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
 
     protected virtual TRequest Request { get; } = request;
 
+    /// <summary>
+    /// Configures request-level settings such as webhooks, page ranges, result filename, and trace ID.
+    /// </summary>
+    /// <param name="action">Configuration action for request settings.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public TBuilder ConfigureRequest(Action<ConfigBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -37,6 +47,11 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
         return (TBuilder)this;
     }
 
+    /// <summary>
+    /// Sets pre-configured request settings.
+    /// </summary>
+    /// <param name="config">Pre-configured RequestConfig instance.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public TBuilder ConfigureRequest(RequestConfig config)
     {
         this.Request.Config = config ?? throw new ArgumentNullException(nameof(config));
@@ -44,6 +59,11 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
         return (TBuilder)this;
     }
 
+    /// <summary>
+    /// Builds the request synchronously. Use when all content is already in memory (no async operations).
+    /// </summary>
+    /// <returns>The configured request ready to send to Gotenberg.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when async methods (AddAsync*, WithAsync*) were used. Use BuildAsync instead.</exception>
     public virtual TRequest Build()
     {
         if (this.BuildTasks.Any()) throw new InvalidOperationException(CallBuildAsyncErrorMessage);
@@ -51,6 +71,11 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
         return this.Request;
     }
 
+    /// <summary>
+    /// Builds the request asynchronously. Use when loading content from streams, files, or using any AddAsync* or WithAsync* methods.
+    /// Safe to use even when no async operations were performed.
+    /// </summary>
+    /// <returns>The configured request ready to send to Gotenberg.</returns>
     public virtual async Task<TRequest> BuildAsync()
     {
         if (this.BuildTasks.Any()) await Task.WhenAll(this.BuildTasks).ConfigureAwait(false);

@@ -15,18 +15,37 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Settings;
 
+/// <summary>
+/// Configuration options for GotenbergSharpClient.
+/// </summary>
+/// <remarks>
+/// Configure these options in appsettings.json under the "GotenbergSharpClient" section
+/// or programmatically using services.Configure&lt;GotenbergSharpClientOptions&gt;().
+/// </remarks>
 public class GotenbergSharpClientOptions
 {
+    /// <summary>
+    /// HTTP timeout for requests to Gotenberg. Default: 3 minutes.
+    /// Increase this for large documents or complex conversions that may take longer to process.
+    /// </summary>
     public TimeSpan TimeOut { get; set; } = TimeSpan.FromMinutes(3);
 
+    /// <summary>
+    /// Base URL of the Gotenberg service. Default: http://localhost:3000.
+    /// Set this to your Gotenberg instance URL (e.g., http://gotenberg:3000 in Docker Compose).
+    /// </summary>
     public Uri ServiceUrl { get; set; } = new Uri("http://localhost:3000");
 
     /// <summary>
-    /// Convenience property for specifying a health check URL.
+    /// Convenience property for specifying a health check URL. Default: http://localhost:3000/health.
     /// Note: This property is not currently used by the library.
     /// </summary>
     public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/health");
 
+    /// <summary>
+    /// Retry policy configuration for handling transient failures. Default: Disabled with 3 retries when enabled.
+    /// Configure retry count, exponential backoff, and logging options.
+    /// </summary>
     public RetryOptions RetryPolicy { get; set; } = new RetryOptions();
 
     /// <summary>
