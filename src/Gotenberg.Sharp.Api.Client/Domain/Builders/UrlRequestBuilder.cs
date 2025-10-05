@@ -17,8 +17,19 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
+/// <summary>
+/// Builds requests for converting remote URLs to PDF using Gotenberg's Chromium module.
+/// Supports header/footer customization, extra CSS/JavaScript injection, and PDF/A conversion.
+/// </summary>
 public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlRequestBuilder>(new UrlRequest())
 {
+    /// <summary>
+    /// Sets the URL to convert to PDF. Must be an absolute URL including protocol (http:// or https://).
+    /// </summary>
+    /// <param name="url">Absolute URL to convert.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown when URL is null or empty.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when URL is not absolute.</exception>
     public UrlRequestBuilder SetUrl(string url)
     {
         if (url.IsNotSet()) throw new ArgumentException("url is either null or empty");
@@ -26,6 +37,13 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
         return this.SetUrl(new Uri(url));
     }
 
+    /// <summary>
+    /// Sets the URL to convert to PDF. Must be an absolute URI.
+    /// </summary>
+    /// <param name="url">Absolute URI to convert.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when URL is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when URL is not absolute.</exception>
     public UrlRequestBuilder SetUrl(Uri url)
     {
         this.Request.Url = url ?? throw new ArgumentNullException(nameof(url));
@@ -35,11 +53,11 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
     }
 
     /// <summary>
-    ///     Sets the format of the resulting PDF document
+    /// Converts the resulting PDF to the specified PDF/A format for long-term archival.
     /// </summary>
-    /// <param name="format"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="format">PDF/A format (A1b, A2b, or A3b).</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when format is invalid.</exception>
     public UrlRequestBuilder SetPdfFormat(ConversionPdfFormats format)
     {
         if (format == default) throw new InvalidOperationException("Invalid PDF format specified");
@@ -50,8 +68,10 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
     }
 
     /// <summary>
-    ///     This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// Enables PDF/UA (Universal Access) for enhanced accessibility compliance.
     /// </summary>
+    /// <param name="enablePdfUa">True to enable PDF/UA compliance.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlRequestBuilder SetPdfUa(bool enablePdfUa = true)
     {
         this.Request.EnablePdfUa = enablePdfUa;
@@ -59,6 +79,12 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
         return this;
     }
 
+    /// <summary>
+    /// Configures custom HTML header and footer that appear on every page of the PDF.
+    /// Header appears at the top margin, footer at the bottom margin.
+    /// </summary>
+    /// <param name="action">Configuration action for header and footer content.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlRequestBuilder AddHeaderFooter(Action<UrlHeaderFooterBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -67,6 +93,11 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
         return this;
     }
 
+    /// <summary>
+    /// Asynchronously configures custom HTML header and footer. Use when loading content from streams or files.
+    /// </summary>
+    /// <param name="asyncAction">Async configuration action for header and footer content.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlRequestBuilder AddAsyncHeaderFooter(Func<UrlHeaderFooterBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
@@ -76,6 +107,12 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
         return this;
     }
 
+    /// <summary>
+    /// Injects additional CSS stylesheets or JavaScript files into the page before rendering.
+    /// Useful for customizing pages you don't control or adding additional styling.
+    /// </summary>
+    /// <param name="action">Configuration action for adding link and script tags.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public UrlRequestBuilder AddExtraResources(Action<UrlExtraResourcesBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));

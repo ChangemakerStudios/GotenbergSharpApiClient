@@ -288,3 +288,5 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
+settings.local.json
+examples/**/output

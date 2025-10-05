@@ -17,6 +17,9 @@ using Gotenberg.Sharp.API.Client.Domain.Pages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
+/// <summary>
+/// Configures request-level settings including page ranges, webhooks, result filename, and trace ID for correlation.
+/// </summary>
 public sealed class ConfigBuilder
 {
     private readonly RequestConfig _requestConfig;
@@ -26,6 +29,11 @@ public sealed class ConfigBuilder
         this._requestConfig = requestConfig;
     }
 
+    /// <summary>
+    /// Specifies which pages to include in the resulting PDF using Chrome print format (e.g., "1-3,5,7-9").
+    /// </summary>
+    /// <param name="pageRanges">Page range specification string, or null for all pages.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public ConfigBuilder SetPageRanges(string? pageRanges)
     {
         this._requestConfig.PageRanges = Pages.PageRanges.Create(pageRanges);
@@ -33,6 +41,11 @@ public sealed class ConfigBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets page ranges using a PageRanges instance.
+    /// </summary>
+    /// <param name="pageRanges">Pre-configured PageRanges instance, or null for all pages.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public ConfigBuilder SetPageRanges(PageRanges? pageRanges)
     {
         this._requestConfig.PageRanges = pageRanges ?? Pages.PageRanges.All;
@@ -46,6 +59,13 @@ public sealed class ConfigBuilder
         return this.SetPageRanges(pageRanges);
     }
 
+    /// <summary>
+    /// Sets the suggested filename for the resulting PDF when Gotenberg returns it.
+    /// Useful when using webhooks to identify which request generated which PDF.
+    /// </summary>
+    /// <param name="resultFileName">Desired filename for the PDF result.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown when filename is null or empty.</exception>
     public ConfigBuilder SetResultFileName(string resultFileName)
     {
         if (resultFileName.IsNotSet())
@@ -62,6 +82,13 @@ public sealed class ConfigBuilder
         return this.SetResultFileName(resultFileName);
     }
 
+    /// <summary>
+    /// Sets a trace ID for correlating this request across logs and metrics in both your application and Gotenberg.
+    /// Useful for debugging and monitoring distributed systems.
+    /// </summary>
+    /// <param name="trace">Trace or correlation ID for this request.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown when trace is null or empty.</exception>
     public ConfigBuilder SetTrace(string trace)
     {
         if (trace.IsNotSet())
@@ -72,6 +99,12 @@ public sealed class ConfigBuilder
         return this;
     }
 
+    /// <summary>
+    /// Configures webhook settings for asynchronous PDF generation. When configured, Gotenberg will POST the
+    /// generated PDF to the specified URL instead of returning it in the response.
+    /// </summary>
+    /// <param name="action">Configuration action for webhook settings.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public ConfigBuilder AddWebhook(Action<WebhookBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -83,6 +116,11 @@ public sealed class ConfigBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets pre-configured webhook settings.
+    /// </summary>
+    /// <param name="webhook">Pre-configured Webhook instance.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public ConfigBuilder SetWebhook(Webhook webhook)
     {
         this._requestConfig.Webhook = webhook ?? throw new ArgumentNullException(nameof(webhook));

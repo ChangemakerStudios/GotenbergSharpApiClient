@@ -1,4 +1,6 @@
-# ![gotenberg icon](https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/develop/lib/Resources/gotenbergSharpClient.PNG) Gotenberg.Sharp.Api.Client
+<h1>
+<img src="https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/refs/heads/develop/resources/gotenberg-sharp-client.png" width="48" height="48" align="top" /> Gotenberg Sharp API Client
+</h1>
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client) 
@@ -39,6 +41,13 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 
 *Note: Use v1.x nugets for Gotenberg v6.*
 
+## IntelliSense Documentation
+All public APIs include comprehensive XML documentation with clear descriptions, parameter details, and links to official Gotenberg documentation. IntelliSense provides:
+- Method descriptions with Gotenberg route documentation links
+- Parameter explanations and valid value ranges
+- Exception documentation for error handling
+- Usage notes and best practices
+
 ## AppSettings
 ```json
   "GotenbergSharpClient": {
@@ -72,6 +81,8 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 ```
 
 ## Configure Services In Startup.cs
+
+### Basic Configuration (using appsettings.json)
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
@@ -79,12 +90,65 @@ public void ConfigureServices(IServiceCollection services)
     services.AddOptions<GotenbergSharpClientOptions>()
 	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
     services.AddGotenbergSharpClient();
-	.....    
+	.....
 }
-
 ```
+
+### Programmatic Configuration
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+	.....
+    // Configure with an action
+    services.AddGotenbergSharpClient(options =>
+    {
+        options.ServiceUrl = new Uri("http://localhost:3000");
+        options.TimeOut = TimeSpan.FromMinutes(5);
+        options.BasicAuthUsername = "username";
+        options.BasicAuthPassword = "password";
+        // Configure retry policy
+        options.RetryPolicy = new RetryPolicyOptions
+        {
+            Enabled = true,
+            RetryCount = 4,
+            BackoffPower = 1.5,
+            LoggingEnabled = true
+        };
+    });
+	.....
+}
+```
+
+### Hybrid Configuration (appsettings + programmatic override)
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+	.....
+    services.AddOptions<GotenbergSharpClientOptions>()
+	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
+
+    // Override or add settings programmatically
+    services.AddGotenbergSharpClient(options =>
+    {
+        options.TimeOut = TimeSpan.FromMinutes(10); // Override timeout
+        options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");
+        options.BasicAuthPassword = Environment.GetEnvironmentVariable("GOTENBERG_PASS");
+    });
+	.....
+}
+```
+
+
 # Using GotenbergSharpClient
-*See the [linqPad folder](linqpad/)* for complete examples. 
+*See the [examples folder](examples/)* for complete working examples as console applications.
+
+## Required Using Statements
+```csharp
+using Gotenberg.Sharp.API.Client;
+using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
+```
 
 ### Html To Pdf 
 *With embedded assets:*
@@ -139,13 +203,14 @@ public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
 }
 ```
 ## Merge Office Docs
-*Merges office documents and configures the request time-out:*
+*Merges office documents:*
 
 ```csharp
 public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 {
 	var builder = new MergeOfficeBuilder()
-		.WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)));
+		.WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)))
+		.SetPdfFormat(LibrePdfFormats.A2b);
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.MergeOfficeDocsAsync(request);
@@ -172,6 +237,92 @@ public async Task<Stream> CreateFromMarkdown()
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+### Working with Cookies
+*Add cookies to the Chromium cookie jar for authenticated requests (v2.8.1+):*
+
+```csharp
+public async Task<Stream> CreatePdfWithCookies()
+{
+	var builder = new UrlRequestBuilder()
+		.SetUrl("https://example.com/protected")
+		.SetConversionBehaviors(b =>
+		{
+			b.AddCookie(new Cookie
+			{
+				Name = "session_token",
+				Value = "abc123xyz",
+				Domain = "example.com",
+				Path = "/",
+				Secure = true,
+				HttpOnly = true,
+				SameSite = "Lax"
+			});
+		})
+		.WithPageProperties(pp => pp.UseChromeDefaults());
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.UrlToPdfAsync(request);
+}
+```
+
+### Document Metadata
+*Add custom metadata to your PDFs (v2.6+):*
+
+```csharp
+public async Task<Stream> CreatePdfWithMetadata()
+{
+	var builder = new HtmlRequestBuilder()
+		.AddDocument(doc => doc.SetBody("<html><body><h1>Document with Metadata</h1></body></html>"))
+		.SetConversionBehaviors(b =>
+		{
+			b.SetMetadata(new Dictionary<string, object>
+			{
+				{ "Author", "John Doe" },
+				{ "Title", "My Document" },
+				{ "Subject", "Important Report" },
+				{ "Keywords", "report, pdf, gotenberg" }
+			});
+		})
+		.WithPageProperties(pp => pp.UseChromeDefaults());
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+
+### PDF Format Conversion
+*Convert PDFs to PDF/A formats (v2.8+):*
+
+```csharp
+public async Task<Stream> ConvertToPdfA(string pdfPath)
+{
+	var builder = new PdfConversionBuilder()
+		.WithPdfs(b => b.AddItem("document.pdf", File.ReadAllBytes(pdfPath)))
+		.SetPdfFormat(LibrePdfFormats.A2b);
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.ConvertPdfDocumentsAsync(request);
+}
+```
+
+### Single Page Output
+*Generate a single-page PDF from multi-page content (v2.8.1+):*
+
+```csharp
+public async Task<Stream> CreateSinglePagePdf()
+{
+	var builder = new UrlRequestBuilder()
+		.SetUrl("https://www.example.com")
+		.WithPageProperties(pp =>
+		{
+			pp.UseChromeDefaults()
+			  .SetSinglePage(true);
+		});
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.UrlToPdfAsync(request);
 }
 ```
 ### Webhook
@@ -272,4 +423,93 @@ async Task<Stream> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests)
     var request = mergeBuilder.Build();
     return await _sharpClient.MergePdfsAsync(request);
 }
-``` 
+```
+
+## Advanced Features
+
+### PDF/UA Support for HTML Conversions
+*Enable Universal Access for accessible PDFs from HTML (v2.4+):*
+
+```csharp
+public async Task<Stream> CreateAccessiblePdf()
+{
+	var builder = new HtmlRequestBuilder()
+		.AddDocument(doc => doc.SetBody("<html><body><h1>Accessible Document</h1></body></html>"))
+		.SetConversionBehaviors(b => b.SetPdfUa(true))
+		.WithPageProperties(pp => pp.UseChromeDefaults());
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+
+### PDF/UA for PDF Conversions
+*Enable Universal Access when converting PDFs to PDF/A (v2.4+):*
+
+```csharp
+public async Task<Stream> ConvertToAccessiblePdfA(string pdfPath)
+{
+	var builder = new PdfConversionBuilder()
+		.WithPdfs(b => b.AddItem("document.pdf", File.ReadAllBytes(pdfPath)))
+		.SetPdfFormat(LibrePdfFormats.A2b)
+		.EnablePdfUa(true);
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.ConvertPdfDocumentsAsync(request);
+}
+```
+
+### Flatten PDFs
+*Flatten PDF forms and annotations (v2.8+):*
+
+```csharp
+public async Task<Stream> FlattenPdf(string pdfPath)
+{
+	var builder = new PdfConversionBuilder()
+		.WithPdfs(b => b.AddItem("form.pdf", File.ReadAllBytes(pdfPath)))
+		.EnableFlatten(true);
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.ConvertPdfDocumentsAsync(request);
+}
+```
+
+### Skip Network Idle Event
+*Speed up conversions by skipping network idle wait (Gotenberg v8+ only):*
+
+```csharp
+public async Task<Stream> FastConversion()
+{
+	var builder = new UrlRequestBuilder()
+		.SetUrl("https://example.com")
+		.SetConversionBehaviors(b => b.SkipNetworkIdleEvent())
+		.WithPageProperties(pp => pp.UseChromeDefaults());
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.UrlToPdfAsync(request);
+}
+```
+
+### Custom Page Properties
+*Fine-tune page dimensions and properties:*
+
+```csharp
+public async Task<Stream> CustomPageProperties()
+{
+	var builder = new HtmlRequestBuilder()
+		.AddDocument(doc => doc.SetBody("<html><body><h1>Custom Page</h1></body></html>"))
+		.WithPageProperties(pp =>
+		{
+			pp.SetPaperSize(PaperSizes.Letter)
+			  .SetMargins(Margins.Normal)
+			  .SetScale(0.95)
+			  .SetLandscape()
+			  .SetPrintBackground(true)
+			  .SetGenerateDocumentOutline(true)
+			  .SetOmitBackground(false);
+		});
+
+	var request = await builder.BuildAsync();
+	return await _sharpClient.HtmlToPdfAsync(request);
+}
+```

@@ -17,6 +17,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
+/// <summary>
+/// Configures Chromium rendering behaviors for HTML and URL to PDF conversions.
+/// Includes settings for wait delays, HTTP headers, cookies, metadata, PDF format, and accessibility.
+/// </summary>
 public sealed class HtmlConversionBehaviorBuilder
 {
     private readonly HtmlConversionBehaviors _htmlConversionBehaviors;
@@ -79,13 +83,13 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    ///     Sets extra HTTP headers that Chromium will send when loading the HTML
+    /// Adds custom HTTP headers that Chromium will send when loading the HTML. Useful for authentication tokens,
+    /// custom request identification, or triggering specific server behavior.
     /// </summary>
-    /// <param name="headerName"></param>
-    /// <param name="headerValue"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    /// <exception cref="JsonReaderException"></exception>
+    /// <param name="headerName">HTTP header name.</param>
+    /// <param name="headerValue">HTTP header value.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when header name or value is invalid.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(string headerName, string headerValue)
     {
         var header = string.Format("{0}{2}{1}", "{", "}", $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
@@ -94,11 +98,11 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    ///     Sets extra HTTP headers that Chromium will send when loading the HTML
+    /// Adds multiple custom HTTP headers as a JSON object. Useful for adding several headers at once.
     /// </summary>
-    /// <param name="extraHeaders"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="extraHeaders">JSON object containing header name-value pairs.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when extraHeaders is null.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JObject extraHeaders)
     {
         if (extraHeaders == null)

@@ -14,13 +14,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<Version>2.8.1</Version>
-		<PackageTags>Gotenberg pdf C# ApiClient unoconv</PackageTags>
+		<Version>2.8.2</Version>
+		<PackageTags>Gotenberg pdf C# API client unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
 		</Description>
 		<IncludeSymbols>True</IncludeSymbols>
 		<PackageReleaseNotes>
+			v2.8.2 - Added optional Action&lt;GotenbergSharpClientOptions&gt; parameter to AddGotenbergSharpClient for programmatic configuration. Options now optional in DI.
 			v2.8.1 - Added strongly-typed cookie support. Added basic authentication support. Added SinglePage page property. Fixed margins bug. Project restructure (moved /lib to /src).
 			v2.8 - Improving handling of PDF formatting and added flatten support.
 			v2.7 - Fixes issue with "Inches".
@@ -34,8 +35,8 @@
 	    </PackageReleaseNotes>
 		<PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
-		<PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/lib/Resources/gotenbergSharpClient.PNG</PackageIconUrl>
-		<PackageIcon>gotenbergSharpClient-large.PNG</PackageIcon>
+		<PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/resources/gotenberg-sharp-client.png</PackageIconUrl>
+		<PackageIcon>gotenberg-sharp-client.png</PackageIcon>
 		<RepositoryUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -105,8 +106,8 @@
 
 	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
-		<None Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
-		<Resource Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
+		<None Include="..\..\resources\gotenberg-sharp-client.png" Pack="true" PackagePath="\" />
+		<Resource Include="..\..\resources\gotenberg-sharp-client.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
