@@ -17,12 +17,23 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
 
+/// <summary>
+/// Types of external resources that can be injected into URL-based PDF conversions.
+/// </summary>
 public enum ExtraUrlResourceType
 {
-    
+    /// <summary>
+    /// No resource type specified.
+    /// </summary>
     None = 0,
 
+    /// <summary>
+    /// CSS stylesheet injected via link tag (&lt;link rel="stylesheet" href="..."&gt;).
+    /// </summary>
     LinkTag = 1,
 
+    /// <summary>
+    /// JavaScript file injected via script tag (&lt;script src="..."&gt;&lt;/script&gt;).
+    /// </summary>
     ScriptTag = 2
 }
