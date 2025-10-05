@@ -1,5 +1,5 @@
 <h1>
-<img src="https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/refs/heads/develop/resources/gotenberg-sharp-client.png" width="48" height="48" align="top" /> Gotenberg Sharp API Client (C#)
+<img src="https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/refs/heads/develop/resources/gotenberg-sharp-client.png" width="48" height="48" align="top" /> Gotenberg Sharp API Client
 </h1>
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
