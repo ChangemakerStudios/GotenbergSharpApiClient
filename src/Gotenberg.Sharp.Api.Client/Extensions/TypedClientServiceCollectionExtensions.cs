@@ -33,6 +33,7 @@ public static class TypedClientServiceCollectionExtensions
     ///     Configure options via appsettings.json or by calling services.Configure&lt;GotenbergSharpClientOptions&gt;().
     /// </summary>
     /// <param name="services">The service collection.</param>
+    /// <param name="configureClientOptions">Optional function to configure client options after they are retrieved.</param>
     /// <returns>An IHttpClientBuilder for further configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when services is null.</exception>
     /// <remarks>
@@ -41,7 +42,8 @@ public static class TypedClientServiceCollectionExtensions
     ///     Options should be configured in the "GotenbergSharpClient" section of appsettings.json or programmatically.
     /// </remarks>
     public static IHttpClientBuilder AddGotenbergSharpClient(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        Action<GotenbergSharpClientOptions>? configureClientOptions = null)
     {
         if (services == null)
         {
@@ -50,7 +52,10 @@ public static class TypedClientServiceCollectionExtensions
 
         return services.AddGotenbergSharpClient((sp, client) =>
         {
-            var ops = GetOptions(sp);
+            var ops = GetOptions(sp) ?? new GotenbergSharpClientOptions();
+
+            configureClientOptions?.Invoke(ops);
+
             client.Timeout = ops.TimeOut;
             client.BaseAddress = ops.ServiceUrl;
         });
@@ -61,6 +66,7 @@ public static class TypedClientServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="configureClient">Action to configure the HttpClient instance.</param>
+    /// <param name="configureClientOptions">Optional function to configure client options after they are retrieved.</param>
     /// <returns>An IHttpClientBuilder for further configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when configureClient is null.</exception>
     /// <remarks>
@@ -69,7 +75,8 @@ public static class TypedClientServiceCollectionExtensions
     /// </remarks>
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services,
-        Action<IServiceProvider, HttpClient> configureClient)
+        Action<IServiceProvider, HttpClient> configureClient,
+        Action<GotenbergSharpClientOptions>? configureClientOptions = null)
     {
         if (configureClient == null)
         {
@@ -87,7 +94,9 @@ public static class TypedClientServiceCollectionExtensions
                 }))
             .AddHttpMessageHandler(sp =>
             {
-                var ops = GetOptions(sp);
+                var ops = GetOptions(sp) ?? new GotenbergSharpClientOptions();
+
+                configureClientOptions?.Invoke(ops);
 
                 var hasUsername = !string.IsNullOrWhiteSpace(ops.BasicAuthUsername);
                 var hasPassword = !string.IsNullOrWhiteSpace(ops.BasicAuthPassword);
@@ -114,8 +123,8 @@ public static class TypedClientServiceCollectionExtensions
         return builder;
     }
 
-    private static GotenbergSharpClientOptions GetOptions(IServiceProvider sp)
+    private static GotenbergSharpClientOptions? GetOptions(IServiceProvider sp)
     {
-        return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value;
+        return sp.GetService<IOptions<GotenbergSharpClientOptions>>()?.Value;
     }
 }
