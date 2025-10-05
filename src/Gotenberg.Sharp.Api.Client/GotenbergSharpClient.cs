@@ -271,8 +271,8 @@ public class GotenbergSharpClient
     /// Sends a request to Gotenberg configured for asynchronous webhook processing. Returns immediately after
     /// Gotenberg accepts the request. Gotenberg will POST the generated PDF to the configured webhook URL.
     /// </summary>
-    /// <typeparam name="TBuilder">The builder type.</typeparam>
-    /// <typeparam name="TRequest">The request type.</typeparam>
+    /// <typeparam name="TBuilder">The request type.</typeparam>
+    /// <typeparam name="TRequest">The builder type.</typeparam>
     /// <param name="builder">The builder with webhook configuration.</param>
     /// <param name="cancelToken">Cancellation token for the async operation.</param>
     /// <returns>A task that completes when Gotenberg accepts the request (not when PDF is generated).</returns>
