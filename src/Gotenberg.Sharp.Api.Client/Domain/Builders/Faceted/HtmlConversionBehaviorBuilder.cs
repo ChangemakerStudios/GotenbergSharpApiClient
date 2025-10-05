@@ -34,6 +34,11 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <remarks>Prefer <see cref="SetBrowserWaitExpression" /> over waitDelay.</remarks>
     public HtmlConversionBehaviorBuilder SetBrowserWaitDelay(int seconds)
     {
+        if (seconds < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(seconds), "Wait delay must be zero or positive.");
+        }
+
         _htmlConversionBehaviors.WaitDelay = $"{seconds}s";
 
         return this;
@@ -76,21 +81,6 @@ public sealed class HtmlConversionBehaviorBuilder
         _htmlConversionBehaviors.UserAgent = userAgent;
 
         return this;
-    }
-
-    /// <summary>
-    ///     Sets extra HTTP headers that Chromium will send when loading the HTML
-    /// </summary>
-    /// <param name="headerName"></param>
-    /// <param name="headerValue"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    /// <exception cref="JsonReaderException"></exception>
-    public HtmlConversionBehaviorBuilder AddAdditionalHeaders(string headerName, string headerValue)
-    {
-        var header = string.Format("{0}{2}{1}", "{", "}", $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
-
-        return AddAdditionalHeaders(JObject.Parse(header));
     }
 
     /// <summary>

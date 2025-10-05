@@ -211,7 +211,7 @@ public static class Constants
             public static class Shared
             {
                 /// <summary>
-                ///     From the header & footer tabs
+                ///     From the header &amp; footer tabs
                 /// </summary>
                 public static class FileNames
                 {

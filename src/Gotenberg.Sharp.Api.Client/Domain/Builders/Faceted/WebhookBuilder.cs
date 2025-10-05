@@ -79,13 +79,13 @@ public sealed class WebhookBuilder
     
     public WebhookBuilder AddExtraHeader(string name, string value)
     {
-        return this.AddExtraHeader(name, new[] { value });
+        return this.AddExtraHeader(name, [value]);
     }
 
     
     public WebhookBuilder AddExtraHeader(KeyValuePair<string, string> header)
     {
-        return this.AddExtraHeader(header.Key, new[] { header.Value });
+        return this.AddExtraHeader(header.Key, [header.Value]);
     }
 
     

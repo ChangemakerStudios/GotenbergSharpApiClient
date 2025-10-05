@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Newtonsoft.Json.Linq;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 public static class HtmlConversionBehaviorBuilderExtensions
@@ -82,5 +84,19 @@ public static class HtmlConversionBehaviorBuilderExtensions
         }
 
         return builder;
+    }
+
+    /// <summary>
+    ///     Sets extra HTTP headers that Chromium will send when loading the HTML
+    /// </summary>
+    /// <param name="builder">HtmlConversionBehaviorBuilder</param>
+    /// <param name="headerName"></param>
+    /// <param name="headerValue"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="JsonReaderException"></exception>
+    public static HtmlConversionBehaviorBuilder AddAdditionalHeaders(this HtmlConversionBehaviorBuilder builder, string headerName, string headerValue)
+    {
+        return builder.AddAdditionalHeaders(new JObject { [headerName] = headerValue });
     }
 }
