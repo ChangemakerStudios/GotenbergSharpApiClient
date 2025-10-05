@@ -72,11 +72,14 @@ public class GotenbergSharpClient
     protected HttpClient HttpClient { get; }
 
     /// <summary>
-    ///     For remote URL conversions. Works just like <see cref="HtmlToPdfAsync" />
+    /// Converts a remote URL to PDF using Gotenberg's Chromium module.
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
+    /// <param name="request">The URL conversion request.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the generated PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-with-chromium">Gotenberg Chromium Route Documentation</seealso>
     public virtual Task<Stream> UrlToPdfAsync(
         UrlRequest request,
         CancellationToken cancelToken = default)
@@ -87,11 +90,14 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    ///     For remote URL conversions. Works just like <see cref="HtmlToPdfAsync" />
+    /// Converts a remote URL to PDF using Gotenberg's Chromium module with a builder pattern.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
+    /// <param name="builder">The builder for configuring URL conversion settings.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the generated PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-with-chromium">Gotenberg Chromium Route Documentation</seealso>
     public virtual async Task<Stream> UrlToPdfAsync(
         UrlRequestBuilder builder,
         CancellationToken cancelToken = default)
@@ -104,12 +110,14 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    ///     Converts the specified request to a PDF document.
+    /// Converts HTML or Markdown content to PDF using Gotenberg's Chromium module.
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="request">The HTML/Markdown conversion request.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the generated PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-with-chromium">Gotenberg Chromium Route Documentation</seealso>
     public virtual Task<Stream> HtmlToPdfAsync(
         HtmlRequest request,
         CancellationToken cancelToken = default)
@@ -120,12 +128,14 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    ///     Converts the specified request to a PDF document.
+    /// Converts HTML or Markdown content to PDF using Gotenberg's Chromium module with a builder pattern.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="builder">The builder for configuring HTML/Markdown conversion settings.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the generated PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-with-chromium">Gotenberg Chromium Route Documentation</seealso>
     public virtual async Task<Stream> HtmlToPdfAsync(
         HtmlRequestBuilder builder,
         CancellationToken cancelToken = default)
@@ -138,12 +148,14 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    ///     Merges items specified by the request
+    /// Merges multiple PDF files into a single PDF using Gotenberg's PDF engines module.
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="request">The merge request containing PDFs to merge.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the merged PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#merge-pdfs-route">Gotenberg Merge PDFs Route Documentation</seealso>
     public virtual Task<Stream> MergePdfsAsync(
         MergeRequest request,
         CancellationToken cancelToken = default)
@@ -154,10 +166,14 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    ///     Converts one or more office documents into a merged pdf.
+    /// Converts and merges Office documents (Word, Excel, PowerPoint, etc.) into a single PDF using Gotenberg's LibreOffice module.
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancelToken"></param>
+    /// <param name="request">The merge request containing Office documents to convert and merge.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the merged PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-with-libreoffice">Gotenberg LibreOffice Route Documentation</seealso>
     public virtual Task<Stream> MergeOfficeDocsAsync(
         MergeOfficeRequest request,
         CancellationToken cancelToken = default)
@@ -168,10 +184,14 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    ///     Converts one or more office documents into a merged pdf.
+    /// Converts and merges Office documents into a single PDF using Gotenberg's LibreOffice module with a builder pattern.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="cancelToken"></param>
+    /// <param name="builder">The builder for configuring Office document merge settings.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the merged PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-with-libreoffice">Gotenberg LibreOffice Route Documentation</seealso>
     public virtual async Task<Stream> MergeOfficeDocsAsync(
         MergeOfficeBuilder builder,
         CancellationToken cancelToken = default)
@@ -191,6 +211,7 @@ public class GotenbergSharpClient
     /// <returns>A stream containing the converted PDF.</returns>
     /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
     /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-into-pdfa--pdfua-route">Gotenberg PDF/A Conversion Route Documentation</seealso>
     public virtual Task<Stream> ConvertPdfDocumentsAsync(
         PdfConversionRequest request,
         CancellationToken cancelToken = default)
@@ -208,6 +229,7 @@ public class GotenbergSharpClient
     /// <returns>A stream containing the converted PDF.</returns>
     /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
     /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/routes#convert-into-pdfa--pdfua-route">Gotenberg PDF/A Conversion Route Documentation</seealso>
     public virtual async Task<Stream> ConvertPdfDocumentsAsync(
         PdfConversionBuilder builder,
         CancellationToken cancelToken = default)
