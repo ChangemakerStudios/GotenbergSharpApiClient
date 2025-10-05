@@ -1,17 +1,36 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+using Microsoft.Extensions.Configuration;
+
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var options = new GotenbergSharpClientOptions();
+config.GetSection(nameof(GotenbergSharpClient)).Bind(options);
 
 var destinationDirectory = args.Length > 0 ? args[0] : Path.Combine(Directory.GetCurrentDirectory(), "output");
 Directory.CreateDirectory(destinationDirectory);
 
 var resourcePath = Path.Combine(AppContext.BaseDirectory, "resources", "Markdown");
-var path = await CreateFromMarkdown(destinationDirectory, resourcePath);
+var path = await CreateFromMarkdown(destinationDirectory, resourcePath, options);
 
 Console.WriteLine($"PDF created from Markdown: {path}");
 
-static async Task<string> CreateFromMarkdown(string destinationDirectory, string resourcePath)
+static async Task<string> CreateFromMarkdown(string destinationDirectory, string resourcePath, GotenbergSharpClientOptions options)
 {
-    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+    var handler = new HttpClientHandler();
+    var httpClient = new HttpClient(
+        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+            : handler
+    )
+    { BaseAddress = options.ServiceUrl };
+
+    var sharpClient = new GotenbergSharpClient(httpClient);
 
     var builder = new HtmlRequestBuilder()
         .AddAsyncDocument(async b =>

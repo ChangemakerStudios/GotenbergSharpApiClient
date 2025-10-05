@@ -1,20 +1,39 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+using Microsoft.Extensions.Configuration;
 
 // If you get 1 file, the result is a PDF; get more and the API returns a zip containing the results
 // Currently, Gotenberg supports these formats: A2b & A3b
+
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var options = new GotenbergSharpClientOptions();
+config.GetSection(nameof(GotenbergSharpClient)).Bind(options);
 
 var sourcePath = args.Length > 0 ? args[0] : Path.Combine(Directory.GetCurrentDirectory(), "pdfs");
 var destinationPath = args.Length > 1 ? args[1] : Path.Combine(Directory.GetCurrentDirectory(), "output");
 Directory.CreateDirectory(destinationPath);
 
-var result = await DoConversion(sourcePath, destinationPath);
+var result = await DoConversion(sourcePath, destinationPath, options);
 Console.WriteLine($"Converted PDF created: {result}");
 
-static async Task<string> DoConversion(string sourcePath, string destinationPath)
+static async Task<string> DoConversion(string sourcePath, string destinationPath, GotenbergSharpClientOptions options)
 {
-    var sharpClient = new GotenbergSharpClient("http://localhost:3000");
+    var handler = new HttpClientHandler();
+    var httpClient = new HttpClient(
+        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+            : handler
+    )
+    { BaseAddress = options.ServiceUrl };
+
+    var sharpClient = new GotenbergSharpClient(httpClient);
 
     var items = Directory.GetFiles(sourcePath, "*.pdf", SearchOption.TopDirectoryOnly)
         .Select(p => new { Info = new FileInfo(p), Path = p })

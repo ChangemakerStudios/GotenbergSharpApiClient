@@ -4,7 +4,12 @@ This directory contains console application examples demonstrating various featu
 
 ## Prerequisites
 
-1. **Gotenberg Server**: You need a running Gotenberg instance. See the [main README](../README.md) for setup instructions.
+1. **Gotenberg Server**: You need a running Gotenberg instance with basic authentication. See the [main README](../README.md) for setup instructions.
+
+   The examples are pre-configured to use the docker-compose setup with basic auth:
+   ```bash
+   docker-compose -f docker/docker-compose-basic-auth.yml up -d
+   ```
 
 2. **.NET 8.0 SDK**: All examples target .NET 8.0.
 
@@ -12,7 +17,12 @@ This directory contains console application examples demonstrating various featu
 
 All examples share a common configuration file: `appsettings.json`
 
-You can modify the Gotenberg service URL and retry policy settings in this file.
+The default configuration includes:
+- **Service URL**: `http://localhost:3000`
+- **Basic Auth**: Username `testuser`, Password `testpass` (matching docker-compose-basic-auth.yml)
+- **Retry Policy**: Enabled with 4 retries and exponential backoff
+
+You can modify these settings in `appsettings.json` or update the credentials directly in the example code.
 
 ## Examples
 

@@ -38,27 +38,17 @@ public static class TypedClientServiceCollectionExtensions
                 var ops = GetOptions(sp);
                 client.Timeout = ops.TimeOut;
                 client.BaseAddress = ops.ServiceUrl;
-
-                // Add basic auth header if credentials are provided
-                if (!string.IsNullOrWhiteSpace(ops.BasicAuthUsername) &&
-                    !string.IsNullOrWhiteSpace(ops.BasicAuthPassword))
-                {
-                    var credentials = Convert.ToBase64String(
-                        System.Text.Encoding.ASCII.GetBytes($"{ops.BasicAuthUsername}:{ops.BasicAuthPassword}"));
-                    client.DefaultRequestHeaders.Authorization =
-                        new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-                }
             });
     }
 
-    
+
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services,
         Action<IServiceProvider, HttpClient> configureClient)
     {
         if (configureClient == null) throw new ArgumentNullException(nameof(configureClient));
 
-        return services
+        var builder = services
             .AddHttpClient(nameof(GotenbergSharpClient), configureClient)
             .AddTypedClient<GotenbergSharpClient>()
             .ConfigurePrimaryHttpMessageHandler(
@@ -68,8 +58,24 @@ public static class TypedClientServiceCollectionExtensions
                         AutomaticDecompression = DecompressionMethods.GZip
                                                  | DecompressionMethods.Deflate
                     }))
+            .AddHttpMessageHandler(sp =>
+            {
+                var ops = GetOptions(sp);
+
+                // Add basic auth handler if credentials are configured
+                if (!string.IsNullOrWhiteSpace(ops.BasicAuthUsername) &&
+                    !string.IsNullOrWhiteSpace(ops.BasicAuthPassword))
+                {
+                    return new BasicAuthHandler(ops.BasicAuthUsername, ops.BasicAuthPassword);
+                }
+
+                // Return a pass-through handler if no auth is configured
+                return new PassThroughHandler();
+            })
             .AddPolicyHandler(PolicyFactory.CreatePolicyFromSettings)
             .SetHandlerLifetime(TimeSpan.FromMinutes(6));
+
+        return builder;
     }
 
     private static GotenbergSharpClientOptions GetOptions(IServiceProvider sp)

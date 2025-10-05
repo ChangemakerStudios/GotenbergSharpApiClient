@@ -2,17 +2,28 @@ using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+using Microsoft.Extensions.Configuration;
 
 // NOTE: You need to increase gotenberg api's timeout for this to work
 // by passing --api-timeout=1800s when running the container.
 
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var options = new GotenbergSharpClientOptions();
+config.GetSection(nameof(GotenbergSharpClient)).Bind(options);
+
 var destinationDirectory = args.Length > 0 ? args[0] : Path.Combine(Directory.GetCurrentDirectory(), "output");
 Directory.CreateDirectory(destinationDirectory);
 
-var path = await CreateWorldNewsSummary(destinationDirectory);
+var path = await CreateWorldNewsSummary(destinationDirectory, options);
 Console.WriteLine($"News summary PDF created: {path}");
 
-static async Task<string> CreateWorldNewsSummary(string destinationDirectory)
+static async Task<string> CreateWorldNewsSummary(string destinationDirectory, GotenbergSharpClientOptions options)
 {
     var sites = new[]
         {
@@ -31,7 +42,7 @@ static async Task<string> CreateWorldNewsSummary(string destinationDirectory)
     var builders = CreateRequestBuilders(sites);
     var requests = builders.Select(b => b.Build());
 
-    return await ExecuteRequestsAndMerge(requests, destinationDirectory);
+    return await ExecuteRequestsAndMerge(requests, destinationDirectory, options);
 }
 
 static IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uris)
@@ -53,11 +64,16 @@ static IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uri
     }
 }
 
-static async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory)
+static async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory, GotenbergSharpClientOptions options)
 {
-    var innerClient = new HttpClient
+    var handler = new HttpClientHandler();
+    var innerClient = new HttpClient(
+        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+            : handler
+    )
     {
-        BaseAddress = new Uri("http://localhost:3000"),
+        BaseAddress = options.ServiceUrl,
         Timeout = TimeSpan.FromMinutes(7)
     };
 

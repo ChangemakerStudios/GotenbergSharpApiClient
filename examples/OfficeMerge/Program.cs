@@ -1,17 +1,36 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+using Microsoft.Extensions.Configuration;
+
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var options = new GotenbergSharpClientOptions();
+config.GetSection(nameof(GotenbergSharpClient)).Bind(options);
 
 var sourceDirectory = args.Length > 0 ? args[0] : Path.Combine(AppContext.BaseDirectory, "resources", "OfficeDocs");
 var destinationDirectory = args.Length > 1 ? args[1] : Path.Combine(Directory.GetCurrentDirectory(), "output");
 Directory.CreateDirectory(destinationDirectory);
 
-var path = await DoOfficeMerge(sourceDirectory, destinationDirectory);
+var path = await DoOfficeMerge(sourceDirectory, destinationDirectory, options);
 Console.WriteLine($"Merged Office documents PDF created: {path}");
 
-static async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory)
+static async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory, GotenbergSharpClientOptions options)
 {
-    var client = new GotenbergSharpClient("http://localhost:3000");
+    var handler = new HttpClientHandler();
+    var httpClient = new HttpClient(
+        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+            : handler
+    )
+    { BaseAddress = options.ServiceUrl };
+
+    var client = new GotenbergSharpClient(httpClient);
 
     var builder = new MergeOfficeBuilder()
         .ConfigureRequest(c => c.SetTrace("ConsoleExample"))
