@@ -128,6 +128,21 @@ public class HtmlConversionBehaviorBuilderTests
     }
 
     [Test]
+    public void AddCookie_CalledWithNullRequiredCookieValues_ThrowsException()
+    {
+        // Arrange
+        var builder = new HtmlRequestBuilder();
+
+        // Act
+        var act = () => builder.SetConversionBehaviors(b => b
+            .AddCookie("cookie1", null!, "domain1.com")
+            .AddCookie(null!, "value2", "domain2.com")
+            .AddCookie("cookie3", "value3", "domain3.com"));
+
+        act.Should().ThrowExactly<ArgumentException>("Caught cookie required field validation");
+    }
+
+    [Test]
     public void AddCookie_CalledMultipleTimes_AccumulatesCookies()
     {
         // Arrange

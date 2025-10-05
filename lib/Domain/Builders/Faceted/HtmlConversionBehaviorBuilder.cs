@@ -113,6 +113,9 @@ public sealed class HtmlConversionBehaviorBuilder
         if (cookie == null) throw new ArgumentNullException(nameof(cookie));
 
         this._htmlConversionBehaviors.Cookies ??= new List<Cookie>();
+
+        Cookie.Validate(cookie);
+
         this._htmlConversionBehaviors.Cookies.Add(cookie);
 
         return this;

@@ -64,4 +64,11 @@ public sealed record Cookie
     /// </summary>
     [JsonProperty("sameSite", NullValueHandling = NullValueHandling.Ignore)]
     public string? SameSite { get; init; }
+
+    public static void Validate(Cookie cookie)
+    {
+        if (cookie.Name.IsNotSet()) throw new ArgumentException("Cookie.Name must not be null or empty", nameof(cookie.Name));
+        if (cookie.Value.IsNotSet()) throw new ArgumentException("Cookie.Value must not be null or empty", nameof(cookie.Value));
+        if (cookie.Domain.IsNotSet()) throw new ArgumentException("Cookie.Domain must not be null or empty", nameof(cookie.Domain));
+    }
 }
