@@ -1,6 +1,6 @@
 using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Newtonsoft.Json.Linq;
 
@@ -110,7 +110,7 @@ public class HtmlConversionBehaviorBuilderTests
 
         cookieContent.Should().NotBeNull("Cookie content should be present in HTTP request");
 
-        var contentString = cookieContent!.ReadAsStringAsync().Result;
+        var contentString = cookieContent.ReadAsStringAsync().Result;
         var jArray = JArray.Parse(contentString);
 
         jArray.Should().HaveCount(3);
@@ -186,7 +186,7 @@ public class HtmlConversionBehaviorBuilderTests
 
         // Assert
         cookieContent.Should().NotBeNull();
-        var contentString = cookieContent!.ReadAsStringAsync().Result;
+        var contentString = cookieContent.ReadAsStringAsync().Result;
         var jArray = JArray.Parse(contentString);
 
         jArray.Should().HaveCount(2);
