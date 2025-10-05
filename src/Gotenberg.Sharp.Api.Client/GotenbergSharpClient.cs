@@ -183,6 +183,14 @@ public class GotenbergSharpClient
         return await this.MergeOfficeDocsAsync(mergeOfficeRequest, cancelToken);
     }
 
+    /// <summary>
+    /// Converts existing PDF files to PDF/A formats or applies transformations like flattening using Gotenberg's PDF engines module.
+    /// </summary>
+    /// <param name="request">The PDF conversion request containing PDFs to convert and conversion settings.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the converted PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
     public virtual Task<Stream> ConvertPdfDocumentsAsync(
         PdfConversionRequest request,
         CancellationToken cancelToken = default)
@@ -192,6 +200,14 @@ public class GotenbergSharpClient
         return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
     }
 
+    /// <summary>
+    /// Converts existing PDF files to PDF/A formats or applies transformations using a builder pattern.
+    /// </summary>
+    /// <param name="builder">The builder for configuring PDF conversion settings.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the converted PDF.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
     public virtual async Task<Stream> ConvertPdfDocumentsAsync(
         PdfConversionBuilder builder,
         CancellationToken cancelToken = default)
@@ -229,6 +245,22 @@ public class GotenbergSharpClient
         return null;
     }
 
+    /// <summary>
+    /// Sends a request to Gotenberg configured for asynchronous webhook processing. Returns immediately after
+    /// Gotenberg accepts the request. Gotenberg will POST the generated PDF to the configured webhook URL.
+    /// </summary>
+    /// <typeparam name="TBuilder">The builder type.</typeparam>
+    /// <typeparam name="TRequest">The request type.</typeparam>
+    /// <param name="builder">The builder with webhook configuration.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A task that completes when Gotenberg accepts the request (not when PDF is generated).</returns>
+    /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the request doesn't have a webhook configured.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
+    /// <remarks>
+    /// Use this method when you want asynchronous PDF generation with callback. Gotenberg will generate the PDF
+    /// and POST it to your webhook URL. This method returns as soon as Gotenberg accepts the request.
+    /// </remarks>
     public virtual async Task FireWebhookAndForgetAsync<TBuilder, TRequest>(
         BaseBuilder<TBuilder, TRequest> builder,
         CancellationToken cancelToken = default)
@@ -241,6 +273,16 @@ public class GotenbergSharpClient
         await this.FireWebhookAndForgetAsync(request, cancelToken);
     }
 
+    /// <summary>
+    /// Sends a request to Gotenberg configured for asynchronous webhook processing. Returns immediately after
+    /// Gotenberg accepts the request. Gotenberg will POST the generated PDF to the configured webhook URL.
+    /// </summary>
+    /// <param name="request">The request with webhook configuration.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A task that completes when Gotenberg accepts the request (not when PDF is generated).</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the request doesn't have a webhook configured.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
     public virtual async Task FireWebhookAndForgetAsync(
         BuildRequestBase request,
         CancellationToken cancelToken = default)
@@ -252,6 +294,16 @@ public class GotenbergSharpClient
         await this.FireWebhookAndForgetAsync(apiRequest, cancelToken);
     }
 
+    /// <summary>
+    /// Sends a request to Gotenberg configured for asynchronous webhook processing. Returns immediately after
+    /// Gotenberg accepts the request. Gotenberg will POST the generated PDF to the configured webhook URL.
+    /// </summary>
+    /// <param name="request">The API request with webhook configuration.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A task that completes when Gotenberg accepts the request (not when PDF is generated).</returns>
+    /// <exception cref="ArgumentNullException">Thrown when request is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the request doesn't have a webhook configured.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when Gotenberg returns an error response.</exception>
     public virtual async Task FireWebhookAndForgetAsync(
         IApiRequest request,
         CancellationToken cancelToken = default)
