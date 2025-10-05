@@ -55,6 +55,12 @@ public class HtmlConversionBehaviors : FacetBase
     public JObject? ExtraHeaders { get; set; }
 
     /// <summary>
+    /// Cookies to store in the Chromium cookie jar.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.Cookies)]
+    public List<Cookie>? Cookies { get; set; }
+
+    /// <summary>
     /// The metadata to write to the PDF (JSON format).
     /// Not all metadata are writable.
     /// Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.

@@ -26,9 +26,7 @@ public sealed class DocumentBuilder
 
     public DocumentBuilder(FullDocument content, Action<bool> setContainsMarkdown)
     {
-        if (content == null) throw new ArgumentNullException(nameof(content));
-
-        this._content = content;
+        this._content = content ?? throw new ArgumentNullException(nameof(content));
         this._setContainsMarkdown = setContainsMarkdown;
     }
 
