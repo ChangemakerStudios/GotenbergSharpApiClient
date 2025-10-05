@@ -18,16 +18,25 @@ using System.Net;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 // ReSharper disable All CA1032
-// ReSharper disable All CA1822 
+// ReSharper disable All CA1822
 namespace Gotenberg.Sharp.API.Client.Infrastructure
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Exception thrown when Gotenberg returns an error response.
+    /// Contains detailed information about the failed request including status code, request URI, and error message from Gotenberg.
+    /// </summary>
     public sealed class GotenbergApiException : Exception
     {
         readonly IApiRequest _request;
 
         readonly HttpResponseMessage _response;
 
+        /// <summary>
+        /// Initializes a new instance of GotenbergApiException.
+        /// </summary>
+        /// <param name="message">Error message from Gotenberg.</param>
+        /// <param name="request">The request that failed.</param>
+        /// <param name="response">The HTTP response containing the error.</param>
         public GotenbergApiException(
             string message,
             IApiRequest request,
@@ -41,12 +50,27 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             this.ReasonPhrase = _response.ReasonPhrase;
         }
 
+        /// <summary>
+        /// Gets the HTTP status code returned by Gotenberg.
+        /// </summary>
         public HttpStatusCode StatusCode { get; }
 
+        /// <summary>
+        /// Gets the URI of the failed request.
+        /// </summary>
         public Uri? RequestUri { get; }
 
+        /// <summary>
+        /// Gets the HTTP reason phrase from the error response.
+        /// </summary>
         public string? ReasonPhrase { get; }
 
+        /// <summary>
+        /// Creates a GotenbergApiException from a failed HTTP response.
+        /// </summary>
+        /// <param name="request">The request that failed.</param>
+        /// <param name="response">The HTTP response containing the error.</param>
+        /// <returns>A new GotenbergApiException with error details.</returns>
         public static GotenbergApiException Create(
             IApiRequest request,
             HttpResponseMessage response)
@@ -55,6 +79,13 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             return new GotenbergApiException(message, request, response);
         }
 
+        /// <summary>
+        /// Generates a detailed JSON representation of the exception for debugging and logging.
+        /// </summary>
+        /// <param name="includeGotenbergResponse">Include the full Gotenberg HTTP response. Default: true.</param>
+        /// <param name="includeRequestContent">Include the request content that was sent. Default: true.</param>
+        /// <param name="indentJson">Format the JSON with indentation for readability. Default: false.</param>
+        /// <returns>JSON string containing detailed error information.</returns>
         public string ToVerboseJson(
             bool includeGotenbergResponse = true,
             bool includeRequestContent = true,

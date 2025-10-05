@@ -41,6 +41,13 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
 
 *Note: Use v1.x nugets for Gotenberg v6.*
 
+## IntelliSense Documentation
+All public APIs include comprehensive XML documentation with clear descriptions, parameter details, and links to official Gotenberg documentation. IntelliSense provides:
+- Method descriptions with Gotenberg route documentation links
+- Parameter explanations and valid value ranges
+- Exception documentation for error handling
+- Usage notes and best practices
+
 ## AppSettings
 ```json
   "GotenbergSharpClient": {

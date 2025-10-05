@@ -15,9 +15,21 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
+/// <summary>
+/// Base class for builders that merge documents (PDFs or Office files) using Gotenberg's merge capabilities.
+/// Provides functionality for adding files to merge.
+/// </summary>
+/// <typeparam name="TRequest">The type of merge request being built.</typeparam>
+/// <typeparam name="TBuilder">The concrete builder type for fluent interface chaining.</typeparam>
 public abstract class BaseMergeBuilder<TRequest, TBuilder>(TRequest request) : BaseBuilder<TRequest, TBuilder>(request)
     where TRequest : BuildRequestBase where TBuilder : BaseMergeBuilder<TRequest, TBuilder>
 {
+    /// <summary>
+    /// Adds files to merge. For PDF merges, add PDF files. For Office merges, add Office documents (.docx, .xlsx, .pptx, etc.).
+    /// Files are merged in the order they are added.
+    /// </summary>
+    /// <param name="action">Configuration action for adding files.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public TBuilder WithAssets(Action<AssetBuilder> action)
     {
         if (action == null) throw new ArgumentNullException(nameof(action));
@@ -27,6 +39,11 @@ public abstract class BaseMergeBuilder<TRequest, TBuilder>(TRequest request) : B
         return (TBuilder)this;
     }
 
+    /// <summary>
+    /// Asynchronously adds files to merge. Use when loading files from streams or the file system.
+    /// </summary>
+    /// <param name="asyncAction">Async configuration action for adding files.</param>
+    /// <returns>The builder instance for method chaining.</returns>
     public TBuilder WithAsyncAssets(Func<AssetBuilder, Task> asyncAction)
     {
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
