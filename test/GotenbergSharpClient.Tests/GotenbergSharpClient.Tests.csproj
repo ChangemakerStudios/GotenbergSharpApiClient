@@ -17,7 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\lib\Gotenberg.Sharp.Api.Client.csproj" />
+	  <ProjectReference Include="..\..\src\Gotenberg.Sharp.Api.Client\Gotenberg.Sharp.Api.Client.csproj" />
 	</ItemGroup>
 
 </Project>
