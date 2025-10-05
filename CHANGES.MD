@@ -1,5 +1,25 @@
 # Release History
 
+## v2.8.2
+- **Configuration Improvements:**
+  - Added optional `Action<GotenbergSharpClientOptions>` parameter to `AddGotenbergSharpClient()` extension methods
+  - Allows programmatic configuration of options directly when registering the client
+  - Made `GotenbergSharpClientOptions` optional in DI - falls back to empty options if not configured
+  - Supports hybrid configuration (appsettings.json + programmatic overrides)
+  - Updated README with configuration examples (basic, programmatic, and hybrid)
+- **Documentation Improvements (PR #65):**
+  - Added comprehensive XML documentation to all public APIs
+  - Added Gotenberg documentation links to all client methods
+  - Enhanced IntelliSense with parameter details, valid value ranges, and usage notes
+  - Documented exception types with clear error handling guidance
+  - Updated README to highlight IntelliSense documentation features
+- **Examples & Quality (PR #66):**
+  - Converted LinqPad examples to .NET 8 console applications
+  - Fixed Footer/Header swap bug in examples
+  - Added proper resource disposal with CancellationToken.None to all CopyToAsync calls
+  - Added validation and null-forgiving operators to BasicAuth handler registration
+  - Fixed GitHub Actions build by adding example project build configurations
+
 ## v2.8.1
 - Added strongly-typed cookie support for Gotenberg API
 - Added basic authentication support
