@@ -87,11 +87,20 @@ public static class TypedClientServiceCollectionExtensions
             {
                 var ops = GetOptions(sp);
 
-                // Add basic auth handler if credentials are configured
-                if (!string.IsNullOrWhiteSpace(ops.BasicAuthUsername) &&
-                    !string.IsNullOrWhiteSpace(ops.BasicAuthPassword))
+                var hasUsername = !string.IsNullOrWhiteSpace(ops.BasicAuthUsername);
+                var hasPassword = !string.IsNullOrWhiteSpace(ops.BasicAuthPassword);
+
+                // Validate that both username and password are provided together
+                if (hasUsername ^ hasPassword)
                 {
-                    return new BasicAuthHandler(ops.BasicAuthUsername, ops.BasicAuthPassword);
+                    throw new InvalidOperationException(
+                        "BasicAuth configuration is incomplete. Both BasicAuthUsername and BasicAuthPassword must be set, or neither should be set.");
+                }
+
+                // Add basic auth handler if credentials are configured
+                if (hasUsername && hasPassword)
+                {
+                    return new BasicAuthHandler(ops.BasicAuthUsername!, ops.BasicAuthPassword!);
                 }
 
                 // Return a pass-through handler if no auth is configured
