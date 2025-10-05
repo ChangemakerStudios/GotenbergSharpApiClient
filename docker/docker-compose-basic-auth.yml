@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - "3000:3000"
+    environment:
+      - GOTENBERG_API_BASIC_AUTH_USERNAME=testuser
+      - GOTENBERG_API_BASIC_AUTH_PASSWORD=testpass
+    command:
+      - "gotenberg"
+      - "--api-enable-basic-auth"
+      - "--api-timeout=1800s"
+      - "--log-level=debug"
+    restart: unless-stopped
