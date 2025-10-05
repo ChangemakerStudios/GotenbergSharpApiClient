@@ -3,6 +3,7 @@ using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder()
@@ -32,7 +33,8 @@ static async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
@@ -43,13 +45,13 @@ static async Task<string> CreateFromUrl(string destinationPath, string headerPat
         .ConfigureRequest(b => b.SetTrace("ConsoleExample").SetPageRanges("1-2"))
         .AddAsyncHeaderFooter(async b =>
             b.SetHeader(await File.ReadAllBytesAsync(headerPath))
-             .SetFooter(await File.ReadAllBytesAsync(footerPath))
+                .SetFooter(await File.ReadAllBytesAsync(footerPath))
         )
         .WithPageProperties(b =>
             b.SetPaperSize(PaperSizes.A4)
-             .UseChromeDefaults()
-             .SetMarginLeft(0)
-             .SetMarginRight(0)
+                .UseChromeDefaults()
+                .SetMarginLeft(0)
+                .SetMarginRight(0)
         );
 
     var request = await builder.BuildAsync();
@@ -57,10 +59,9 @@ static async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
     var resultPath = Path.Combine(destinationPath, $"GotenbergFromUrl-{DateTime.Now:yyyyMMddHHmmss}.pdf");
 
-    using (var destinationStream = File.Create(resultPath))
-    {
-        await response.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(resultPath);
+
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 
     return resultPath;
 }

@@ -99,9 +99,9 @@ static async Task<string> WriteFileAndGetPath(Stream responseStream, string dest
 {
     var fullPath = Path.Combine(destinationDirectory, $"{DateTime.Now:yyyy-MM-dd}-{DateTime.Now.Ticks}.pdf");
 
-    using (var destinationStream = File.Create(fullPath))
-    {
-        await responseStream.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(fullPath);
+
+    await responseStream.CopyToAsync(destinationStream, CancellationToken.None);
+
     return fullPath;
 }

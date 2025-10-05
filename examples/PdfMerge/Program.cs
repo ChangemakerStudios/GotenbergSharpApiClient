@@ -29,7 +29,8 @@ static async Task<string> DoMerge(string sourcePath, string destinationPath, Got
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
@@ -57,10 +58,9 @@ static async Task<string> DoMerge(string sourcePath, string destinationPath, Got
 
     var outPath = Path.Combine(destinationPath, "GotenbergMergeResult.pdf");
 
-    using (var destinationStream = File.Create(outPath))
-    {
-        await response.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(outPath);
+
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 
     return outPath;
 }

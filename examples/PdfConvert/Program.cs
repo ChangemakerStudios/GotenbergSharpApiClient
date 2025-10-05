@@ -3,6 +3,7 @@ using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+
 using Microsoft.Extensions.Configuration;
 
 // If you get 1 file, the result is a PDF; get more and the API returns a zip containing the results
@@ -32,7 +33,8 @@ static async Task<string> DoConversion(string sourcePath, string destinationPath
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
@@ -61,10 +63,9 @@ static async Task<string> DoConversion(string sourcePath, string destinationPath
     var extension = items.Count() > 1 ? "zip" : "pdf";
     var outPath = Path.Combine(destinationPath, $"GotenbergConvertResult.{extension}");
 
-    using (var destinationStream = File.Create(outPath))
-    {
-        await response.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(outPath);
+
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 
     return outPath;
 }

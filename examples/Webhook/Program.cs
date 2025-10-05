@@ -35,7 +35,8 @@ static async Task CreateFromUrl(string headerPath, string footerPath, GotenbergS
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var sharpClient = new GotenbergSharpClient(httpClient);

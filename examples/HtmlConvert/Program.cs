@@ -1,8 +1,8 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder()
@@ -30,15 +30,16 @@ static async Task<string> CreateFromHtml(string destinationDirectory, string res
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
 
     var builder = new HtmlRequestBuilder()
-       .AddAsyncDocument(async doc =>
+        .AddAsyncDocument(async doc =>
             doc.SetBody(await GetHtmlFile(resourcePath, "body.html"))
-               .SetFooter(await GetHtmlFile(resourcePath, "footer.html"))
+                .SetFooter(await GetHtmlFile(resourcePath, "footer.html"))
         ).WithPageProperties(dims => dims.UseChromeDefaults())
         .WithAsyncAssets(async assets =>
             assets.AddItem("ear-on-beach.jpg", await GetImageBytes(resourcePath))
@@ -53,10 +54,8 @@ static async Task<string> CreateFromHtml(string destinationDirectory, string res
     var resultPath = Path.Combine(destinationDirectory, $"GotenbergFromHtml-{DateTime.Now:yyyyMMddHHmmss}.pdf");
     var response = await sharpClient.HtmlToPdfAsync(request);
 
-    using (var destinationStream = File.Create(resultPath))
-    {
-        await response.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(resultPath);
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 
     return resultPath;
 }

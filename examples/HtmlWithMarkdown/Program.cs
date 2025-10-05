@@ -29,7 +29,8 @@ static async Task<string> CreateFromMarkdown(string destinationDirectory, string
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
@@ -56,10 +57,8 @@ static async Task<string> CreateFromMarkdown(string destinationDirectory, string
 
     var outPath = Path.Combine(destinationDirectory, $"GotenbergFromMarkDown-{DateTime.Now:yyyyMMddHHmmss}.pdf");
 
-    using (var destinationStream = File.Create(outPath))
-    {
-        await response.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(outPath);
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 
     return outPath;
 }

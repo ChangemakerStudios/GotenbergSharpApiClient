@@ -1,10 +1,10 @@
-using System.Threading;
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Extensions;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,7 +29,7 @@ var response = await sharpClient.UrlToPdfAsync(request);
 
 var resultPath = Path.Combine(saveToPath, $"GotenbergFromUrl-{DateTime.Now:yyyyMMddHHmmss}.pdf");
 
-using (var destinationStream = File.Create(resultPath))
+await using (var destinationStream = File.Create(resultPath))
 {
     await response.CopyToAsync(destinationStream, CancellationToken.None);
 }
@@ -63,7 +63,7 @@ Task<UrlRequest> CreateUrlRequest()
         .WithPageProperties(b =>
         {
             b.SetPaperSize(PaperSizes.A4)
-             .SetMargins(Margins.None);
+                .SetMargins(Margins.None);
         });
 
     return builder.BuildAsync();

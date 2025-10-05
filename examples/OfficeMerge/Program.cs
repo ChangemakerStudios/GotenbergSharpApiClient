@@ -3,6 +3,7 @@ using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
+
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder()
@@ -29,7 +30,8 @@ static async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 
     using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
-        BaseAddress = options.ServiceUrl
+        BaseAddress = options.ServiceUrl,
+        Timeout = options.TimeOut
     };
 
     var client = new GotenbergSharpClient(httpClient);
@@ -44,10 +46,9 @@ static async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 
     var mergeResultPath = Path.Combine(destinationDirectory, $"GotenbergOfficeMerge-{DateTime.Now:yyyyMMddHHmmss}.pdf");
 
-    using (var destinationStream = File.Create(mergeResultPath))
-    {
-        await response.CopyToAsync(destinationStream, CancellationToken.None);
-    }
+    await using var destinationStream = File.Create(mergeResultPath);
+
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 
     return mergeResultPath;
 }
