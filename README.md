@@ -9,6 +9,8 @@
 .NET C# Client for interacting with the [Gotenberg](https://gotenberg.dev/) v7 & v8 micro-service's API. [Gotenberg](https://github.com/gotenberg/gotenberg) is a [Docker-powered stateless API](https://hub.docker.com/r/gotenberg/gotenberg/) for converting & merging HTML, Markdown and Office documents to PDF. The client supports a configurable [Polly](http://www.thepollyproject.org/) **retry policy** with exponential backoff for handling transient exceptions.
 
 # Getting Started
+
+## Using Docker Run
 *Pull the image from dockerhub.com*
 ```powershell
 > docker pull gotenberg/gotenberg:latest
@@ -17,6 +19,17 @@
 ```powershell
 docker run --name gotenbee8x --rm -p 3000:3000 gotenberg/gotenberg:latest gotenberg --api-timeout=1800s --log-level=debug
 ```
+
+## Using Docker Compose (with Basic Auth)
+For local development with basic authentication enabled, use the provided docker-compose file:
+
+```powershell
+docker-compose -f docker/docker-compose-basic-auth.yml up -d
+```
+
+Pre-configured with test credentials:
+- **Username:** `testuser`
+- **Password:** `testpass`
 
 # .NET Core Project Setup
 *Install nuget package into your project*
@@ -31,6 +44,24 @@ PM> Install-Package Gotenberg.Sharp.Api.Client
   "GotenbergSharpClient": {
     "ServiceUrl": "http://localhost:3000",
     "HealthCheckUrl": "http://localhost:3000/health",
+    "RetryPolicy": {
+      "Enabled": true,
+      "RetryCount": 4,
+      "BackoffPower": 1.5,
+      "LoggingEnabled": true
+    }
+  }
+```
+
+### Optional: Basic Authentication
+**Gotenberg v8+** - If your Gotenberg instance is configured with basic authentication (using `--api-enable-basic-auth`), you can provide credentials in the settings:
+
+```json
+  "GotenbergSharpClient": {
+    "ServiceUrl": "http://localhost:3000",
+    "HealthCheckUrl": "http://localhost:3000/health",
+    "BasicAuthUsername": "your-username",
+    "BasicAuthPassword": "your-password",
     "RetryPolicy": {
       "Enabled": true,
       "RetryCount": 4,

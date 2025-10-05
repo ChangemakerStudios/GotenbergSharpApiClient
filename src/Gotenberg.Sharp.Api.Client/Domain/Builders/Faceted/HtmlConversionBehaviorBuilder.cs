@@ -23,7 +23,7 @@ public sealed class HtmlConversionBehaviorBuilder
 
     internal HtmlConversionBehaviorBuilder(HtmlConversionBehaviors htmlConversionBehaviors)
     {
-        this._htmlConversionBehaviors = htmlConversionBehaviors;
+        _htmlConversionBehaviors = htmlConversionBehaviors;
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <remarks>Prefer <see cref="SetBrowserWaitExpression" /> over waitDelay.</remarks>
     public HtmlConversionBehaviorBuilder SetBrowserWaitDelay(int seconds)
     {
-        this._htmlConversionBehaviors.WaitDelay = $"{seconds}s";
+        _htmlConversionBehaviors.WaitDelay = $"{seconds}s";
 
         return this;
     }
@@ -49,9 +49,12 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <exception cref="InvalidOperationException"></exception>
     public HtmlConversionBehaviorBuilder SetBrowserWaitExpression(string expression)
     {
-        if (expression.IsNotSet()) throw new InvalidOperationException("expression is not set");
+        if (expression.IsNotSet())
+        {
+            throw new InvalidOperationException("expression is not set");
+        }
 
-        this._htmlConversionBehaviors.WaitForExpression = expression;
+        _htmlConversionBehaviors.WaitForExpression = expression;
 
         return this;
     }
@@ -65,9 +68,12 @@ public sealed class HtmlConversionBehaviorBuilder
     [Obsolete("Deprecated in Gotenberg v8+")]
     public HtmlConversionBehaviorBuilder SetUserAgent(string userAgent)
     {
-        if (userAgent.IsNotSet()) throw new InvalidOperationException("headerName is not set");
+        if (userAgent.IsNotSet())
+        {
+            throw new InvalidOperationException("headerName is not set");
+        }
 
-        this._htmlConversionBehaviors.UserAgent = userAgent;
+        _htmlConversionBehaviors.UserAgent = userAgent;
 
         return this;
     }
@@ -84,7 +90,7 @@ public sealed class HtmlConversionBehaviorBuilder
     {
         var header = string.Format("{0}{2}{1}", "{", "}", $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
 
-        return this.AddAdditionalHeaders(JObject.Parse(header));
+        return AddAdditionalHeaders(JObject.Parse(header));
     }
 
     /// <summary>
@@ -95,16 +101,42 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <exception cref="InvalidOperationException"></exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JObject extraHeaders)
     {
-        if (extraHeaders == null) throw new InvalidOperationException("headerValue is null");
+        if (extraHeaders == null)
+        {
+            throw new InvalidOperationException("extraHeaders is null");
+        }
 
-        this._htmlConversionBehaviors.ExtraHeaders = extraHeaders;
+        _htmlConversionBehaviors.ExtraHeaders = extraHeaders;
 
         return this;
     }
 
     /// <summary>
-    /// Sets the document metadata.
-    /// Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
+    ///     Adds a cookie to store in the Chromium cookie jar.
+    /// </summary>
+    /// <param name="cookie">The cookie to add</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public HtmlConversionBehaviorBuilder AddCookie(Cookie cookie)
+    {
+        if (cookie == null)
+        {
+            throw new ArgumentNullException(nameof(cookie));
+        }
+
+        _htmlConversionBehaviors.Cookies ??= new List<Cookie>();
+
+        Cookie.Validate(cookie);
+
+        _htmlConversionBehaviors.Cookies.Add(cookie);
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the document metadata.
+    ///     Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an
+    ///     (exhaustive?) list of available metadata.
     /// </summary>
     /// <param name="dictionary"></param>
     /// <returns></returns>
@@ -116,16 +148,20 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    /// Sets the document metadata.
-    /// Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
+    ///     Sets the document metadata.
+    ///     Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an
+    ///     (exhaustive?) list of available metadata.
     /// </summary>
     /// <param name="metadata"></param>
     /// <returns></returns>
     public HtmlConversionBehaviorBuilder SetMetadata(JObject metadata)
     {
-        if (metadata == null) throw new InvalidOperationException("metadata is null");
+        if (metadata == null)
+        {
+            throw new InvalidOperationException("metadata is null");
+        }
 
-        this._htmlConversionBehaviors.MetaData = metadata;
+        _htmlConversionBehaviors.MetaData = metadata;
 
         return this;
     }
@@ -136,7 +172,7 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns></returns>
     public HtmlConversionBehaviorBuilder FailOnConsoleExceptions()
     {
-        this._htmlConversionBehaviors.FailOnConsoleExceptions = true;
+        _htmlConversionBehaviors.FailOnConsoleExceptions = true;
 
         return this;
     }
@@ -147,18 +183,18 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns></returns>
     public HtmlConversionBehaviorBuilder EmulateAsScreen()
     {
-        this._htmlConversionBehaviors.EmulatedMediaType = "screen";
+        _htmlConversionBehaviors.EmulatedMediaType = "screen";
 
         return this;
     }
 
     /// <summary>
-    ///     Gotenberg 8+ ONLY: Configures gotenberg to not wait for Chromium network to be idle. 
+    ///     Gotenberg 8+ ONLY: Configures gotenberg to not wait for Chromium network to be idle.
     /// </summary>
     /// <returns></returns>
     public HtmlConversionBehaviorBuilder SkipNetworkIdleEvent()
     {
-        this._htmlConversionBehaviors.SkipNetworkIdleEvent = true;
+        _htmlConversionBehaviors.SkipNetworkIdleEvent = true;
 
         return this;
     }
@@ -171,9 +207,12 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <exception cref="InvalidOperationException"></exception>
     public HtmlConversionBehaviorBuilder SetPdfFormat(ConversionPdfFormats format)
     {
-        if (format == default) throw new InvalidOperationException("Invalid PDF format specified");
+        if (format == default)
+        {
+            throw new InvalidOperationException("Invalid PDF format specified");
+        }
 
-        this._htmlConversionBehaviors.PdfFormat = format;
+        _htmlConversionBehaviors.PdfFormat = format;
 
         return this;
     }
@@ -183,7 +222,7 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     public HtmlConversionBehaviorBuilder SetPdfUa(bool enablePdfUa = true)
     {
-        this._htmlConversionBehaviors.EnablePdfUa = enablePdfUa;
+        _htmlConversionBehaviors.EnablePdfUa = enablePdfUa;
 
         return this;
     }

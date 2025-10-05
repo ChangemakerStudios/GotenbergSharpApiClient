@@ -250,6 +250,8 @@ public static class Constants
                     public const string Scale = "scale";
 
                     public const string PageRanges = CrossCutting.PageRanges;
+                    
+                    public const string SinglePage = "singlePage";
                 }
 
                 public static class HtmlConvert
@@ -263,6 +265,8 @@ public static class Constants
                     public const string UserAgent = "userAgent";
 
                     public const string ExtraHttpHeaders = "extraHttpHeaders";
+
+                    public const string Cookies = "cookies";
 
                     public const string MetaData = "metadata";
 

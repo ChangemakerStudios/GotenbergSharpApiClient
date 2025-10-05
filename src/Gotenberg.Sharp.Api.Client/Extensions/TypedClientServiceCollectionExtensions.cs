@@ -38,6 +38,16 @@ public static class TypedClientServiceCollectionExtensions
                 var ops = GetOptions(sp);
                 client.Timeout = ops.TimeOut;
                 client.BaseAddress = ops.ServiceUrl;
+
+                // Add basic auth header if credentials are provided
+                if (!string.IsNullOrWhiteSpace(ops.BasicAuthUsername) &&
+                    !string.IsNullOrWhiteSpace(ops.BasicAuthPassword))
+                {
+                    var credentials = Convert.ToBase64String(
+                        System.Text.Encoding.ASCII.GetBytes($"{ops.BasicAuthUsername}:{ops.BasicAuthPassword}"));
+                    client.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+                }
             });
     }
 

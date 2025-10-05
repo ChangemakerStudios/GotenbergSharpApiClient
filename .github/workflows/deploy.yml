@@ -8,12 +8,28 @@ jobs:
     strategy:
       matrix:
         dotnet-version: [8.x]
-        
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Start Gotenberg with Basic Auth
+      run: |
+        docker run -d \
+          --name gotenberg \
+          -p 3000:3000 \
+          -e GOTENBERG_API_BASIC_AUTH_USERNAME=testuser \
+          -e GOTENBERG_API_BASIC_AUTH_PASSWORD=testpass \
+          gotenberg/gotenberg:8 \
+          gotenberg \
+          --api-enable-basic-auth \
+          --api-timeout=1800s \
+          --log-level=debug
+
+        # Wait for Gotenberg to be ready
+        timeout 30 bash -c 'until curl -f http://localhost:3000/health; do sleep 1; done'
 
     - name: Setup Dotnet
       uses: actions/setup-dotnet@v4
@@ -21,18 +37,31 @@ jobs:
         dotnet-version: ${{ matrix.dotnet-version }}
         
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v1.1.1
+      uses: gittools/actions/gitversion/setup@v4.1.0
       with:
-        versionSpec: '5.x'
-        
+        versionSpec: '6.x'
+
     - name: GitVersion
       id: gitversion
-      uses: gittools/actions/gitversion/execute@v1.1.1
+      uses: gittools/actions/gitversion/execute@v4.1.0
       with:
-        useConfigFile: true
-        
+        configFilePath: GitVersion.yml
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release
+
+    - name: Run tests
+      run: dotnet test --no-build -c Release --verbosity normal
+      env:
+        GOTENBERG_URL: http://localhost:3000
+        GOTENBERG_USERNAME: testuser
+        GOTENBERG_PASSWORD: testpass
+
     - name: Pack
-      run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+      run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.FullSemVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
         
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')

@@ -21,7 +21,25 @@ public class GotenbergSharpClientOptions
 
     public Uri ServiceUrl { get; set; } = new Uri("http://localhost:3000");
 
+    /// <summary>
+    /// Convenience property for specifying a health check URL.
+    /// Note: This property is not currently used by the library.
+    /// </summary>
     public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/health");
 
     public RetryOptions RetryPolicy { get; set; } = new RetryOptions();
+
+    /// <summary>
+    /// Optional username for HTTP Basic Authentication.
+    /// When set along with <see cref="BasicAuthPassword"/>, the client will include
+    /// an Authorization header with basic auth credentials in all requests.
+    /// </summary>
+    public string? BasicAuthUsername { get; set; }
+
+    /// <summary>
+    /// Optional password for HTTP Basic Authentication.
+    /// When set along with <see cref="BasicAuthUsername"/>, the client will include
+    /// an Authorization header with basic auth credentials in all requests.
+    /// </summary>
+    public string? BasicAuthPassword { get; set; }
 }

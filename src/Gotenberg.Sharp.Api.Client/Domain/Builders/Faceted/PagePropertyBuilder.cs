@@ -42,6 +42,12 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
 
         return this;
     }
+    
+    public PagePropertyBuilder SetSinglePage(bool singlePage = true)
+    {
+        this._pageProperties.SinglePage = singlePage;
+        return this;
+    }
 
     public PagePropertyBuilder SetPaperSize(PaperSizes sizes)
     {
@@ -152,9 +158,9 @@ public sealed class PagePropertyBuilder(PageProperties pageProperties)
         Dimension marginLeft)
     {
         this.SetMarginTop(marginTop);
-        this.SetMarginRight(marginTop);
-        this.SetMarginBottom(marginTop);
-        this.SetMarginLeft(marginTop);
+        this.SetMarginRight(marginRight);
+        this.SetMarginBottom(marginBottom);
+        this.SetMarginLeft(marginLeft);
 
         return this;
     }
