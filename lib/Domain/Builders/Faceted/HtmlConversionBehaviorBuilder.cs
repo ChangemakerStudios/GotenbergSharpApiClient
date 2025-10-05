@@ -1,4 +1,4 @@
-﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,7 +92,12 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     /// <param name="extraHeaders"></param>
     /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <summary>
+    /// Sets additional HTTP headers to include during HTML conversion.
+    /// </summary>
+    /// <param name="extraHeaders">A JSON object mapping header names to header values.</param>
+    /// <returns>The current <see cref="HtmlConversionBehaviorBuilder"/> instance for chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if <paramref name="extraHeaders"/> is null.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JObject extraHeaders)
     {
         if (extraHeaders == null) throw new InvalidOperationException("extraHeaders is null");
@@ -107,7 +112,12 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     /// <param name="cookie">The cookie to add</param>
     /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>
+    /// Adds the specified cookie to the HTML conversion behavior's cookie collection.
+    /// </summary>
+    /// <param name="cookie">The cookie to add; must not be null.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="cookie"/> is null.</exception>
     public HtmlConversionBehaviorBuilder AddCookie(Cookie cookie)
     {
         if (cookie == null) throw new ArgumentNullException(nameof(cookie));
@@ -128,7 +138,17 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="secure">Optional secure flag</param>
     /// <param name="httpOnly">Optional HTTP-only flag</param>
     /// <param name="sameSite">Optional SameSite attribute ("Strict", "Lax", or "None")</param>
-    /// <returns></returns>
+    /// <summary>
+    /// Adds a cookie constructed from the provided fields to the conversion behavior and returns the builder.
+    /// </summary>
+    /// <param name="name">The cookie name.</param>
+    /// <param name="value">The cookie value.</param>
+    /// <param name="domain">The cookie domain.</param>
+    /// <param name="path">The cookie path (optional).</param>
+    /// <param name="secure">Whether the cookie is marked secure (optional).</param>
+    /// <param name="httpOnly">Whether the cookie is marked HttpOnly (optional).</param>
+    /// <param name="sameSite">The SameSite attribute for the cookie (optional).</param>
+    /// <returns>The current <see cref="HtmlConversionBehaviorBuilder"/> instance for chaining.</returns>
     public HtmlConversionBehaviorBuilder AddCookie(
         string name,
         string value,
@@ -157,7 +177,12 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     /// <param name="cookies">The cookies to add</param>
     /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>
+    /// Adds the specified cookies to the HTML conversion behavior.
+    /// </summary>
+    /// <param name="cookies">Collection of cookies to add to the conversion behavior.</param>
+    /// <returns>The current <see cref="HtmlConversionBehaviorBuilder"/> for chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="cookies"/> is null.</exception>
     public HtmlConversionBehaviorBuilder AddCookies(IEnumerable<Cookie> cookies)
     {
         if (cookies == null) throw new ArgumentNullException(nameof(cookies));

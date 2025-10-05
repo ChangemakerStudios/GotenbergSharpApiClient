@@ -1,4 +1,4 @@
-﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             return httpContent;
         }
 
+        /// <summary>
+        /// Converts supported values to a string suitable for form-data using invariant culture.
+        /// </summary>
+        /// <returns>
+        /// The string representation of the input for supported types (e.g., numeric types and DateTime formatted with invariant culture, enum-like types via their form-data value methods, and a JSON string for List&lt;Cookie&gt;), or null if the input is null.
+        /// </returns>
         protected static string? GetValueAsInvariantCultureString(object? value)
         {
             if (value == null) return null;
