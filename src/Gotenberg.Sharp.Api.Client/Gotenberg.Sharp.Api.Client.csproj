@@ -103,8 +103,6 @@
 	</ItemGroup>	
 
 	<ItemGroup>
-		<None Include="..\README.md" Pack="true" PackagePath="\" />
-		<None Include="..\.editorconfig" Link=".editorconfig" />
 		<None Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
 		<Resource Include="Resources\gotenbergSharpClient-large.PNG" Pack="true" PackagePath="\" />
 	</ItemGroup>

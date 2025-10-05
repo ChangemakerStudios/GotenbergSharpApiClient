@@ -51,7 +51,7 @@ public sealed class HtmlConversionBehaviorBuilder
     {
         if (expression.IsNotSet())
         {
-            throw new InvalidOperationException("expression is not set");
+            throw new ArgumentException("expression cannot be null or empty", nameof(expression));
         }
 
         _htmlConversionBehaviors.WaitForExpression = expression;
@@ -70,7 +70,7 @@ public sealed class HtmlConversionBehaviorBuilder
     {
         if (userAgent.IsNotSet())
         {
-            throw new InvalidOperationException("headerName is not set");
+            throw new ArgumentException("userAgent cannot be null or empty", nameof(userAgent));
         }
 
         _htmlConversionBehaviors.UserAgent = userAgent;
@@ -103,7 +103,7 @@ public sealed class HtmlConversionBehaviorBuilder
     {
         if (extraHeaders == null)
         {
-            throw new InvalidOperationException("extraHeaders is null");
+            throw new ArgumentNullException(nameof(extraHeaders));
         }
 
         _htmlConversionBehaviors.ExtraHeaders = extraHeaders;
@@ -142,6 +142,11 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns></returns>
     public HtmlConversionBehaviorBuilder SetMetadata(IDictionary<string, object> dictionary)
     {
+        if (dictionary == null)
+        {
+            throw new ArgumentNullException(nameof(dictionary));
+        }
+
         SetMetadata(JObject.FromObject(dictionary));
 
         return this;
@@ -158,7 +163,7 @@ public sealed class HtmlConversionBehaviorBuilder
     {
         if (metadata == null)
         {
-            throw new InvalidOperationException("metadata is null");
+            throw new ArgumentNullException(nameof(metadata));
         }
 
         _htmlConversionBehaviors.MetaData = metadata;
@@ -209,7 +214,7 @@ public sealed class HtmlConversionBehaviorBuilder
     {
         if (format == default)
         {
-            throw new InvalidOperationException("Invalid PDF format specified");
+            throw new ArgumentOutOfRangeException(nameof(format), "Invalid PDF format specified");
         }
 
         _htmlConversionBehaviors.PdfFormat = format;
