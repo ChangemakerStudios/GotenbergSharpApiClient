@@ -14,12 +14,8 @@
 //  limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-
-
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
-
 
 [SuppressMessage("ReSharper", "CA2000")]
 // ReSharper disable once HollowTypeName
@@ -40,7 +36,7 @@ public sealed class TimeoutHandler : DelegatingHandler
     /// <value>
     ///     The default timeout.
     /// </value>
-    
+
     public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(300);
 
     /// <summary>
@@ -54,7 +50,7 @@ public sealed class TimeoutHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        using var cts = this.GetCancelTokenSource(request, cancellationToken);
+        using var cts = GetCancelTokenSource(request, cancellationToken);
 
         try
         {
@@ -71,8 +67,11 @@ public sealed class TimeoutHandler : DelegatingHandler
         HttpRequestMessage request,
         CancellationToken cancelToken)
     {
-        var timeout = request.GetTimeout() ?? this.DefaultTimeout;
-        if (timeout == Timeout.InfiniteTimeSpan) return null;
+        var timeout = request.GetTimeout() ?? DefaultTimeout;
+        if (timeout == Timeout.InfiniteTimeSpan)
+        {
+            return null;
+        }
 
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
         cts.CancelAfter(timeout);

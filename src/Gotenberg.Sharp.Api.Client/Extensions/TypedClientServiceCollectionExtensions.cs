@@ -18,71 +18,73 @@ using System.Net;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
-
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 /// <summary>
-/// Extension methods for registering GotenbergSharpClient with dependency injection.
+///     Extension methods for registering GotenbergSharpClient with dependency injection.
 /// </summary>
 public static class TypedClientServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers GotenbergSharpClient with dependency injection using configured options.
-    /// Configure options via appsettings.json or by calling services.Configure&lt;GotenbergSharpClientOptions&gt;().
+    ///     Registers GotenbergSharpClient with dependency injection using configured options.
+    ///     Configure options via appsettings.json or by calling services.Configure&lt;GotenbergSharpClientOptions&gt;().
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>An IHttpClientBuilder for further configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when services is null.</exception>
     /// <remarks>
-    /// This method configures the HttpClient with automatic compression, retry policies, and basic authentication if credentials are provided.
-    /// Options should be configured in the "GotenbergSharpClient" section of appsettings.json or programmatically.
+    ///     This method configures the HttpClient with automatic compression, retry policies, and basic authentication if
+    ///     credentials are provided.
+    ///     Options should be configured in the "GotenbergSharpClient" section of appsettings.json or programmatically.
     /// </remarks>
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services)
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
 
-        return services.AddGotenbergSharpClient(
-            (sp, client) =>
-            {
-                var ops = GetOptions(sp);
-                client.Timeout = ops.TimeOut;
-                client.BaseAddress = ops.ServiceUrl;
-            });
+        return services.AddGotenbergSharpClient((sp, client) =>
+        {
+            var ops = GetOptions(sp);
+            client.Timeout = ops.TimeOut;
+            client.BaseAddress = ops.ServiceUrl;
+        });
     }
 
-
     /// <summary>
-    /// Registers GotenbergSharpClient with dependency injection using a custom HttpClient configuration.
+    ///     Registers GotenbergSharpClient with dependency injection using a custom HttpClient configuration.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="configureClient">Action to configure the HttpClient instance.</param>
     /// <returns>An IHttpClientBuilder for further configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when configureClient is null.</exception>
     /// <remarks>
-    /// This overload allows full control over HttpClient configuration. The client is configured with
-    /// automatic compression, timeout handling, and exponential backoff retry policies.
+    ///     This overload allows full control over HttpClient configuration. The client is configured with
+    ///     automatic compression, timeout handling, and exponential backoff retry policies.
     /// </remarks>
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services,
         Action<IServiceProvider, HttpClient> configureClient)
     {
-        if (configureClient == null) throw new ArgumentNullException(nameof(configureClient));
+        if (configureClient == null)
+        {
+            throw new ArgumentNullException(nameof(configureClient));
+        }
 
         var builder = services
             .AddHttpClient(nameof(GotenbergSharpClient), configureClient)
             .AddTypedClient<GotenbergSharpClient>()
-            .ConfigurePrimaryHttpMessageHandler(
-                () => new TimeoutHandler(
-                    new HttpClientHandler
-                    {
-                        AutomaticDecompression = DecompressionMethods.GZip
-                                                 | DecompressionMethods.Deflate
-                    }))
+            .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(
+                new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip
+                                             | DecompressionMethods.Deflate
+                }))
             .AddHttpMessageHandler(sp =>
             {
                 var ops = GetOptions(sp);
