@@ -95,9 +95,75 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <exception cref="InvalidOperationException"></exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JObject extraHeaders)
     {
-        if (extraHeaders == null) throw new InvalidOperationException("headerValue is null");
+        if (extraHeaders == null) throw new InvalidOperationException("extraHeaders is null");
 
         this._htmlConversionBehaviors.ExtraHeaders = extraHeaders;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a cookie to store in the Chromium cookie jar.
+    /// </summary>
+    /// <param name="cookie">The cookie to add</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public HtmlConversionBehaviorBuilder AddCookie(Cookie cookie)
+    {
+        if (cookie == null) throw new ArgumentNullException(nameof(cookie));
+
+        this._htmlConversionBehaviors.Cookies ??= new List<Cookie>();
+        this._htmlConversionBehaviors.Cookies.Add(cookie);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a cookie to store in the Chromium cookie jar.
+    /// </summary>
+    /// <param name="name">Cookie name</param>
+    /// <param name="value">Cookie value</param>
+    /// <param name="domain">Cookie domain</param>
+    /// <param name="path">Optional cookie path</param>
+    /// <param name="secure">Optional secure flag</param>
+    /// <param name="httpOnly">Optional HTTP-only flag</param>
+    /// <param name="sameSite">Optional SameSite attribute ("Strict", "Lax", or "None")</param>
+    /// <returns></returns>
+    public HtmlConversionBehaviorBuilder AddCookie(
+        string name,
+        string value,
+        string domain,
+        string? path = null,
+        bool? secure = null,
+        bool? httpOnly = null,
+        string? sameSite = null)
+    {
+        var cookie = new Cookie
+        {
+            Name = name,
+            Value = value,
+            Domain = domain,
+            Path = path,
+            Secure = secure,
+            HttpOnly = httpOnly,
+            SameSite = sameSite
+        };
+
+        return AddCookie(cookie);
+    }
+
+    /// <summary>
+    /// Adds multiple cookies to store in the Chromium cookie jar.
+    /// </summary>
+    /// <param name="cookies">The cookies to add</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public HtmlConversionBehaviorBuilder AddCookies(IEnumerable<Cookie> cookies)
+    {
+        if (cookies == null) throw new ArgumentNullException(nameof(cookies));
+
+        this._htmlConversionBehaviors.Cookies ??= new List<Cookie>();
+        this._htmlConversionBehaviors.Cookies.AddRange(cookies);
 
         return this;
     }

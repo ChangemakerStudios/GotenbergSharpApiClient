@@ -70,6 +70,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
             {
                 LibrePdfFormats format => format.ToFormDataValue(),
                 ConversionPdfFormats format => format.ToFormDataValue(),
+                List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
                 float f => f.ToString(cultureInfo),
                 double d => d.ToString(cultureInfo),
                 decimal c => c.ToString(cultureInfo),
