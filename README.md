@@ -81,6 +81,8 @@ All public APIs include comprehensive XML documentation with clear descriptions,
 ```
 
 ## Configure Services In Startup.cs
+
+### Basic Configuration (using appsettings.json)
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
@@ -88,10 +90,55 @@ public void ConfigureServices(IServiceCollection services)
     services.AddOptions<GotenbergSharpClientOptions>()
 	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
     services.AddGotenbergSharpClient();
-	.....    
+	.....
 }
-
 ```
+
+### Programmatic Configuration
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+	.....
+    // Configure with an action
+    services.AddGotenbergSharpClient(options =>
+    {
+        options.ServiceUrl = new Uri("http://localhost:3000");
+        options.TimeOut = TimeSpan.FromMinutes(5);
+        options.BasicAuthUsername = "username";
+        options.BasicAuthPassword = "password";
+        // Configure retry policy
+        options.RetryPolicy = new RetryPolicyOptions
+        {
+            Enabled = true,
+            RetryCount = 4,
+            BackoffPower = 1.5,
+            LoggingEnabled = true
+        };
+    });
+	.....
+}
+```
+
+### Hybrid Configuration (appsettings + programmatic override)
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+	.....
+    services.AddOptions<GotenbergSharpClientOptions>()
+	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
+
+    // Override or add settings programmatically
+    services.AddGotenbergSharpClient(options =>
+    {
+        options.TimeOut = TimeSpan.FromMinutes(10); // Override timeout
+        options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");
+        options.BasicAuthPassword = Environment.GetEnvironmentVariable("GOTENBERG_PASS");
+    });
+	.....
+}
+```
+
+
 # Using GotenbergSharpClient
 *See the [examples folder](examples/)* for complete working examples as console applications.
 
