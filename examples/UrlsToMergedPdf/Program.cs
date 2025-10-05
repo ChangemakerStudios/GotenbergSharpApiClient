@@ -90,7 +90,7 @@ static async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> reques
             b.AddItems(results.Select((r, i) => KeyValuePair.Create($"{i}.pdf", r)));
         });
 
-    var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build());
+    var response = await sharpClient.MergePdfsAsync(mergeBuilder.Build(), CancellationToken.None);
 
     return await WriteFileAndGetPath(response, destinationDirectory);
 }
