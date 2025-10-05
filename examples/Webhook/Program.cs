@@ -16,8 +16,8 @@ var options = new GotenbergSharpClientOptions();
 config.GetSection(nameof(GotenbergSharpClient)).Bind(options);
 
 var resourcePath = Path.Combine(AppContext.BaseDirectory, "resources", "Html");
-var footerPath = Path.Combine(resourcePath, "UrlHeader.html");
-var headerPath = Path.Combine(resourcePath, "UrlFooter.html");
+var headerPath = Path.Combine(resourcePath, "UrlHeader.html");
+var footerPath = Path.Combine(resourcePath, "UrlFooter.html");
 
 Console.WriteLine($"Header: {headerPath}");
 Console.WriteLine($"Footer: {footerPath}");
