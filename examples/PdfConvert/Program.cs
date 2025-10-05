@@ -25,13 +25,15 @@ Console.WriteLine($"Converted PDF created: {result}");
 
 static async Task<string> DoConversion(string sourcePath, string destinationPath, GotenbergSharpClientOptions options)
 {
-    var handler = new HttpClientHandler();
-    var httpClient = new HttpClient(
-        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
-            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
-            : handler
-    )
-    { BaseAddress = options.ServiceUrl };
+    using var handler = new HttpClientHandler();
+    using var authHandler = !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+        ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+        : null;
+
+    using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
+    {
+        BaseAddress = options.ServiceUrl
+    };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
 

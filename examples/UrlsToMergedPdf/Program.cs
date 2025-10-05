@@ -66,12 +66,12 @@ static IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uri
 
 static async Task<string> ExecuteRequestsAndMerge(IEnumerable<UrlRequest> requests, string destinationDirectory, GotenbergSharpClientOptions options)
 {
-    var handler = new HttpClientHandler();
-    var innerClient = new HttpClient(
-        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
-            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
-            : handler
-    )
+    using var handler = new HttpClientHandler();
+    using var authHandler = !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+        ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+        : null;
+
+    using var innerClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
     {
         BaseAddress = options.ServiceUrl,
         Timeout = TimeSpan.FromMinutes(7)
@@ -101,7 +101,7 @@ static async Task<string> WriteFileAndGetPath(Stream responseStream, string dest
 
     using (var destinationStream = File.Create(fullPath))
     {
-        await responseStream.CopyToAsync(destinationStream);
+        await responseStream.CopyToAsync(destinationStream, CancellationToken.None);
     }
     return fullPath;
 }

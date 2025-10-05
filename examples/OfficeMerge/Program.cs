@@ -22,13 +22,15 @@ Console.WriteLine($"Merged Office documents PDF created: {path}");
 
 static async Task<string> DoOfficeMerge(string sourceDirectory, string destinationDirectory, GotenbergSharpClientOptions options)
 {
-    var handler = new HttpClientHandler();
-    var httpClient = new HttpClient(
-        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
-            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
-            : handler
-    )
-    { BaseAddress = options.ServiceUrl };
+    using var handler = new HttpClientHandler();
+    using var authHandler = !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+        ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+        : null;
+
+    using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
+    {
+        BaseAddress = options.ServiceUrl
+    };
 
     var client = new GotenbergSharpClient(httpClient);
 
@@ -44,7 +46,7 @@ static async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
 
     using (var destinationStream = File.Create(mergeResultPath))
     {
-        await response.CopyToAsync(destinationStream).ConfigureAwait(false);
+        await response.CopyToAsync(destinationStream, CancellationToken.None);
     }
 
     return mergeResultPath;

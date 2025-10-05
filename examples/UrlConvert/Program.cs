@@ -25,13 +25,15 @@ Console.WriteLine($"PDF created from URL: {path}");
 
 static async Task<string> CreateFromUrl(string destinationPath, string headerPath, string footerPath, GotenbergSharpClientOptions options)
 {
-    var handler = new HttpClientHandler();
-    var httpClient = new HttpClient(
-        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
-            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
-            : handler
-    )
-    { BaseAddress = options.ServiceUrl };
+    using var handler = new HttpClientHandler();
+    using var authHandler = !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+        ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+        : null;
+
+    using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
+    {
+        BaseAddress = options.ServiceUrl
+    };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
 
@@ -57,7 +59,7 @@ static async Task<string> CreateFromUrl(string destinationPath, string headerPat
 
     using (var destinationStream = File.Create(resultPath))
     {
-        await response.CopyToAsync(destinationStream);
+        await response.CopyToAsync(destinationStream, CancellationToken.None);
     }
 
     return resultPath;

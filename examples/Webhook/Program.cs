@@ -28,13 +28,15 @@ Console.WriteLine("Webhook request sent...");
 
 static async Task CreateFromUrl(string headerPath, string footerPath, GotenbergSharpClientOptions options)
 {
-    var handler = new HttpClientHandler();
-    var httpClient = new HttpClient(
-        !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
-            ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
-            : handler
-    )
-    { BaseAddress = options.ServiceUrl };
+    using var handler = new HttpClientHandler();
+    using var authHandler = !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
+        ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
+        : null;
+
+    using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
+    {
+        BaseAddress = options.ServiceUrl
+    };
 
     var sharpClient = new GotenbergSharpClient(httpClient);
 

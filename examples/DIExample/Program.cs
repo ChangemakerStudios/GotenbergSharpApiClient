@@ -1,3 +1,4 @@
+using System.Threading;
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
@@ -30,7 +31,7 @@ var resultPath = Path.Combine(saveToPath, $"GotenbergFromUrl-{DateTime.Now:yyyyM
 
 using (var destinationStream = File.Create(resultPath))
 {
-    await response.CopyToAsync(destinationStream);
+    await response.CopyToAsync(destinationStream, CancellationToken.None);
 }
 
 Console.WriteLine($"PDF created: {resultPath}");
