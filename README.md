@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/develop/src/Gotenberg.Sharp.Api.Client/resources/gotenberg-sharp-client.png" width="32" height="32" /> Gotenberg Sharp API Client (C#)
+<img src="https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/refs/heads/develop/resources/gotenberg-sharp-client.png" width="32" height="32" /> Gotenberg Sharp API Client (C#)
 =================
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
