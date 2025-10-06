@@ -1,6 +1,6 @@
 # Release History
 
-## v2.8.2
+## v2.8.3
 - **Configuration Improvements:**
   - Added optional `Action<GotenbergSharpClientOptions>` parameter to `AddGotenbergSharpClient()` extension methods
   - Allows programmatic configuration of options directly when registering the client
@@ -19,6 +19,11 @@
   - Added proper resource disposal with CancellationToken.None to all CopyToAsync calls
   - Added validation and null-forgiving operators to BasicAuth handler registration
   - Fixed GitHub Actions build by adding example project build configurations
+- **Build & Packaging Fixes:**
+  - Fixed NuGet packaging to only publish the client library (not example projects)
+  - Replaced deprecated `PackageLicenseUrl` with `PackageLicenseExpression`
+  - Fixed GitHub Actions to only pack and push the Gotenberg.Sharp.Api.Client package
+  - Removed redundant symbol package push (handled automatically with main package)
 
 ## v2.8.1
 - Added strongly-typed cookie support for Gotenberg API
