@@ -14,14 +14,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<Version>2.8.2</Version>
+		<Version>2.8.3</Version>
 		<PackageTags>Gotenberg pdf C# API client unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
 		</Description>
 		<IncludeSymbols>True</IncludeSymbols>
 		<PackageReleaseNotes>
-			v2.8.2 - Added optional Action&lt;GotenbergSharpClientOptions&gt; parameter to AddGotenbergSharpClient for programmatic configuration. Options now optional in DI.
+			v2.8.3 - Added programmatic configuration support. Comprehensive documentation improvements. Fixed NuGet packaging issues. See CHANGES.MD for full details.
 			v2.8.1 - Added strongly-typed cookie support. Added basic authentication support. Added SinglePage page property. Fixed margins bug. Project restructure (moved /lib to /src).
 			v2.8 - Improving handling of PDF formatting and added flatten support.
 			v2.7 - Fixes issue with "Inches".
@@ -33,7 +33,7 @@
 			v2.1 - Added Trace Support. Fixed extra webhook header support.
 			v2.0 - Upgraded to support Gotenberg v7 -- this version no longer works with Gotenberg v6.
 	    </PackageReleaseNotes>
-		<PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
 		<PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/GotenbergSharpApiClient/master/resources/gotenberg-sharp-client.png</PackageIconUrl>
 		<PackageIcon>gotenberg-sharp-client.png</PackageIcon>
