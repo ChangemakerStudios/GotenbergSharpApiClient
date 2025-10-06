@@ -61,10 +61,8 @@ jobs:
         GOTENBERG_PASSWORD: testpass
 
     - name: Pack
-      run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.FullSemVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
-        
+      run: dotnet pack src/Gotenberg.Sharp.Api.Client/Gotenberg.Sharp.Api.Client.csproj -c Release -p:PackageVersion=${{ steps.gitversion.outputs.FullSemVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')
-      run: |
-        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate
-        dotnet nuget push **/*.snupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate        
+      run: dotnet nuget push src/Gotenberg.Sharp.Api.Client/bin/Release/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate        
