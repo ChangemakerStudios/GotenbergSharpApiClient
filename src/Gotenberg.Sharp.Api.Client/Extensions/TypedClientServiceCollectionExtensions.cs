@@ -30,31 +30,78 @@ public static class TypedClientServiceCollectionExtensions
 {
     /// <summary>
     ///     Registers GotenbergSharpClient with dependency injection using configured options.
-    ///     Configure options via appsettings.json or by calling services.Configure&lt;GotenbergSharpClientOptions&gt;().
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="configureClientOptions">Optional function to configure client options after they are retrieved.</param>
     /// <returns>An IHttpClientBuilder for further configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when services is null.</exception>
     /// <remarks>
-    ///     This method configures the HttpClient with automatic compression, retry policies, and basic authentication if
-    ///     credentials are provided.
-    ///     Options should be configured in the "GotenbergSharpClient" section of appsettings.json or programmatically.
+    ///     <para>
+    ///         This method registers the GotenbergSharpClient with automatic compression, retry policies,
+    ///         and basic authentication if credentials are provided in the options.
+    ///     </para>
+    ///     <para>
+    ///         Options must be registered before calling this method using
+    ///         standard .NET options configuration methods.
+    ///         The client retrieves options from the DI container using <c>IOptions&lt;TOptions&gt;</c>.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///     services.AddOptions&lt;GotenbergSharpClientOptions&gt;()
+    ///         .Bind(configuration.GetSection("GotenbergSharpClient"));
+    ///     services.AddGotenbergSharpClient();
+    ///     </code>
+    ///     </para>
     /// </remarks>
     public static IHttpClientBuilder AddGotenbergSharpClient(
-        this IServiceCollection services,
-        Action<GotenbergSharpClientOptions>? configureClientOptions = null)
+        this IServiceCollection services)
     {
         if (services == null)
         {
             throw new ArgumentNullException(nameof(services));
         }
 
-        return services.AddGotenbergSharpClient((sp, client) =>
-        {
-            var ops = GetOptions(sp) ?? new GotenbergSharpClientOptions();
+        return services.AddGotenbergSharpClient<GotenbergSharpClientOptions>();
+    }
 
-            configureClientOptions?.Invoke(ops);
+    /// <summary>
+    ///     Registers GotenbergSharpClient with dependency injection using configured options.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type, must inherit from GotenbergSharpClientOptions.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <returns>An IHttpClientBuilder for further configuration.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when services is null.</exception>
+    /// <remarks>
+    ///     <para>
+    ///         This method registers the GotenbergSharpClient with automatic compression, retry policies,
+    ///         and basic authentication if credentials are provided in the options.
+    ///     </para>
+    ///     <para>
+    ///         Options must be registered before calling this method using
+    ///         standard .NET options configuration methods.
+    ///         The client retrieves options from the DI container using <c>IOptions&lt;TOptions&gt;</c>.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///     services.AddOptions&lt;GotenbergSharpClientOptions&gt;()
+    ///         .Bind(configuration.GetSection("GotenbergSharpClient"));
+    ///     services.AddGotenbergSharpClient();
+    ///     </code>
+    ///     </para>
+    /// </remarks>
+    public static IHttpClientBuilder AddGotenbergSharpClient<TOptions>(
+        this IServiceCollection services)
+        where TOptions : GotenbergSharpClientOptions, new()
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        return services.AddGotenbergSharpClient<TOptions>((sp, client) =>
+        {
+            var ops = sp.GetRequiredService<IOptions<TOptions>>().Value;
 
             client.Timeout = ops.TimeOut;
             client.BaseAddress = ops.ServiceUrl;
@@ -65,18 +112,92 @@ public static class TypedClientServiceCollectionExtensions
     ///     Registers GotenbergSharpClient with dependency injection using a custom HttpClient configuration.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="configureClient">Action to configure the HttpClient instance.</param>
-    /// <param name="configureClientOptions">Optional function to configure client options after they are retrieved.</param>
+    /// <param name="configureClient">
+    ///     Action to configure the HttpClient instance. The action receives the service provider and HttpClient
+    ///     for custom configuration.
+    /// </param>
     /// <returns>An IHttpClientBuilder for further configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when configureClient is null.</exception>
     /// <remarks>
-    ///     This overload allows full control over HttpClient configuration. The client is configured with
-    ///     automatic compression, timeout handling, and exponential backoff retry policies.
+    ///     <para>
+    ///         This overload allows full control over HttpClient configuration while still using the options
+    ///         for basic authentication and retry policies. The client is configured with automatic compression,
+    ///         timeout handling, and exponential backoff retry policies based on the registered options.
+    ///     </para>
+    ///     <para>
+    ///         Options must be registered before calling this method using
+    ///         standard .NET options configuration methods.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///     services.AddOptions&lt;GotenbergSharpClientOptions&gt;()
+    ///         .Bind(configuration.GetSection("GotenbergSharpClient"))
+    ///         .PostConfigure(options =>
+    ///         {
+    ///             options.BasicAuthUsername = "user";
+    ///             options.BasicAuthPassword = "pass";
+    ///         });
+    ///
+    ///     services.AddGotenbergSharpClient((sp, client) =>
+    ///     {
+    ///         // Custom HttpClient configuration
+    ///         client.DefaultRequestHeaders.Add("X-Custom-Header", "value");
+    ///     });
+    ///     </code>
+    ///     </para>
     /// </remarks>
     public static IHttpClientBuilder AddGotenbergSharpClient(
         this IServiceCollection services,
-        Action<IServiceProvider, HttpClient> configureClient,
-        Action<GotenbergSharpClientOptions>? configureClientOptions = null)
+        Action<IServiceProvider, HttpClient> configureClient)
+    {
+        return services.AddGotenbergSharpClient<GotenbergSharpClientOptions>(configureClient);
+    }
+
+    /// <summary>
+    ///     Registers GotenbergSharpClient with dependency injection using a custom HttpClient configuration.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type, must inherit from GotenbergSharpClientOptions.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configureClient">
+    ///     Action to configure the HttpClient instance. The action receives the service provider and HttpClient
+    ///     for custom configuration.
+    /// </param>
+    /// <returns>An IHttpClientBuilder for further configuration.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when configureClient is null.</exception>
+    /// <remarks>
+    ///     <para>
+    ///         This overload allows full control over HttpClient configuration while still using the options
+    ///         for basic authentication and retry policies. The client is configured with automatic compression,
+    ///         timeout handling, and exponential backoff retry policies based on the registered options.
+    ///     </para>
+    ///     <para>
+    ///         Options must be registered before calling this method using
+    ///         standard .NET options configuration methods.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///     services.AddOptions&lt;GotenbergSharpClientOptions&gt;()
+    ///         .Bind(configuration.GetSection("GotenbergSharpClient"))
+    ///         .PostConfigure(options =>
+    ///         {
+    ///             options.BasicAuthUsername = "user";
+    ///             options.BasicAuthPassword = "pass";
+    ///         });
+    ///
+    ///     services.AddGotenbergSharpClient((sp, client) =>
+    ///     {
+    ///         // Custom HttpClient configuration
+    ///         client.DefaultRequestHeaders.Add("X-Custom-Header", "value");
+    ///     });
+    ///     </code>
+    ///     </para>
+    /// </remarks>
+    public static IHttpClientBuilder AddGotenbergSharpClient<TOptions>(
+        this IServiceCollection services,
+        Action<IServiceProvider, HttpClient> configureClient)
+        where TOptions : GotenbergSharpClientOptions, new()
     {
         if (configureClient == null)
         {
@@ -94,9 +215,7 @@ public static class TypedClientServiceCollectionExtensions
                 }))
             .AddHttpMessageHandler(sp =>
             {
-                var ops = GetOptions(sp) ?? new GotenbergSharpClientOptions();
-
-                configureClientOptions?.Invoke(ops);
+                var ops = sp.GetRequiredService<IOptions<TOptions>>().Value;
 
                 var hasUsername = !string.IsNullOrWhiteSpace(ops.BasicAuthUsername);
                 var hasPassword = !string.IsNullOrWhiteSpace(ops.BasicAuthPassword);
@@ -121,10 +240,5 @@ public static class TypedClientServiceCollectionExtensions
             .SetHandlerLifetime(TimeSpan.FromMinutes(6));
 
         return builder;
-    }
-
-    private static GotenbergSharpClientOptions? GetOptions(IServiceProvider sp)
-    {
-        return sp.GetService<IOptions<GotenbergSharpClientOptions>>()?.Value;
     }
 }

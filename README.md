@@ -102,21 +102,24 @@ public void ConfigureServices(IServiceCollection services)
 {
 	.....
     // Configure with an action
-    services.AddGotenbergSharpClient(options =>
-    {
-        options.ServiceUrl = new Uri("http://localhost:3000");
-        options.TimeOut = TimeSpan.FromMinutes(5);
-        options.BasicAuthUsername = "username";
-        options.BasicAuthPassword = "password";
-        // Configure retry policy
-        options.RetryPolicy = new RetryPolicyOptions
+    services.AddOptions<GotenbergSharpClientOptions>()
+        .Configure(options =>
         {
-            Enabled = true,
-            RetryCount = 4,
-            BackoffPower = 1.5,
-            LoggingEnabled = true
-        };
-    });
+            options.ServiceUrl = new Uri("http://localhost:3000");
+            options.TimeOut = TimeSpan.FromMinutes(5);
+            options.BasicAuthUsername = "username";
+            options.BasicAuthPassword = "password";
+            // Configure retry policy
+            options.RetryPolicy = new RetryOptions
+            {
+                Enabled = true,
+                RetryCount = 4,
+                BackoffPower = 1.5,
+                LoggingEnabled = true
+            };
+        });
+
+    services.AddGotenbergSharpClient();
 	.....
 }
 ```
@@ -127,15 +130,16 @@ public void ConfigureServices(IServiceCollection services)
 {
 	.....
     services.AddOptions<GotenbergSharpClientOptions>()
-	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
+	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)))
+            .PostConfigure(options =>
+            {
+                // Override or add settings programmatically (runs after binding)
+                options.TimeOut = TimeSpan.FromMinutes(10); // Override timeout
+                options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");
+                options.BasicAuthPassword = Environment.GetEnvironmentVariable("GOTENBERG_PASS");
+            });
 
-    // Override or add settings programmatically
-    services.AddGotenbergSharpClient(options =>
-    {
-        options.TimeOut = TimeSpan.FromMinutes(10); // Override timeout
-        options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");
-        options.BasicAuthPassword = Environment.GetEnvironmentVariable("GOTENBERG_PASS");
-    });
+    services.AddGotenbergSharpClient();
 	.....
 }
 ```
