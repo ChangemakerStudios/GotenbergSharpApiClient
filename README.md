@@ -156,7 +156,7 @@ using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
 ```
 
-### Html To Pdf 
+### HTML To PDF
 *With embedded assets:*
 
 ```csharp
@@ -181,8 +181,8 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
  }
 ```
 
-### Url To Pdf
-*Url to Pdf with custom page range, header & footer:*
+### URL To PDF
+*URL to PDF with custom page range, header & footer:*
 
 ```csharp
 public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
@@ -222,8 +222,8 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 	return await _sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
-### Markdown to Pdf
-*Markdown to Pdf conversion with embedded assets:*
+### Markdown to PDF
+*Markdown to PDF conversion with embedded assets:*
 
 ```csharp
 public async Task<Stream> CreateFromMarkdown()
