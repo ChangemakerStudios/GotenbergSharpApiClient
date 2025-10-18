@@ -288,7 +288,7 @@ public async Task<Stream> CreatePdfWithMetadata()
 				{ "Author", "John Doe" },
 				{ "Title", "My Document" },
 				{ "Subject", "Important Report" },
-				{ "Keywords", "report, pdf, gotenberg" }
+				{ "Keywords", "report, PDF, gotenberg" }
 			});
 		})
 		.WithPageProperties(pp => pp.UseChromeDefaults());
@@ -366,8 +366,8 @@ public async Task<Stream> CreateSinglePagePdf()
  }
 
 ```
-### Merge 15 Urls to one pdf
-*Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
+### Merge 15 URLs to one PDF
+*Builds a 30 page PDF by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
 ```csharp
 public async Task<Stream> CreateWorldNewsSummary()
