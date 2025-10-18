@@ -128,19 +128,19 @@ public void ConfigureServices(IServiceCollection services)
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-	.....
+    .....
     services.AddOptions<GotenbergSharpClientOptions>()
-	        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)))
-            .PostConfigure(options =>
-            {
-                // Override or add settings programmatically (runs after binding)
-                options.TimeOut = TimeSpan.FromMinutes(10); // Override timeout
-                options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");
-                options.BasicAuthPassword = Environment.GetEnvironmentVariable("GOTENBERG_PASS");
-            });
+        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)))
+        .PostConfigure(options =>
+        {
+            // Override or add settings programmatically (runs after binding)
+            options.TimeOut = TimeSpan.FromMinutes(10); // Override timeout
+            options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");
+            options.BasicAuthPassword = Environment.GetEnvironmentVariable("GOTENBERG_PASS");
+        });
 
     services.AddGotenbergSharpClient();
-	.....
+    .....
 }
 ```
 
