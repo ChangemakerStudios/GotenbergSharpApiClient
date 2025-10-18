@@ -14,13 +14,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="PackageInfo">
-		<Version>2.8.3</Version>
+		<Version>2.8.4</Version>
 		<PackageTags>Gotenberg pdf C# API client unoconv</PackageTags>
 		<Description>
 		C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
 		</Description>
 		<IncludeSymbols>True</IncludeSymbols>
 		<PackageReleaseNotes>
+			v2.8.4 - Fixed hybrid configuration for basic authentication credentials. See CHANGES.MD for full details.
 			v2.8.3 - Added programmatic configuration support. Comprehensive documentation improvements. Fixed NuGet packaging issues. See CHANGES.MD for full details.
 			v2.8.1 - Added strongly-typed cookie support. Added basic authentication support. Added SinglePage page property. Fixed margins bug. Project restructure (moved /lib to /src).
 			v2.8 - Improving handling of PDF formatting and added flatten support.
