@@ -1,5 +1,10 @@
 # Release History
 
+## v2.8.4
+- **Bug Fixes:**
+  - Fixed hybrid configuration for basic authentication credentials (PR #68)
+  - Resolved issue where basic auth credentials were not properly applied when using hybrid configuration (appsettings.json + programmatic overrides)
+
 ## v2.8.3
 - **Configuration Improvements:**
   - Added optional `Action<GotenbergSharpClientOptions>` parameter to `AddGotenbergSharpClient()` extension methods
