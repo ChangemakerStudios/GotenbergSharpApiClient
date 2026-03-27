@@ -1,5 +1,9 @@
 # Release History
 
+## v2.8.5
+- **Features:**
+  - Added support for the GenerateTaggedPdf flag.
+
 ## v2.8.4
 - **Bug Fixes:**
   - Fixed hybrid configuration for basic authentication credentials (PR #68)
