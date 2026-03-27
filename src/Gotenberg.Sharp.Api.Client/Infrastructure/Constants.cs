@@ -278,6 +278,8 @@ public static class Constants
 
                     public const string SkipNetworkIdleEvent = "skipNetworkIdleEvent";
 
+                    public const string GenerateTaggedPdf = "generateTaggedPdf";
+
                     //pdf format
                     public const string PdfFormat = CrossCutting.PdfFormat;
 

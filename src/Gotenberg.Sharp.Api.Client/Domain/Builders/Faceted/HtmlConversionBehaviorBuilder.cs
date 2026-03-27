@@ -230,4 +230,14 @@ public sealed class HtmlConversionBehaviorBuilder
 
         return this;
     }
+
+    /// <summary>
+    ///     This tells gotenberg to enable embeds logical structure tags for accessibility during generation.
+    /// </summary>
+    public HtmlConversionBehaviorBuilder SetGenerateTaggedPdf(bool generateTaggedPdf = true)
+    {
+        _htmlConversionBehaviors.GenerateTaggedPdf = generateTaggedPdf;
+
+        return this;
+    }
 }

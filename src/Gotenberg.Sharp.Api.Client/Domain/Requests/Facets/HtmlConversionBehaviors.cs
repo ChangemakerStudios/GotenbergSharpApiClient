@@ -1,4 +1,4 @@
-﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
+﻿// Copyright 2019-2026 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,8 +96,14 @@ public class HtmlConversionBehaviors : FacetBase
     public ConversionPdfFormats? PdfFormat { get; set; }
 
     /// <summary>
-    ///    This tells gotenberg to enable Universal Access for the resulting PDF.
+    /// This tells gotenberg to enable Universal Access for the resulting PDF.
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.PdfUa)]
     public bool? EnablePdfUa { get; set; }
+
+    /// <summary>
+    ///  Chromium feature. Embeds logical structure tags for accessibility during generation.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.GenerateTaggedPdf)]
+    public bool GenerateTaggedPdf { get; set; } = false;
 }

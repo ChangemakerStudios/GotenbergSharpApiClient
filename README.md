@@ -156,7 +156,7 @@ using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
 ```
 
-### Html To Pdf 
+### HTML To PDF
 *With embedded assets:*
 
 ```csharp
@@ -181,8 +181,8 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
  }
 ```
 
-### Url To Pdf
-*Url to Pdf with custom page range, header & footer:*
+### URL To PDF
+*URL to PDF with custom page range, header & footer:*
 
 ```csharp
 public async Task<Stream> CreateFromUrl(string headerPath, string footerPath)
@@ -222,8 +222,8 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 	return await _sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
-### Markdown to Pdf
-*Markdown to Pdf conversion with embedded assets:*
+### Markdown to PDF
+*Markdown to PDF conversion with embedded assets:*
 
 ```csharp
 public async Task<Stream> CreateFromMarkdown()
@@ -288,7 +288,7 @@ public async Task<Stream> CreatePdfWithMetadata()
 				{ "Author", "John Doe" },
 				{ "Title", "My Document" },
 				{ "Subject", "Important Report" },
-				{ "Keywords", "report, pdf, gotenberg" }
+				{ "Keywords", "report, PDF, gotenberg" }
 			});
 		})
 		.WithPageProperties(pp => pp.UseChromeDefaults());
@@ -366,8 +366,8 @@ public async Task<Stream> CreateSinglePagePdf()
  }
 
 ```
-### Merge 15 Urls to one pdf
-*Builds a 30 page pdf by merging the front two pages of 15 news sites. Takes about a minute to complete*
+### Merge 15 URLs to one PDF
+*Builds a 30 page PDF by merging the front two pages of 15 news sites. Takes about a minute to complete*
 
 ```csharp
 public async Task<Stream> CreateWorldNewsSummary()

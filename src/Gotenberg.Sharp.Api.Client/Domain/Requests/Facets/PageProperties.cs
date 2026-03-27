@@ -142,7 +142,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.SinglePage)]
         public bool SinglePage { get; set; }
-        
+
         #endregion
 
         #region public methods
