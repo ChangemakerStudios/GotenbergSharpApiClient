@@ -39,7 +39,7 @@ static async Task<string> DoOfficeMerge(string sourceDirectory, string destinati
     var builder = new MergeOfficeBuilder()
         .ConfigureRequest(c => c.SetTrace("ConsoleExample"))
         .WithAsyncAssets(async b => b.AddItems(await GetDocsAsync(sourceDirectory)))
-        .SetPdfFormat(LibrePdfFormats.A2b)
+        .SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A2b))
         .SetPageRanges("1-3"); // Only one of the files has more than 1 page.
 
     var response = await client.MergeOfficeDocsAsync(builder).ConfigureAwait(false);

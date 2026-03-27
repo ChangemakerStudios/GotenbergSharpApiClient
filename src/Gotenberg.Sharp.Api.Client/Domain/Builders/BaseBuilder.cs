@@ -60,6 +60,35 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
     }
 
     /// <summary>
+    /// Configures PDF output options shared across all request types, including PDF/A format,
+    /// PDF/UA accessibility, flatten, tagged PDF generation, and metadata.
+    /// </summary>
+    /// <param name="action">Configuration action for PDF output options.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public TBuilder SetPdfOutputOptions(Action<PdfOutputOptionsBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        this.Request.PdfOutputOptions ??= new PdfOutputOptions();
+
+        action(new PdfOutputOptionsBuilder(this.Request.PdfOutputOptions));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Sets pre-configured PDF output options.
+    /// </summary>
+    /// <param name="options">Pre-configured PdfOutputOptions instance.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public TBuilder SetPdfOutputOptions(PdfOutputOptions options)
+    {
+        this.Request.PdfOutputOptions = options ?? throw new ArgumentNullException(nameof(options));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
     /// Builds the request synchronously. Use when all content is already in memory (no async operations).
     /// </summary>
     /// <returns>The configured request ready to send to Gotenberg.</returns>

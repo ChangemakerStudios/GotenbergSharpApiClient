@@ -22,7 +22,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
         protected override IEnumerable<HttpContent> ToHttpContent() =>
-            Config.IfNullEmptyContent()
+            base.ToHttpContent()
+                .Concat(Config.IfNullEmptyContent())
                 .Concat(this.PageProperties.IfNullEmptyContent())
                 .Concat(ConversionBehaviors.IfNullEmptyContent());
     }

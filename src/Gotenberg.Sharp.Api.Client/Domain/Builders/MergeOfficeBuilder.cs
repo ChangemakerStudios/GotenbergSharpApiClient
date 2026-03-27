@@ -1,12 +1,12 @@
-﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
-// 
+//
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,33 +50,27 @@ public sealed class MergeOfficeBuilder()
     /// <summary>
     /// Converts the resulting merged PDF to the specified PDF/A format for long-term archival.
     /// </summary>
-    /// <param name="format">PDF/A format (A1a, A1b, A2a, A2b, A2u, A3a, A3b, or A3u).</param>
-    /// <returns>The builder instance for method chaining.</returns>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfFormat(...)) instead")]
     public MergeOfficeBuilder SetPdfFormat(LibrePdfFormats format)
     {
-        this.Request.PdfFormat = format;
         return this;
     }
 
     /// <summary>
-    /// Flattens the resulting PDF by removing interactive form fields and annotations, converting them to static content.
+    /// Flattens the resulting PDF by removing interactive form fields and annotations.
     /// </summary>
-    /// <param name="enableFlatten">True to flatten the PDF.</param>
-    /// <returns>The builder instance for method chaining.</returns>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetFlatten()) instead")]
     public MergeOfficeBuilder SetFlatten(bool enableFlatten = true)
     {
-        this.Request.EnableFlatten = enableFlatten;
         return this;
     }
 
     /// <summary>
-    /// Enables PDF/UA (Universal Access) for enhanced accessibility compliance in the merged PDF.
+    /// Enables PDF/UA (Universal Access) for enhanced accessibility compliance.
     /// </summary>
-    /// <param name="enablePdfUa">True to enable PDF/UA compliance.</param>
-    /// <returns>The builder instance for method chaining.</returns>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfUa()) instead")]
     public MergeOfficeBuilder SetPdfUa(bool enablePdfUa = true)
     {
-        this.Request.EnablePdfUa = enablePdfUa;
         return this;
     }
 }

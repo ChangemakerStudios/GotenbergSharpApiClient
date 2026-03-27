@@ -1,12 +1,12 @@
-﻿// Copyright 2019-2026 Chris Mohan, Jaben Cargman
+// Copyright 2019-2026 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
-// 
+//
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,8 +18,13 @@ using Newtonsoft.Json.Linq;
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 /// <summary>
-/// The right side tabs here: https://gotenberg.dev/docs/modules/chromium#routes
+/// Chromium rendering behaviors for HTML/URL to PDF conversions.
+/// Controls wait conditions, HTTP headers, cookies, media emulation, and error handling.
 /// </summary>
+/// <remarks>
+/// PDF output options (PDF/A, PDF/UA, flatten, tagged PDF, metadata) have moved to
+/// <see cref="PdfOutputOptions"/> which is shared across all request types.
+/// </remarks>
 public class HtmlConversionBehaviors : FacetBase
 {
     /// <summary>
@@ -61,14 +66,6 @@ public class HtmlConversionBehaviors : FacetBase
     public List<Cookie>? Cookies { get; set; }
 
     /// <summary>
-    /// The metadata to write to the PDF (JSON format).
-    /// Not all metadata are writable.
-    /// Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
-    /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.MetaData)]
-    public JObject? MetaData { get; set; }
-
-    /// <summary>
     /// Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <remarks>
@@ -88,22 +85,4 @@ public class HtmlConversionBehaviors : FacetBase
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.SkipNetworkIdleEvent)]
     public bool? SkipNetworkIdleEvent { get; set; }
-
-    /// <summary>
-    /// Convert the resulting PDF into the given PDF/A format.
-    /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.PdfFormat)]
-    public ConversionPdfFormats? PdfFormat { get; set; }
-
-    /// <summary>
-    /// This tells gotenberg to enable Universal Access for the resulting PDF.
-    /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.PdfUa)]
-    public bool? EnablePdfUa { get; set; }
-
-    /// <summary>
-    ///  Chromium feature. Embeds logical structure tags for accessibility during generation.
-    /// </summary>
-    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.GenerateTaggedPdf)]
-    public bool GenerateTaggedPdf { get; set; } = false;
 }

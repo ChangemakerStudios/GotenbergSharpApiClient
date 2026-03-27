@@ -1,12 +1,12 @@
-﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
-// 
+//
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,8 +19,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 
 /// <summary>
 /// Configures Chromium rendering behaviors for HTML and URL to PDF conversions.
-/// Includes settings for wait delays, HTTP headers, cookies, metadata, PDF format, and accessibility.
+/// Includes settings for wait delays, HTTP headers, cookies, media emulation, and error handling.
 /// </summary>
+/// <remarks>
+/// PDF output options (PDF/A, PDF/UA, flatten, tagged PDF, metadata) have moved to
+/// <see cref="PdfOutputOptionsBuilder"/> which is available via <c>SetPdfOutputOptions()</c> on all builders.
+/// </remarks>
 public sealed class HtmlConversionBehaviorBuilder
 {
     private readonly HtmlConversionBehaviors _htmlConversionBehaviors;
@@ -138,39 +142,6 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    ///     Sets the document metadata.
-    ///     Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an
-    ///     (exhaustive?) list of available metadata.
-    /// </summary>
-    /// <param name="dictionary"></param>
-    /// <returns></returns>
-    public HtmlConversionBehaviorBuilder SetMetadata(IDictionary<string, object> dictionary)
-    {
-        SetMetadata(JObject.FromObject(dictionary));
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Sets the document metadata.
-    ///     Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an
-    ///     (exhaustive?) list of available metadata.
-    /// </summary>
-    /// <param name="metadata"></param>
-    /// <returns></returns>
-    public HtmlConversionBehaviorBuilder SetMetadata(JObject metadata)
-    {
-        if (metadata == null)
-        {
-            throw new InvalidOperationException("metadata is null");
-        }
-
-        _htmlConversionBehaviors.MetaData = metadata;
-
-        return this;
-    }
-
-    /// <summary>
     ///     Tells gotenberg to return a 409 response if there are exceptions in the Chromium console.
     /// </summary>
     /// <returns></returns>
@@ -204,40 +175,47 @@ public sealed class HtmlConversionBehaviorBuilder
     }
 
     /// <summary>
-    ///     Sets the format of the resulting PDF document
+    ///     Sets the format of the resulting PDF document.
     /// </summary>
-    /// <param name="format"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfFormat(...)) on the builder instead")]
     public HtmlConversionBehaviorBuilder SetPdfFormat(ConversionPdfFormats format)
     {
-        if (format == default)
-        {
-            throw new InvalidOperationException("Invalid PDF format specified");
-        }
-
-        _htmlConversionBehaviors.PdfFormat = format;
-
         return this;
     }
 
     /// <summary>
     ///     This tells gotenberg to enable Universal Access for the resulting PDF.
     /// </summary>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfUa()) on the builder instead")]
     public HtmlConversionBehaviorBuilder SetPdfUa(bool enablePdfUa = true)
     {
-        _htmlConversionBehaviors.EnablePdfUa = enablePdfUa;
-
         return this;
     }
 
     /// <summary>
     ///     This tells gotenberg to enable embeds logical structure tags for accessibility during generation.
     /// </summary>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetGenerateTaggedPdf()) on the builder instead")]
     public HtmlConversionBehaviorBuilder SetGenerateTaggedPdf(bool generateTaggedPdf = true)
     {
-        _htmlConversionBehaviors.GenerateTaggedPdf = generateTaggedPdf;
+        return this;
+    }
 
+    /// <summary>
+    ///     Sets the document metadata.
+    /// </summary>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetMetadata(...)) on the builder instead")]
+    public HtmlConversionBehaviorBuilder SetMetadata(IDictionary<string, object> dictionary)
+    {
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the document metadata.
+    /// </summary>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetMetadata(...)) on the builder instead")]
+    public HtmlConversionBehaviorBuilder SetMetadata(JObject metadata)
+    {
         return this;
     }
 }

@@ -23,6 +23,11 @@ public abstract class BuildRequestBase
 
     internal AssetDictionary? Assets { get; set; }
 
+    /// <summary>
+    /// PDF output options shared across all request types (PDF/A, PDF/UA, flatten, tagged PDF, metadata).
+    /// </summary>
+    public PdfOutputOptions? PdfOutputOptions { get; set; }
+
     protected abstract string ApiPath { get; }
 
     private const string _dispositionType = Constants.HttpContent.Disposition.Types.FormData;
@@ -36,7 +41,10 @@ public abstract class BuildRequestBase
         return item;
     }
 
-    protected abstract IEnumerable<HttpContent> ToHttpContent();
+    protected virtual IEnumerable<HttpContent> ToHttpContent()
+    {
+        return this.PdfOutputOptions.IfNullEmptyContent();
+    }
 
     protected virtual void Validate()
     {

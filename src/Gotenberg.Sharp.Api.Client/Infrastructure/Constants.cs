@@ -82,10 +82,32 @@ public static class Constants
 
             internal const string PdfUa = "pdfua";
 
+            internal const string Flatten = "flatten";
+
+            internal const string GenerateTaggedPdf = "generateTaggedPdf";
+
+            internal const string MetaData = "metadata";
+
             internal static class FileNames
             {
                 internal const string Index = "index.html";
             }
+        }
+
+        /// <summary>
+        ///     PDF output options shared across all modules (Chromium, LibreOffice, PDF Engines).
+        /// </summary>
+        public static class PdfOutput
+        {
+            public const string PdfFormat = CrossCutting.PdfFormat;
+
+            public const string PdfUa = CrossCutting.PdfUa;
+
+            public const string Flatten = CrossCutting.Flatten;
+
+            public const string GenerateTaggedPdf = CrossCutting.GenerateTaggedPdf;
+
+            public const string MetaData = CrossCutting.MetaData;
         }
 
         /// <summary>
@@ -211,7 +233,7 @@ public static class Constants
             public static class Shared
             {
                 /// <summary>
-                ///     From the header & footer tabs
+                ///     From the header and footer tabs
                 /// </summary>
                 public static class FileNames
                 {

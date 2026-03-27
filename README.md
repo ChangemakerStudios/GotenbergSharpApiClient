@@ -216,7 +216,7 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 {
 	var builder = new MergeOfficeBuilder()
 		.WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)))
-		.SetPdfFormat(LibrePdfFormats.A2b);
+		.SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A2b));
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.MergeOfficeDocsAsync(request);
@@ -281,16 +281,13 @@ public async Task<Stream> CreatePdfWithMetadata()
 {
 	var builder = new HtmlRequestBuilder()
 		.AddDocument(doc => doc.SetBody("<html><body><h1>Document with Metadata</h1></body></html>"))
-		.SetConversionBehaviors(b =>
+		.SetPdfOutputOptions(o => o.SetMetadata(new Dictionary<string, object>
 		{
-			b.SetMetadata(new Dictionary<string, object>
-			{
-				{ "Author", "John Doe" },
-				{ "Title", "My Document" },
-				{ "Subject", "Important Report" },
-				{ "Keywords", "report, PDF, gotenberg" }
-			});
-		})
+			{ "Author", "John Doe" },
+			{ "Title", "My Document" },
+			{ "Subject", "Important Report" },
+			{ "Keywords", "report, PDF, gotenberg" }
+		}))
 		.WithPageProperties(pp => pp.UseChromeDefaults());
 
 	var request = await builder.BuildAsync();
@@ -306,7 +303,7 @@ public async Task<Stream> ConvertToPdfA(string pdfPath)
 {
 	var builder = new PdfConversionBuilder()
 		.WithPdfs(b => b.AddItem("document.pdf", File.ReadAllBytes(pdfPath)))
-		.SetPdfFormat(LibrePdfFormats.A2b);
+		.SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A2b));
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.ConvertPdfDocumentsAsync(request);
@@ -441,7 +438,7 @@ public async Task<Stream> CreateAccessiblePdf()
 {
 	var builder = new HtmlRequestBuilder()
 		.AddDocument(doc => doc.SetBody("<html><body><h1>Accessible Document</h1></body></html>"))
-		.SetConversionBehaviors(b => b.SetPdfUa(true))
+		.SetPdfOutputOptions(o => o.SetPdfUa())
 		.WithPageProperties(pp => pp.UseChromeDefaults());
 
 	var request = await builder.BuildAsync();
@@ -457,8 +454,7 @@ public async Task<Stream> ConvertToAccessiblePdfA(string pdfPath)
 {
 	var builder = new PdfConversionBuilder()
 		.WithPdfs(b => b.AddItem("document.pdf", File.ReadAllBytes(pdfPath)))
-		.SetPdfFormat(LibrePdfFormats.A2b)
-		.EnablePdfUa(true);
+		.SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A2b).SetPdfUa());
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.ConvertPdfDocumentsAsync(request);
@@ -473,7 +469,7 @@ public async Task<Stream> FlattenPdf(string pdfPath)
 {
 	var builder = new PdfConversionBuilder()
 		.WithPdfs(b => b.AddItem("form.pdf", File.ReadAllBytes(pdfPath)))
-		.EnableFlatten(true);
+		.SetPdfOutputOptions(o => o.SetFlatten());
 
 	var request = await builder.BuildAsync();
 	return await _sharpClient.ConvertPdfDocumentsAsync(request);

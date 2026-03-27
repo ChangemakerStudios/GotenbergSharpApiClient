@@ -1,12 +1,12 @@
-﻿// Copyright 2019-2025 Chris Mohan, Jaben Cargman
+// Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
-// 
+//
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Builders;
 
 /// <summary>
 /// Builds requests for converting existing PDF files to PDF/A formats or applying transformations
-/// using Gotenberg's PDF engines module. Supports flattening and PDF/UA compliance.
+/// using Gotenberg's PDF engines module. Supports flattening and PDF/UA compliance via SetPdfOutputOptions().
 /// </summary>
 public sealed class PdfConversionBuilder()
     : BaseBuilder<PdfConversionRequest, PdfConversionBuilder>(new PdfConversionRequest())
@@ -25,39 +25,27 @@ public sealed class PdfConversionBuilder()
     /// <summary>
     /// Converts the PDF to the specified PDF/A format for long-term archival and compliance.
     /// </summary>
-    /// <param name="format">PDF/A format (A1a, A1b, A2a, A2b, A2u, A3a, A3b, or A3u).</param>
-    /// <returns>The builder instance for method chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when format is null or default.</exception>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfFormat(...)) instead")]
     public PdfConversionBuilder SetPdfFormat(LibrePdfFormats format)
     {
-        if (format == default) throw new ArgumentNullException(nameof(format));
-
-        this.Request.PdfFormat = format;
-
         return this;
     }
 
     /// <summary>
-    /// Flattens the PDF by removing interactive form fields and annotations, converting them to static content.
+    /// Flattens the PDF by removing interactive form fields and annotations.
     /// </summary>
-    /// <param name="enableFlatten">True to flatten the PDF.</param>
-    /// <returns>The builder instance for method chaining.</returns>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetFlatten()) instead")]
     public PdfConversionBuilder EnableFlatten(bool enableFlatten = true)
     {
-        this.Request.EnableFlatten = enableFlatten;
-
         return this;
     }
 
     /// <summary>
     /// Enables PDF/UA (Universal Access) for enhanced accessibility compliance.
     /// </summary>
-    /// <param name="enablePdfUa">True to enable PDF/UA compliance.</param>
-    /// <returns>The builder instance for method chaining.</returns>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfUa()) instead")]
     public PdfConversionBuilder EnablePdfUa(bool enablePdfUa = true)
     {
-        this.Request.EnablePdfUa = enablePdfUa;
-
         return this;
     }
 

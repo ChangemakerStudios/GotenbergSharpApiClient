@@ -74,6 +74,7 @@ public abstract class FacetBase : IConvertToHttpContent
 
         return value switch
         {
+            PdfFormat format => format.ToFormDataValue(),
             LibrePdfFormats format => format.ToFormDataValue(),
             ConversionPdfFormats format => format.ToFormDataValue(),
             List<Cookie> cookies => JsonConvert.SerializeObject(cookies),

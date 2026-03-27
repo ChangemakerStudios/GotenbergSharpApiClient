@@ -54,7 +54,7 @@ static async Task<string> DoConversion(string sourcePath, string destinationPath
 
     var builder = new PdfConversionBuilder()
         .WithPdfs(b => b.AddItems(toConvert))
-        .SetPdfFormat(LibrePdfFormats.A2b);
+        .SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A2b));
 
     var request = builder.Build();
     var response = await sharpClient.ConvertPdfDocumentsAsync(request);

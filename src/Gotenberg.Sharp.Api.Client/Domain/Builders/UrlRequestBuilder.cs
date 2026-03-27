@@ -55,27 +55,18 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
     /// <summary>
     /// Converts the resulting PDF to the specified PDF/A format for long-term archival.
     /// </summary>
-    /// <param name="format">PDF/A format (A1b, A2b, or A3b).</param>
-    /// <returns>The builder instance for method chaining.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when format is invalid.</exception>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfFormat(...)) instead")]
     public UrlRequestBuilder SetPdfFormat(ConversionPdfFormats format)
     {
-        if (format == default) throw new InvalidOperationException("Invalid PDF format specified");
-
-        this.Request.PdfFormat = format;
-
         return this;
     }
 
     /// <summary>
     /// Enables PDF/UA (Universal Access) for enhanced accessibility compliance.
     /// </summary>
-    /// <param name="enablePdfUa">True to enable PDF/UA compliance.</param>
-    /// <returns>The builder instance for method chaining.</returns>
+    [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfUa()) instead")]
     public UrlRequestBuilder SetPdfUa(bool enablePdfUa = true)
     {
-        this.Request.EnablePdfUa = enablePdfUa;
-
         return this;
     }
 
