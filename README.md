@@ -492,6 +492,38 @@ public async Task<Stream> FastConversion()
 }
 ```
 
+### Watermark & Rotation
+*Add text watermarks and rotate PDF pages — available on all request types:*
+
+```csharp
+public async Task<Stream> CreateWatermarkedPdf()
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body><h1>Report</h1></body></html>"))
+        .SetWatermarkOptions(w => w.SetTextWatermark("DRAFT", "1-3"))
+        .SetRotationOptions(r => r.SetAngle(90).SetPages("2"))
+        .WithPageProperties(pp => pp.UseChromeDefaults());
+
+    var request = builder.Build();
+    return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+
+### Split PDFs
+*Split generated PDFs into chunks or extract specific pages:*
+
+```csharp
+public async Task<Stream> SplitPdf()
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body>Multi-page content</body></html>"))
+        .SetSplitOptions(s => s.SplitByPages("1-3,5", unify: true));
+
+    var request = builder.Build();
+    return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+
 ### Custom Page Properties
 *Fine-tune page dimensions and properties:*
 
