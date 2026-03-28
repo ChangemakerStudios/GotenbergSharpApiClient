@@ -492,6 +492,27 @@ public async Task<Stream> FastConversion()
 }
 ```
 
+### Wait For Selector & Emulated Media Features
+*Wait for a DOM element and emulate CSS media features like dark mode:*
+
+```csharp
+public async Task<Stream> CreateWithChromiumFeatures()
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body><div id='app'>Ready</div></body></html>"))
+        .SetConversionBehaviors(b => b
+            .SetWaitForSelector("#app")
+            .AddEmulatedMediaFeature("prefers-color-scheme", "dark")
+            .SetFailOnHttpStatusCodes(499, 599)
+            .FailOnResourceLoadingFailed()
+            .AddIgnoreResourceHttpStatusDomains("cdn.example.com"))
+        .WithPageProperties(pp => pp.UseChromeDefaults());
+
+    var request = builder.Build();
+    return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+
 ### Custom Page Properties
 *Fine-tune page dimensions and properties:*
 
