@@ -283,6 +283,8 @@ public static class Constants
 
                     public const string WaitForExpression = "waitForExpression";
 
+                    public const string WaitForSelector = "waitForSelector";
+
                     //http headers
                     public const string UserAgent = "userAgent";
 
@@ -298,9 +300,20 @@ public static class Constants
                     //css
                     public const string EmulatedMediaType = "emulatedMediaType";
 
+                    public const string EmulatedMediaFeatures = "emulatedMediaFeatures";
+
                     public const string SkipNetworkIdleEvent = "skipNetworkIdleEvent";
 
                     public const string GenerateTaggedPdf = "generateTaggedPdf";
+
+                    //error handling
+                    public const string FailOnHttpStatusCodes = "failOnHttpStatusCodes";
+
+                    public const string FailOnResourceHttpStatusCodes = "failOnResourceHttpStatusCodes";
+
+                    public const string IgnoreResourceHttpStatusDomains = "ignoreResourceHttpStatusDomains";
+
+                    public const string FailOnResourceLoadingFailed = "failOnResourceLoadingFailed";
 
                     //pdf format
                     public const string PdfFormat = CrossCutting.PdfFormat;

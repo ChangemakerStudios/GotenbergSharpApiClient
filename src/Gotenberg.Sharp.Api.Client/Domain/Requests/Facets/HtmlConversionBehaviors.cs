@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+
 using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
@@ -85,4 +87,44 @@ public class HtmlConversionBehaviors : FacetBase
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.SkipNetworkIdleEvent)]
     public bool? SkipNetworkIdleEvent { get; set; }
+
+    /// <summary>
+    /// CSS selector to wait for before conversion. Delays until the element appears in the DOM.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.WaitForSelector)]
+    public CssSelector? WaitForSelector { get; set; }
+
+    /// <summary>
+    /// Overrides CSS media features (e.g., prefers-color-scheme, prefers-reduced-motion).
+    /// Sent as a JSON array of {name, value} objects.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.EmulatedMediaFeatures)]
+    public List<EmulatedMediaFeature>? EmulatedMediaFeatures { get; set; }
+
+    /// <summary>
+    /// HTTP status codes that trigger a 409 Conflict response from Gotenberg
+    /// when the main page returns a matching code. Default: [499, 599].
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnHttpStatusCodes)]
+    public List<HttpStatusCode>? FailOnHttpStatusCodes { get; set; }
+
+    /// <summary>
+    /// HTTP status codes that trigger a failure when page resources (CSS, images, fonts)
+    /// return a matching code.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnResourceHttpStatusCodes)]
+    public List<HttpStatusCode>? FailOnResourceHttpStatusCodes { get; set; }
+
+    /// <summary>
+    /// Domains to exclude from HTTP status code checks on resources.
+    /// Useful for ignoring third-party CDNs or analytics domains.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.IgnoreResourceHttpStatusDomains)]
+    public List<DomainName>? IgnoreResourceHttpStatusDomains { get; set; }
+
+    /// <summary>
+    /// Tells Gotenberg to return a 409 Conflict if any resource fails to load due to network errors.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnResourceLoadingFailed)]
+    public bool? FailOnResourceLoadingFailed { get; set; }
 }

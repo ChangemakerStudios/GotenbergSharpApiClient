@@ -15,6 +15,8 @@
 
 using System.Globalization;
 
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 
 public abstract class FacetBase : IConvertToHttpContent
@@ -78,6 +80,11 @@ public abstract class FacetBase : IConvertToHttpContent
             LibrePdfFormats format => format.ToFormDataValue(),
             ConversionPdfFormats format => format.ToFormDataValue(),
             List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
+            List<EmulatedMediaFeature> features => JsonConvert.SerializeObject(
+                features.ToDictionary(f => f.Name, f => f.Value)),
+            List<HttpStatusCode> codes => JsonConvert.SerializeObject(codes.Select(c => c.Value)),
+            List<DomainName> domains => JsonConvert.SerializeObject(domains.Select(d => d.Value)),
+            CssSelector selector => selector.Value,
             float f => f.ToString(cultureInfo),
             double d => d.ToString(cultureInfo),
             decimal c => c.ToString(cultureInfo),
