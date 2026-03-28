@@ -142,6 +142,53 @@ public static class Constants
                     public const string Flatten = "flatten";
                 }
             }
+
+            public static class Options
+            {
+                // Layout
+                public const string SinglePageSheets = "singlePageSheets";
+                public const string SkipEmptyPages = "skipEmptyPages";
+                public const string ExportPlaceholders = "exportPlaceholders";
+
+                // Image compression
+                public const string LosslessImageCompression = "losslessImageCompression";
+                public const string Quality = "quality";
+                public const string ReduceImageResolution = "reduceImageResolution";
+                public const string MaxImageResolution = "maxImageResolution";
+
+                // Notes & slides
+                public const string ExportNotes = "exportNotes";
+                public const string ExportNotesPages = "exportNotesPages";
+                public const string ExportOnlyNotesPages = "exportOnlyNotesPages";
+                public const string ExportNotesInMargin = "exportNotesInMargin";
+                public const string ExportHiddenSlides = "exportHiddenSlides";
+
+                // Links
+                public const string ConvertOooTargetToPdfTarget = "convertOooTargetToPdfTarget";
+                public const string ExportLinksRelativeFsys = "exportLinksRelativeFsys";
+
+                // Document outline
+                public const string UpdateIndexes = "updateIndexes";
+                public const string ExportBookmarks = "exportBookmarks";
+                public const string ExportBookmarksToPdfDestination = "exportBookmarksToPdfDestination";
+                public const string AddOriginalDocumentAsStream = "addOriginalDocumentAsStream";
+
+                // Form fields
+                public const string ExportFormFields = "exportFormFields";
+                public const string AllowDuplicateFieldNames = "allowDuplicateFieldNames";
+
+                // Native watermark
+                public const string NativeWatermarkText = "nativeWatermarkText";
+                public const string NativeWatermarkColor = "nativeWatermarkColor";
+                public const string NativeWatermarkFontHeight = "nativeWatermarkFontHeight";
+                public const string NativeWatermarkRotateAngle = "nativeWatermarkRotateAngle";
+                public const string NativeWatermarkFontName = "nativeWatermarkFontName";
+                public const string NativeTiledWatermarkText = "nativeTiledWatermarkText";
+
+                // Source password & merge
+                public const string Password = "password";
+                public const string Merge = "merge";
+            }
         }
 
         /// <summary>
