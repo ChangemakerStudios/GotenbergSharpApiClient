@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+
 using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
@@ -54,4 +56,16 @@ public class PdfOutputOptions : FacetBase
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.PdfOutput.MetaData)]
     public JObject? MetaData { get; set; }
+
+    /// <summary>
+    /// The password required to open the PDF.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.PdfOutput.UserPassword)]
+    public PdfPassword? UserPassword { get; set; }
+
+    /// <summary>
+    /// The password required to change permissions or edit the PDF.
+    /// </summary>
+    [MultiFormHeader(Constants.Gotenberg.PdfOutput.OwnerPassword)]
+    public PdfPassword? OwnerPassword { get; set; }
 }

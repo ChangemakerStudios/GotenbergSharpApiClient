@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+
 using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
@@ -109,6 +111,64 @@ public sealed class PdfOutputOptionsBuilder
         }
 
         _options.MetaData = metadata;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the password required to open the resulting PDF.
+    /// </summary>
+    /// <param name="password">A validated PDF password.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public PdfOutputOptionsBuilder SetUserPassword(PdfPassword password)
+    {
+        _options.UserPassword = password ?? throw new ArgumentNullException(nameof(password));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the password required to open the resulting PDF.
+    /// </summary>
+    /// <param name="password">A non-empty password string.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public PdfOutputOptionsBuilder SetUserPassword(string password)
+    {
+        return SetUserPassword(PdfPassword.Create(password));
+    }
+
+    /// <summary>
+    /// Sets the password required to change permissions or edit the resulting PDF.
+    /// </summary>
+    /// <param name="password">A validated PDF password.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public PdfOutputOptionsBuilder SetOwnerPassword(PdfPassword password)
+    {
+        _options.OwnerPassword = password ?? throw new ArgumentNullException(nameof(password));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the password required to change permissions or edit the resulting PDF.
+    /// </summary>
+    /// <param name="password">A non-empty password string.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public PdfOutputOptionsBuilder SetOwnerPassword(string password)
+    {
+        return SetOwnerPassword(PdfPassword.Create(password));
+    }
+
+    /// <summary>
+    /// Sets both user and owner passwords for the resulting PDF.
+    /// </summary>
+    /// <param name="userPassword">Password required to open the PDF.</param>
+    /// <param name="ownerPassword">Password required to change permissions.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public PdfOutputOptionsBuilder SetEncryption(string userPassword, string ownerPassword)
+    {
+        SetUserPassword(userPassword);
+        SetOwnerPassword(ownerPassword);
 
         return this;
     }
