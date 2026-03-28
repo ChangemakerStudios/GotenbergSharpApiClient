@@ -492,6 +492,42 @@ public async Task<Stream> FastConversion()
 }
 ```
 
+### Screenshot from HTML
+*Capture a screenshot of HTML content as PNG, JPEG, or WebP:*
+
+```csharp
+public async Task<Stream> ScreenshotHtml()
+{
+    var builder = new ScreenshotHtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body><h1>Screenshot!</h1></body></html>"))
+        .WithScreenshotProperties(p => p
+            .SetSize(1280, 720)
+            .SetFormat(ScreenshotFormat.Png));
+
+    var request = builder.Build();
+    return await _sharpClient.ScreenshotHtmlAsync(request);
+}
+```
+
+### Screenshot from URL
+*Capture a screenshot of any URL:*
+
+```csharp
+public async Task<Stream> ScreenshotUrl()
+{
+    var builder = new ScreenshotUrlRequestBuilder()
+        .SetUrl("https://example.com")
+        .WithScreenshotProperties(p => p
+            .SetSize(1024, 768)
+            .SetFormat(ScreenshotFormat.Jpeg)
+            .SetQuality(90)
+            .SetClip());
+
+    var request = builder.Build();
+    return await _sharpClient.ScreenshotUrlAsync(request);
+}
+```
+
 ### Custom Page Properties
 *Fine-tune page dimensions and properties:*
 
