@@ -28,6 +28,26 @@ public abstract class BuildRequestBase
     /// </summary>
     public PdfOutputOptions? PdfOutputOptions { get; set; }
 
+    /// <summary>
+    /// Cross-cutting rotation options (angle and page ranges).
+    /// </summary>
+    public RotationOptions? RotationOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting split options (mode, span, and unify).
+    /// </summary>
+    public SplitOptions? SplitOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting watermark options (background overlay).
+    /// </summary>
+    public WatermarkOptions? WatermarkOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting stamp options (foreground overlay).
+    /// </summary>
+    public StampOptions? StampOptions { get; set; }
+
     protected abstract string ApiPath { get; }
 
     private const string _dispositionType = Constants.HttpContent.Disposition.Types.FormData;
@@ -43,7 +63,11 @@ public abstract class BuildRequestBase
 
     protected virtual IEnumerable<HttpContent> ToHttpContent()
     {
-        return this.PdfOutputOptions.IfNullEmptyContent();
+        return this.PdfOutputOptions.IfNullEmptyContent()
+            .Concat(this.RotationOptions.IfNullEmptyContent())
+            .Concat(this.SplitOptions.IfNullEmptyContent())
+            .Concat(this.WatermarkOptions.IfNullEmptyContent())
+            .Concat(this.StampOptions.IfNullEmptyContent());
     }
 
     protected virtual void Validate()
