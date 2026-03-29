@@ -153,7 +153,7 @@ public class CrossCuttingOptionsTests
     #region Serialization Tests
 
     [Test]
-    public void RotationOptions_SerializesCorrectly()
+    public async Task RotationOptions_SerializesCorrectly()
     {
         var options = new RotationOptions
         {
@@ -163,16 +163,17 @@ public class CrossCuttingOptionsTests
 
         var httpContents = options.ToHttpContent().ToList();
 
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "rotateAngle")!
-            .ReadAsStringAsync().Result.Should().Be("90");
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "rotatePages")!
-            .ReadAsStringAsync().Result.Should().Be("1-3");
+        var angleContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "rotateAngle")!;
+        (await angleContent.ReadAsStringAsync()).Should().Be("90");
+
+        var pagesContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "rotatePages")!;
+        (await pagesContent.ReadAsStringAsync()).Should().Be("1-3");
     }
 
     [Test]
-    public void SplitOptions_SerializesCorrectly()
+    public async Task SplitOptions_SerializesCorrectly()
     {
         var options = new SplitOptions
         {
@@ -183,16 +184,17 @@ public class CrossCuttingOptionsTests
 
         var httpContents = options.ToHttpContent().ToList();
 
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "splitMode")!
-            .ReadAsStringAsync().Result.Should().Be("intervals");
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "splitSpan")!
-            .ReadAsStringAsync().Result.Should().Be("2");
+        var modeContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "splitMode")!;
+        (await modeContent.ReadAsStringAsync()).Should().Be("intervals");
+
+        var spanContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "splitSpan")!;
+        (await spanContent.ReadAsStringAsync()).Should().Be("2");
     }
 
     [Test]
-    public void WatermarkOptions_SerializesCorrectly()
+    public async Task WatermarkOptions_SerializesCorrectly()
     {
         var options = new WatermarkOptions
         {
@@ -202,16 +204,17 @@ public class CrossCuttingOptionsTests
 
         var httpContents = options.ToHttpContent().ToList();
 
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "watermarkSource")!
-            .ReadAsStringAsync().Result.Should().Be("text");
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "watermarkExpression")!
-            .ReadAsStringAsync().Result.Should().Be("DRAFT");
+        var sourceContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "watermarkSource")!;
+        (await sourceContent.ReadAsStringAsync()).Should().Be("text");
+
+        var exprContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "watermarkExpression")!;
+        (await exprContent.ReadAsStringAsync()).Should().Be("DRAFT");
     }
 
     [Test]
-    public void StampOptions_SerializesCorrectly()
+    public async Task StampOptions_SerializesCorrectly()
     {
         var options = new StampOptions
         {
@@ -222,21 +225,24 @@ public class CrossCuttingOptionsTests
 
         var httpContents = options.ToHttpContent().ToList();
 
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "stampSource")!
-            .ReadAsStringAsync().Result.Should().Be("image");
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "stampExpression")!
-            .ReadAsStringAsync().Result.Should().Be("logo.png");
-        httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "stampPages")!
-            .ReadAsStringAsync().Result.Should().Be("1");
+        var sourceContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "stampSource")!;
+        (await sourceContent.ReadAsStringAsync()).Should().Be("image");
+
+        var exprContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "stampExpression")!;
+        (await exprContent.ReadAsStringAsync()).Should().Be("logo.png");
+
+        var pagesContent = httpContents.FirstOrDefault(c =>
+            c.Headers.ContentDisposition?.Name == "stampPages")!;
+        (await pagesContent.ReadAsStringAsync()).Should().Be("1");
     }
 
     #endregion
 
     #region Integration Tests
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithRotation_Succeeds()
     {
@@ -253,6 +259,7 @@ public class CrossCuttingOptionsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithWatermark_Succeeds()
     {
