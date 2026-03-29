@@ -305,6 +305,23 @@ public static class Constants
                 public const string ConvertHtml = $"{Root}/convert/html";
 
                 public const string ConvertMarkdown = $"{Root}/convert/markdown";
+
+                public const string ScreenshotUrl = $"{Root}/screenshot/url";
+
+                public const string ScreenshotHtml = $"{Root}/screenshot/html";
+
+                public const string ScreenshotMarkdown = $"{Root}/screenshot/markdown";
+            }
+
+            public static class Screenshot
+            {
+                public const string Width = "width";
+                public const string Height = "height";
+                public const string Clip = "clip";
+                public const string Format = "format";
+                public const string Quality = "quality";
+                public const string OmitBackground = "omitBackground";
+                public const string OptimizeForSpeed = "optimizeForSpeed";
             }
 
             public static class Routes

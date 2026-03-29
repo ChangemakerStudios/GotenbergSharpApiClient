@@ -243,6 +243,66 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
+    /// Captures a screenshot of HTML content using Gotenberg's Chromium module.
+    /// </summary>
+    /// <param name="request">The HTML screenshot request.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the screenshot image (PNG, JPEG, or WebP).</returns>
+    /// <seealso href="https://gotenberg.dev/docs/convert-with-chromium/screenshot-html">Gotenberg Screenshot HTML Documentation</seealso>
+    public virtual Task<Stream> ScreenshotHtmlAsync(
+        ScreenshotHtmlRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of HTML content using a builder pattern.
+    /// </summary>
+    public virtual async Task<Stream> ScreenshotHtmlAsync(
+        ScreenshotHtmlRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ScreenshotHtmlAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of a URL using Gotenberg's Chromium module.
+    /// </summary>
+    /// <param name="request">The URL screenshot request.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the screenshot image (PNG, JPEG, or WebP).</returns>
+    /// <seealso href="https://gotenberg.dev/docs/convert-with-chromium/screenshot-url">Gotenberg Screenshot URL Documentation</seealso>
+    public virtual Task<Stream> ScreenshotUrlAsync(
+        ScreenshotUrlRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of a URL using a builder pattern.
+    /// </summary>
+    public virtual async Task<Stream> ScreenshotUrlAsync(
+        ScreenshotUrlRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ScreenshotUrlAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Executes a standalone PDF engine operation (flatten, rotate, split, encrypt, metadata).
     /// </summary>
     public virtual Task<Stream> ExecutePdfEngineAsync(

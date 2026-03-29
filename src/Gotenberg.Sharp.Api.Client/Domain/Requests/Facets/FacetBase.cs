@@ -81,6 +81,7 @@ public abstract class FacetBase : IConvertToHttpContent
             ConversionPdfFormats format => format.ToFormDataValue(),
             PdfPassword password => password.Value,
             List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
+            ScreenshotFormat screenshotFormat => screenshotFormat.ToFormValue(),
             List<EmulatedMediaFeature> features => JsonConvert.SerializeObject(
                 features.ToDictionary(f => f.Name, f => f.Value)),
             List<GotenbergStatusCode> codes => JsonConvert.SerializeObject(codes.Select(c => c.Value)),

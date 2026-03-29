@@ -154,6 +154,7 @@ using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects; // For ScreenshotFormat, etc.
 ```
 
 ### HTML To PDF
@@ -529,27 +530,41 @@ public async Task<Stream> FastConversion()
 }
 ```
 
-### Wait For Selector & Emulated Media Features
-*Wait for a DOM element and emulate CSS media features like dark mode:*
+### Screenshot from HTML
+*Capture a screenshot of HTML content as PNG, JPEG, or WebP:*
 
 ```csharp
-public async Task<Stream> CreateWithChromiumFeatures()
+public async Task<Stream> ScreenshotHtml()
 {
-    var builder = new HtmlRequestBuilder()
-        .AddDocument(doc => doc.SetBody("<html><body><div id='app'>Ready</div></body></html>"))
-        .SetConversionBehaviors(b => b
-            .SetWaitForSelector("#app")
-            .AddEmulatedMediaFeature("prefers-color-scheme", "dark")
-            .SetFailOnHttpStatusCodes(499, 599)
-            .FailOnResourceLoadingFailed()
-            .AddIgnoreResourceHttpStatusDomains("cdn.example.com"))
-        .WithPageProperties(pp => pp.UseChromeDefaults());
+    var builder = new ScreenshotHtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body><h1>Screenshot!</h1></body></html>"))
+        .WithScreenshotProperties(p => p
+            .SetSize(1280, 720)
+            .SetFormat(ScreenshotFormat.Png));
 
     var request = builder.Build();
-    return await _sharpClient.HtmlToPdfAsync(request);
+    return await _sharpClient.ScreenshotHtmlAsync(request);
 }
 ```
 
+### Screenshot from URL
+*Capture a screenshot of any URL:*
+
+```csharp
+public async Task<Stream> ScreenshotUrl()
+{
+    var builder = new ScreenshotUrlRequestBuilder()
+        .SetUrl("https://example.com")
+        .WithScreenshotProperties(p => p
+            .SetSize(1024, 768)
+            .SetFormat(ScreenshotFormat.Jpeg)
+            .SetQuality(90)
+            .SetClip());
+
+    var request = builder.Build();
+    return await _sharpClient.ScreenshotUrlAsync(request);
+}
+```
 
 ### Custom Page Properties
 *Fine-tune page dimensions and properties:*
