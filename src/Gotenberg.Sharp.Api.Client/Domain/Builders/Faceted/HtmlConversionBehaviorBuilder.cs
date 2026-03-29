@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+
 using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
@@ -170,6 +172,171 @@ public sealed class HtmlConversionBehaviorBuilder
     public HtmlConversionBehaviorBuilder SkipNetworkIdleEvent()
     {
         _htmlConversionBehaviors.SkipNetworkIdleEvent = true;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets a CSS selector to wait for before conversion.
+    /// Chromium will delay conversion until the specified element appears in the DOM.
+    /// </summary>
+    /// <param name="selector">A validated CSS selector.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder SetWaitForSelector(CssSelector selector)
+    {
+        _htmlConversionBehaviors.WaitForSelector = selector ?? throw new ArgumentNullException(nameof(selector));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets a CSS selector to wait for before conversion.
+    /// Chromium will delay conversion until the specified element appears in the DOM.
+    /// </summary>
+    /// <param name="selector">A CSS selector string (e.g., "#content", ".loaded").</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder SetWaitForSelector(string selector)
+    {
+        return SetWaitForSelector(CssSelector.Create(selector));
+    }
+
+    /// <summary>
+    /// Adds a CSS media feature override for Chromium rendering.
+    /// </summary>
+    /// <param name="feature">A validated emulated media feature.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder AddEmulatedMediaFeature(EmulatedMediaFeature feature)
+    {
+        if (feature == null) throw new ArgumentNullException(nameof(feature));
+
+        _htmlConversionBehaviors.EmulatedMediaFeatures ??= new List<EmulatedMediaFeature>();
+        _htmlConversionBehaviors.EmulatedMediaFeatures.Add(feature);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a CSS media feature override by name and value.
+    /// </summary>
+    /// <param name="name">CSS media feature name (e.g., "prefers-color-scheme").</param>
+    /// <param name="value">CSS media feature value (e.g., "dark").</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder AddEmulatedMediaFeature(string name, string value)
+    {
+        return AddEmulatedMediaFeature(EmulatedMediaFeature.Create(name, value));
+    }
+
+    /// <summary>
+    /// Sets HTTP status codes that trigger a 409 Conflict when the main page returns them.
+    /// </summary>
+    /// <param name="statusCodes">Validated HTTP status codes.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder SetFailOnHttpStatusCodes(IEnumerable<GotenbergStatusCode> statusCodes)
+    {
+        if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
+
+        var codes = statusCodes.ToList();
+
+        if (codes.Any(c => c == null))
+            throw new ArgumentException("Status codes collection must not contain null elements.", nameof(statusCodes));
+
+        _htmlConversionBehaviors.FailOnHttpStatusCodes = codes;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets HTTP status codes that trigger a 409 Conflict when the main page returns them.
+    /// </summary>
+    /// <param name="statusCodes">Raw HTTP status code integers (must be 100-599).</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder SetFailOnHttpStatusCodes(params int[] statusCodes)
+    {
+        if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
+
+        return SetFailOnHttpStatusCodes(statusCodes.Select(GotenbergStatusCode.Create));
+    }
+
+    /// <summary>
+    /// Sets HTTP status codes that trigger a failure when page resources return them.
+    /// </summary>
+    /// <param name="statusCodes">Validated HTTP status codes.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder SetFailOnResourceHttpStatusCodes(IEnumerable<GotenbergStatusCode> statusCodes)
+    {
+        if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
+
+        var codes = statusCodes.ToList();
+
+        if (codes.Any(c => c == null))
+            throw new ArgumentException("Status codes collection must not contain null elements.", nameof(statusCodes));
+
+        _htmlConversionBehaviors.FailOnResourceHttpStatusCodes = codes;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets HTTP status codes that trigger a failure when page resources return them.
+    /// </summary>
+    /// <param name="statusCodes">Raw HTTP status code integers (must be 100-599).</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder SetFailOnResourceHttpStatusCodes(params int[] statusCodes)
+    {
+        if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
+
+        return SetFailOnResourceHttpStatusCodes(statusCodes.Select(GotenbergStatusCode.Create));
+    }
+
+    /// <summary>
+    /// Adds a domain to exclude from HTTP status code checks on resources.
+    /// </summary>
+    /// <param name="domain">A validated domain name.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder AddIgnoreResourceHttpStatusDomain(DomainName domain)
+    {
+        if (domain == null) throw new ArgumentNullException(nameof(domain));
+
+        _htmlConversionBehaviors.IgnoreResourceHttpStatusDomains ??= new List<DomainName>();
+        _htmlConversionBehaviors.IgnoreResourceHttpStatusDomains.Add(domain);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a domain to exclude from HTTP status code checks on resources.
+    /// </summary>
+    /// <param name="domain">A domain string (e.g., "cdn.example.com").</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder AddIgnoreResourceHttpStatusDomain(string domain)
+    {
+        return AddIgnoreResourceHttpStatusDomain(DomainName.Create(domain));
+    }
+
+    /// <summary>
+    /// Adds multiple domains to exclude from HTTP status code checks on resources.
+    /// </summary>
+    /// <param name="domains">Domain strings to exclude.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder AddIgnoreResourceHttpStatusDomains(params string[] domains)
+    {
+        if (domains == null) throw new ArgumentNullException(nameof(domains));
+
+        var validated = domains.Select(DomainName.Create).ToList();
+
+        _htmlConversionBehaviors.IgnoreResourceHttpStatusDomains ??= new List<DomainName>();
+        _htmlConversionBehaviors.IgnoreResourceHttpStatusDomains.AddRange(validated);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Tells Gotenberg to return a 409 Conflict if any resource fails to load due to network errors.
+    /// </summary>
+    /// <returns>The builder instance for method chaining.</returns>
+    public HtmlConversionBehaviorBuilder FailOnResourceLoadingFailed()
+    {
+        _htmlConversionBehaviors.FailOnResourceLoadingFailed = true;
 
         return this;
     }

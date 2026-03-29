@@ -529,16 +529,20 @@ public async Task<Stream> FastConversion()
 }
 ```
 
-### Watermark & Rotation
-*Add text watermarks and rotate PDF pages — available on all request types:*
+### Wait For Selector & Emulated Media Features
+*Wait for a DOM element and emulate CSS media features like dark mode:*
 
 ```csharp
-public async Task<Stream> CreateWatermarkedPdf()
+public async Task<Stream> CreateWithChromiumFeatures()
 {
     var builder = new HtmlRequestBuilder()
-        .AddDocument(doc => doc.SetBody("<html><body><h1>Report</h1></body></html>"))
-        .SetWatermarkOptions(w => w.SetTextWatermark("DRAFT", "1-3"))
-        .SetRotationOptions(r => r.SetAngle(90).SetPages("2"))
+        .AddDocument(doc => doc.SetBody("<html><body><div id='app'>Ready</div></body></html>"))
+        .SetConversionBehaviors(b => b
+            .SetWaitForSelector("#app")
+            .AddEmulatedMediaFeature("prefers-color-scheme", "dark")
+            .SetFailOnHttpStatusCodes(499, 599)
+            .FailOnResourceLoadingFailed()
+            .AddIgnoreResourceHttpStatusDomains("cdn.example.com"))
         .WithPageProperties(pp => pp.UseChromeDefaults());
 
     var request = builder.Build();
@@ -546,20 +550,6 @@ public async Task<Stream> CreateWatermarkedPdf()
 }
 ```
 
-### Split PDFs
-*Split generated PDFs into chunks or extract specific pages:*
-
-```csharp
-public async Task<Stream> SplitPdf()
-{
-    var builder = new HtmlRequestBuilder()
-        .AddDocument(doc => doc.SetBody("<html><body>Multi-page content</body></html>"))
-        .SetSplitOptions(s => s.SplitByPages("1-3,5", unify: true));
-
-    var request = builder.Build();
-    return await _sharpClient.HtmlToPdfAsync(request);
-}
-```
 
 ### Custom Page Properties
 *Fine-tune page dimensions and properties:*

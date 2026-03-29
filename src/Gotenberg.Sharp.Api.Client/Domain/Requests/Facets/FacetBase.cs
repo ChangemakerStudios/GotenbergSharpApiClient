@@ -81,6 +81,11 @@ public abstract class FacetBase : IConvertToHttpContent
             ConversionPdfFormats format => format.ToFormDataValue(),
             PdfPassword password => password.Value,
             List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
+            List<EmulatedMediaFeature> features => JsonConvert.SerializeObject(
+                features.ToDictionary(f => f.Name, f => f.Value)),
+            List<GotenbergStatusCode> codes => JsonConvert.SerializeObject(codes.Select(c => c.Value)),
+            List<DomainName> domains => JsonConvert.SerializeObject(domains.Select(d => d.Value)),
+            CssSelector selector => selector.Value,
             OverlaySource overlaySource => overlaySource.ToFormValue(),
             SplitMode splitMode => splitMode.ToFormValue(),
             float f => f.ToString(cultureInfo),
