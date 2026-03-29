@@ -35,7 +35,7 @@ public sealed class CompressionQuality : IEquatable<CompressionQuality>
 
     public static CompressionQuality Create(int quality)
     {
-        if (quality < MinValue || quality > MaxValue)
+        if (quality is < MinValue or > MaxValue)
             throw new ArgumentOutOfRangeException(
                 nameof(quality),
                 quality,

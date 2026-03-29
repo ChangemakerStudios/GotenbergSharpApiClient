@@ -220,7 +220,7 @@ public class PdfEngineOperationsTests
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody("<html><body><h1>Test PDF</h1></body></html>"));
 
-        using var stream = await client.HtmlToPdfAsync(builder);
+        await using var stream = await client.HtmlToPdfAsync(builder);
 
         using var ms = new MemoryStream();
         await stream.CopyToAsync(ms);

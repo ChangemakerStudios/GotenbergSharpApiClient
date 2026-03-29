@@ -265,7 +265,7 @@ public class LibreOfficeOptionsTests
     {
         // Minimal valid .docx file (ZIP with minimal content)
         // Using a simple HTML-like approach via a .txt renamed - Gotenberg can handle basic office docs
-        return System.Text.Encoding.UTF8.GetBytes("Hello World - LibreOffice test document");
+        return "Hello World - LibreOffice test document"u8.ToArray();
     }
 
     #endregion
