@@ -106,7 +106,7 @@ public class EncryptionOptionsTests
     #region HTTP Content Serialization Tests
 
     [Test]
-    public void UserPassword_SerializesToCorrectHttpContent()
+    public async Task UserPassword_SerializesToCorrectHttpContent()
     {
         var options = new PdfOutputOptions
         {
@@ -118,11 +118,11 @@ public class EncryptionOptionsTests
             c.Headers.ContentDisposition?.Name == "userPassword");
 
         content.Should().NotBeNull();
-        content!.ReadAsStringAsync().Result.Should().Be("openme");
+        (await content!.ReadAsStringAsync()).Should().Be("openme");
     }
 
     [Test]
-    public void OwnerPassword_SerializesToCorrectHttpContent()
+    public async Task OwnerPassword_SerializesToCorrectHttpContent()
     {
         var options = new PdfOutputOptions
         {
@@ -134,7 +134,7 @@ public class EncryptionOptionsTests
             c.Headers.ContentDisposition?.Name == "ownerPassword");
 
         content.Should().NotBeNull();
-        content!.ReadAsStringAsync().Result.Should().Be("editme");
+        (await content!.ReadAsStringAsync()).Should().Be("editme");
     }
 
     [Test]
@@ -154,6 +154,7 @@ public class EncryptionOptionsTests
 
     #region Integration Tests
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithEncryption_Succeeds()
     {
