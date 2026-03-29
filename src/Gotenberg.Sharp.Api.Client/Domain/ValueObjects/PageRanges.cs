@@ -51,6 +51,33 @@ public sealed class PageRanges : IEquatable<PageRanges>
                 $"Invalid page range format: '{ranges}'. Expected format: '1-3,5,8-10'.",
                 nameof(ranges));
 
+        // Semantic validation: verify page numbers are >= 1 and range start <= end
+        foreach (var segment in trimmed.Split(','))
+        {
+            var parts = segment.Trim().Split('-');
+            if (parts.Length == 1)
+            {
+                var page = int.Parse(parts[0].Trim());
+                if (page < 1)
+                    throw new ArgumentException(
+                        $"Page number must be >= 1, but got {page} in '{ranges}'.",
+                        nameof(ranges));
+            }
+            else if (parts.Length == 2)
+            {
+                var start = int.Parse(parts[0].Trim());
+                var end = int.Parse(parts[1].Trim());
+                if (start < 1 || end < 1)
+                    throw new ArgumentException(
+                        $"Page numbers must be >= 1, but got range '{start}-{end}' in '{ranges}'.",
+                        nameof(ranges));
+                if (start > end)
+                    throw new ArgumentException(
+                        $"Range start must be <= end, but got '{start}-{end}' in '{ranges}'.",
+                        nameof(ranges));
+            }
+        }
+
         return new PageRanges(trimmed);
     }
 

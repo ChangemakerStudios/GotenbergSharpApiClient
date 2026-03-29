@@ -79,6 +79,7 @@ public abstract class FacetBase : IConvertToHttpContent
             PdfFormat format => format.ToFormDataValue(),
             LibrePdfFormats format => format.ToFormDataValue(),
             ConversionPdfFormats format => format.ToFormDataValue(),
+            PdfPassword password => password.Value,
             List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
             OverlaySource overlaySource => overlaySource.ToFormValue(),
             SplitMode splitMode => splitMode.ToFormValue(),

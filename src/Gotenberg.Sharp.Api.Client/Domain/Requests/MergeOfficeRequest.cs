@@ -38,6 +38,11 @@ public class MergeOfficeRequest : PdfRequestBase
     /// </remarks>
     public string? PageRanges { get; set; }
 
+    /// <summary>
+    /// LibreOffice-specific conversion options (layout, image compression, notes, links, etc.).
+    /// </summary>
+    public LibreOfficeOptions? LibreOfficeOptions { get; set; }
+
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
         var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty().ToList();
@@ -61,6 +66,9 @@ public class MergeOfficeRequest : PdfRequestBase
 
         if (this.PageRanges.IsSet())
             yield return CreateFormDataItem(this.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
+
+        foreach (var item in this.LibreOfficeOptions.IfNullEmptyContent())
+            yield return item;
 
         foreach (var content in base.ToHttpContent()) yield return content;
     }
