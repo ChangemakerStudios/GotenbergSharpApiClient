@@ -22,12 +22,12 @@ Console.WriteLine($"PDF with LibreOffice options created: {path}");
 
 static async Task<string> ConvertWithLibreOfficeOptions(string sourceDirectory, string destinationDirectory, GotenbergSharpClientOptions options)
 {
-    using var handler = new HttpClientHandler();
-    using var authHandler = !string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword)
-        ? new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler }
-        : null;
+    var handler = new HttpClientHandler();
+    HttpMessageHandler effectiveHandler = handler;
+    if (!string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword))
+        effectiveHandler = new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler };
 
-    using var httpClient = new HttpClient(authHandler ?? (HttpMessageHandler)handler)
+    using var httpClient = new HttpClient(effectiveHandler, disposeHandler: true)
     {
         BaseAddress = options.ServiceUrl,
         Timeout = options.TimeOut

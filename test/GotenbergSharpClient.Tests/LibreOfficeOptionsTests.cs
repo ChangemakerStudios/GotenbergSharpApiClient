@@ -191,7 +191,7 @@ public class LibreOfficeOptionsTests
     #region Serialization Tests
 
     [Test]
-    public void LibreOfficeOptions_SerializesAllSetFields()
+    public async Task LibreOfficeOptions_SerializesAllSetFields()
     {
         var options = new LibreOfficeOptions
         {
@@ -205,15 +205,15 @@ public class LibreOfficeOptionsTests
 
         httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "singlePageSheets").Should().NotBeNull();
-        httpContents.FirstOrDefault(c =>
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "quality")!
-            .ReadAsStringAsync().Result.Should().Be("75");
-        httpContents.FirstOrDefault(c =>
+            .ReadAsStringAsync()).Should().Be("75");
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "maxImageResolution")!
-            .ReadAsStringAsync().Result.Should().Be("300");
-        httpContents.FirstOrDefault(c =>
+            .ReadAsStringAsync()).Should().Be("300");
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "nativeWatermarkText")!
-            .ReadAsStringAsync().Result.Should().Be("DRAFT");
+            .ReadAsStringAsync()).Should().Be("DRAFT");
     }
 
     [Test]
@@ -230,6 +230,7 @@ public class LibreOfficeOptionsTests
 
     #region Integration Tests
 
+    [Category("Integration")]
     [Test]
     public async Task MergeOfficeDocs_WithLibreOfficeOptions_Succeeds()
     {
