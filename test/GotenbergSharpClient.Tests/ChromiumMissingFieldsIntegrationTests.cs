@@ -33,6 +33,7 @@ public class ChromiumMissingFieldsIntegrationTests
         _client = serviceProvider.GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
     }
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithWaitForSelector_Succeeds()
     {
@@ -48,6 +49,7 @@ public class ChromiumMissingFieldsIntegrationTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithEmulatedMediaFeatures_Succeeds()
     {
@@ -63,6 +65,7 @@ public class ChromiumMissingFieldsIntegrationTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithFailOnHttpStatusCodes_Succeeds()
     {
@@ -78,6 +81,7 @@ public class ChromiumMissingFieldsIntegrationTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithFailOnResourceLoadingFailed_Succeeds()
     {
@@ -93,6 +97,7 @@ public class ChromiumMissingFieldsIntegrationTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task HtmlToPdf_WithAllNewFields_Succeeds()
     {

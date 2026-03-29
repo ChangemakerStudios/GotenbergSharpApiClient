@@ -144,7 +144,7 @@ public class ChromiumMissingFieldsTests
     #region HTTP Content Serialization Tests
 
     [Test]
-    public void WaitForSelector_SerializesToCorrectHttpContent()
+    public async Task WaitForSelector_SerializesToCorrectHttpContent()
     {
         var behaviors = new HtmlConversionBehaviors
         {
@@ -156,11 +156,11 @@ public class ChromiumMissingFieldsTests
             c.Headers.ContentDisposition?.Name == "waitForSelector");
 
         content.Should().NotBeNull();
-        content!.ReadAsStringAsync().Result.Should().Be("#content");
+        (await content!.ReadAsStringAsync()).Should().Be("#content");
     }
 
     [Test]
-    public void EmulatedMediaFeatures_SerializesToCorrectJsonObject()
+    public async Task EmulatedMediaFeatures_SerializesToCorrectJsonObject()
     {
         var behaviors = new HtmlConversionBehaviors
         {
@@ -176,7 +176,7 @@ public class ChromiumMissingFieldsTests
             c.Headers.ContentDisposition?.Name == "emulatedMediaFeatures");
 
         content.Should().NotBeNull();
-        var json = content!.ReadAsStringAsync().Result;
+        var json = await content!.ReadAsStringAsync();
         var jObject = JObject.Parse(json);
 
         jObject.Should().HaveCount(2);
@@ -185,7 +185,7 @@ public class ChromiumMissingFieldsTests
     }
 
     [Test]
-    public void FailOnHttpStatusCodes_SerializesToIntArray()
+    public async Task FailOnHttpStatusCodes_SerializesToIntArray()
     {
         var behaviors = new HtmlConversionBehaviors
         {
@@ -201,7 +201,7 @@ public class ChromiumMissingFieldsTests
             c.Headers.ContentDisposition?.Name == "failOnHttpStatusCodes");
 
         content.Should().NotBeNull();
-        var json = content!.ReadAsStringAsync().Result;
+        var json = await content!.ReadAsStringAsync();
         var jArray = JArray.Parse(json);
 
         jArray.Should().HaveCount(2);
@@ -210,7 +210,7 @@ public class ChromiumMissingFieldsTests
     }
 
     [Test]
-    public void FailOnResourceHttpStatusCodes_SerializesToIntArray()
+    public async Task FailOnResourceHttpStatusCodes_SerializesToIntArray()
     {
         var behaviors = new HtmlConversionBehaviors
         {
@@ -226,7 +226,7 @@ public class ChromiumMissingFieldsTests
             c.Headers.ContentDisposition?.Name == "failOnResourceHttpStatusCodes");
 
         content.Should().NotBeNull();
-        var json = content!.ReadAsStringAsync().Result;
+        var json = await content!.ReadAsStringAsync();
         var jArray = JArray.Parse(json);
 
         jArray.Should().HaveCount(2);
@@ -235,7 +235,7 @@ public class ChromiumMissingFieldsTests
     }
 
     [Test]
-    public void IgnoreResourceHttpStatusDomains_SerializesToStringArray()
+    public async Task IgnoreResourceHttpStatusDomains_SerializesToStringArray()
     {
         var behaviors = new HtmlConversionBehaviors
         {
@@ -251,7 +251,7 @@ public class ChromiumMissingFieldsTests
             c.Headers.ContentDisposition?.Name == "ignoreResourceHttpStatusDomains");
 
         content.Should().NotBeNull();
-        var json = content!.ReadAsStringAsync().Result;
+        var json = await content!.ReadAsStringAsync();
         var jArray = JArray.Parse(json);
 
         jArray.Should().HaveCount(2);
@@ -260,7 +260,7 @@ public class ChromiumMissingFieldsTests
     }
 
     [Test]
-    public void FailOnResourceLoadingFailed_SerializesToHttpContent()
+    public async Task FailOnResourceLoadingFailed_SerializesToHttpContent()
     {
         var behaviors = new HtmlConversionBehaviors
         {
@@ -272,7 +272,7 @@ public class ChromiumMissingFieldsTests
             c.Headers.ContentDisposition?.Name == "failOnResourceLoadingFailed");
 
         content.Should().NotBeNull();
-        content!.ReadAsStringAsync().Result.Should().Be("True");
+        (await content!.ReadAsStringAsync()).Should().Be("True");
     }
 
     [Test]
