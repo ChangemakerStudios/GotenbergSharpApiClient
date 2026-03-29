@@ -492,6 +492,34 @@ public async Task<Stream> FastConversion()
 }
 ```
 
+### Standalone PDF Engine Operations
+*Flatten, rotate, encrypt, and manipulate existing PDFs:*
+
+```csharp
+// Flatten form fields
+var flattenResult = await _sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.Flatten().WithPdfs(a => a.AddItem("form.pdf", pdfBytes)));
+
+// Rotate pages 90 degrees
+var rotateResult = await _sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.Rotate(90, "1-3").WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+
+// Encrypt with passwords
+var encrypted = await _sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.Encrypt("reader123", "admin456").WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+
+// Read metadata (returns JSON)
+var metadataJson = await _sharpClient.ReadPdfMetadataAsync(
+    PdfEngineBuilders.ReadMetadata().WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+
+// Write metadata
+var result = await _sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.WriteMetadata(new Dictionary<string, object>
+    {
+        { "Author", "John Doe" }, { "Title", "My Document" }
+    }).WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+```
+
 ### Custom Page Properties
 *Fine-tune page dimensions and properties:*
 

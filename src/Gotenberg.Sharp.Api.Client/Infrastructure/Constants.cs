@@ -32,6 +32,8 @@ public static class Constants
             public const string TextHtml = "text/html";
 
             public const string ApplicationPdf = "application/pdf";
+
+            public const string ApplicationJson = "application/json";
         }
 
         public static class MultipartData
@@ -156,6 +158,22 @@ public static class Constants
                 public const string MergePdf = $"{Root}/merge";
 
                 public const string ConvertPdf = $"{Root}/convert";
+
+                public const string Flatten = $"{Root}/flatten";
+
+                public const string Rotate = $"{Root}/rotate";
+
+                public const string Split = $"{Root}/split";
+
+                public const string Encrypt = $"{Root}/encrypt";
+
+                public const string ReadMetadata = $"{Root}/metadata/read";
+
+                public const string WriteMetadata = $"{Root}/metadata/write";
+
+                public const string Watermark = $"{Root}/watermark";
+
+                public const string Stamp = $"{Root}/stamp";
             }
 
             public static class Routes
