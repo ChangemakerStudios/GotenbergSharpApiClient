@@ -18,12 +18,13 @@ Directory.CreateDirectory(destinationDirectory);
 
 var path = await CreateEncryptedPdf(destinationDirectory, options);
 Console.WriteLine($"Encrypted PDF created: {path}");
-Console.WriteLine("Open with password: reader123");
 
 static async Task<string> CreateEncryptedPdf(string destinationDirectory, GotenbergSharpClientOptions options)
 {
     var handler = new HttpClientHandler();
     HttpMessageHandler effectiveHandler = handler;
+    if (string.IsNullOrWhiteSpace(options.BasicAuthUsername) != string.IsNullOrWhiteSpace(options.BasicAuthPassword))
+        throw new InvalidOperationException("Both BasicAuthUsername and BasicAuthPassword must be provided, or neither.");
     if (!string.IsNullOrWhiteSpace(options.BasicAuthUsername) && !string.IsNullOrWhiteSpace(options.BasicAuthPassword))
         effectiveHandler = new BasicAuthHandler(options.BasicAuthUsername, options.BasicAuthPassword) { InnerHandler = handler };
 

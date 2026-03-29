@@ -167,8 +167,12 @@ public sealed class PdfOutputOptionsBuilder
     /// <returns>The builder instance for method chaining.</returns>
     public PdfOutputOptionsBuilder SetEncryption(string userPassword, string ownerPassword)
     {
-        SetUserPassword(userPassword);
-        SetOwnerPassword(ownerPassword);
+        // Validate both passwords first before mutating any state
+        var validatedUser = PdfPassword.Create(userPassword);
+        var validatedOwner = PdfPassword.Create(ownerPassword);
+
+        _options.UserPassword = validatedUser;
+        _options.OwnerPassword = validatedOwner;
 
         return this;
     }

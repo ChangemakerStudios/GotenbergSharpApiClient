@@ -41,15 +41,13 @@ public sealed class PdfPassword : IEquatable<PdfPassword>
         return new PdfPassword(password);
     }
 
-    public override string ToString() => Value;
+    public override string ToString() => "****";
 
     public bool Equals(PdfPassword? other) => other is not null && Value == other.Value;
 
     public override bool Equals(object? obj) => Equals(obj as PdfPassword);
 
     public override int GetHashCode() => Value.GetHashCode();
-
-    public static implicit operator string(PdfPassword password) => password.Value;
 
     public static bool operator ==(PdfPassword? left, PdfPassword? right) => Equals(left, right);
 

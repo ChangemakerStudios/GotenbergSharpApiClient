@@ -4,6 +4,7 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
 using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GotenbergSharpClient.Tests;
@@ -19,7 +20,6 @@ public class EncryptionOptionsTests
         var password = PdfPassword.Create("secret123");
 
         password.Value.Should().Be("secret123");
-        password.ToString().Should().Be("secret123");
     }
 
     [TestCase(null)]
@@ -43,12 +43,11 @@ public class EncryptionOptionsTests
     }
 
     [Test]
-    public void PdfPassword_ImplicitConversion_ToStringReturnsValue()
+    public void PdfPassword_ToString_ReturnsRedactedValue()
     {
-        PdfPassword password = PdfPassword.Create("secret");
-        string result = password;
+        var password = PdfPassword.Create("secret");
 
-        result.Should().Be("secret");
+        password.ToString().Should().Be("****");
     }
 
     #endregion
@@ -115,7 +114,7 @@ public class EncryptionOptionsTests
 
         var httpContents = options.ToHttpContent().ToList();
         var content = httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "userPassword");
+            c.Headers.ContentDisposition?.Name == Constants.Gotenberg.PdfOutput.UserPassword);
 
         content.Should().NotBeNull();
         (await content!.ReadAsStringAsync()).Should().Be("openme");
@@ -131,7 +130,7 @@ public class EncryptionOptionsTests
 
         var httpContents = options.ToHttpContent().ToList();
         var content = httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "ownerPassword");
+            c.Headers.ContentDisposition?.Name == Constants.Gotenberg.PdfOutput.OwnerPassword);
 
         content.Should().NotBeNull();
         (await content!.ReadAsStringAsync()).Should().Be("editme");
@@ -145,9 +144,9 @@ public class EncryptionOptionsTests
         var httpContents = options.ToHttpContent().ToList();
 
         httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "userPassword").Should().BeNull();
+            c.Headers.ContentDisposition?.Name == Constants.Gotenberg.PdfOutput.UserPassword).Should().BeNull();
         httpContents.FirstOrDefault(c =>
-            c.Headers.ContentDisposition?.Name == "ownerPassword").Should().BeNull();
+            c.Headers.ContentDisposition?.Name == Constants.Gotenberg.PdfOutput.OwnerPassword).Should().BeNull();
     }
 
     #endregion
