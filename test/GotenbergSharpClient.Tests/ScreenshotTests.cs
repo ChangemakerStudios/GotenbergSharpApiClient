@@ -149,7 +149,7 @@ public class ScreenshotTests
                 .SetSize(800, 600)
                 .SetFormat(ScreenshotFormat.Png));
 
-        var result = await client.ScreenshotHtmlAsync(builder);
+        using var result = await client.ScreenshotHtmlAsync(builder);
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
@@ -177,7 +177,7 @@ public class ScreenshotTests
                 .SetFormat(ScreenshotFormat.Jpeg)
                 .SetQuality(90));
 
-        var result = await client.ScreenshotUrlAsync(builder);
+        using var result = await client.ScreenshotUrlAsync(builder);
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);

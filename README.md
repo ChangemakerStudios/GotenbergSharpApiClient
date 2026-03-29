@@ -154,6 +154,7 @@ using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 using Gotenberg.Sharp.API.Client.Domain.Requests.Facets; // For Cookie, etc.
+using Gotenberg.Sharp.API.Client.Domain.ValueObjects; // For ScreenshotFormat, etc.
 ```
 
 ### HTML To PDF

@@ -29,7 +29,6 @@ public abstract class ScreenshotRequest : BuildRequestBase
     {
         return this.ScreenshotProperties.ToHttpContent()
             .Concat(this.ConversionBehaviors.ToHttpContent())
-            .Concat(this.Config.IfNullEmptyContent())
-            .Concat(base.ToHttpContent());
+            .Concat(this.Config.IfNullEmptyContent());
     }
 }
