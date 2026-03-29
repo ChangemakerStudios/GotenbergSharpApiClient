@@ -189,10 +189,10 @@ public class ChromiumMissingFieldsTests
     {
         var behaviors = new HtmlConversionBehaviors
         {
-            FailOnHttpStatusCodes = new List<HttpStatusCode>
+            FailOnHttpStatusCodes = new List<GotenbergStatusCode>
             {
-                HttpStatusCode.Create(499),
-                HttpStatusCode.Create(599)
+                GotenbergStatusCode.Create(499),
+                GotenbergStatusCode.Create(599)
             }
         };
 
@@ -214,10 +214,10 @@ public class ChromiumMissingFieldsTests
     {
         var behaviors = new HtmlConversionBehaviors
         {
-            FailOnResourceHttpStatusCodes = new List<HttpStatusCode>
+            FailOnResourceHttpStatusCodes = new List<GotenbergStatusCode>
             {
-                HttpStatusCode.Create(400),
-                HttpStatusCode.Create(500)
+                GotenbergStatusCode.Create(400),
+                GotenbergStatusCode.Create(500)
             }
         };
 

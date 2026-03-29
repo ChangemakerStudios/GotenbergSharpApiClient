@@ -25,14 +25,14 @@ namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
 /// Gotenberg uses these as range boundaries. For example, [499, 599] means
 /// "fail on any status code from 499 to 599 inclusive."
 /// </remarks>
-public sealed class HttpStatusCode : IEquatable<HttpStatusCode>, IComparable<HttpStatusCode>
+public sealed class GotenbergStatusCode : IEquatable<GotenbergStatusCode>, IComparable<GotenbergStatusCode>
 {
     public const int MinValue = 100;
     public const int MaxValue = 599;
 
     public int Value { get; }
 
-    private HttpStatusCode(int value)
+    private GotenbergStatusCode(int value)
     {
         Value = value;
     }
@@ -42,7 +42,7 @@ public sealed class HttpStatusCode : IEquatable<HttpStatusCode>, IComparable<Htt
     /// </summary>
     /// <param name="statusCode">An HTTP status code between 100 and 599 inclusive.</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when statusCode is outside valid range.</exception>
-    public static HttpStatusCode Create(int statusCode)
+    public static GotenbergStatusCode Create(int statusCode)
     {
         if (statusCode < MinValue || statusCode > MaxValue)
             throw new ArgumentOutOfRangeException(
@@ -50,22 +50,22 @@ public sealed class HttpStatusCode : IEquatable<HttpStatusCode>, IComparable<Htt
                 statusCode,
                 $"HTTP status code must be between {MinValue} and {MaxValue}.");
 
-        return new HttpStatusCode(statusCode);
+        return new GotenbergStatusCode(statusCode);
     }
 
     public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
 
-    public bool Equals(HttpStatusCode? other) => other is not null && Value == other.Value;
+    public bool Equals(GotenbergStatusCode? other) => other is not null && Value == other.Value;
 
-    public override bool Equals(object? obj) => Equals(obj as HttpStatusCode);
+    public override bool Equals(object? obj) => Equals(obj as GotenbergStatusCode);
 
     public override int GetHashCode() => Value;
 
-    public int CompareTo(HttpStatusCode? other) => other is null ? 1 : Value.CompareTo(other.Value);
+    public int CompareTo(GotenbergStatusCode? other) => other is null ? 1 : Value.CompareTo(other.Value);
 
-    public static implicit operator int(HttpStatusCode code) => code.Value;
+    public static implicit operator int(GotenbergStatusCode code) => code?.Value ?? 0;
 
-    public static bool operator ==(HttpStatusCode? left, HttpStatusCode? right) => Equals(left, right);
+    public static bool operator ==(GotenbergStatusCode? left, GotenbergStatusCode? right) => Equals(left, right);
 
-    public static bool operator !=(HttpStatusCode? left, HttpStatusCode? right) => !Equals(left, right);
+    public static bool operator !=(GotenbergStatusCode? left, GotenbergStatusCode? right) => !Equals(left, right);
 }

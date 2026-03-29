@@ -50,7 +50,7 @@ public sealed class DomainName : IEquatable<DomainName>
 
     public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
 
-    public static implicit operator string(DomainName domain) => domain.Value;
+    public static implicit operator string(DomainName domain) => domain?.Value!;
 
     public static bool operator ==(DomainName? left, DomainName? right) => Equals(left, right);
 

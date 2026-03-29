@@ -59,17 +59,36 @@ public sealed record EmulatedMediaFeature
         return new EmulatedMediaFeature(name, value);
     }
 
+    private static readonly string[] ValidColorSchemes = { "light", "dark" };
+    private static readonly string[] ValidReducedMotionValues = { "no-preference", "reduce" };
+
     /// <summary>
     /// Creates a "prefers-color-scheme" media feature.
     /// </summary>
     /// <param name="scheme">The color scheme value: "light" or "dark".</param>
-    public static EmulatedMediaFeature PrefersColorScheme(string scheme) =>
-        Create("prefers-color-scheme", scheme);
+    /// <exception cref="ArgumentException">Thrown when scheme is not "light" or "dark".</exception>
+    public static EmulatedMediaFeature PrefersColorScheme(string scheme)
+    {
+        if (!ValidColorSchemes.Contains(scheme, StringComparer.Ordinal))
+            throw new ArgumentException(
+                $"prefers-color-scheme must be 'light' or 'dark', but got '{scheme}'.",
+                nameof(scheme));
+
+        return Create("prefers-color-scheme", scheme);
+    }
 
     /// <summary>
     /// Creates a "prefers-reduced-motion" media feature.
     /// </summary>
     /// <param name="value">The value: "no-preference" or "reduce".</param>
-    public static EmulatedMediaFeature PrefersReducedMotion(string value) =>
-        Create("prefers-reduced-motion", value);
+    /// <exception cref="ArgumentException">Thrown when value is not "no-preference" or "reduce".</exception>
+    public static EmulatedMediaFeature PrefersReducedMotion(string value)
+    {
+        if (!ValidReducedMotionValues.Contains(value, StringComparer.Ordinal))
+            throw new ArgumentException(
+                $"prefers-reduced-motion must be 'no-preference' or 'reduce', but got '{value}'.",
+                nameof(value));
+
+        return Create("prefers-reduced-motion", value);
+    }
 }

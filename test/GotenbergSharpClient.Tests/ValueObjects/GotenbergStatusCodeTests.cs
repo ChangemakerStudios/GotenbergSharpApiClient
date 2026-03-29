@@ -3,7 +3,7 @@ using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
 namespace GotenbergSharpClient.Tests.ValueObjects;
 
 [TestFixture]
-public class HttpStatusCodeTests
+public class GotenbergStatusCodeTests
 {
     [TestCase(100)]
     [TestCase(200)]
@@ -12,7 +12,7 @@ public class HttpStatusCodeTests
     [TestCase(599)]
     public void Create_WithValidStatusCode_ReturnsInstance(int code)
     {
-        var statusCode = HttpStatusCode.Create(code);
+        var statusCode = GotenbergStatusCode.Create(code);
 
         statusCode.Value.Should().Be(code);
     }
@@ -24,7 +24,7 @@ public class HttpStatusCodeTests
     [TestCase(1000)]
     public void Create_WithOutOfRangeCode_ThrowsArgumentOutOfRangeException(int code)
     {
-        var act = () => HttpStatusCode.Create(code);
+        var act = () => GotenbergStatusCode.Create(code);
 
         act.Should().ThrowExactly<ArgumentOutOfRangeException>();
     }
@@ -32,7 +32,7 @@ public class HttpStatusCodeTests
     [Test]
     public void ImplicitConversion_ToIntReturnsValue()
     {
-        var statusCode = HttpStatusCode.Create(404);
+        var statusCode = GotenbergStatusCode.Create(404);
         int result = statusCode;
 
         result.Should().Be(404);
@@ -41,8 +41,8 @@ public class HttpStatusCodeTests
     [Test]
     public void Equals_WithSameValue_ReturnsTrue()
     {
-        var a = HttpStatusCode.Create(499);
-        var b = HttpStatusCode.Create(499);
+        var a = GotenbergStatusCode.Create(499);
+        var b = GotenbergStatusCode.Create(499);
 
         a.Should().Be(b);
         (a == b).Should().BeTrue();
@@ -51,8 +51,8 @@ public class HttpStatusCodeTests
     [Test]
     public void CompareTo_OrdersCorrectly()
     {
-        var low = HttpStatusCode.Create(200);
-        var high = HttpStatusCode.Create(500);
+        var low = GotenbergStatusCode.Create(200);
+        var high = GotenbergStatusCode.Create(500);
 
         low.CompareTo(high).Should().BeNegative();
         high.CompareTo(low).Should().BePositive();
@@ -62,7 +62,7 @@ public class HttpStatusCodeTests
     [Test]
     public void ToString_ReturnsInvariantString()
     {
-        var statusCode = HttpStatusCode.Create(404);
+        var statusCode = GotenbergStatusCode.Create(404);
 
         statusCode.ToString().Should().Be("404");
     }

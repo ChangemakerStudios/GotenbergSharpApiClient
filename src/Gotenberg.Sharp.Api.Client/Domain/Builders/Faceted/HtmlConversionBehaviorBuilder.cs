@@ -231,11 +231,16 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     /// <param name="statusCodes">Validated HTTP status codes.</param>
     /// <returns>The builder instance for method chaining.</returns>
-    public HtmlConversionBehaviorBuilder SetFailOnHttpStatusCodes(IEnumerable<HttpStatusCode> statusCodes)
+    public HtmlConversionBehaviorBuilder SetFailOnHttpStatusCodes(IEnumerable<GotenbergStatusCode> statusCodes)
     {
         if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
 
-        _htmlConversionBehaviors.FailOnHttpStatusCodes = statusCodes.ToList();
+        var codes = statusCodes.ToList();
+
+        if (codes.Any(c => c == null))
+            throw new ArgumentException("Status codes collection must not contain null elements.", nameof(statusCodes));
+
+        _htmlConversionBehaviors.FailOnHttpStatusCodes = codes;
 
         return this;
     }
@@ -247,7 +252,9 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns>The builder instance for method chaining.</returns>
     public HtmlConversionBehaviorBuilder SetFailOnHttpStatusCodes(params int[] statusCodes)
     {
-        return SetFailOnHttpStatusCodes(statusCodes.Select(HttpStatusCode.Create));
+        if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
+
+        return SetFailOnHttpStatusCodes(statusCodes.Select(GotenbergStatusCode.Create));
     }
 
     /// <summary>
@@ -255,11 +262,16 @@ public sealed class HtmlConversionBehaviorBuilder
     /// </summary>
     /// <param name="statusCodes">Validated HTTP status codes.</param>
     /// <returns>The builder instance for method chaining.</returns>
-    public HtmlConversionBehaviorBuilder SetFailOnResourceHttpStatusCodes(IEnumerable<HttpStatusCode> statusCodes)
+    public HtmlConversionBehaviorBuilder SetFailOnResourceHttpStatusCodes(IEnumerable<GotenbergStatusCode> statusCodes)
     {
         if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
 
-        _htmlConversionBehaviors.FailOnResourceHttpStatusCodes = statusCodes.ToList();
+        var codes = statusCodes.ToList();
+
+        if (codes.Any(c => c == null))
+            throw new ArgumentException("Status codes collection must not contain null elements.", nameof(statusCodes));
+
+        _htmlConversionBehaviors.FailOnResourceHttpStatusCodes = codes;
 
         return this;
     }
@@ -271,7 +283,9 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns>The builder instance for method chaining.</returns>
     public HtmlConversionBehaviorBuilder SetFailOnResourceHttpStatusCodes(params int[] statusCodes)
     {
-        return SetFailOnResourceHttpStatusCodes(statusCodes.Select(HttpStatusCode.Create));
+        if (statusCodes == null) throw new ArgumentNullException(nameof(statusCodes));
+
+        return SetFailOnResourceHttpStatusCodes(statusCodes.Select(GotenbergStatusCode.Create));
     }
 
     /// <summary>
@@ -306,10 +320,12 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <returns>The builder instance for method chaining.</returns>
     public HtmlConversionBehaviorBuilder AddIgnoreResourceHttpStatusDomains(params string[] domains)
     {
-        foreach (var domain in domains)
-        {
-            AddIgnoreResourceHttpStatusDomain(domain);
-        }
+        if (domains == null) throw new ArgumentNullException(nameof(domains));
+
+        var validated = domains.Select(DomainName.Create).ToList();
+
+        _htmlConversionBehaviors.IgnoreResourceHttpStatusDomains ??= new List<DomainName>();
+        _htmlConversionBehaviors.IgnoreResourceHttpStatusDomains.AddRange(validated);
 
         return this;
     }

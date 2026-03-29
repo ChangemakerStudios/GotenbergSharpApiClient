@@ -106,14 +106,14 @@ public class HtmlConversionBehaviors : FacetBase
     /// when the main page returns a matching code. Default: [499, 599].
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnHttpStatusCodes)]
-    public List<HttpStatusCode>? FailOnHttpStatusCodes { get; set; }
+    public List<GotenbergStatusCode>? FailOnHttpStatusCodes { get; set; }
 
     /// <summary>
     /// HTTP status codes that trigger a failure when page resources (CSS, images, fonts)
     /// return a matching code.
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.FailOnResourceHttpStatusCodes)]
-    public List<HttpStatusCode>? FailOnResourceHttpStatusCodes { get; set; }
+    public List<GotenbergStatusCode>? FailOnResourceHttpStatusCodes { get; set; }
 
     /// <summary>
     /// Domains to exclude from HTTP status code checks on resources.

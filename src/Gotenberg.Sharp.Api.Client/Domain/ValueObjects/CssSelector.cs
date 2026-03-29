@@ -49,7 +49,7 @@ public sealed class CssSelector : IEquatable<CssSelector>
 
     public override int GetHashCode() => Value.GetHashCode();
 
-    public static implicit operator string(CssSelector selector) => selector.Value;
+    public static implicit operator string(CssSelector selector) => selector?.Value!;
 
     public static bool operator ==(CssSelector? left, CssSelector? right) => Equals(left, right);
 
