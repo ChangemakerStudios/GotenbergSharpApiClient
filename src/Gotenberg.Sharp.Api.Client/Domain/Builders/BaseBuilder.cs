@@ -89,6 +89,63 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
     }
 
     /// <summary>
+    /// Configures rotation options for the resulting PDF.
+    /// </summary>
+    public TBuilder SetRotationOptions(Action<RotationOptionsBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        this.Request.RotationOptions ??= new RotationOptions();
+
+        action(new RotationOptionsBuilder(this.Request.RotationOptions));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Configures split options for the resulting PDF.
+    /// When splitting returns multiple files, Gotenberg returns a ZIP.
+    /// </summary>
+    public TBuilder SetSplitOptions(Action<SplitOptionsBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        this.Request.SplitOptions ??= new SplitOptions();
+
+        action(new SplitOptionsBuilder(this.Request.SplitOptions));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Configures watermark options (background overlay) for the resulting PDF.
+    /// </summary>
+    public TBuilder SetWatermarkOptions(Action<WatermarkOptionsBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        this.Request.WatermarkOptions ??= new WatermarkOptions();
+
+        action(new WatermarkOptionsBuilder(this.Request.WatermarkOptions));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Configures stamp options (foreground overlay) for the resulting PDF.
+    /// </summary>
+    public TBuilder SetStampOptions(Action<StampOptionsBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        this.Request.StampOptions ??= new StampOptions();
+
+        action(new StampOptionsBuilder(this.Request.StampOptions));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
     /// Builds the request synchronously. Use when all content is already in memory (no async operations).
     /// </summary>
     /// <returns>The configured request ready to send to Gotenberg.</returns>
