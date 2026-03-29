@@ -303,6 +303,56 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
+    /// Executes a standalone PDF engine operation (flatten, rotate, split, encrypt, metadata).
+    /// </summary>
+    public virtual Task<Stream> ExecutePdfEngineAsync(
+        PdfEngineRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Executes a standalone PDF engine operation using a builder.
+    /// </summary>
+    public virtual async Task<Stream> ExecutePdfEngineAsync<TRequest>(
+        PdfEngineBuilder<TRequest> builder,
+        CancellationToken cancelToken = default)
+        where TRequest : PdfEngineRequest
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ExecutePdfEngineAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Reads metadata from PDF files. Returns JSON string keyed by filename.
+    /// </summary>
+    public virtual async Task<string> ReadPdfMetadataAsync(
+        PdfEngineBuilder<ReadMetadataRequest> builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        using var response = await this.SendRequestAsync(
+            request.CreateApiRequest(),
+            HttpCompletionOption.ResponseContentRead,
+            cancelToken);
+
+#if NET5_0_OR_GREATER
+        return await response.Content.ReadAsStringAsync(cancelToken);
+#else
+        return await response.Content.ReadAsStringAsync();
+#endif
+    }
+
+    /// <summary>
     /// Gets the current version of Gotenberg.
     /// Custom variants of Gotenberg may not print a strict semver version.
     /// For instance, the live demo prints 8.17.0-live-demo-snapshot.

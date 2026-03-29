@@ -48,6 +48,23 @@ public sealed class MergeOfficeBuilder()
     }
 
     /// <summary>
+    /// Configures LibreOffice-specific conversion options such as image compression,
+    /// notes export, bookmarks, form fields, and native watermarks.
+    /// </summary>
+    /// <param name="action">Configuration action for LibreOffice options.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public MergeOfficeBuilder SetLibreOfficeOptions(Action<LibreOfficeOptionsBuilder> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        this.Request.LibreOfficeOptions ??= new LibreOfficeOptions();
+
+        action(new LibreOfficeOptionsBuilder(this.Request.LibreOfficeOptions));
+
+        return this;
+    }
+
+    /// <summary>
     /// Converts the resulting merged PDF to the specified PDF/A format for long-term archival.
     /// </summary>
     [Obsolete("Use SetPdfOutputOptions(o => o.SetPdfFormat(...)) instead")]
