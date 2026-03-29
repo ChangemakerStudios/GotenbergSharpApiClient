@@ -222,6 +222,26 @@ public async Task<Stream> DoOfficeMerge(string sourceDirectory)
 	return await _sharpClient.MergeOfficeDocsAsync(request);
 }
 ```
+
+### LibreOffice Conversion Options
+*Fine-tune LibreOffice conversions with image compression, bookmarks, and native watermarks:*
+
+```csharp
+public async Task<Stream> ConvertWithOptions(string sourceDirectory)
+{
+    var builder = new MergeOfficeBuilder()
+        .WithAsyncAssets(async a => a.AddItems(await GetDocsAsync(sourceDirectory)))
+        .SetLibreOfficeOptions(o => o
+            .SetQuality(85)
+            .SetReduceImageResolution()
+            .SetMaxImageResolution(300)
+            .SetExportBookmarks()
+            .SetNativeWatermarkText("DRAFT"));
+
+    var request = await builder.BuildAsync();
+    return await _sharpClient.MergeOfficeDocsAsync(request);
+}
+```
 ### Markdown to PDF
 *Markdown to PDF conversion with embedded assets:*
 
