@@ -101,6 +101,33 @@ public static class Constants
         }
 
         /// <summary>
+        ///     Cross-cutting options that apply across multiple modules (Chromium, LibreOffice, PDF Engines).
+        /// </summary>
+        public static class CrossCuttingOptions
+        {
+            // Rotation
+            public const string RotateAngle = "rotateAngle";
+            public const string RotatePages = "rotatePages";
+
+            // Split
+            public const string SplitMode = "splitMode";
+            public const string SplitSpan = "splitSpan";
+            public const string SplitUnify = "splitUnify";
+
+            // Watermark
+            public const string WatermarkSource = "watermarkSource";
+            public const string WatermarkExpression = "watermarkExpression";
+            public const string WatermarkPages = "watermarkPages";
+            public const string WatermarkOptionsJson = "watermarkOptions";
+
+            // Stamp
+            public const string StampSource = "stampSource";
+            public const string StampExpression = "stampExpression";
+            public const string StampPages = "stampPages";
+            public const string StampOptionsJson = "stampOptions";
+        }
+
+        /// <summary>
         ///     PDF output options shared across all modules (Chromium, LibreOffice, PDF Engines).
         /// </summary>
         public static class PdfOutput

@@ -529,32 +529,36 @@ public async Task<Stream> FastConversion()
 }
 ```
 
-### Standalone PDF Engine Operations
-*Flatten, rotate, encrypt, and manipulate existing PDFs:*
+### Watermark & Rotation
+*Add text watermarks and rotate PDF pages — available on all request types:*
 
 ```csharp
-// Flatten form fields
-var flattenResult = await _sharpClient.ExecutePdfEngineAsync(
-    PdfEngineBuilders.Flatten().WithPdfs(a => a.AddItem("form.pdf", pdfBytes)));
+public async Task<Stream> CreateWatermarkedPdf()
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body><h1>Report</h1></body></html>"))
+        .SetWatermarkOptions(w => w.SetTextWatermark("DRAFT", "1-3"))
+        .SetRotationOptions(r => r.SetAngle(90).SetPages("2"))
+        .WithPageProperties(pp => pp.UseChromeDefaults());
 
-// Rotate pages 90 degrees
-var rotateResult = await _sharpClient.ExecutePdfEngineAsync(
-    PdfEngineBuilders.Rotate(90, "1-3").WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+    var request = builder.Build();
+    return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
 
-// Encrypt with passwords
-var encrypted = await _sharpClient.ExecutePdfEngineAsync(
-    PdfEngineBuilders.Encrypt("reader123", "admin456").WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+### Split PDFs
+*Split generated PDFs into chunks or extract specific pages:*
 
-// Read metadata (returns JSON)
-var metadataJson = await _sharpClient.ReadPdfMetadataAsync(
-    PdfEngineBuilders.ReadMetadata().WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+```csharp
+public async Task<Stream> SplitPdf()
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body>Multi-page content</body></html>"))
+        .SetSplitOptions(s => s.SplitByPages("1-3,5", unify: true));
 
-// Write metadata
-var result = await _sharpClient.ExecutePdfEngineAsync(
-    PdfEngineBuilders.WriteMetadata(new Dictionary<string, object>
-    {
-        { "Author", "John Doe" }, { "Title", "My Document" }
-    }).WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+    var request = builder.Build();
+    return await _sharpClient.HtmlToPdfAsync(request);
+}
 ```
 
 ### Custom Page Properties
