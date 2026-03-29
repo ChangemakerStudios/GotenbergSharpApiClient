@@ -123,7 +123,7 @@ public class PdfEngineOperationsTests
         var builder = PdfEngineBuilders.Flatten()
             .WithPdfs(a => a.AddItem("test.pdf", pdfBytes));
 
-        var result = await client.ExecutePdfEngineAsync(builder);
+        using var result = await client.ExecutePdfEngineAsync(builder);
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
@@ -139,7 +139,7 @@ public class PdfEngineOperationsTests
         var builder = PdfEngineBuilders.Rotate(90)
             .WithPdfs(a => a.AddItem("test.pdf", pdfBytes));
 
-        var result = await client.ExecutePdfEngineAsync(builder);
+        using var result = await client.ExecutePdfEngineAsync(builder);
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
@@ -155,7 +155,7 @@ public class PdfEngineOperationsTests
         var builder = PdfEngineBuilders.Encrypt("user123", "owner456")
             .WithPdfs(a => a.AddItem("test.pdf", pdfBytes));
 
-        var result = await client.ExecutePdfEngineAsync(builder);
+        using var result = await client.ExecutePdfEngineAsync(builder);
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
@@ -175,7 +175,7 @@ public class PdfEngineOperationsTests
             })
             .WithPdfs(a => a.AddItem("test.pdf", pdfBytes));
 
-        var result = await client.ExecutePdfEngineAsync(builder);
+        using var result = await client.ExecutePdfEngineAsync(builder);
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
@@ -220,7 +220,7 @@ public class PdfEngineOperationsTests
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody("<html><body><h1>Test PDF</h1></body></html>"));
 
-        var stream = await client.HtmlToPdfAsync(builder);
+        using var stream = await client.HtmlToPdfAsync(builder);
 
         using var ms = new MemoryStream();
         await stream.CopyToAsync(ms);

@@ -100,7 +100,7 @@ public static class PdfEngineBuilders
         var request = new SplitPdfRequest
         {
             Mode = mode,
-            Span = span ?? throw new ArgumentNullException(nameof(span)),
+            Span = !string.IsNullOrWhiteSpace(span) ? span : throw new ArgumentException("Span must not be null or whitespace.", nameof(span)),
             Unify = unify
         };
         return new PdfEngineBuilder<SplitPdfRequest>(request);

@@ -5,6 +5,9 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+/// <summary>
+/// Flattens PDF form fields into static content.
+/// </summary>
 public sealed class FlattenPdfRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.Flatten;

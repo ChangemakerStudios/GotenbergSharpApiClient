@@ -26,25 +26,25 @@ var pdfBytes = await GenerateTestPdf(sharpClient);
 
 // Flatten
 Console.WriteLine("Flattening PDF...");
-var flattenResult = await sharpClient.ExecutePdfEngineAsync(
+using var flattenResult = await sharpClient.ExecutePdfEngineAsync(
     PdfEngineBuilders.Flatten().WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
 await SaveStream(flattenResult, destinationDirectory, "Flattened.pdf");
 
 // Rotate 90 degrees
 Console.WriteLine("Rotating PDF 90 degrees...");
-var rotateResult = await sharpClient.ExecutePdfEngineAsync(
+using var rotateResult = await sharpClient.ExecutePdfEngineAsync(
     PdfEngineBuilders.Rotate(90).WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
 await SaveStream(rotateResult, destinationDirectory, "Rotated.pdf");
 
 // Encrypt
 Console.WriteLine("Encrypting PDF...");
-var encryptResult = await sharpClient.ExecutePdfEngineAsync(
+using var encryptResult = await sharpClient.ExecutePdfEngineAsync(
     PdfEngineBuilders.Encrypt("reader123", "admin456").WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
 await SaveStream(encryptResult, destinationDirectory, "Encrypted.pdf");
 
 // Write metadata
 Console.WriteLine("Writing metadata...");
-var writeResult = await sharpClient.ExecutePdfEngineAsync(
+using var writeResult = await sharpClient.ExecutePdfEngineAsync(
     PdfEngineBuilders.WriteMetadata(new Dictionary<string, object>
     {
         { "Author", "GotenbergSharpApiClient" },
@@ -71,7 +71,7 @@ static async Task<byte[]> GenerateTestPdf(GotenbergSharpClient client)
                 <form><input type='text' name='field1' value='Form field (will be flattened)'/></form>
             </body></html>"));
 
-    var stream = await client.HtmlToPdfAsync(builder);
+    using var stream = await client.HtmlToPdfAsync(builder);
     using var ms = new MemoryStream();
     await stream.CopyToAsync(ms);
     return ms.ToArray();

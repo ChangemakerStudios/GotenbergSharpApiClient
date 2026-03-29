@@ -27,7 +27,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
         var metadataContent = new StringContent(this.Metadata!.ToString());
-        metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.TextHtml);
+        metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
         metadataContent.Headers.ContentDisposition =
             new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
             {

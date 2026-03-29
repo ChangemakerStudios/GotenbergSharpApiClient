@@ -32,6 +32,8 @@ public static class Constants
             public const string TextHtml = "text/html";
 
             public const string ApplicationPdf = "application/pdf";
+
+            public const string ApplicationJson = "application/json";
         }
 
         public static class MultipartData

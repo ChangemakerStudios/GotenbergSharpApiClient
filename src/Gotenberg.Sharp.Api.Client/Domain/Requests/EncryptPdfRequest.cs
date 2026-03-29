@@ -16,7 +16,7 @@ public sealed class EncryptPdfRequest : PdfEngineRequest
     protected override void Validate()
     {
         if (string.IsNullOrWhiteSpace(this.UserPassword))
-            throw new InvalidOperationException("User password is required for encryption.");
+            throw new ArgumentException("User password is required for encryption.");
 
         base.Validate();
     }
