@@ -1,6 +1,9 @@
 # Advanced Features
 
-> **Examples:** [Webhook](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/Webhook), [UrlsToMergedPdf](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/UrlsToMergedPdf), [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample)
+!!! example "Working Examples"
+    [Webhook](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/Webhook) |
+    [UrlsToMergedPdf](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/UrlsToMergedPdf) |
+    [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample)
 
 ## Webhooks
 

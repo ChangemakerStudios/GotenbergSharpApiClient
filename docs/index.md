@@ -1,10 +1,10 @@
----
-_layout: landing
----
-
 # GotenbergSharpApiClient
 
 .NET C# client for [Gotenberg](https://gotenberg.dev/) — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF.
+
+[![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
+[![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client)
+![Build status](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/actions/workflows/deploy.yml/badge.svg)
 
 ## Features
 
@@ -19,15 +19,21 @@ _layout: landing
 
 ## Quick Start
 
+### Install
+
 ```bash
 dotnet add package Gotenberg.Sharp.Api.Client
 ```
+
+### Configure
 
 ```csharp
 services.AddOptions<GotenbergSharpClientOptions>()
     .Bind(Configuration.GetSection("GotenbergSharpClient"));
 services.AddGotenbergSharpClient();
 ```
+
+### Use
 
 ```csharp
 var builder = new HtmlRequestBuilder()
@@ -37,12 +43,4 @@ var builder = new HtmlRequestBuilder()
 var result = await sharpClient.HtmlToPdfAsync(builder);
 ```
 
-## Documentation
-
-- [Getting Started](articles/getting-started.md)
-- [HTML & URL to PDF](articles/html-and-url-to-pdf.md)
-- [Screenshots](articles/screenshots.md)
-- [Office Document Conversion](articles/office-conversion.md)
-- [PDF Manipulation](articles/pdf-manipulation.md)
-- [Advanced Features](articles/advanced-features.md)
-- [API Reference](api/index.md)
+!!! tip "See the [Getting Started](getting-started.md) guide for full setup instructions."

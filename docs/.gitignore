@@ -1,6 +1,1 @@
-_site/
-api/.manifest
-api/*.yml
-api/*.md
-!api/index.md
-obj/
+

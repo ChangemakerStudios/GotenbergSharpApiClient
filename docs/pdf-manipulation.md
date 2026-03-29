@@ -1,6 +1,11 @@
 # PDF Manipulation
 
-> **Examples:** [PdfEngineOperations](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/PdfEngineOperations), [WatermarkAndRotate](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/WatermarkAndRotate), [EncryptPdf](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/EncryptPdf), [PdfMerge](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/PdfMerge), [PdfConvert](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/PdfConvert)
+!!! example "Working Examples"
+    [PdfEngineOperations](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/PdfEngineOperations) |
+    [WatermarkAndRotate](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/WatermarkAndRotate) |
+    [EncryptPdf](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/EncryptPdf) |
+    [PdfMerge](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/PdfMerge) |
+    [PdfConvert](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/PdfConvert)
 
 Standalone operations on existing PDF files using Gotenberg's PDF engine routes.
 

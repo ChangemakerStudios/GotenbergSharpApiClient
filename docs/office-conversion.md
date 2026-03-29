@@ -1,6 +1,8 @@
 # Office Document Conversion
 
-> **Examples:** [OfficeMerge](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/OfficeMerge), [LibreOfficeOptions](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/LibreOfficeOptions)
+!!! example "Working Examples"
+    [OfficeMerge](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/OfficeMerge) |
+    [LibreOfficeOptions](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/LibreOfficeOptions)
 
 Convert and merge Office documents (Word, Excel, PowerPoint, and 100+ formats) to PDF using LibreOffice.
 
