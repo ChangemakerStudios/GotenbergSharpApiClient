@@ -39,6 +39,16 @@ public class GotenbergStatusCodeTests
     }
 
     [Test]
+    public void ImplicitConversion_WithNull_Throws()
+    {
+        GotenbergStatusCode? nullCode = null;
+
+        var act = () => { int _ = nullCode!; };
+
+        act.Should().ThrowExactly<ArgumentNullException>();
+    }
+
+    [Test]
     public void Equals_WithSameValue_ReturnsTrue()
     {
         var a = GotenbergStatusCode.Create(499);

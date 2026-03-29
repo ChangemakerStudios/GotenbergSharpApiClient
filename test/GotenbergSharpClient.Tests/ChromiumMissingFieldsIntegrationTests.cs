@@ -1,6 +1,7 @@
 using Gotenberg.Sharp.API.Client.Domain.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GotenbergSharpClient.Tests;
@@ -79,6 +80,21 @@ public class ChromiumMissingFieldsIntegrationTests
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task HtmlToPdf_WithFailOnResourceLoadingFailed_WhenResourceFails_Throws()
+    {
+        var builder = new HtmlRequestBuilder()
+            .AddDocument(doc => doc.SetBody(
+                "<html><body><img src='http://192.0.2.1/nonexistent.png'/></body></html>"))
+            .SetConversionBehaviors(b => b
+                .FailOnResourceLoadingFailed());
+
+        var act = async () => await _client.HtmlToPdfAsync(builder);
+
+        await act.Should().ThrowAsync<GotenbergApiException>();
     }
 
     [Category("Integration")]

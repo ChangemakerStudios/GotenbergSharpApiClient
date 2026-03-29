@@ -50,7 +50,9 @@ public sealed class DomainName : IEquatable<DomainName>
 
     public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
 
-    public static implicit operator string(DomainName domain) => domain?.Value!;
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="domain"/> is null.</exception>
+    public static implicit operator string(DomainName domain) =>
+        domain?.Value ?? throw new ArgumentNullException(nameof(domain));
 
     public static bool operator ==(DomainName? left, DomainName? right) => Equals(left, right);
 

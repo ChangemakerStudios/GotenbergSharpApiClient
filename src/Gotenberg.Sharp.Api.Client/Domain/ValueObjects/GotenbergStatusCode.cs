@@ -63,7 +63,9 @@ public sealed class GotenbergStatusCode : IEquatable<GotenbergStatusCode>, IComp
 
     public int CompareTo(GotenbergStatusCode? other) => other is null ? 1 : Value.CompareTo(other.Value);
 
-    public static implicit operator int(GotenbergStatusCode code) => code?.Value ?? 0;
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="code"/> is null.</exception>
+    public static implicit operator int(GotenbergStatusCode code) =>
+        code?.Value ?? throw new ArgumentNullException(nameof(code));
 
     public static bool operator ==(GotenbergStatusCode? left, GotenbergStatusCode? right) => Equals(left, right);
 

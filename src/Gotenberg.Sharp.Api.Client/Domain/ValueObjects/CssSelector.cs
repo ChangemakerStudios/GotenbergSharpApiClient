@@ -49,7 +49,9 @@ public sealed class CssSelector : IEquatable<CssSelector>
 
     public override int GetHashCode() => Value.GetHashCode();
 
-    public static implicit operator string(CssSelector selector) => selector?.Value!;
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="selector"/> is null.</exception>
+    public static implicit operator string(CssSelector selector) =>
+        selector?.Value ?? throw new ArgumentNullException(nameof(selector));
 
     public static bool operator ==(CssSelector? left, CssSelector? right) => Equals(left, right);
 
