@@ -104,7 +104,7 @@ public class ScreenshotTests
     #region Serialization Tests
 
     [Test]
-    public void ScreenshotProperties_SerializesCorrectly()
+    public async Task ScreenshotProperties_SerializesCorrectly()
     {
         var props = new ScreenshotProperties
         {
@@ -118,24 +118,25 @@ public class ScreenshotTests
 
         var httpContents = props.ToHttpContent().ToList();
 
-        httpContents.FirstOrDefault(c =>
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "width")!
-            .ReadAsStringAsync().Result.Should().Be("1920");
-        httpContents.FirstOrDefault(c =>
+            .ReadAsStringAsync()).Should().Be("1920");
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "height")!
-            .ReadAsStringAsync().Result.Should().Be("1080");
-        httpContents.FirstOrDefault(c =>
+            .ReadAsStringAsync()).Should().Be("1080");
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "format")!
-            .ReadAsStringAsync().Result.Should().Be("jpeg");
-        httpContents.FirstOrDefault(c =>
+            .ReadAsStringAsync()).Should().Be("jpeg");
+        (await httpContents.FirstOrDefault(c =>
             c.Headers.ContentDisposition?.Name == "quality")!
-            .ReadAsStringAsync().Result.Should().Be("80");
+            .ReadAsStringAsync()).Should().Be("80");
     }
 
     #endregion
 
     #region Integration Tests
 
+    [Category("Integration")]
     [Test]
     public async Task ScreenshotHtml_ReturnsImage()
     {
@@ -163,6 +164,7 @@ public class ScreenshotTests
         header[3].Should().Be(0x47); // 'G'
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ScreenshotUrl_ReturnsImage()
     {
