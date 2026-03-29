@@ -1,5 +1,7 @@
 # Advanced Features
 
+> **Examples:** [Webhook](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/Webhook), [UrlsToMergedPdf](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/UrlsToMergedPdf), [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample)
+
 ## Webhooks
 
 All request types support asynchronous webhook processing. Gotenberg generates the PDF and POSTs it to your webhook URL.

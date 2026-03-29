@@ -1,5 +1,7 @@
 # HTML & URL to PDF
 
+> **Examples:** [HtmlConvert](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/HtmlConvert), [UrlConvert](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/UrlConvert), [HtmlWithMarkdown](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/HtmlWithMarkdown), [ChromiumFeatures](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/ChromiumFeatures)
+
 ## HTML to PDF
 
 Convert HTML content with embedded assets, headers, and footers.

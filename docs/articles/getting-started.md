@@ -1,5 +1,7 @@
 # Getting Started
 
+> **Example:** [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample) — Full DI setup with logging and Polly retry
+
 ## Prerequisites
 
 - [Docker](https://www.docker.com/) for running Gotenberg

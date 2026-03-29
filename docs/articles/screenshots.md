@@ -1,5 +1,7 @@
 # Screenshots
 
+> **Example:** [Screenshot](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/Screenshot)
+
 Capture screenshots of HTML content or URLs using Chromium. Returns PNG, JPEG, or WebP images.
 
 ## Screenshot from HTML
