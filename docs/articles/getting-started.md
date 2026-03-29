@@ -53,7 +53,7 @@ dotnet add package Gotenberg.Sharp.Api.Client
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddOptions<GotenbergSharpClientOptions>()
-        .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)));
+        .Bind(Configuration.GetSection("GotenbergSharpClient"));
     services.AddGotenbergSharpClient();
 }
 ```
@@ -95,7 +95,7 @@ services.AddGotenbergSharpClient();
 
 ```csharp
 services.AddOptions<GotenbergSharpClientOptions>()
-    .Bind(Configuration.GetSection(nameof(GotenbergSharpClient)))
+    .Bind(Configuration.GetSection("GotenbergSharpClient"))
     .PostConfigure(options =>
     {
         options.BasicAuthUsername = Environment.GetEnvironmentVariable("GOTENBERG_USER");

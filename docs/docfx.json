@@ -16,11 +16,11 @@
   "build": {
     "content": [
       {
-        "files": ["api/**.yml", "api/index.md"]
+        "files": ["api/**/*.yml", "api/index.md"]
       },
       {
         "files": [
-          "articles/**.md",
+          "articles/**/*.md",
           "articles/**/toc.yml",
           "toc.yml",
           "*.md"
