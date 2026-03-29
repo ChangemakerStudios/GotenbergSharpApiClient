@@ -87,13 +87,12 @@ var builder = new HtmlRequestBuilder()
 
 See the **[full documentation](https://changemakerstudios.github.io/GotenbergSharpApiClient/)** for:
 
-- [Getting Started](https://changemakerstudios.github.io/GotenbergSharpApiClient/articles/getting-started.html) — setup, configuration, DI
-- [HTML & URL to PDF](https://changemakerstudios.github.io/GotenbergSharpApiClient/articles/html-and-url-to-pdf.html) — Chromium features, page properties, cookies
-- [Screenshots](https://changemakerstudios.github.io/GotenbergSharpApiClient/articles/screenshots.html) — PNG/JPEG/WebP capture
-- [Office Conversion](https://changemakerstudios.github.io/GotenbergSharpApiClient/articles/office-conversion.html) — LibreOffice options
-- [PDF Manipulation](https://changemakerstudios.github.io/GotenbergSharpApiClient/articles/pdf-manipulation.html) — merge, rotate, split, encrypt, watermark
-- [Advanced Features](https://changemakerstudios.github.io/GotenbergSharpApiClient/articles/advanced-features.html) — webhooks, value objects, multi-URL merge
-- [API Reference](https://changemakerstudios.github.io/GotenbergSharpApiClient/api/) — auto-generated from XML docs
+- [Getting Started](https://changemakerstudios.github.io/GotenbergSharpApiClient/getting-started/) — setup, configuration, DI
+- [HTML & URL to PDF](https://changemakerstudios.github.io/GotenbergSharpApiClient/html-and-url-to-pdf/) — Chromium features, page properties, cookies
+- [Screenshots](https://changemakerstudios.github.io/GotenbergSharpApiClient/screenshots/) — PNG/JPEG/WebP capture
+- [Office Conversion](https://changemakerstudios.github.io/GotenbergSharpApiClient/office-conversion/) — LibreOffice options
+- [PDF Manipulation](https://changemakerstudios.github.io/GotenbergSharpApiClient/pdf-manipulation/) — merge, rotate, split, encrypt, watermark
+- [Advanced Features](https://changemakerstudios.github.io/GotenbergSharpApiClient/advanced-features/) — webhooks, value objects, multi-URL merge
 
 ## Examples
 
