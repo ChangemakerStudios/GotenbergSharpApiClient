@@ -113,6 +113,7 @@ public class PdfEngineOperationsTests
 
     #region Integration Tests
 
+    [Category("Integration")]
     [Test]
     public async Task FlattenPdf_Succeeds()
     {
@@ -128,6 +129,7 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task RotatePdf_Succeeds()
     {
@@ -143,6 +145,7 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task EncryptPdf_Succeeds()
     {
@@ -158,6 +161,7 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task WriteMetadata_Succeeds()
     {
@@ -177,6 +181,7 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
+    [Category("Integration")]
     [Test]
     public async Task ReadMetadata_ReturnsJson()
     {
