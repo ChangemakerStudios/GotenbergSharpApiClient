@@ -481,6 +481,23 @@ public async Task<Stream> ConvertToAccessiblePdfA(string pdfPath)
 }
 ```
 
+### PDF Encryption
+*Password-protect PDFs with user and owner passwords:*
+
+```csharp
+public async Task<Stream> CreateEncryptedPdf()
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody("<html><body><h1>Confidential</h1></body></html>"))
+        .SetPdfOutputOptions(o => o
+            .SetEncryption(userPassword: "reader123", ownerPassword: "admin456"))
+        .WithPageProperties(pp => pp.UseChromeDefaults());
+
+    var request = builder.Build();
+    return await _sharpClient.HtmlToPdfAsync(request);
+}
+```
+
 ### Flatten PDFs
 *Flatten PDF forms and annotations (v2.8+):*
 

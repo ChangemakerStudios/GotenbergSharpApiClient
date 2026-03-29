@@ -90,6 +90,10 @@ public static class Constants
 
             internal const string MetaData = "metadata";
 
+            internal const string UserPassword = "userPassword";
+
+            internal const string OwnerPassword = "ownerPassword";
+
             internal static class FileNames
             {
                 internal const string Index = "index.html";
@@ -110,6 +114,10 @@ public static class Constants
             public const string GenerateTaggedPdf = CrossCutting.GenerateTaggedPdf;
 
             public const string MetaData = CrossCutting.MetaData;
+
+            public const string UserPassword = CrossCutting.UserPassword;
+
+            public const string OwnerPassword = CrossCutting.OwnerPassword;
         }
 
         /// <summary>
