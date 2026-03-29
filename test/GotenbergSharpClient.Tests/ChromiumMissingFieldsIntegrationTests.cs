@@ -88,7 +88,7 @@ public class ChromiumMissingFieldsIntegrationTests
     {
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody(
-                "<html><body><img src='http://192.0.2.1/nonexistent.png'/></body></html>"))
+                "<html><body><img src='http://invalid.test/nonexistent.png'/></body></html>"))
             .SetConversionBehaviors(b => b
                 .FailOnResourceLoadingFailed());
 
