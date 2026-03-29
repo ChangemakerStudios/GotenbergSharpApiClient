@@ -39,7 +39,6 @@
       "_appName": "GotenbergSharpApiClient",
       "_appFooter": "GotenbergSharpApiClient - C# Client for Gotenberg API",
       "_enableSearch": true,
-      "_appLogoPath": "images/logo.png",
       "_disableContribution": false,
       "_gitContribute": {
         "repo": "https://github.com/ChangemakerStudios/GotenbergSharpApiClient",
