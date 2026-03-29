@@ -5,8 +5,7 @@ on:
     branches: [master, develop]
     paths:
       - 'docs/**'
-      - 'src/**/*.cs'
-      - 'src/**/*.csproj'
+      - 'mkdocs.yml'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
@@ -28,21 +27,21 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
-        dotnet-version: 8.x
+        python-version: '3.x'
 
-    - name: Install DocFX
-      run: dotnet tool install -g docfx
+    - name: Install MkDocs Material
+      run: pip install mkdocs-material
 
     - name: Build docs
-      run: docfx docs/docfx.json
+      run: mkdocs build --strict
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: docs/_site
+        path: site
 
   deploy:
     environment:

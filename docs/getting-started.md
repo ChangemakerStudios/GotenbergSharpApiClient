@@ -1,6 +1,7 @@
 # Getting Started
 
-> **Example:** [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample) — Full DI setup with logging and Polly retry
+!!! example "Working Example"
+    [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample) — Full DI setup with logging and Polly retry
 
 ## Prerequisites
 
