@@ -13,7 +13,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.Documents;
+using Gotenberg.Sharp.API.Client.Domain.Documents;
+
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Builds requests for capturing screenshots of HTML content using Chromium.

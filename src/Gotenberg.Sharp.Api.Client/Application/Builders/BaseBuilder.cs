@@ -13,7 +13,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.Overlays;
+using Gotenberg.Sharp.API.Client.Application.PdfOutput;
+using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Application.Rotation;
+using Gotenberg.Sharp.API.Client.Application.Split;
+using Gotenberg.Sharp.API.Client.Domain.Overlays;
+using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
+using Gotenberg.Sharp.API.Client.Domain.Rotation;
+using Gotenberg.Sharp.API.Client.Domain.Split;
+
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Base class for all Gotenberg request builders. Provides core functionality for building and configuring requests.

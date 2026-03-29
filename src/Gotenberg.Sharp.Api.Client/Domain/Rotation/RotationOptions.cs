@@ -13,9 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.Rotation;
 
 /// <summary>
 /// Cross-cutting rotation options. Applies to Chromium, LibreOffice, and PDF engine routes.

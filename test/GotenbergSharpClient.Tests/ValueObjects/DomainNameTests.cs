@@ -1,4 +1,4 @@
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace GotenbergSharpClient.Tests.ValueObjects;
 

@@ -15,7 +15,7 @@
 
 using System.Globalization;
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Compression;
 
 /// <summary>
 /// Represents a validated compression quality value (0-100) for screenshot output.

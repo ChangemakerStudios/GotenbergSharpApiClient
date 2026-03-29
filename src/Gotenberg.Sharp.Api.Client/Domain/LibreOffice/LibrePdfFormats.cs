@@ -15,7 +15,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum LibrePdfFormats

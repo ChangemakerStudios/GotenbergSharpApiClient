@@ -15,7 +15,7 @@
 
 using System.Globalization;
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Screenshots;
 
 /// <summary>
 /// Represents a validated screen dimension (width or height) in pixels for screenshots.

@@ -16,7 +16,7 @@
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class AssetDictionary : Dictionary<string, ContentItem>, IConvertToHttpContent
     {

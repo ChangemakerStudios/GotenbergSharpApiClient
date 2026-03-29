@@ -13,9 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Application.Webhooks;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
+using Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.Requests;
 
 /// <summary>
 /// Configures request-level settings including page ranges, webhooks, result filename, and trace ID for correlation.
@@ -36,7 +38,7 @@ public sealed class ConfigBuilder
     /// <returns>The builder instance for method chaining.</returns>
     public ConfigBuilder SetPageRanges(string? pageRanges)
     {
-        this._requestConfig.PageRanges = Pages.PageRanges.Create(pageRanges);
+        this._requestConfig.PageRanges = Domain.Pages.PageRanges.Create(pageRanges);
 
         return this;
     }
@@ -48,7 +50,7 @@ public sealed class ConfigBuilder
     /// <returns>The builder instance for method chaining.</returns>
     public ConfigBuilder SetPageRanges(PageRanges? pageRanges)
     {
-        this._requestConfig.PageRanges = pageRanges ?? Pages.PageRanges.All;
+        this._requestConfig.PageRanges = pageRanges ?? Domain.Pages.PageRanges.All;
 
         return this;
     }

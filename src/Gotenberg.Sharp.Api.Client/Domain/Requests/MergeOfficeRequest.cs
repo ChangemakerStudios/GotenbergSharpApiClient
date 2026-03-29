@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
+using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;

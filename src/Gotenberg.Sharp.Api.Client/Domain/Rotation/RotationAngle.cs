@@ -15,7 +15,7 @@
 
 using System.Globalization;
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Rotation;
 
 /// <summary>
 /// Represents a validated PDF rotation angle. Only 90, 180, and 270 degrees are valid.

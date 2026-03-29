@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
+namespace Gotenberg.Sharp.API.Client.Domain.Documents
 {
     /// <summary>
     /// Represents the elements of a document

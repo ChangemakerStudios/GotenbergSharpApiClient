@@ -1,8 +1,8 @@
-using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Compression;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Domain.Screenshots;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -15,7 +15,7 @@
 
 
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
+namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     /// <summary>
     /// Represents content for PDF conversion requests. Supports content from strings, byte arrays, or streams.

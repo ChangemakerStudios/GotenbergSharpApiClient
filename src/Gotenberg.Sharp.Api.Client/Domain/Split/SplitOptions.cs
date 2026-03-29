@@ -13,9 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
-
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.Split;
 
 /// <summary>
 /// Cross-cutting split options. When splitting returns multiple files, Gotenberg returns a ZIP.

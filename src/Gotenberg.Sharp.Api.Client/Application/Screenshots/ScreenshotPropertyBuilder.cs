@@ -13,9 +13,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Compression;
+using Gotenberg.Sharp.API.Client.Domain.Screenshots;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.Screenshots;
 
 /// <summary>
 /// Configures screenshot-specific properties (device dimensions, format, quality).

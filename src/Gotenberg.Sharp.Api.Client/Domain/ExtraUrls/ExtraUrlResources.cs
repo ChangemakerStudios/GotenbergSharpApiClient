@@ -15,7 +15,7 @@
 
 
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
+namespace Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
 
 public class ExtraUrlResources : IConvertToHttpContent
 {

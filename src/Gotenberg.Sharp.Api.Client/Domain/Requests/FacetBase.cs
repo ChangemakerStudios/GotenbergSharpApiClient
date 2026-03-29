@@ -15,9 +15,17 @@
 
 using System.Globalization;
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Authentication;
+using Gotenberg.Sharp.API.Client.Domain.Cookies;
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
+using Gotenberg.Sharp.API.Client.Domain.Overlays;
+using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
+using Gotenberg.Sharp.API.Client.Domain.Screenshots;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Split;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 public abstract class FacetBase : IConvertToHttpContent
 {
@@ -76,7 +84,7 @@ public abstract class FacetBase : IConvertToHttpContent
 
         return value switch
         {
-            PdfFormat format => format.ToFormDataValue(),
+            PdfFormat.PdfFormat format => format.ToFormDataValue(),
             LibrePdfFormats format => format.ToFormDataValue(),
             ConversionPdfFormats format => format.ToFormDataValue(),
             PdfPassword password => password.Value,

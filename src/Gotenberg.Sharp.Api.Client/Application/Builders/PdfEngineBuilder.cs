@@ -13,11 +13,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Rotation;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Split;
 
 using Newtonsoft.Json.Linq;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Builds standalone PDF engine requests. Use the static factory methods to create

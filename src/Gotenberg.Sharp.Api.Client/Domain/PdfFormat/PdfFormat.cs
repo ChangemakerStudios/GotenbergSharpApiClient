@@ -15,7 +15,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 
 /// <summary>
 /// PDF/A conformance formats supported by Gotenberg across all modules (Chromium, LibreOffice, PDF Engines).

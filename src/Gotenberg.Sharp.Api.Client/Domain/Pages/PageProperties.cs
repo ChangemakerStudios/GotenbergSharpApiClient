@@ -15,7 +15,7 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets
+namespace Gotenberg.Sharp.API.Client.Domain.Pages
 {
     /// <summary>
     ///  Represents the page properties of the pdf document

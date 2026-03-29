@@ -13,6 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Domain.Screenshots;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>

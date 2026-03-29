@@ -1,4 +1,5 @@
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

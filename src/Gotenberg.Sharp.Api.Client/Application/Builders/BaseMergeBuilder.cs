@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.Requests;
+
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Base class for builders that merge documents (PDFs or Office files) using Gotenberg's merge capabilities.

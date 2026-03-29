@@ -15,7 +15,7 @@
 
 
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
+namespace Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
 
 /// <summary>
 /// Types of external resources that can be injected into URL-based PDF conversions.

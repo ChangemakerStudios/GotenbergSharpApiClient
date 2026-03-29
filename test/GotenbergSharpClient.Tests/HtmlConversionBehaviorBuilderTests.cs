@@ -1,7 +1,8 @@
-using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Domain.Cookies;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+
 using Newtonsoft.Json.Linq;
 
 namespace GotenbergSharpClient.Tests;

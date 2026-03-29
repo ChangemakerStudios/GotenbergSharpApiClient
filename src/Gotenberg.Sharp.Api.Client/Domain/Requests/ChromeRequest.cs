@@ -13,6 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Domain.Pages;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class ChromeRequest : BuildRequestBase

@@ -13,9 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Newtonsoft.Json;
-
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 
 /// <summary>
 /// Represents a single CSS media feature override for Chromium's emulatedMediaFeatures.

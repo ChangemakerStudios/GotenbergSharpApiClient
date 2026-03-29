@@ -13,9 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Documents;
 
-
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.ExtraUrls;
 
 /// <summary>
 /// Configures custom HTML header and footer for URL to PDF conversions.

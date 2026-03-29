@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 
 /// <summary>
 /// Represents a validated CSS selector string used by Chromium's waitForSelector feature.

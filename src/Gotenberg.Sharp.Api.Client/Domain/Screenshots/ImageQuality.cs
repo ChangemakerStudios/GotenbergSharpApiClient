@@ -15,7 +15,7 @@
 
 using System.Globalization;
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Screenshots;
 
 /// <summary>
 /// Represents a validated image quality value (1-100) used for JPEG export quality

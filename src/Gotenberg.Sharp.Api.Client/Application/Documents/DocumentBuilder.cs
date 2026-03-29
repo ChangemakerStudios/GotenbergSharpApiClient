@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Domain.Documents;
+
+namespace Gotenberg.Sharp.API.Client.Application.Documents;
 
 /// <summary>
 /// Configures the document content for HTML or Markdown to PDF conversions.

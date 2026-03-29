@@ -13,9 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Screenshots;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 
 /// <summary>
 /// LibreOffice-specific conversion options. These apply only to the LibreOffice route

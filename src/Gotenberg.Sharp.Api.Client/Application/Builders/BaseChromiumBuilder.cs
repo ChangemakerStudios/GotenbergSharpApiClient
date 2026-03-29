@@ -13,7 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Application.Pages;
+using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Domain.Pages;
+
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Base class for builders that use Gotenberg's Chromium module for HTML and URL to PDF conversions.

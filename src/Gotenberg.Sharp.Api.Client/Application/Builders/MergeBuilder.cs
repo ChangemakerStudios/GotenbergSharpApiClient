@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
+
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Builds requests for merging multiple PDF files into a single PDF using Gotenberg's PDF engines module.

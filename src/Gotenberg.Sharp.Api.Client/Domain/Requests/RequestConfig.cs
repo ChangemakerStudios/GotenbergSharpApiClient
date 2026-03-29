@@ -14,8 +14,9 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Pages;
+using Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>
 ///     All endpoints accept form fields for each property

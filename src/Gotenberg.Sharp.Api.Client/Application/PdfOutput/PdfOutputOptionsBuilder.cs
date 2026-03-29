@@ -13,11 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Authentication;
+using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
+using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 
 using Newtonsoft.Json.Linq;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.PdfOutput;
 
 /// <summary>
 /// Configures PDF output options shared across all Gotenberg modules.

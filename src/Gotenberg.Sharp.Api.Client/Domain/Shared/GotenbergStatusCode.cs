@@ -15,7 +15,7 @@
 
 using System.Globalization;
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Shared;
 
 /// <summary>
 /// Represents a validated HTTP status code used for Gotenberg's failOnHttpStatusCodes

@@ -13,11 +13,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Cookies;
+using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 using Newtonsoft.Json.Linq;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 
 /// <summary>
 /// Chromium rendering behaviors for HTML/URL to PDF conversions.

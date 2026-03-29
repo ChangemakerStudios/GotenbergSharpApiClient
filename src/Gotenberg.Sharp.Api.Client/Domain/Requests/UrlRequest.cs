@@ -13,7 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
+using Gotenberg.Sharp.API.Client.Domain.Documents;
+using Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 

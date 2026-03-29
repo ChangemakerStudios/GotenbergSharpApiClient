@@ -13,11 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Domain.Authentication;
 
 using Newtonsoft.Json.Linq;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 
 /// <summary>
 /// PDF output options shared across all Gotenberg modules (Chromium, LibreOffice, PDF Engines).
@@ -29,7 +29,7 @@ public class PdfOutputOptions : FacetBase
     /// Convert the resulting PDF into the given PDF/A format.
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.PdfOutput.PdfFormat)]
-    public PdfFormat? PdfFormat { get; set; }
+    public PdfFormat.PdfFormat? PdfFormat { get; set; }
 
     /// <summary>
     /// Enables PDF/UA (Universal Accessibility) compliance for the resulting PDF.

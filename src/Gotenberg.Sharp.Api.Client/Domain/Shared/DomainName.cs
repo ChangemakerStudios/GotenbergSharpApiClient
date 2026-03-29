@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Shared;
 
 /// <summary>
 /// Represents a validated domain name used for Gotenberg's ignoreResourceHttpStatusDomains field.

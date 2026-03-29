@@ -15,7 +15,7 @@
 
 using System.ComponentModel;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 namespace Gotenberg.Sharp.API.Client;

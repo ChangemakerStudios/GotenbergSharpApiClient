@@ -15,9 +15,7 @@
 
 using System.ComponentModel;
 
-
-
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
+namespace Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
 
 using urlConstants = Constants.Gotenberg.Chromium.Routes.Url;
 

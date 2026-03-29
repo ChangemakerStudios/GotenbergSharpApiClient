@@ -15,7 +15,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+namespace Gotenberg.Sharp.API.Client.Domain.Shared;
 
 /// <summary>
 /// Represents validated page ranges in the format "1-3,5,8-10".

@@ -13,9 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Newtonsoft.Json;
-
-namespace Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+namespace Gotenberg.Sharp.API.Client.Domain.Cookies;
 
 /// <summary>
 /// Represents a cookie to store in the Chromium cookie jar.

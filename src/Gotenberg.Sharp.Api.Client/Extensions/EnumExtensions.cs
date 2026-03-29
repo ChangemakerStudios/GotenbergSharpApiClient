@@ -17,6 +17,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
+using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
+
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class EnumExtensions

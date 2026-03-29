@@ -13,11 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
+using Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
 
-
-
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.ExtraUrls;
 
 /// <summary>
 /// Injects additional CSS stylesheets or JavaScript files into a URL-based PDF conversion before rendering.

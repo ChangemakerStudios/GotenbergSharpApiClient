@@ -13,7 +13,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Application.Screenshots;
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Base builder for all Chromium screenshot requests. Provides screenshot properties,

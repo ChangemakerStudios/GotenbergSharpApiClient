@@ -13,9 +13,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets.UrlExtras;
+using Gotenberg.Sharp.API.Client.Application.ExtraUrls;
+using Gotenberg.Sharp.API.Client.Domain.Documents;
+using Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
+using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders;
+namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
 /// <summary>
 /// Builds requests for converting remote URLs to PDF using Gotenberg's Chromium module.

@@ -13,11 +13,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Security.Cryptography.X509Certificates;
-
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
+using Gotenberg.Sharp.API.Client.Domain.Pages;
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.Pages;
 
 public sealed class PagePropertyBuilder(PageProperties pageProperties)
 {

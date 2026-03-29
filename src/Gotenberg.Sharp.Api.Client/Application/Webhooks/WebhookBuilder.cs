@@ -13,9 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
-
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+namespace Gotenberg.Sharp.API.Client.Application.Webhooks;
 
 /// <summary>
 /// Configures webhook settings for asynchronous PDF generation. Gotenberg will POST the generated PDF

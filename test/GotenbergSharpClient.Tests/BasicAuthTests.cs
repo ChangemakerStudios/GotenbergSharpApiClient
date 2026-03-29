@@ -1,5 +1,6 @@
 using AwesomeAssertions;
-using Gotenberg.Sharp.API.Client.Domain.Builders;
+
+using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Microsoft.Extensions.DependencyInjection;

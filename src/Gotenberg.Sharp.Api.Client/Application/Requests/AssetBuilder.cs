@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace Gotenberg.Sharp.API.Client.Domain.Builders.Faceted
+namespace Gotenberg.Sharp.API.Client.Application.Requests
 {
     /// <summary>
     /// Adds embedded resources (assets) to PDF conversion requests. Assets are files referenced by your HTML content
