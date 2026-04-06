@@ -1,5 +1,33 @@
 # Release History
 
+## v3.0.0
+- **Breaking Changes:**
+  - Dropped .NET 5, .NET 6, and .NET 7 target frameworks
+  - Added .NET 9 and .NET 10 target frameworks (retains .NET 8, netstandard2.1, netstandard2.0)
+  - Builders reorganized from `Domain.Builders` to `Application.Builders` namespace
+- **Screenshot Operations (PR #74):**
+  - New `ScreenshotHtmlAsync()` and `ScreenshotUrlAsync()` public API methods
+  - Full request/builder hierarchy for HTML and URL screenshots
+  - Support for PNG, JPEG, and WebP output formats
+- **Standalone PDF Engine Operations (PR #75):**
+  - New `ExecutePdfEngineAsync()` methods for direct PDF manipulation
+  - Flatten, rotate, split, encrypt, and write metadata without prior conversion
+- **PDF Encryption (PR #71):**
+  - New encryption support with userPassword and ownerPassword
+- **Cross-Cutting Options (PR #73):**
+  - Watermark, stamp, rotation, and split options available on any conversion
+- **LibreOffice Options (PR #72):**
+  - New LibreOffice-specific conversion options with DDD value objects
+  - Enhanced `MergeOfficeDocsAsync()` with quality, bookmarks, and image compression settings
+- **Chromium Missing Fields (PR #70):**
+  - Additional Chromium form fields with DDD value objects
+- **Documentation:**
+  - Switched from DocFX to MkDocs Material documentation site (PR #76, #77)
+  - Linked example projects from documentation articles
+- **Examples:**
+  - New EncryptPdf, LibreOfficeOptions, PdfEngineOperations, WatermarkAndRotate, and ChromiumFeatures examples
+  - Converted LinqPad examples to standalone console applications
+
 ## v2.8.5
 - **Features:**
   - Added support for the GenerateTaggedPdf flag.
