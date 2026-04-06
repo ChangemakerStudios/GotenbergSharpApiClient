@@ -15,7 +15,7 @@
 
 using System.ComponentModel;
 
-using Gotenberg.Sharp.API.Client.Domain.Builders;
+using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 namespace Gotenberg.Sharp.API.Client;
@@ -240,6 +240,116 @@ public class GotenbergSharpClient
 
         return await this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken)
             .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of HTML content using Gotenberg's Chromium module.
+    /// </summary>
+    /// <param name="request">The HTML screenshot request.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the screenshot image (PNG, JPEG, or WebP).</returns>
+    /// <seealso href="https://gotenberg.dev/docs/convert-with-chromium/screenshot-html">Gotenberg Screenshot HTML Documentation</seealso>
+    public virtual Task<Stream> ScreenshotHtmlAsync(
+        ScreenshotHtmlRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of HTML content using a builder pattern.
+    /// </summary>
+    public virtual async Task<Stream> ScreenshotHtmlAsync(
+        ScreenshotHtmlRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ScreenshotHtmlAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of a URL using Gotenberg's Chromium module.
+    /// </summary>
+    /// <param name="request">The URL screenshot request.</param>
+    /// <param name="cancelToken">Cancellation token for the async operation.</param>
+    /// <returns>A stream containing the screenshot image (PNG, JPEG, or WebP).</returns>
+    /// <seealso href="https://gotenberg.dev/docs/convert-with-chromium/screenshot-url">Gotenberg Screenshot URL Documentation</seealso>
+    public virtual Task<Stream> ScreenshotUrlAsync(
+        ScreenshotUrlRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Captures a screenshot of a URL using a builder pattern.
+    /// </summary>
+    public virtual async Task<Stream> ScreenshotUrlAsync(
+        ScreenshotUrlRequestBuilder builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ScreenshotUrlAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Executes a standalone PDF engine operation (flatten, rotate, split, encrypt, metadata).
+    /// </summary>
+    public virtual Task<Stream> ExecutePdfEngineAsync(
+        PdfEngineRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        return this.ExecuteRequestAsync(request.CreateApiRequest(), cancelToken);
+    }
+
+    /// <summary>
+    /// Executes a standalone PDF engine operation using a builder.
+    /// </summary>
+    public virtual async Task<Stream> ExecutePdfEngineAsync<TRequest>(
+        PdfEngineBuilder<TRequest> builder,
+        CancellationToken cancelToken = default)
+        where TRequest : PdfEngineRequest
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ExecutePdfEngineAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Reads metadata from PDF files. Returns JSON string keyed by filename.
+    /// </summary>
+    public virtual async Task<string> ReadPdfMetadataAsync(
+        PdfEngineBuilder<ReadMetadataRequest> builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        using var response = await this.SendRequestAsync(
+            request.CreateApiRequest(),
+            HttpCompletionOption.ResponseContentRead,
+            cancelToken);
+
+#if NET5_0_OR_GREATER
+        return await response.Content.ReadAsStringAsync(cancelToken);
+#else
+        return await response.Content.ReadAsStringAsync();
+#endif
     }
 
     /// <summary>

@@ -1,4 +1,6 @@
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
+using Gotenberg.Sharp.API.Client.Domain.Cookies;
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

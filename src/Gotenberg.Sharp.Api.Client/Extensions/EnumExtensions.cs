@@ -17,15 +17,25 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
+using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
+
 namespace Gotenberg.Sharp.API.Client.Extensions;
 
 internal static class EnumExtensions
 {
+    internal static string ToFormDataValue(this PdfFormat format)
+    {
+        return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";
+    }
+
+    [Obsolete("Use PdfFormat instead")]
     internal static string ToFormDataValue(this LibrePdfFormats format)
     {
         return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";
     }
 
+    [Obsolete("Use PdfFormat instead")]
     internal static string ToFormDataValue(this ConversionPdfFormats format)
     {
         return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";

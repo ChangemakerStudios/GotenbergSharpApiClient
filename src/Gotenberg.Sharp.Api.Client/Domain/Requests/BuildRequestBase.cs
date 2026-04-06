@@ -13,7 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Overlays;
+using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
+using Gotenberg.Sharp.API.Client.Domain.Rotation;
+using Gotenberg.Sharp.API.Client.Domain.Split;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -22,6 +26,31 @@ public abstract class BuildRequestBase
     internal RequestConfig? Config { get; set; }
 
     internal AssetDictionary? Assets { get; set; }
+
+    /// <summary>
+    /// PDF output options shared across all request types (PDF/A, PDF/UA, flatten, tagged PDF, metadata).
+    /// </summary>
+    public PdfOutputOptions? PdfOutputOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting rotation options (angle and page ranges).
+    /// </summary>
+    public RotationOptions? RotationOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting split options (mode, span, and unify).
+    /// </summary>
+    public SplitOptions? SplitOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting watermark options (background overlay).
+    /// </summary>
+    public WatermarkOptions? WatermarkOptions { get; set; }
+
+    /// <summary>
+    /// Cross-cutting stamp options (foreground overlay).
+    /// </summary>
+    public StampOptions? StampOptions { get; set; }
 
     protected abstract string ApiPath { get; }
 
@@ -36,7 +65,14 @@ public abstract class BuildRequestBase
         return item;
     }
 
-    protected abstract IEnumerable<HttpContent> ToHttpContent();
+    protected virtual IEnumerable<HttpContent> ToHttpContent()
+    {
+        return this.PdfOutputOptions.IfNullEmptyContent()
+            .Concat(this.RotationOptions.IfNullEmptyContent())
+            .Concat(this.SplitOptions.IfNullEmptyContent())
+            .Concat(this.WatermarkOptions.IfNullEmptyContent())
+            .Concat(this.StampOptions.IfNullEmptyContent());
+    }
 
     protected virtual void Validate()
     {

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.1;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <AssemblyName>Gotenberg.Sharp.API.Client</AssemblyName>
     <RootNamespace>Gotenberg.Sharp.API.Client</RootNamespace>
@@ -17,23 +17,17 @@
     <Version>1.0.0</Version>
     <PackageTags>Gotenberg pdf C# API client unoconv</PackageTags>
     <Description>
-      C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF. The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
+      C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF, taking screenshots, and performing standalone PDF operations (flatten, rotate, split, encrypt). The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
     </Description>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageReleaseNotes>
+      v3.0.0 - Major release: Screenshot operations (HTML/URL to PNG/JPEG/WebP). Standalone PDF engine operations (flatten, rotate, split, encrypt, metadata). Cross-cutting watermark, stamp, rotation, and split options. LibreOffice conversion options. PDF encryption. Additional Chromium fields. Dropped .NET 5/6/7; added .NET 9/10. Namespace reorganization (builders moved to Application layer). See CHANGES.MD for full details.
       v2.8.5 - Added support for the GenerateTaggedPdf flag.
-      v2.8.4 - Fixed hybrid configuration for basic authentication credentials. See CHANGES.MD for full details.
-      v2.8.3 - Added programmatic configuration support. Comprehensive documentation improvements. Fixed NuGet packaging issues. See CHANGES.MD for full details.
-      v2.8.1 - Added strongly-typed cookie support. Added basic authentication support. Added SinglePage page property. Fixed margins bug. Project restructure (moved /lib to /src).
-      v2.8 - Improving handling of PDF formatting and added flatten support.
-      v2.7 - Fixes issue with "Inches".
-      v2.6 - Updated office Extensions. Added document metadata support. Add Dimension.FromUnit() support for dimensional values.
-      v2.5 - Renamed "Dimentions" to "PageProperties". Added support for 'GenerateDocumentOutline' and 'OmitBackground.'
-      v2.4 - Updated dependencies. Removed Annotations. Add support for PDF/UA form field. Thank you for the PR @lennartb-!
-      v2.3 - Added Convert Page 'ExportFormFields' flag support (Gotenberg v8.3+ Only). Added .NET 8 target.
-      v2.2 - Added 'SkipNetworkIdle' flag support (Gotenberg v8+ Only). Thank you for the PR @guillaumeduhr! Upgraded nugets to latest. Added .NET 7.0 support.
-      v2.1 - Added Trace Support. Fixed extra webhook header support.
-      v2.0 - Upgraded to support Gotenberg v7 -- this version no longer works with Gotenberg v6.
+      v2.8.4 - Fixed hybrid configuration for basic authentication credentials.
+      v2.8.3 - Added programmatic configuration support. Comprehensive documentation improvements.
+      v2.8.1 - Added cookie support, basic auth, SinglePage property.
+      v2.8 - PDF formatting improvements, flatten support.
+      v2.0 - Upgraded to support Gotenberg v7.
     </PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ChangemakerStudios/GotenbergSharpApiClient</PackageProjectUrl>
@@ -82,28 +76,22 @@
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.5" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.0" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

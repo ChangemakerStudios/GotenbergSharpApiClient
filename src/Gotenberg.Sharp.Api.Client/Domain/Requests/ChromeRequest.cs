@@ -13,6 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Domain.Pages;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class ChromeRequest : BuildRequestBase
@@ -22,7 +25,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
         protected override IEnumerable<HttpContent> ToHttpContent() =>
-            Config.IfNullEmptyContent()
+            base.ToHttpContent()
+                .Concat(Config.IfNullEmptyContent())
                 .Concat(this.PageProperties.IfNullEmptyContent())
                 .Concat(ConversionBehaviors.IfNullEmptyContent());
     }

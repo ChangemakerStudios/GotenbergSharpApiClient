@@ -15,9 +15,7 @@
 
 global using System.Net.Http.Headers;
 
-global using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
 global using Gotenberg.Sharp.API.Client.Domain.Requests;
-global using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
 global using Gotenberg.Sharp.API.Client.Extensions;
 global using Gotenberg.Sharp.API.Client.Infrastructure;
 

@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Documents;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>

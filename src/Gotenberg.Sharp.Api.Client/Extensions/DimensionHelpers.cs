@@ -15,6 +15,7 @@
 
 using System.ComponentModel;
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
+using Gotenberg.Sharp.API.Client.Domain.Pages;
 
 namespace Gotenberg.Sharp.API.Client.Extensions
 {

@@ -1,6 +1,6 @@
 using Gotenberg.Sharp.API.Client;
-using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
+using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +50,7 @@ static async Task<string> DoMerge(string sourcePath, string destinationPath, Got
     var toMerge = items.Select(item => KeyValuePair.Create(item.Info.Name, File.ReadAllBytes(item.Path)));
 
     var builder = new MergeBuilder()
-        .SetPdfFormat(LibrePdfFormats.A2b)
+        .SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A2b))
         .WithAssets(b => { b.AddItems(toMerge); });
 
     var request = builder.Build();
