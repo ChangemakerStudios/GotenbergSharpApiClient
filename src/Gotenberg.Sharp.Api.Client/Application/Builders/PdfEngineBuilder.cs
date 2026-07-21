@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
@@ -151,5 +152,19 @@ public static class PdfEngineBuilders
     public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(IDictionary<string, object> metadata)
     {
         return WriteMetadata(JObject.FromObject(metadata));
+    }
+
+    /// <summary>
+    /// Creates a builder for embedding files into PDFs.
+    /// </summary>
+    /// <param name="embedsMetadata">A dictionary from file names to their data</param>
+    public static PdfEngineBuilder<EmbedRequest> Embed(IDictionary<string, Entry> embedsMetadata)
+    {
+        var request = new EmbedRequest
+        {
+            EmbedsData = embedsMetadata,
+        };
+        
+        return new PdfEngineBuilder<EmbedRequest>(request);
     }
 }

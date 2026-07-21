@@ -1,9 +1,12 @@
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 using Gotenberg.Sharp.API.Client.Extensions;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using MimeMapping;
 using Newtonsoft.Json.Linq;
 
 namespace GotenbergSharpClient.Tests;
@@ -93,6 +96,33 @@ public class PdfEngineOperationsTests
         writeRequest.Metadata!["Author"]!.Value<string>().Should().Be("Test");
     }
 
+    [Test]
+    public void PdfEngineBuilders_Embed_CreatesRequest()
+    {
+        const string xml = """
+                           <?xml version="1.0" encoding="UTF-8"?>
+                           """;
+
+        var entries = new Dictionary<string, Entry>
+        {
+            {
+                "test.xml", new Entry
+                {
+                    MimeType = KnownMimeTypes.Xml,
+                    Relationship = Constants.Gotenberg.PdfEngines.EmbedRelation.Data,
+                    Content = new ContentItem(xml),
+                }
+            },
+        }; 
+        
+        var builder = PdfEngineBuilders.Embed(entries)
+                                       .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
+        var request = builder.Build();
+
+        var writeRequest = (EmbedRequest)request;
+        writeRequest.EmbedsData.Should().NotBeNull();
+    }
+    
     [Test]
     public void PdfEngineBuilders_Rotate_WithInvalidAngle_Throws()
     {
@@ -198,6 +228,43 @@ public class PdfEngineOperationsTests
         parsed.Should().NotBeEmpty();
     }
 
+    [Category("Integration")]
+    [Test]
+    public async Task Emend()
+    {
+        const string xml = """
+                           <?xml version="1.0" encoding="UTF-8"?>
+                           <data id="test">
+                             Important data
+                           </data>
+                           """;
+
+        var entries = new Dictionary<string, Entry>
+        {
+            {
+                "test.xml", new Entry
+                {
+                    MimeType = KnownMimeTypes.Xml,
+                    Relationship = Constants.Gotenberg.PdfEngines.EmbedRelation.Data,
+                    Content = new ContentItem(xml),
+                }
+            },
+        };
+        
+        var client = CreateAuthenticatedClient();
+        var pdfBytes = await GenerateTestPdf(client);
+
+        var builder = PdfEngineBuilders.Embed(entries)
+            .WithPdfs(a => a.AddItem("test.pdf", pdfBytes));
+
+        var result = await client.ExecutePdfEngineAsync(builder);
+
+        var file = File.Create("result.pdf");
+        await result.CopyToAsync(file);
+        
+        result.Length.Should().BeGreaterThan(0);
+    }
+    
     #endregion
 
     private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateAuthenticatedClient()

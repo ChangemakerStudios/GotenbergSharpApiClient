@@ -256,6 +256,8 @@ public static class Constants
                 public const string Watermark = $"{Root}/watermark";
 
                 public const string Stamp = $"{Root}/stamp";
+                
+                public const string Embed = $"{Root}/embed";
             }
 
             public static class Routes
@@ -269,6 +271,15 @@ public static class Constants
                 {
                     public const string PdfFormat = CrossCutting.PdfFormat;
                 }
+            }
+            
+            public static class EmbedRelation
+            {
+                public const string Source = "source";
+                public const string Data = "data";
+                public const string Alternative = "alternative";
+                public const string Supplement = "supplement";
+                public const string Unspecified = "unspecified";
             }
         }
 
