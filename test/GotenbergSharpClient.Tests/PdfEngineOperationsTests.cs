@@ -230,7 +230,7 @@ public class PdfEngineOperationsTests
 
     [Category("Integration")]
     [Test]
-    public async Task Emend()
+    public async Task Embed_Succeeds()
     {
         const string xml = """
                            <?xml version="1.0" encoding="UTF-8"?>
@@ -257,7 +257,7 @@ public class PdfEngineOperationsTests
         var builder = PdfEngineBuilders.Embed(entries)
             .WithPdfs(a => a.AddItem("test.pdf", pdfBytes));
 
-        var result = await client.ExecutePdfEngineAsync(builder);
+        await using var result = await client.ExecutePdfEngineAsync(builder);
 
         var file = File.Create("result.pdf");
         await result.CopyToAsync(file);
