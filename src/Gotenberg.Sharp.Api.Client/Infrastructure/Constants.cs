@@ -275,11 +275,11 @@ public static class Constants
             
             public static class EmbedRelation
             {
-                public const string Source = "source";
-                public const string Data = "data";
-                public const string Alternative = "alternative";
-                public const string Supplement = "supplement";
-                public const string Unspecified = "unspecified";
+                public const string Source = "Source";
+                public const string Data = "Data";
+                public const string Alternative = "Alternative";
+                public const string Supplement = "Supplement";
+                public const string Unspecified = "Unspecified";
             }
         }
 
