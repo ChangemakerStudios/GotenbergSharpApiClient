@@ -17,7 +17,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         protected override void Validate()
         {
             if (this.EmbedsData == null || !this.EmbedsData.Any())
-                throw new InvalidOperationException("EmbedsMetadata is required and cannot be empty");
+                throw new InvalidOperationException($"{nameof(EmbedsData)} is required and cannot be empty");
 
             base.Validate();
         }
