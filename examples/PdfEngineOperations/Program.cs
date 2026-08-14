@@ -1,7 +1,7 @@
 using Gotenberg.Sharp.API.Client;
-using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
 using Microsoft.Extensions.Configuration;
@@ -59,7 +59,61 @@ var metadataJson = await sharpClient.ReadPdfMetadataAsync(
 var parsed = JObject.Parse(metadataJson);
 Console.WriteLine($"Metadata: {parsed.ToString(Newtonsoft.Json.Formatting.Indented)}");
 
+// Bookmarks require Gotenberg 8.28.0, so skip the demo rather than fail on older services.
+var version = await sharpClient.GetGotenbergVersionAsync();
+Console.WriteLine($"\nGotenberg version: {version}");
+
+var bookmarksRequest = PdfEngineBuilders.ReadBookmarks()
+    .WithPdfs(a => a.AddItem("test.pdf", pdfBytes))
+    .Build();
+
+if (await sharpClient.SupportsAsync(bookmarksRequest))
+{
+    // Bookmarks point at pages, so this part needs a PDF with more than one.
+    var multiPageBytes = await GenerateMultiPageTestPdf(sharpClient);
+
+    // Write an outline
+    Console.WriteLine("Writing bookmarks...");
+    using var bookmarkedResult = await sharpClient.ExecutePdfEngineAsync(
+        PdfEngineBuilders.WriteBookmarks(b => b
+                .Add("Introduction", 1)
+                .Add("Chapter 1", 2, c => c
+                    .Add("Section 1.1", 2)
+                    .Add("Section 1.2", 3)))
+            .WithPdfs(a => a.AddItem("test.pdf", multiPageBytes)));
+
+    using var bookmarkedBytes = new MemoryStream();
+    await bookmarkedResult.CopyToAsync(bookmarkedBytes);
+    await SaveBytes(bookmarkedBytes.ToArray(), destinationDirectory, "WithBookmarks.pdf");
+
+    // Read it back
+    Console.WriteLine("Reading bookmarks...");
+    var outlines = await sharpClient.ReadPdfBookmarksAsync(
+        PdfEngineBuilders.ReadBookmarks()
+            .WithPdfs(a => a.AddItem("bookmarked.pdf", bookmarkedBytes.ToArray())));
+
+    foreach (var outline in outlines)
+    {
+        Console.WriteLine($"  {outline.Key}:");
+        PrintBookmarks(outline.Value, indent: 2);
+    }
+}
+else
+{
+    Console.WriteLine(
+        $"Skipping bookmarks: requires Gotenberg {bookmarksRequest.Requires!.MinimumVersion} or newer.");
+}
+
 Console.WriteLine($"\nAll output saved to: {destinationDirectory}");
+
+static void PrintBookmarks(IEnumerable<Gotenberg.Sharp.API.Client.Domain.Bookmarks.Bookmark> bookmarks, int indent)
+{
+    foreach (var bookmark in bookmarks)
+    {
+        Console.WriteLine($"{new string(' ', indent * 2)}{bookmark.Title} -> page {bookmark.Page}");
+        PrintBookmarks(bookmark.Children, indent + 1);
+    }
+}
 
 static async Task<byte[]> GenerateTestPdf(GotenbergSharpClient client)
 {
@@ -75,6 +129,28 @@ static async Task<byte[]> GenerateTestPdf(GotenbergSharpClient client)
     using var ms = new MemoryStream();
     await stream.CopyToAsync(ms);
     return ms.ToArray();
+}
+
+static async Task<byte[]> GenerateMultiPageTestPdf(GotenbergSharpClient client)
+{
+    var builder = new HtmlRequestBuilder()
+        .AddDocument(doc => doc.SetBody(@"
+            <html><body>
+                <h1>Page One</h1>
+                <div style='page-break-before: always'><h1>Page Two</h1></div>
+                <div style='page-break-before: always'><h1>Page Three</h1></div>
+            </body></html>"));
+
+    using var stream = await client.HtmlToPdfAsync(builder);
+    using var ms = new MemoryStream();
+    await stream.CopyToAsync(ms);
+    return ms.ToArray();
+}
+
+static async Task SaveBytes(byte[] bytes, string directory, string filename)
+{
+    using var ms = new MemoryStream(bytes);
+    await SaveStream(ms, directory, filename);
 }
 
 static async Task SaveStream(Stream stream, string directory, string filename)

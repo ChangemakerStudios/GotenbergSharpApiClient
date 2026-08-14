@@ -88,6 +88,103 @@ var json = await sharpClient.ReadPdfMetadataAsync(
 // json: { "doc.pdf": { "Author": "...", "Title": "...", ... } }
 ```
 
+### Write Bookmarks
+
+!!! info "Requires Gotenberg 8.28.0"
+    The bookmark routes were introduced in Gotenberg 8.28.0. Older services are rejected with a
+    `GotenbergVersionNotSupportedException` before the request is sent — see
+    [Version Compatibility](advanced-features.md#version-compatibility).
+
+Write a document outline (the table of contents readers show in their sidebar). Pages are 1-based,
+and entries nest arbitrarily deep:
+
+```csharp
+using var result = await sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.WriteBookmarks(b => b
+            .Add("Introduction", 1)
+            .Add("Chapter 1", 2, c => c
+                .Add("Section 1.1", 3)
+                .Add("Section 1.2", 5))
+            .Add("Appendix", 9))
+        .WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+```
+
+To give each PDF its own outline, use `WriteBookmarksPerFile`. The file names must match the names
+the PDFs were added under:
+
+```csharp
+using var result = await sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.WriteBookmarksPerFile(m => m
+            .ForFile("report.pdf", b => b.Add("Summary", 1))
+            .ForFile("appendix.pdf", b => b.Add("Tables", 1)))
+        .WithPdfs(a => a
+            .AddItem("report.pdf", reportBytes)
+            .AddItem("appendix.pdf", appendixBytes)));
+```
+
+!!! note "Multiple files return a ZIP"
+    As with the other PDF engine routes, sending more than one PDF makes Gotenberg return a ZIP
+    archive rather than a single PDF.
+
+Both factories also accept pre-built `Bookmark` objects when you're generating the outline from your
+own data:
+
+```csharp
+var outline = chapters.Select(c => new Bookmark(c.Title, c.StartPage)).ToList();
+
+using var result = await sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.WriteBookmarks(outline)
+        .WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+```
+
+### Read Bookmarks
+
+Returns the outline of each PDF, keyed by the filename it was uploaded under. PDFs without an
+outline come back with an empty list:
+
+```csharp
+var outlines = await sharpClient.ReadPdfBookmarksAsync(
+    PdfEngineBuilders.ReadBookmarks()
+        .WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+
+foreach (var bookmark in outlines["doc.pdf"])
+{
+    Console.WriteLine($"{bookmark.Title} -> page {bookmark.Page}");
+
+    foreach (var child in bookmark.Children)
+        Console.WriteLine($"  {child.Title} -> page {child.Page}");
+}
+```
+
+Use `ReadPdfBookmarksJsonAsync` instead if you want Gotenberg's raw JSON response.
+
+### Embed Files
+
+!!! info "Requires Gotenberg 8.25.0"
+    The embed route was introduced in Gotenberg 8.25.0. Older services are rejected with a
+    `GotenbergVersionNotSupportedException` before the request is sent — see
+    [Version Compatibility](advanced-features.md#version-compatibility).
+
+Embed files inside a PDF — for standards such as ZUGFeRD / Factur-X that require an XML invoice
+or other attachment to live inside the PDF. Each entry is keyed by the embedded file's name and
+carries its mime type, content, and relationship:
+
+```csharp
+using var result = await sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.Embed(new Dictionary<string, Entry>
+    {
+        ["factur-x.xml"] = new Entry
+        {
+            MimeType = "text/xml",
+            Relationship = Constants.Gotenberg.PdfEngines.EmbedRelation.Data,
+            Content = new ContentItem(invoiceXml)
+        }
+    }).WithPdfs(a => a.AddItem("invoice.pdf", pdfBytes)));
+```
+
+`Constants.Gotenberg.PdfEngines.EmbedRelation` provides the valid relationship values: `Source`,
+`Data`, `Alternative`, `Supplement`, and `Unspecified`.
+
 ## Cross-Cutting Options
 
 These options are available on **all** request types (HTML, URL, Office, PDF conversion) via `BuildRequestBase`.

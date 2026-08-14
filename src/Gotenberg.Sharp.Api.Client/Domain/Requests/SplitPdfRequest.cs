@@ -17,6 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.Split;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+[MinimumGotenbergVersion(GotenbergVersions.Split, Feature = "The standalone split route")]
 public sealed class SplitPdfRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.Split;

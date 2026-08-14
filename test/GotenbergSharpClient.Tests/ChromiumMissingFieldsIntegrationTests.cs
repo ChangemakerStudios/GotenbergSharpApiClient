@@ -86,9 +86,15 @@ public class ChromiumMissingFieldsIntegrationTests
     [Test]
     public async Task HtmlToPdf_WithFailOnResourceLoadingFailed_WhenResourceFails_Throws()
     {
+        // The missing resource is referenced relatively so Chromium resolves it against the
+        // request's working directory and reports net::ERR_FILE_NOT_FOUND, which Gotenberg
+        // counts as a failed resource. An unresolvable remote host is not usable here:
+        // Gotenberg validates every sub-resource URL before Chromium requests it, and a host
+        // it cannot resolve is failed with net::ERR_ACCESS_DENIED, an error deliberately
+        // excluded from its resource-failure detection.
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody(
-                "<html><body><img src='http://invalid.test/nonexistent.png'/></body></html>"))
+                "<html><body><img src='missing-asset.png'/></body></html>"))
             .SetConversionBehaviors(b => b
                 .FailOnResourceLoadingFailed());
 

@@ -13,9 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
-internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent
+internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent, IRequireGotenbergVersion
 {
     private readonly Func<IEnumerable<HttpContent>> _toHttpContent;
 
@@ -23,17 +25,21 @@ internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent
         Func<IEnumerable<HttpContent>> toHttpContent,
         string apiPath,
         ILookup<string, string?>? headers,
-        bool isWebhookRequest)
+        bool isWebhookRequest,
+        GotenbergFeatureRequirement? requires = null)
     {
         _toHttpContent = toHttpContent;
         ApiPath = apiPath;
         IsWebhookRequest = isWebhookRequest;
         Headers = headers;
+        Requires = requires;
     }
 
     public string ApiPath { get; }
 
     public ILookup<string, string?>? Headers { get; }
+
+    public GotenbergFeatureRequirement? Requires { get; }
 
     private const string BoundaryPrefix = Constants.HttpContent.MultipartData.BoundaryPrefix;
 
