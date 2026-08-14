@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Application.Bookmarks;
 using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
@@ -152,6 +154,101 @@ public static class PdfEngineBuilders
     public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(IDictionary<string, object> metadata)
     {
         return WriteMetadata(JObject.FromObject(metadata));
+    }
+
+    /// <summary>
+    /// Creates a builder for reading the document outline (table of contents) from PDFs. Returns JSON.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    public static PdfEngineBuilder<ReadBookmarksRequest> ReadBookmarks()
+    {
+        return new PdfEngineBuilder<ReadBookmarksRequest>(new ReadBookmarksRequest());
+    }
+
+    /// <summary>
+    /// Creates a builder for writing a document outline applied to every uploaded PDF.
+    /// </summary>
+    /// <param name="bookmarks">Configuration action for the outline.</param>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <example>
+    /// <code>
+    /// PdfEngineBuilders.WriteBookmarks(b => b
+    ///         .Add("Introduction", 1)
+    ///         .Add("Chapter 1", 2, c => c
+    ///             .Add("Section 1.1", 3)))
+    ///     .WithPdfs(a => a.AddItem("doc.pdf", pdfBytes));
+    /// </code>
+    /// </example>
+    public static PdfEngineBuilder<WriteBookmarksRequest> WriteBookmarks(Action<BookmarkBuilder> bookmarks)
+    {
+        if (bookmarks == null) throw new ArgumentNullException(nameof(bookmarks));
+
+        var outline = new List<Bookmark>();
+
+        bookmarks(new BookmarkBuilder(outline));
+
+        return WriteBookmarks(BookmarkSet.Create(outline));
+    }
+
+    /// <summary>
+    /// Creates a builder for writing a pre-built document outline applied to every uploaded PDF.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    public static PdfEngineBuilder<WriteBookmarksRequest> WriteBookmarks(IEnumerable<Bookmark> bookmarks)
+    {
+        return WriteBookmarks(BookmarkSet.Create(bookmarks));
+    }
+
+    /// <summary>
+    /// Creates a builder for writing a pre-built bookmark set.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    public static PdfEngineBuilder<WriteBookmarksRequest> WriteBookmarks(BookmarkSet bookmarks)
+    {
+        var request = new WriteBookmarksRequest
+        {
+            Bookmarks = bookmarks ?? throw new ArgumentNullException(nameof(bookmarks))
+        };
+
+        return new PdfEngineBuilder<WriteBookmarksRequest>(request);
+    }
+
+    /// <summary>
+    /// Creates a builder for writing a distinct document outline to each uploaded PDF. File names
+    /// must match the names the PDFs are added under.
+    /// </summary>
+    /// <param name="bookmarksByFile">Configuration action mapping file names to outlines.</param>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <example>
+    /// <code>
+    /// PdfEngineBuilders.WriteBookmarksPerFile(m => m
+    ///         .ForFile("report.pdf", b => b.Add("Summary", 1))
+    ///         .ForFile("appendix.pdf", b => b.Add("Tables", 1)))
+    ///     .WithPdfs(a => a
+    ///         .AddItem("report.pdf", reportBytes)
+    ///         .AddItem("appendix.pdf", appendixBytes));
+    /// </code>
+    /// </example>
+    public static PdfEngineBuilder<WriteBookmarksRequest> WriteBookmarksPerFile(
+        Action<BookmarkMapBuilder> bookmarksByFile)
+    {
+        if (bookmarksByFile == null) throw new ArgumentNullException(nameof(bookmarksByFile));
+
+        var map = new Dictionary<string, IEnumerable<Bookmark>>();
+
+        bookmarksByFile(new BookmarkMapBuilder(map));
+
+        return WriteBookmarksPerFile(map);
+    }
+
+    /// <summary>
+    /// Creates a builder for writing a distinct pre-built outline to each uploaded PDF.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    public static PdfEngineBuilder<WriteBookmarksRequest> WriteBookmarksPerFile(
+        IDictionary<string, IEnumerable<Bookmark>> bookmarksByFile)
+    {
+        return WriteBookmarks(BookmarkSet.CreatePerFile(bookmarksByFile));
     }
 
     /// <summary>

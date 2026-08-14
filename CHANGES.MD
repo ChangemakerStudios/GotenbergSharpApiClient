@@ -1,5 +1,20 @@
 # Release History
 
+## v3.1.0
+- **PDF Bookmarks (Issue #79):**
+  - New `PdfEngineBuilders.ReadBookmarks()`, `WriteBookmarks()`, and `WriteBookmarksPerFile()`
+  - Fluent `BookmarkBuilder` for nested outlines; `Bookmark` and `BookmarkSet` domain types
+  - `ReadPdfBookmarksAsync()` returns a deserialized outline keyed by filename; `ReadPdfBookmarksJsonAsync()` returns the raw JSON
+  - Requires Gotenberg 8.28.0 or newer
+- **Version Compatibility Checking:**
+  - Requests declare the Gotenberg release that introduced their route via `[MinimumGotenbergVersion]`
+  - The client verifies the running service before sending and throws `GotenbergVersionNotSupportedException` instead of surfacing an opaque 404
+  - New `GetGotenbergVersionAsync()`, `SupportsAsync()`, and `EnsureSupportedAsync()`; the version is fetched once per client and cached
+  - Services predating the `/version` route are treated as unsupported; opt out with `EnforceMinimumVersion = false`
+  - Declared floors: split (8.15.0), flatten (8.16.0), embedded files (8.25.0), bookmarks (8.28.0)
+- **Fixes:**
+  - Fixed the `PdfEngineOperations` example, which had not compiled since the v3.0.0 builder namespace move
+
 ## v3.0.0
 - **Breaking Changes:**
   - Dropped .NET 5, .NET 6, and .NET 7 target frameworks

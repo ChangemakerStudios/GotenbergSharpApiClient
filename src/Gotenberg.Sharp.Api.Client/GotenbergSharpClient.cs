@@ -14,9 +14,12 @@
 //  limitations under the License.
 
 using System.ComponentModel;
+using System.Net;
 
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client;
 
@@ -70,6 +73,23 @@ public class GotenbergSharpClient
     }
 
     protected HttpClient HttpClient { get; }
+
+    private readonly SemaphoreSlim _versionLock = new(1, 1);
+
+    private GotenbergVersion? _cachedVersion;
+
+    /// <summary>
+    /// When true (the default), requests that target a route introduced in a specific Gotenberg
+    /// release are checked against the running service before being sent, throwing
+    /// <see cref="GotenbergVersionNotSupportedException" /> instead of letting Gotenberg answer with
+    /// an opaque 404. The version is fetched once per client instance and cached.
+    /// </summary>
+    /// <remarks>
+    /// Releases predating the <c>/version</c> route report no version at all. Those are older than
+    /// every version this client gates on, so they are treated as unsupported. Set this to false to
+    /// skip the check entirely — for instance when a proxy hides <c>/version</c> from the client.
+    /// </remarks>
+    public bool EnforceMinimumVersion { get; set; } = true;
 
     /// <summary>
     /// Converts a remote URL to PDF using Gotenberg's Chromium module.
@@ -340,16 +360,143 @@ public class GotenbergSharpClient
 
         var request = await builder.BuildAsync().ConfigureAwait(false);
 
-        using var response = await this.SendRequestAsync(
-            request.CreateApiRequest(),
-            HttpCompletionOption.ResponseContentRead,
-            cancelToken);
+        return await this.ReadResponseAsStringAsync(request.CreateApiRequest(), cancelToken)
+            .ConfigureAwait(false);
+    }
 
-#if NET5_0_OR_GREATER
-        return await response.Content.ReadAsStringAsync(cancelToken);
-#else
-        return await response.Content.ReadAsStringAsync();
-#endif
+    /// <summary>
+    /// Reads the document outline (table of contents) from PDF files, keyed by the filename each
+    /// PDF was uploaded under. Files without bookmarks come back with an empty outline.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
+    /// <seealso href="https://gotenberg.dev/docs/manipulate-pdfs/read-bookmarks">Gotenberg Read Bookmarks Documentation</seealso>
+    public virtual async Task<IReadOnlyDictionary<string, IReadOnlyList<Bookmark>>> ReadPdfBookmarksAsync(
+        PdfEngineBuilder<ReadBookmarksRequest> builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ReadPdfBookmarksAsync(request, cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Reads the document outline (table of contents) from PDF files, keyed by the filename each
+    /// PDF was uploaded under. Files without bookmarks come back with an empty outline.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
+    public virtual async Task<IReadOnlyDictionary<string, IReadOnlyList<Bookmark>>> ReadPdfBookmarksAsync(
+        ReadBookmarksRequest request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var json = await this.ReadResponseAsStringAsync(request.CreateApiRequest(), cancelToken)
+            .ConfigureAwait(false);
+
+        var parsed = JsonConvert.DeserializeObject<Dictionary<string, List<Bookmark>?>>(json)
+                     ?? new Dictionary<string, List<Bookmark>?>();
+
+        return parsed.ToDictionary(
+            entry => entry.Key,
+            entry => (IReadOnlyList<Bookmark>)(entry.Value ?? new List<Bookmark>()));
+    }
+
+    /// <summary>
+    /// Reads the document outline from PDF files as the raw JSON Gotenberg returned, keyed by filename.
+    /// Use <see cref="ReadPdfBookmarksAsync(PdfEngineBuilder{ReadBookmarksRequest},CancellationToken)" />
+    /// for a deserialized outline.
+    /// </summary>
+    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
+    public virtual async Task<string> ReadPdfBookmarksJsonAsync(
+        PdfEngineBuilder<ReadBookmarksRequest> builder,
+        CancellationToken cancelToken = default)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        var request = await builder.BuildAsync().ConfigureAwait(false);
+
+        return await this.ReadResponseAsStringAsync(request.CreateApiRequest(), cancelToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the version of the running Gotenberg service, parsed and cached for the lifetime of this
+    /// client. Returns <see cref="GotenbergVersion.Unknown" /> when the service does not expose the
+    /// <c>/version</c> route or reports something unparsable.
+    /// </summary>
+    public virtual async Task<GotenbergVersion> GetGotenbergVersionAsync(CancellationToken token = default)
+    {
+        if (this._cachedVersion != null) return this._cachedVersion;
+
+        await this._versionLock.WaitAsync(token).ConfigureAwait(false);
+
+        try
+        {
+            if (this._cachedVersion != null) return this._cachedVersion;
+
+            string? reported;
+
+            try
+            {
+                reported = await this.GetVersion(token).ConfigureAwait(false);
+            }
+            catch (GotenbergApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Releases predating the /version route answer with a 404. Any other failure —
+                // auth, proxy, 5xx — says nothing about the version and is left to propagate
+                // rather than being cached as "unknown" for the life of the client.
+                reported = null;
+            }
+
+            this._cachedVersion = GotenbergVersion.TryParse(reported, out var version)
+                ? version!
+                : GotenbergVersion.Unknown;
+
+            return this._cachedVersion;
+        }
+        finally
+        {
+            this._versionLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Determines whether the running Gotenberg is new enough to serve <paramref name="request" />,
+    /// without sending it. Requests that target routes present in every supported release are
+    /// always supported.
+    /// </summary>
+    public virtual async Task<bool> SupportsAsync(
+        BuildRequestBase request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        var requirement = request.Requires;
+
+        if (requirement == null) return true;
+
+        var running = await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false);
+
+        return requirement.IsSatisfiedBy(running);
+    }
+
+    /// <summary>
+    /// Throws <see cref="GotenbergVersionNotSupportedException" /> when the running Gotenberg is
+    /// older than the release that introduced the route <paramref name="request" /> targets.
+    /// </summary>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
+    public virtual async Task EnsureSupportedAsync(
+        BuildRequestBase request,
+        CancellationToken cancelToken = default)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        await this.EnsureSupportedAsync(request.Requires, cancelToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -487,6 +634,9 @@ public class GotenbergSharpClient
         HttpCompletionOption option,
         CancellationToken cancelToken)
     {
+        await this.EnsureSupportedAsync((request as IRequireGotenbergVersion)?.Requires, cancelToken)
+            .ConfigureAwait(false);
+
         using var message = request.ToApiRequestMessage();
 
         var response = await this.HttpClient
@@ -499,5 +649,39 @@ public class GotenbergSharpClient
             return response;
 
         throw GotenbergApiException.Create(request, response);
+    }
+
+    /// <summary>
+    ///     Verifies the running Gotenberg satisfies a request's declared minimum version. Requests
+    ///     without a declared minimum — and the version lookup itself — short-circuit, so this never
+    ///     re-enters itself.
+    /// </summary>
+    private async Task EnsureSupportedAsync(
+        GotenbergFeatureRequirement? requirement,
+        CancellationToken cancelToken)
+    {
+        if (requirement == null || !this.EnforceMinimumVersion) return;
+
+        var running = await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false);
+
+        if (requirement.IsSatisfiedBy(running)) return;
+
+        throw GotenbergVersionNotSupportedException.Create(requirement, running);
+    }
+
+    private async Task<string> ReadResponseAsStringAsync(
+        IApiRequest request,
+        CancellationToken cancelToken)
+    {
+        using var response = await this.SendRequestAsync(
+            request,
+            HttpCompletionOption.ResponseContentRead,
+            cancelToken).ConfigureAwait(false);
+
+#if NET5_0_OR_GREATER
+        return await response.Content.ReadAsStringAsync(cancelToken).ConfigureAwait(false);
+#else
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+#endif
     }
 }

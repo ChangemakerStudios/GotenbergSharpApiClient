@@ -1,3 +1,5 @@
+using System.IO.Compression;
+
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -261,10 +263,134 @@ public class PdfEngineOperationsTests
 
         var file = File.Create("result.pdf");
         await result.CopyToAsync(file);
-        
+
         result.Length.Should().BeGreaterThan(0);
     }
-    
+
+    [Category("Integration")]
+    [Test]
+    public async Task WriteThenReadBookmarks_RoundTripsTheOutline()
+    {
+        var client = CreateAuthenticatedClient();
+        var pdfBytes = await GenerateMultiPageTestPdf(client);
+
+        var written = await client.ExecutePdfEngineAsync(
+            PdfEngineBuilders.WriteBookmarks(b => b
+                    .Add("Introduction", 1)
+                    .Add("Chapter 1", 2, c => c
+                        .Add("Section 1.1", 2)
+                        .Add("Section 1.2", 3)))
+                .WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
+
+        using var ms = new MemoryStream();
+        await written.CopyToAsync(ms);
+        await written.DisposeAsync();
+
+        var outlines = await client.ReadPdfBookmarksAsync(
+            PdfEngineBuilders.ReadBookmarks()
+                .WithPdfs(a => a.AddItem("bookmarked.pdf", ms.ToArray())));
+
+        outlines.Should().ContainKey("bookmarked.pdf");
+
+        var outline = outlines["bookmarked.pdf"];
+        outline.Should().HaveCount(2);
+        outline[0].Title.Should().Be("Introduction");
+        outline[0].Page.Should().Be(1, "bookmark pages are 1-based");
+        outline[1].Title.Should().Be("Chapter 1");
+        outline[1].Children.Should().HaveCount(2);
+        outline[1].Children[0].Title.Should().Be("Section 1.1");
+        outline[1].Children[1].Page.Should().Be(3);
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task ReadBookmarks_WithoutAnOutline_ReturnsEmpty()
+    {
+        var client = CreateAuthenticatedClient();
+        var pdfBytes = await GenerateTestPdf(client);
+
+        var outlines = await client.ReadPdfBookmarksAsync(
+            PdfEngineBuilders.ReadBookmarks()
+                .WithPdfs(a => a.AddItem("plain.pdf", pdfBytes)));
+
+        outlines.Should().ContainKey("plain.pdf");
+        outlines["plain.pdf"].Should().BeEmpty();
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task ReadBookmarks_ReturnsRawJsonKeyedByFilename()
+    {
+        var client = CreateAuthenticatedClient();
+        var pdfBytes = await GenerateTestPdf(client);
+
+        var json = await client.ReadPdfBookmarksJsonAsync(
+            PdfEngineBuilders.ReadBookmarks()
+                .WithPdfs(a => a.AddItem("plain.pdf", pdfBytes)));
+
+        json.Should().NotBeNullOrEmpty();
+        JObject.Parse(json).Should().ContainKey("plain.pdf");
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task WriteBookmarksPerFile_AppliesADistinctOutlineToEachPdf()
+    {
+        var client = CreateAuthenticatedClient();
+        var pdfBytes = await GenerateMultiPageTestPdf(client);
+
+        // Both PDFs go in one request: sending them separately would pass even if the map were
+        // treated as a single shared outline.
+        await using var written = await client.ExecutePdfEngineAsync(
+            PdfEngineBuilders.WriteBookmarksPerFile(m => m
+                    .ForFile("first.pdf", b => b.Add("First Outline", 1))
+                    .ForFile("second.pdf", b => b.Add("Second Outline", 2)))
+                .WithPdfs(a => a
+                    .AddItem("first.pdf", pdfBytes)
+                    .AddItem("second.pdf", pdfBytes)));
+
+        // Multiple inputs come back as a zip.
+        using var archive = new ZipArchive(written, ZipArchiveMode.Read);
+
+        archive.Entries.Should().HaveCount(2);
+
+        var expected = new Dictionary<string, (string Title, int Page)>
+        {
+            ["first.pdf"] = ("First Outline", 1),
+            ["second.pdf"] = ("Second Outline", 2)
+        };
+
+        foreach (var entry in archive.Entries)
+        {
+            expected.Should().ContainKey(entry.Name);
+
+            using var entryStream = entry.Open();
+            using var entryBytes = new MemoryStream();
+            await entryStream.CopyToAsync(entryBytes);
+
+            var outlines = await client.ReadPdfBookmarksAsync(
+                PdfEngineBuilders.ReadBookmarks()
+                    .WithPdfs(a => a.AddItem(entry.Name, entryBytes.ToArray())));
+
+            var outline = outlines[entry.Name].Should().ContainSingle().Which;
+
+            outline.Title.Should().Be(expected[entry.Name].Title);
+            outline.Page.Should().Be(expected[entry.Name].Page);
+        }
+    }
+
+    [Category("Integration")]
+    [Test]
+    public async Task GetGotenbergVersion_ReportsAKnownVersion()
+    {
+        var client = CreateAuthenticatedClient();
+
+        var version = await client.GetGotenbergVersionAsync();
+
+        version.IsKnown.Should().BeTrue();
+        version.Major.Should().BeGreaterThan(0);
+    }
+
     #endregion
 
     private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateAuthenticatedClient()
@@ -286,6 +412,29 @@ public class PdfEngineOperationsTests
     {
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody("<html><body><h1>Test PDF</h1></body></html>"));
+
+        await using var stream = await client.HtmlToPdfAsync(builder);
+
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        return ms.ToArray();
+    }
+
+    /// <summary>
+    /// Bookmarks point at pages, so outline tests need a PDF with more than one of them.
+    /// </summary>
+    private static async Task<byte[]> GenerateMultiPageTestPdf(
+        Gotenberg.Sharp.API.Client.GotenbergSharpClient client)
+    {
+        var builder = new HtmlRequestBuilder()
+            .AddDocument(doc => doc.SetBody(
+                """
+                <html><body>
+                    <h1>Page One</h1>
+                    <div style="page-break-before: always"><h1>Page Two</h1></div>
+                    <div style="page-break-before: always"><h1>Page Three</h1></div>
+                </body></html>
+                """));
 
         await using var stream = await client.HtmlToPdfAsync(builder);
 
