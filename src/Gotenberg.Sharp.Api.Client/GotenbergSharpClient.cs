@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.ComponentModel;
+using System.Net;
 
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
@@ -444,9 +445,11 @@ public class GotenbergSharpClient
             {
                 reported = await this.GetVersion(token).ConfigureAwait(false);
             }
-            catch (GotenbergApiException)
+            catch (GotenbergApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                // Releases predating the /version route answer with a 404.
+                // Releases predating the /version route answer with a 404. Any other failure —
+                // auth, proxy, 5xx — says nothing about the version and is left to propagate
+                // rather than being cached as "unknown" for the life of the client.
                 reported = null;
             }
 
@@ -631,7 +634,8 @@ public class GotenbergSharpClient
         HttpCompletionOption option,
         CancellationToken cancelToken)
     {
-        await this.EnsureSupportedAsync(request.Requires, cancelToken).ConfigureAwait(false);
+        await this.EnsureSupportedAsync((request as IRequireGotenbergVersion)?.Requires, cancelToken)
+            .ConfigureAwait(false);
 
         using var message = request.ToApiRequestMessage();
 

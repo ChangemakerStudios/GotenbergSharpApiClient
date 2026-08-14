@@ -1,3 +1,5 @@
+using System.IO.Compression;
+
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -337,23 +339,43 @@ public class PdfEngineOperationsTests
         var client = CreateAuthenticatedClient();
         var pdfBytes = await GenerateMultiPageTestPdf(client);
 
-        // Multiple inputs come back as a zip, so verify each file separately instead.
-        foreach (var (fileName, title) in new[] { ("first.pdf", "First Outline"), ("second.pdf", "Second Outline") })
-        {
-            var written = await client.ExecutePdfEngineAsync(
-                PdfEngineBuilders.WriteBookmarksPerFile(m => m
-                        .ForFile(fileName, b => b.Add(title, 1)))
-                    .WithPdfs(a => a.AddItem(fileName, pdfBytes)));
+        // Both PDFs go in one request: sending them separately would pass even if the map were
+        // treated as a single shared outline.
+        await using var written = await client.ExecutePdfEngineAsync(
+            PdfEngineBuilders.WriteBookmarksPerFile(m => m
+                    .ForFile("first.pdf", b => b.Add("First Outline", 1))
+                    .ForFile("second.pdf", b => b.Add("Second Outline", 2)))
+                .WithPdfs(a => a
+                    .AddItem("first.pdf", pdfBytes)
+                    .AddItem("second.pdf", pdfBytes)));
 
-            using var ms = new MemoryStream();
-            await written.CopyToAsync(ms);
-            await written.DisposeAsync();
+        // Multiple inputs come back as a zip.
+        using var archive = new ZipArchive(written, ZipArchiveMode.Read);
+
+        archive.Entries.Should().HaveCount(2);
+
+        var expected = new Dictionary<string, (string Title, int Page)>
+        {
+            ["first.pdf"] = ("First Outline", 1),
+            ["second.pdf"] = ("Second Outline", 2)
+        };
+
+        foreach (var entry in archive.Entries)
+        {
+            expected.Should().ContainKey(entry.Name);
+
+            using var entryStream = entry.Open();
+            using var entryBytes = new MemoryStream();
+            await entryStream.CopyToAsync(entryBytes);
 
             var outlines = await client.ReadPdfBookmarksAsync(
                 PdfEngineBuilders.ReadBookmarks()
-                    .WithPdfs(a => a.AddItem(fileName, ms.ToArray())));
+                    .WithPdfs(a => a.AddItem(entry.Name, entryBytes.ToArray())));
 
-            outlines[fileName].Single().Title.Should().Be(title);
+            var outline = outlines[entry.Name].Should().ContainSingle().Which;
+
+            outline.Title.Should().Be(expected[entry.Name].Title);
+            outline.Page.Should().Be(expected[entry.Name].Page);
         }
     }
 

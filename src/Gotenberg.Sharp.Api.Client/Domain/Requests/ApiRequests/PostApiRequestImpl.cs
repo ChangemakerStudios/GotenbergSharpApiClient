@@ -17,7 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
-internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent
+internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent, IRequireGotenbergVersion
 {
     private readonly Func<IEnumerable<HttpContent>> _toHttpContent;
 

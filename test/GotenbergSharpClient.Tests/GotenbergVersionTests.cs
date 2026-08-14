@@ -1,5 +1,8 @@
+using System.Net;
+
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
@@ -122,7 +125,19 @@ public class GotenbergVersionTests
             .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }))
             .Build();
 
-        request.CreateApiRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.28.0"));
+        var apiRequest = request.CreateApiRequest();
+
+        apiRequest.Should().BeAssignableTo<IRequireGotenbergVersion>();
+        ((IRequireGotenbergVersion)apiRequest).Requires!.MinimumVersion
+            .Should().Be(GotenbergVersion.Parse("8.28.0"));
+    }
+
+    [Test]
+    public void VersionAwareness_IsNotOnIApiRequest()
+    {
+        // Requires lives on a separate interface so adding it did not break existing
+        // IApiRequest implementations.
+        typeof(IApiRequest).GetProperty("Requires").Should().BeNull();
     }
 
     #endregion
@@ -182,6 +197,45 @@ public class GotenbergVersionTests
     }
 
     [Test]
+    public async Task Client_TreatsAMissingVersionRouteAsUnknown()
+    {
+        var client = StubVersionClient.WithVersionFailure(HttpStatusCode.NotFound);
+
+        var version = await client.GetGotenbergVersionAsync();
+
+        version.IsKnown.Should().BeFalse();
+    }
+
+    [TestCase(HttpStatusCode.Unauthorized)]
+    [TestCase(HttpStatusCode.Forbidden)]
+    [TestCase(HttpStatusCode.BadGateway)]
+    [TestCase(HttpStatusCode.ServiceUnavailable)]
+    public async Task Client_DoesNotTreatOtherVersionFailuresAsAnOldService(HttpStatusCode statusCode)
+    {
+        // An auth or proxy failure says nothing about the version. Swallowing it would cache
+        // "unknown" for the client's lifetime and mis-report every gated feature as unsupported.
+        var client = StubVersionClient.WithVersionFailure(statusCode);
+
+        var act = async () => await client.GetGotenbergVersionAsync();
+
+        await act.Should().ThrowExactlyAsync<GotenbergApiException>();
+    }
+
+    [Test]
+    public async Task Client_DoesNotCacheAFailedVersionLookup()
+    {
+        var client = StubVersionClient.WithVersionFailure(HttpStatusCode.ServiceUnavailable);
+
+        for (var attempt = 0; attempt < 3; attempt++)
+        {
+            var act = async () => await client.GetGotenbergVersionAsync();
+            await act.Should().ThrowExactlyAsync<GotenbergApiException>();
+        }
+
+        client.VersionCallCount.Should().Be(3, "a transient failure must be retried, not cached");
+    }
+
+    [Test]
     public async Task Client_CachesTheVersionLookup()
     {
         var client = new StubVersionClient("8.35.0");
@@ -238,16 +292,22 @@ public class GotenbergVersionTests
 
         private readonly string? _version;
 
-        private StubVersionClient(ThrowingHandler handler, string? version)
+        private readonly Exception? _versionFailure;
+
+        private StubVersionClient(ThrowingHandler handler, string? version, Exception? versionFailure)
             : base(new HttpClient(handler) { BaseAddress = new Uri("http://gotenberg.invalid:3000") })
         {
             this._handler = handler;
             this._version = version;
+            this._versionFailure = versionFailure;
         }
 
-        public StubVersionClient(string? version) : this(new ThrowingHandler(), version)
+        public StubVersionClient(string? version) : this(new ThrowingHandler(), version, null)
         {
         }
+
+        public static StubVersionClient WithVersionFailure(HttpStatusCode statusCode) =>
+            new(new ThrowingHandler(), null, ApiException(statusCode));
 
         public int VersionCallCount { get; private set; }
 
@@ -257,8 +317,16 @@ public class GotenbergVersionTests
         {
             this.VersionCallCount++;
 
-            return Task.FromResult(this._version);
+            return this._versionFailure != null
+                ? Task.FromException<string?>(this._versionFailure)
+                : Task.FromResult(this._version);
         }
+
+        private static GotenbergApiException ApiException(HttpStatusCode statusCode) =>
+            new(
+                $"{statusCode}",
+                new GetApiRequestImpl("version"),
+                new HttpResponseMessage(statusCode));
 
         private sealed class ThrowingHandler : HttpMessageHandler
         {

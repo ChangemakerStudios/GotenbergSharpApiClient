@@ -21,12 +21,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 /// </summary>
 public sealed class Bookmark
 {
-    /// <summary>
-    /// The deepest nesting level accepted when validating an outline. Exceeding it almost
-    /// always means the same <see cref="Bookmark"/> instance was added beneath itself.
-    /// </summary>
-    internal const int MaxDepth = 32;
-
     public Bookmark()
     {
     }
@@ -59,11 +53,19 @@ public sealed class Bookmark
     [JsonProperty("children", NullValueHandling = NullValueHandling.Ignore)]
     public IList<Bookmark> Children { get; set; } = new List<Bookmark>();
 
-    internal void Validate(int depth = 1)
+    internal void Validate() =>
+        this.Validate(new HashSet<Bookmark>(BookmarkReferenceComparer.Instance));
+
+    /// <param name="ancestors">
+    /// The bookmarks on the path from the root to this one. A bookmark reached twice on the same
+    /// path is a cycle, which would otherwise recurse until the stack gave out. Nesting is
+    /// unbounded as long as it stays acyclic.
+    /// </param>
+    private void Validate(ISet<Bookmark> ancestors)
     {
-        if (depth > MaxDepth)
+        if (!ancestors.Add(this))
             throw new InvalidOperationException(
-                $"Bookmark nesting exceeds the maximum supported depth of {MaxDepth}. Check for a bookmark added beneath itself.");
+                $"Bookmark '{this.Title}' is nested beneath itself. Bookmark outlines cannot contain cycles.");
 
         if (this.Title.IsNotSet())
             throw new InvalidOperationException("Bookmark titles are required and cannot be empty.");
@@ -73,7 +75,24 @@ public sealed class Bookmark
                 $"Bookmark '{this.Title}' has page {this.Page}. Bookmark pages are 1-based.");
 
         foreach (var child in this.Children.IfNullEmpty())
-            child.Validate(depth + 1);
+            child.Validate(ancestors);
+
+        // Only the current path matters: the same instance may legitimately appear in two
+        // sibling branches.
+        ancestors.Remove(this);
+    }
+
+    /// <summary>
+    /// Compares by instance so validation tracks the objects themselves, not equal-looking titles.
+    /// </summary>
+    private sealed class BookmarkReferenceComparer : IEqualityComparer<Bookmark>
+    {
+        internal static readonly BookmarkReferenceComparer Instance = new();
+
+        public bool Equals(Bookmark? x, Bookmark? y) => ReferenceEquals(x, y);
+
+        public int GetHashCode(Bookmark obj) =>
+            System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 
     public override string ToString() => $"{this.Title} (p. {this.Page})";

@@ -160,7 +160,64 @@ public class BookmarkTests
         var act = () => builder.Build().CreateApiRequest();
 
         act.Should().ThrowExactly<InvalidOperationException>()
-            .WithMessage("*depth*");
+            .WithMessage("*cycle*");
+    }
+
+    [Test]
+    public void WriteBookmarks_IndirectCycle_Throws()
+    {
+        var root = new Bookmark("Root", 1);
+        var child = new Bookmark("Child", 2);
+
+        root.Children.Add(child);
+        child.Children.Add(root);
+
+        var builder = PdfEngineBuilders.WriteBookmarks(new[] { root })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
+
+        var act = () => builder.Build().CreateApiRequest();
+
+        act.Should().ThrowExactly<InvalidOperationException>()
+            .WithMessage("*cycle*");
+    }
+
+    [Test]
+    public void WriteBookmarks_DeeplyNestedButAcyclic_IsAccepted()
+    {
+        var root = new Bookmark("Level 1", 1);
+        var current = root;
+
+        for (var level = 2; level <= 100; level++)
+        {
+            var child = new Bookmark($"Level {level}", 1);
+            current.Children.Add(child);
+            current = child;
+        }
+
+        var builder = PdfEngineBuilders.WriteBookmarks(new[] { root })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
+
+        var act = () => builder.Build().CreateApiRequest();
+
+        act.Should().NotThrow("acyclic outlines are not depth limited");
+    }
+
+    [Test]
+    public void WriteBookmarks_SameInstanceInSiblingBranches_IsAccepted()
+    {
+        // Sharing an instance across branches is not a cycle — only a repeat on the same path is.
+        var shared = new Bookmark("Glossary", 9);
+
+        var builder = PdfEngineBuilders.WriteBookmarks(new[]
+            {
+                new Bookmark("Chapter 1", 1, shared),
+                new Bookmark("Chapter 2", 5, shared)
+            })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
+
+        var act = () => builder.Build().CreateApiRequest();
+
+        act.Should().NotThrow();
     }
 
     #endregion
