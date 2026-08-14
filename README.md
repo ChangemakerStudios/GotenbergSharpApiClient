@@ -108,9 +108,9 @@ See [CHANGES.MD](CHANGES.MD) for the full release history.
 
 <a href="https://www.star-history.com/?repos=ChangemakerStudios%2FGotenbergSharpApiClient&type=date&legend=bottom-right">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&theme=dark&legend=bottom-right" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&legend=bottom-right" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&legend=bottom-right" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&theme=dark&legend=bottom-right&sealed_token=z5p1MPnrE9kOQ54LnPGNWeTOnk2_TocK1Lxf9bazC2eWxz6DBwLXsVy3X_SkotQnapS37KEUFLG2cN8eZzTCsbgnDFrssZ8fSXXTZTN7xiCVGAWNjbh0xg" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&legend=bottom-right&sealed_token=z5p1MPnrE9kOQ54LnPGNWeTOnk2_TocK1Lxf9bazC2eWxz6DBwLXsVy3X_SkotQnapS37KEUFLG2cN8eZzTCsbgnDFrssZ8fSXXTZTN7xiCVGAWNjbh0xg" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&legend=bottom-right&sealed_token=z5p1MPnrE9kOQ54LnPGNWeTOnk2_TocK1Lxf9bazC2eWxz6DBwLXsVy3X_SkotQnapS37KEUFLG2cN8eZzTCsbgnDFrssZ8fSXXTZTN7xiCVGAWNjbh0xg" />
  </picture>
 </a>
 
