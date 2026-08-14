@@ -11,9 +11,9 @@
 - **HTML/URL to PDF** — Convert HTML content or URLs to PDF using Chromium
 - **Screenshots** — Capture screenshots of HTML or URLs as PNG, JPEG, or WebP
 - **Office to PDF** — Convert Word, Excel, PowerPoint (100+ formats) via LibreOffice
-- **PDF Manipulation** — Merge, flatten, rotate, split, encrypt, watermark, stamp
+- **PDF Manipulation** — Merge, flatten, rotate, split, encrypt, watermark, stamp, embed files
 - **PDF/A & PDF/UA** — Archive-ready and accessible PDF output
-- **Metadata** — Read and write PDF metadata
+- **Metadata & Bookmarks** — Read and write PDF metadata and document outlines
 - **Webhooks** — Async PDF generation with callback support
 - **DI-Ready** — Built for dependency injection with Polly retry policies
 

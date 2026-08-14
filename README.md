@@ -8,15 +8,15 @@
 
 .NET C# client for [Gotenberg](https://gotenberg.dev/) v7 & v8 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
 
-> **v3.0.0** — Screenshots, standalone PDF operations (flatten/rotate/split/encrypt), cross-cutting watermark & stamp options, LibreOffice conversion options, .NET 10/9/8 + netstandard 2.x. See [CHANGES.MD](CHANGES.MD) for details.
+> **v3.1.0** — PDF bookmark read/write, embed files into PDFs (ZUGFeRD / Factur-X), and Gotenberg version compatibility checking with clear errors for unsupported features. See [CHANGES.MD](CHANGES.MD) for details.
 
 ## Features
 
 - **HTML/URL to PDF** with Chromium (page properties, headers/footers, cookies, wait conditions)
 - **Screenshots** of HTML or URLs as PNG, JPEG, or WebP
 - **Office to PDF** via LibreOffice (100+ formats, image compression, watermarks)
-- **PDF Manipulation** — merge, flatten, rotate, split, encrypt, watermark, stamp
-- **PDF/A & PDF/UA** compliance, metadata read/write
+- **PDF Manipulation** — merge, flatten, rotate, split, encrypt, watermark, stamp, embed files
+- **PDF/A & PDF/UA** compliance, metadata & bookmark read/write
 - **Webhooks** for async PDF generation
 - **DI-Ready** with Polly retry policies
 
@@ -93,8 +93,8 @@ See the **[full documentation](https://changemakerstudios.github.io/GotenbergSha
 - [HTML & URL to PDF](https://changemakerstudios.github.io/GotenbergSharpApiClient/html-and-url-to-pdf/) — Chromium features, page properties, cookies
 - [Screenshots](https://changemakerstudios.github.io/GotenbergSharpApiClient/screenshots/) — PNG/JPEG/WebP capture
 - [Office Conversion](https://changemakerstudios.github.io/GotenbergSharpApiClient/office-conversion/) — LibreOffice options
-- [PDF Manipulation](https://changemakerstudios.github.io/GotenbergSharpApiClient/pdf-manipulation/) — merge, rotate, split, encrypt, watermark
-- [Advanced Features](https://changemakerstudios.github.io/GotenbergSharpApiClient/advanced-features/) — webhooks, value objects, multi-URL merge
+- [PDF Manipulation](https://changemakerstudios.github.io/GotenbergSharpApiClient/pdf-manipulation/) — merge, rotate, split, encrypt, watermark, bookmarks, embedded files
+- [Advanced Features](https://changemakerstudios.github.io/GotenbergSharpApiClient/advanced-features/) — webhooks, value objects, version compatibility, multi-URL merge
 
 ## Examples
 

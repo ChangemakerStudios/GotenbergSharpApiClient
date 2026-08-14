@@ -17,11 +17,11 @@
     <Version>1.0.0</Version>
     <PackageTags>Gotenberg pdf C# API client unoconv</PackageTags>
     <Description>
-      C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF, taking screenshots, and performing standalone PDF operations (flatten, rotate, split, encrypt, bookmarks). The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
+      C# API client for interacting with the Gotenberg v7 &amp; v8 micro-service's API, a docker-powered stateless API for converting &amp; merging HTML, Markdown and Office documents to PDF, taking screenshots, and performing standalone PDF operations (flatten, rotate, split, encrypt, bookmarks, embedded files). The client supports a configurable Polly retry policy with exponential back-off for handling transient exceptions.
     </Description>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageReleaseNotes>
-      v3.1.0 - PDF bookmark read/write support. Gotenberg version compatibility checking with clear errors for unsupported features.
+      v3.1.0 - PDF bookmark read/write support. Embed files into PDFs (ZUGFeRD / Factur-X). Gotenberg version compatibility checking with clear errors for unsupported features.
       v3.0.0 - Major release: Screenshot operations (HTML/URL to PNG/JPEG/WebP). Standalone PDF engine operations (flatten, rotate, split, encrypt, metadata). Cross-cutting watermark, stamp, rotation, and split options. LibreOffice conversion options. PDF encryption. Additional Chromium fields. Dropped .NET 5/6/7; added .NET 9/10. Namespace reorganization (builders moved to Application layer). See CHANGES.MD for full details.
       v2.8.5 - Added support for the GenerateTaggedPdf flag.
       v2.8.4 - Fixed hybrid configuration for basic authentication credentials.

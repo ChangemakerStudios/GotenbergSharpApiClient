@@ -158,6 +158,33 @@ foreach (var bookmark in outlines["doc.pdf"])
 
 Use `ReadPdfBookmarksJsonAsync` instead if you want Gotenberg's raw JSON response.
 
+### Embed Files
+
+!!! info "Requires Gotenberg 8.25.0"
+    The embed route was introduced in Gotenberg 8.25.0. Older services are rejected with a
+    `GotenbergVersionNotSupportedException` before the request is sent — see
+    [Version Compatibility](advanced-features.md#version-compatibility).
+
+Embed files inside a PDF — for standards such as ZUGFeRD / Factur-X that require an XML invoice
+or other attachment to live inside the PDF. Each entry is keyed by the embedded file's name and
+carries its mime type, content, and relationship:
+
+```csharp
+using var result = await sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.Embed(new Dictionary<string, Entry>
+    {
+        ["factur-x.xml"] = new Entry
+        {
+            MimeType = "text/xml",
+            Relationship = Constants.Gotenberg.PdfEngines.EmbedRelation.Data,
+            Content = new ContentItem(invoiceXml)
+        }
+    }).WithPdfs(a => a.AddItem("invoice.pdf", pdfBytes)));
+```
+
+`Constants.Gotenberg.PdfEngines.EmbedRelation` provides the valid relationship values: `Source`,
+`Data`, `Alternative`, `Supplement`, and `Unspecified`.
+
 ## Cross-Cutting Options
 
 These options are available on **all** request types (HTML, URL, Office, PDF conversion) via `BuildRequestBase`.

@@ -6,6 +6,10 @@
   - Fluent `BookmarkBuilder` for nested outlines; `Bookmark` and `BookmarkSet` domain types
   - `ReadPdfBookmarksAsync()` returns a deserialized outline keyed by filename; `ReadPdfBookmarksJsonAsync()` returns the raw JSON
   - Requires Gotenberg 8.28.0 or newer
+- **Embedded Files (PR #78 — THANK YOU [@kokoISnoTarget](https://github.com/kokoISnoTarget)!):**
+  - New `PdfEngineBuilders.Embed()` embeds files inside PDFs — for standards such as ZUGFeRD / Factur-X that require an XML invoice or other attachment to live inside the PDF
+  - Each `Entry` carries the attachment's mime type, content, and relationship (`Constants.Gotenberg.PdfEngines.EmbedRelation` provides the valid values)
+  - Requires Gotenberg 8.25.0 or newer
 - **Version Compatibility Checking:**
   - Requests declare the Gotenberg release that introduced their route via `[MinimumGotenbergVersion]`
   - The client verifies the running service before sending and throws `GotenbergVersionNotSupportedException` instead of surfacing an opaque 404
