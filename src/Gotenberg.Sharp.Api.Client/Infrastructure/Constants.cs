@@ -256,8 +256,17 @@ public static class Constants
                 public const string Watermark = $"{Root}/watermark";
 
                 public const string Stamp = $"{Root}/stamp";
-                
+
                 public const string Embed = $"{Root}/embed";
+
+                public const string ReadBookmarks = $"{Root}/bookmarks/read";
+
+                public const string WriteBookmarks = $"{Root}/bookmarks/write";
+            }
+
+            public static class FormFieldNames
+            {
+                public const string Bookmarks = "bookmarks";
             }
 
             public static class Routes

@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
 public interface IApiRequest
@@ -20,4 +22,10 @@ public interface IApiRequest
     HttpRequestMessage ToApiRequestMessage();
 
     bool IsWebhookRequest { get; }
+
+    /// <summary>
+    /// The Gotenberg version this request needs, or null when the route is available in every
+    /// supported release. Declared with <see cref="MinimumGotenbergVersionAttribute"/>.
+    /// </summary>
+    GotenbergFeatureRequirement? Requires { get; }
 }

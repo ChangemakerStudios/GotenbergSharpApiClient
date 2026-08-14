@@ -17,6 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -80,6 +81,12 @@ public abstract class BuildRequestBase
         this.Assets?.Validate();
     }
 
+    /// <summary>
+    /// The Gotenberg version this request needs, declared with <see cref="MinimumGotenbergVersionAttribute"/>,
+    /// or null when the route is available in every supported release.
+    /// </summary>
+    public GotenbergFeatureRequirement? Requires => GotenbergFeatureRequirement.For(this.GetType());
+
     public virtual IApiRequest CreateApiRequest()
     {
         this.Validate();
@@ -88,6 +95,6 @@ public abstract class BuildRequestBase
 
         var headers = (this.Config?.GetHeaders()).IfNullEmpty().ToLookup(s => s.Name, s => s.Value);
 
-        return new PostApiRequestImpl(this.ToHttpContent, this.ApiPath, headers, isWebHook);
+        return new PostApiRequestImpl(this.ToHttpContent, this.ApiPath, headers, isWebHook, this.Requires);
     }
 }

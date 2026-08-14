@@ -97,6 +97,64 @@ builder.ConfigureRequest(config =>
 });
 ```
 
+## Version Compatibility
+
+Some Gotenberg routes only exist in newer releases. Requests that use one declare the release that
+introduced it, and the client checks it against the running service before sending — so an
+unsupported feature surfaces as an explanatory error instead of an opaque `404`:
+
+```csharp
+// Against Gotenberg 8.20:
+await sharpClient.ExecutePdfEngineAsync(
+    PdfEngineBuilders.WriteBookmarks(b => b.Add("Intro", 1))
+        .WithPdfs(a => a.AddItem("doc.pdf", pdfBytes)));
+
+// GotenbergVersionNotSupportedException:
+//   Writing PDF bookmarks requires Gotenberg 8.28.0 or newer, but the service at this
+//   address reports 8.20.0. Upgrade Gotenberg to use this feature.
+```
+
+The version is fetched from `/version` once per client instance and cached. Routes available in
+every supported release are never checked, so most requests cost no extra round-trip.
+
+### Checking ahead of time
+
+To branch on support rather than catch an exception:
+
+```csharp
+var request = PdfEngineBuilders.ReadBookmarks()
+    .WithPdfs(a => a.AddItem("doc.pdf", pdfBytes))
+    .Build();
+
+if (await sharpClient.SupportsAsync(request))
+    outlines = await sharpClient.ReadPdfBookmarksAsync(request);
+```
+
+`EnsureSupportedAsync(request)` does the same but throws, and `GetGotenbergVersionAsync()` returns
+the parsed, cached `GotenbergVersion` directly.
+
+### Services that don't report a version
+
+Gotenberg releases predating the `/version` route report nothing at all. Those releases are older
+than every version this client gates on, so an undeterminable version is treated as unsupported.
+
+If your service does support the feature but hides `/version` — behind a proxy, for instance — turn
+the check off:
+
+```csharp
+sharpClient.EnforceMinimumVersion = false;
+```
+
+### Declaring a minimum on your own requests
+
+Custom requests deriving from the built-in request types can declare their own floor with
+`[MinimumGotenbergVersion]`:
+
+```csharp
+[MinimumGotenbergVersion("8.28.0", Feature = "My custom route")]
+public sealed class MyCustomRequest : PdfEngineRequest { /* ... */ }
+```
+
 ## Examples
 
 See the [examples folder](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples) for complete working console applications demonstrating each feature.

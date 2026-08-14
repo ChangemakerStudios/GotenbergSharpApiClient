@@ -9,6 +9,16 @@
   - New `ScreenshotHtmlAsync()` and `ScreenshotUrlAsync()` public API methods
   - Full request/builder hierarchy for HTML and URL screenshots
   - Support for PNG, JPEG, and WebP output formats
+- **PDF Bookmarks (Issue #79):**
+  - New `PdfEngineBuilders.ReadBookmarks()`, `WriteBookmarks()`, and `WriteBookmarksPerFile()`
+  - Fluent `BookmarkBuilder` for nested outlines; `Bookmark` and `BookmarkSet` domain types
+  - `ReadPdfBookmarksAsync()` returns a deserialized outline keyed by filename; `ReadPdfBookmarksJsonAsync()` returns the raw JSON
+  - Requires Gotenberg 8.28.0 or newer
+- **Version Compatibility Checking:**
+  - Requests declare the Gotenberg release that introduced their route via `[MinimumGotenbergVersion]`
+  - The client verifies the running service before sending and throws `GotenbergVersionNotSupportedException` instead of surfacing an opaque 404
+  - New `GetGotenbergVersionAsync()`, `SupportsAsync()`, and `EnsureSupportedAsync()`; the version is fetched once per client and cached
+  - Services predating the `/version` route are treated as unsupported; opt out with `EnforceMinimumVersion = false`
 - **Standalone PDF Engine Operations (PR #75):**
   - New `ExecutePdfEngineAsync()` methods for direct PDF manipulation
   - Flatten, rotate, split, encrypt, and write metadata without prior conversion
