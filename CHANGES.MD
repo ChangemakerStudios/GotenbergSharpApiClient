@@ -19,6 +19,7 @@
   - The client verifies the running service before sending and throws `GotenbergVersionNotSupportedException` instead of surfacing an opaque 404
   - New `GetGotenbergVersionAsync()`, `SupportsAsync()`, and `EnsureSupportedAsync()`; the version is fetched once per client and cached
   - Services predating the `/version` route are treated as unsupported; opt out with `EnforceMinimumVersion = false`
+  - Declared floors: split (8.15.0), flatten (8.16.0), embedded files (8.25.0), bookmarks (8.28.0)
 - **Standalone PDF Engine Operations (PR #75):**
   - New `ExecutePdfEngineAsync()` methods for direct PDF manipulation
   - Flatten, rotate, split, encrypt, and write metadata without prior conversion

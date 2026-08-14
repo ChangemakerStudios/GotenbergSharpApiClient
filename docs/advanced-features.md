@@ -117,6 +117,18 @@ await sharpClient.ExecutePdfEngineAsync(
 The version is fetched from `/version` once per client instance and cached. Routes available in
 every supported release are never checked, so most requests cost no extra round-trip.
 
+Currently gated:
+
+| Feature | Requires |
+| --- | --- |
+| Split (`PdfEngineBuilders.Split`) | 8.15.0 |
+| Flatten (`PdfEngineBuilders.Flatten`) | 8.16.0 |
+| Embedded files (`PdfEngineBuilders.Embed`) | 8.25.0 |
+| Bookmarks (`ReadBookmarks` / `WriteBookmarks`) | 8.28.0 |
+
+Rotate, metadata, watermark, stamp, merge and the screenshot routes all predate Gotenberg 8.5 and
+are not gated.
+
 ### Checking ahead of time
 
 To branch on support rather than catch an exception:

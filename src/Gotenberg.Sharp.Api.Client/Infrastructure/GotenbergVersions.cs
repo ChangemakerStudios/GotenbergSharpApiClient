@@ -26,6 +26,21 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure;
 public static class GotenbergVersions
 {
     /// <summary>
+    /// The <c>POST /forms/pdfengines/split</c> route. Added in Gotenberg 8.15.0.
+    /// </summary>
+    public const string Split = "8.15.0";
+
+    /// <summary>
+    /// The <c>POST /forms/pdfengines/flatten</c> route. Added in Gotenberg 8.16.0.
+    /// </summary>
+    public const string Flatten = "8.16.0";
+
+    /// <summary>
+    /// Embedded file support, added in Gotenberg 8.25.0 for ZUGFeRD / Factur-X style PDFs.
+    /// </summary>
+    public const string Embed = "8.25.0";
+
+    /// <summary>
     /// Bookmark read and write routes. Added in Gotenberg 8.28.0.
     /// </summary>
     public const string Bookmarks = "8.28.0";

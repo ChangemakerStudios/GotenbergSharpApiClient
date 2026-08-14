@@ -90,10 +90,29 @@ public class GotenbergVersionTests
     }
 
     [Test]
-    public void RequestsWithoutAMinimum_DeclareNoRequirement()
+    public void EmbedRequest_DeclaresItsMinimumVersion()
     {
-        new FlattenPdfRequest().Requires.Should().BeNull();
+        new EmbedRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.25.0"));
+        new EmbedRequest().Requires!.Feature.Should().Be("Embedding files in PDFs");
+    }
+
+    [Test]
+    public void StandaloneRouteRequests_DeclareTheReleaseThatAddedTheirRoute()
+    {
+        new SplitPdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.15.0"));
+        new FlattenPdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.16.0"));
+    }
+
+    [Test]
+    public void RequestsOnLongStandingRoutes_DeclareNoRequirement()
+    {
+        // Rotate, metadata, watermark, stamp and the screenshot routes all predate Gotenberg 8.5,
+        // so they are not gated — which also keeps them from paying for a version lookup.
         new ReadMetadataRequest().Requires.Should().BeNull();
+        new WriteMetadataRequest().Requires.Should().BeNull();
+        new RotatePdfRequest().Requires.Should().BeNull();
+        new MergeRequest().Requires.Should().BeNull();
+        new ScreenshotHtmlRequest().Requires.Should().BeNull();
     }
 
     [Test]
@@ -195,7 +214,8 @@ public class GotenbergVersionTests
     {
         var client = new StubVersionClient("8.1.0");
 
-        var builder = PdfEngineBuilders.Flatten()
+        // Rotate is an ungated route, so no version lookup should happen at all.
+        var builder = PdfEngineBuilders.Rotate(90)
             .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
 
         var act = async () => await client.ExecutePdfEngineAsync(builder);

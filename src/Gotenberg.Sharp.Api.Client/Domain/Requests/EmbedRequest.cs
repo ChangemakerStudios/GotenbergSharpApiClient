@@ -6,6 +6,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
+    /// <summary>
+    /// Embeds files into PDFs, for standards such as ZUGFeRD / Factur-X that require an XML invoice
+    /// or other attachment to live inside the PDF.
+    /// </summary>
+    [MinimumGotenbergVersion(GotenbergVersions.Embed, Feature = "Embedding files in PDFs")]
     public sealed class EmbedRequest : PdfEngineRequest
     {
         /// <inheritdoc />
