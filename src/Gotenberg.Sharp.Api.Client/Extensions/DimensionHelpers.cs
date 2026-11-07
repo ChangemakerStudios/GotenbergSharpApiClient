@@ -23,24 +23,27 @@ namespace Gotenberg.Sharp.API.Client.Extensions
     {
         private static readonly IEnumerable<(Margins MarginType, (Dimension Left, Dimension Right, Dimension Top, Dimension Bottom) Value)> MarginSizer =
         [
-            (Margins.None, (Left: 0.0, Right: 0.0, Top: 0.0, Bottom: 0.0)),
-            (Margins.Default, (Left: 0.39, Right: 0.39, Top: 0.39, Bottom: 0.39)),
-            (Margins.Normal, (Left: 1.0, Right: 1.0, Top: 1.0, Bottom: 1.0)),
-            (Margins.Large, (Left: 2.0, Right: 2.0, Top: 2.0, Bottom: 2.0))
+            (Margins.None, (Left: Inches(0.0), Right: Inches(0.0), Top: Inches(0.0), Bottom: Inches(0.0))),
+            (Margins.Default, (Left: Inches(0.39), Right: Inches(0.39), Top: Inches(0.39), Bottom: Inches(0.39))),
+            (Margins.Normal, (Left: Inches(1.0), Right: Inches(1.0), Top: Inches(1.0), Bottom: Inches(1.0))),
+            (Margins.Large, (Left: Inches(2.0), Right: Inches(2.0), Top: Inches(2.0), Bottom: Inches(2.0)))
         ];
 
         private static readonly IEnumerable<(PaperSizes Size, (Dimension Width, Dimension Height) Value)> PaperSizer =
         [
-            (PaperSizes.A3, (Width: 11.7, Height: 16.5)),
-            (PaperSizes.A4, (Width: 8.27, Height: 11.7)),
-            (PaperSizes.A5, (Width: 5.8, Height: 8.2)),
-            (PaperSizes.A6, (Width: 4.1, Height: 5.8)),
-            (PaperSizes.Letter, (Width: 8.5, Height: 11.0)),
-            (PaperSizes.Legal, (Width: 8.5, Height: 14.0)),
-            (PaperSizes.Tabloid, (Width: 11.0, Height: 17.0)),
-            (PaperSizes.D, (Width: 22.0, Height: 34.0)),
-            (PaperSizes.E, (Width: 34.0, Height: 44.0))
+            // The ISO A series is defined in millimetres; rounded inch values (8.27 x 11.7) are not exactly A4.
+            (PaperSizes.A3, (Width: Dimension.FromMillimeters(297), Height: Dimension.FromMillimeters(420))),
+            (PaperSizes.A4, (Width: Dimension.FromMillimeters(210), Height: Dimension.FromMillimeters(297))),
+            (PaperSizes.A5, (Width: Dimension.FromMillimeters(148), Height: Dimension.FromMillimeters(210))),
+            (PaperSizes.A6, (Width: Dimension.FromMillimeters(105), Height: Dimension.FromMillimeters(148))),
+            (PaperSizes.Letter, (Width: Inches(8.5), Height: Inches(11.0))),
+            (PaperSizes.Legal, (Width: Inches(8.5), Height: Inches(14.0))),
+            (PaperSizes.Tabloid, (Width: Inches(11.0), Height: Inches(17.0))),
+            (PaperSizes.D, (Width: Inches(22.0), Height: Inches(34.0))),
+            (PaperSizes.E, (Width: Inches(34.0), Height: Inches(44.0)))
         ];
+
+        private static Dimension Inches(double value) => Dimension.FromInches(value);
 
         internal static (Dimension Width, Dimension Height) ToSelectedSize(this PaperSizes selectedSize)
         {
