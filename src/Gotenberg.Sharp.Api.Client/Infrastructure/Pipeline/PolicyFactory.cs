@@ -15,6 +15,7 @@
 
 using System.Diagnostics.Contracts;
 
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 
 
@@ -34,13 +35,17 @@ internal static class PolicyFactory
 {
     internal static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(
         IServiceProvider sp,
-        HttpRequestMessage _)
+        HttpRequestMessage request)
     {
         Contract.Ensures(Contract.Result<IAsyncPolicy<HttpResponseMessage>>() != null);
 
         var retryOps = GetRetryOptions(sp);
 
         if (!(retryOps?.Enabled ?? false)) return Policy.NoOpAsync<HttpResponseMessage>();
+
+        // A consumed non-seekable stream cannot be sent again: a retry would only replace the
+        // original failure with an InvalidOperationException.
+        if (HasNonReplayableContent(request)) return Policy.NoOpAsync<HttpResponseMessage>();
 
         return HandleTransientHttpError()
             .Or<TimeoutRejectedException>()
@@ -66,6 +71,9 @@ internal static class PolicyFactory
                 })
             .WithPolicyKey(nameof(GotenbergSharpClient));
     }
+
+    private static bool HasNonReplayableContent(HttpRequestMessage request) =>
+        request.Content is MultipartContent parts && parts.Any(part => part is NonReplayableStreamContent);
 
     private static RetryOptions? GetRetryOptions(IServiceProvider sp)
     {
