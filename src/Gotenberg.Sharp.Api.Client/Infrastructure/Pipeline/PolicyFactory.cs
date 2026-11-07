@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.Diagnostics.Contracts;
+using System.Net;
 
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 
@@ -24,9 +25,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Polly;
-using Polly.Timeout;
-
-using static Polly.Extensions.Http.HttpPolicyExtensions;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
@@ -42,8 +40,9 @@ internal static class PolicyFactory
 
         if (!(retryOps?.Enabled ?? false)) return Policy.NoOpAsync<HttpResponseMessage>();
 
-        return HandleTransientHttpError()
-            .Or<TimeoutRejectedException>()
+        return Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()
+            .OrResult(response => IsRetryable(response.StatusCode))
             .WaitAndRetryAsync(
                 retryOps.RetryCount,
                 retryCount => TimeSpan.FromSeconds(Math.Pow(retryOps.BackoffPower, retryCount)),
@@ -66,6 +65,19 @@ internal static class PolicyFactory
                 })
             .WithPolicyKey(nameof(GotenbergSharpClient));
     }
+
+    /// <summary>
+    /// Whether a response is worth sending again unchanged. Gotenberg answers 500 for a conversion
+    /// that will fail the same way again, and 503 for a request that ran out of time (and, from
+    /// Gotenberg 9, for a wait condition that was never met), so neither is retried. A full queue
+    /// (429) asks to be retried shortly; a 502 comes from a proxy that could not reach Gotenberg.
+    /// Connection failures surface as <see cref="HttpRequestException" /> and are retried too.
+    /// </summary>
+    internal static bool IsRetryable(HttpStatusCode statusCode) =>
+        statusCode is TooManyRequests or HttpStatusCode.BadGateway;
+
+    // HttpStatusCode.TooManyRequests is missing from netstandard2.0.
+    private const HttpStatusCode TooManyRequests = (HttpStatusCode)429;
 
     private static RetryOptions? GetRetryOptions(IServiceProvider sp)
     {
