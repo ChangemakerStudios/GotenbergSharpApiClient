@@ -47,6 +47,22 @@ public class RetryPredicateTests
         handler.Calls.Should().Be(1 + RetryCount);
     }
 
+    [Test]
+    public async Task SuccessAfterRetry_IsReturned()
+    {
+        var attempt = 0;
+        var handler = new StubHandler(() => attempt++ == 0
+            ? new HttpResponseMessage((HttpStatusCode)429) { Content = new StringContent("busy") }
+            : new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("8.40.0") });
+
+        var client = CreateClient(handler);
+
+        var version = await client.GetVersion();
+
+        version.Should().Be("8.40.0");
+        handler.Calls.Should().Be(2);
+    }
+
     private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateClient(HttpMessageHandler handler)
     {
         var services = new ServiceCollection();
