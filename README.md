@@ -5,10 +5,11 @@
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client)
 ![Build status](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/actions/workflows/deploy.yml/badge.svg)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/Jaben?logo=githubsponsors&label=sponsors)](https://github.com/sponsors/Jaben)
 
 .NET C# client for [Gotenberg](https://gotenberg.dev/) v7 & v8 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
 
-> **v3.1.0** — PDF bookmark read/write, embed files into PDFs (ZUGFeRD / Factur-X), and Gotenberg version compatibility checking with clear errors for unsupported features. See [CHANGES.MD](CHANGES.MD) for details.
+> **v3.2.0** — More reliable retries, exact A-series paper sizes, `Gotenberg-Trace` on API errors, async error handling, and options validation. See [CHANGES.MD](CHANGES.MD) for details.
 
 ## Features
 
@@ -23,7 +24,7 @@
 ## Quick Start
 
 ```bash
-docker run --rm -p 3000:3000 gotenberg/gotenberg:latest
+docker run --rm -p 3000:3000 gotenberg/gotenberg:8
 ```
 
 ```bash
@@ -113,6 +114,10 @@ See [CHANGES.MD](CHANGES.MD) for the full release history.
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ChangemakerStudios/GotenbergSharpApiClient&type=date&legend=bottom-right&sealed_token=z5p1MPnrE9kOQ54LnPGNWeTOnk2_TocK1Lxf9bazC2eWxz6DBwLXsVy3X_SkotQnapS37KEUFLG2cN8eZzTCsbgnDFrssZ8fSXXTZTN7xiCVGAWNjbh0xg" />
  </picture>
 </a>
+
+## Support This Project
+
+GotenbergSharpApiClient is free and open source. If it saves you time, consider [sponsoring](https://github.com/sponsors/Jaben) — sponsorships go directly toward the costs of maintaining Changemaker Studios' open-source projects, like code-signing certificates and development tooling.
 
 ## License
 

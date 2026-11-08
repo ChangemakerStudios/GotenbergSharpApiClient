@@ -19,6 +19,7 @@ using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Gotenberg.Sharp.API.Client.Extensions;
@@ -204,6 +205,9 @@ public static class TypedClientServiceCollectionExtensions
             throw new ArgumentNullException(nameof(configureClient));
         }
 
+        services.TryAddEnumerable(
+            ServiceDescriptor.Singleton<IValidateOptions<TOptions>, GotenbergSharpClientOptionsValidator<TOptions>>());
+
         var builder = services
             .AddHttpClient(nameof(GotenbergSharpClient), configureClient)
             .AddTypedClient<GotenbergSharpClient>()
@@ -236,7 +240,7 @@ public static class TypedClientServiceCollectionExtensions
                 // Return a pass-through handler if no auth is configured
                 return new PassThroughHandler();
             })
-            .AddPolicyHandler(PolicyFactory.CreatePolicyFromSettings)
+            .AddPolicyHandler(PolicyFactory.CreatePolicyFromSettings<TOptions>)
             .SetHandlerLifetime(TimeSpan.FromMinutes(6));
 
         return builder;

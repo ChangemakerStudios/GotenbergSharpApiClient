@@ -193,7 +193,14 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
         return !Equals(left, right);
     }
 
-    // Implicit conversions from double and int to Dimension (defaulting to Inches)
+    // Implicit conversions from double and int to Dimension (defaulting to Inches).
+    // A bare number reads as pixels or millimetres to most people, so these are easy to misuse.
+    private const string BareNumberMessage =
+        "A bare number is interpreted as inches. Use Dimension.FromInches, FromMillimeters, FromCentimeters, FromPixels, FromPoints or FromPicas to state the unit.";
+
+    [Obsolete(BareNumberMessage)]
     public static implicit operator Dimension(double value) => new(value, DimensionUnitType.Inches);
+
+    [Obsolete(BareNumberMessage)]
     public static implicit operator Dimension(int value) => new(value, DimensionUnitType.Inches);
 }

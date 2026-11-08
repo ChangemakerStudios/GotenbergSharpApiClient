@@ -21,6 +21,7 @@
     </Description>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageReleaseNotes>
+      v3.2.0 - Retry fixes: settings on options subclasses are honoured, only connection failures, 429, 502 and 503 are retried, and non-seekable streams are not resent. GotenbergApiException exposes Trace and reads error bodies asynchronously. A-series paper sizes are exact. Options are validated. Implicit number-to-Dimension conversions are obsolete. See CHANGES.MD for full details.
       v3.1.0 - PDF bookmark read/write support. Embed files into PDFs (ZUGFeRD / Factur-X). Gotenberg version compatibility checking with clear errors for unsupported features.
       v3.0.0 - Major release: Screenshot operations (HTML/URL to PNG/JPEG/WebP). Standalone PDF engine operations (flatten, rotate, split, encrypt, metadata). Cross-cutting watermark, stamp, rotation, and split options. LibreOffice conversion options. PDF encryption. Additional Chromium fields. Dropped .NET 5/6/7; added .NET 9/10. Namespace reorganization (builders moved to Application layer). See CHANGES.MD for full details.
       v2.8.5 - Added support for the GenerateTaggedPdf flag.

@@ -648,7 +648,8 @@ public class GotenbergSharpClient
         if (response.IsSuccessStatusCode)
             return response;
 
-        throw GotenbergApiException.Create(request, response);
+        throw await GotenbergApiException.CreateAsync(request, response, cancelToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
