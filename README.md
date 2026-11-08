@@ -24,7 +24,7 @@
 ## Quick Start
 
 ```bash
-docker run --rm -p 3000:3000 gotenberg/gotenberg:latest
+docker run --rm -p 3000:3000 gotenberg/gotenberg:8
 ```
 
 ```bash
