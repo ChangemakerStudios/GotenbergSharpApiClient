@@ -19,4 +19,7 @@ global using Gotenberg.Sharp.API.Client.Domain.Requests;
 global using Gotenberg.Sharp.API.Client.Extensions;
 global using Gotenberg.Sharp.API.Client.Infrastructure;
 
-global using Newtonsoft.Json;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+
+global using Gotenberg.Sharp.API.Client.Infrastructure.Json;

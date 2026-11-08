@@ -13,8 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>
@@ -24,7 +22,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.WriteMetadata;
 
-    public JObject? Metadata { get; set; }
+    public IDictionary<string, object>? Metadata { get; set; }
 
     protected override void Validate()
     {
@@ -36,7 +34,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
 
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
-        var metadataContent = new StringContent(this.Metadata!.ToString());
+        var metadataContent = new StringContent(JsonObjectWriter.ToJson(this.Metadata!));
         metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
         metadataContent.Headers.ContentDisposition =
             new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)

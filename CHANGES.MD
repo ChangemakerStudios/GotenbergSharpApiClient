@@ -1,5 +1,18 @@
 # Release History
 
+## Unreleased
+- **Native AOT and Trimming Support:**
+  - The package is marked `IsAotCompatible` for .NET 8 and newer and builds without trim or AOT warnings
+  - JSON is now written and read with source-generated `System.Text.Json`; the `Newtonsoft.Json` dependency is removed
+  - New `test/GotenbergSharpClient.AotSmokeTest` project publishes the client with Native AOT and exercises it end to end
+- **Breaking Changes:**
+  - `JObject` is gone from the public API. `PdfOutputOptions.MetaData`, `WriteMetadataRequest.Metadata`, `WatermarkOptions.Options`, `StampOptions.Options`, and `HtmlConversionBehaviors.ExtraHeaders` are now `IDictionary<string, object>`
+  - Builder overloads that took a `JObject` (`SetMetadata`, `WriteMetadata`, `SetOptions`, `AddAdditionalHeaders`) now take an `IDictionary<string, object>` or a `System.Text.Json.Nodes.JsonObject`
+  - Dictionary values must be strings, numbers, booleans, dates, dictionaries, collections, or `JsonNode`/`JsonElement`; other object types throw `NotSupportedException` instead of being serialized by reflection
+  - `ReadPdfBookmarksAsync()` throws `System.Text.Json.JsonException` on malformed JSON instead of a Newtonsoft exception
+  - `GotenbergApiException.ToVerboseJson()` writes a fixed set of response and request fields rather than a reflection dump of the underlying objects
+  - JSON form fields are sent compact rather than indented
+
 ## v3.1.0
 - **PDF Bookmarks (Issue #79):**
   - New `PdfEngineBuilders.ReadBookmarks()`, `WriteBookmarks()`, and `WriteBookmarksPerFile()`

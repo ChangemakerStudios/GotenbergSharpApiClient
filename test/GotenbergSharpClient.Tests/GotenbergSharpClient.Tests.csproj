@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -9,8 +9,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="AwesomeAssertions" Version="9.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
 		<PackageReference Include="NUnit" Version="4.4.0" />
 		<PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />

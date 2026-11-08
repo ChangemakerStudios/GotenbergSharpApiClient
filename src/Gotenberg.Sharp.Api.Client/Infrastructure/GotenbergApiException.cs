@@ -93,29 +93,77 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         {
             using (_response)
             {
-                IEnumerable<object>? clientRequestFormContent = null;
+                using var stream = new MemoryStream();
 
-                if (includeRequestContent
-                    && this._request is IConvertToHttpContent convertToHttpContent)
+                using (var writer = new Utf8JsonWriter(
+                           stream,
+                           new JsonWriterOptions { Indented = indentJson, Encoder = GotenbergJsonContext.Encoder }))
                 {
-                    clientRequestFormContent = convertToHttpContent.IfNullEmptyContent()
-                        .ToDumpFriendlyFormat(false);
+                    writer.WriteStartObject();
+                    writer.WriteString("GotenbergMessage", Message);
+
+                    if (includeGotenbergResponse)
+                    {
+                        writer.WriteStartObject("GotenbergResponseReceived");
+                        writer.WriteNumber("StatusCode", (int)_response.StatusCode);
+                        if (_response.ReasonPhrase != null)
+                            writer.WriteString("ReasonPhrase", _response.ReasonPhrase);
+                        writer.WriteString("Version", _response.Version.ToString());
+                        writer.WriteBoolean("IsSuccessStatusCode", _response.IsSuccessStatusCode);
+                        if (_response.RequestMessage?.RequestUri != null)
+                            writer.WriteString("RequestUri", _response.RequestMessage.RequestUri.ToString());
+                        WriteHeaders(writer, "Headers", _response.Headers);
+                        if (_response.Content != null)
+                            WriteHeaders(writer, "ContentHeaders", _response.Content.Headers);
+                        writer.WriteEndObject();
+                    }
+
+                    writer.WriteStartObject("ClientRequestSent");
+                    writer.WriteString("Type", _request.GetType().Name);
+                    writer.WriteBoolean("IsWebhookRequest", _request.IsWebhookRequest);
+                    writer.WriteEndObject();
+
+                    if (includeRequestContent
+                        && this._request is IConvertToHttpContent convertToHttpContent)
+                    {
+                        writer.WriteStartArray("ClientRequestFormContent");
+
+                        foreach (var content in convertToHttpContent.IfNullEmptyContent())
+                        {
+                            var contentType = content.Headers.ContentType?.ToString();
+                            var isText = contentType?.StartsWith("text", StringComparison.Ordinal) ?? false;
+
+                            writer.WriteStartObject();
+                            writer.WriteStartObject("Headers");
+                            writer.WriteString("ContentType", contentType ?? string.Empty);
+                            writer.WriteString(
+                                "Disposition",
+                                content.Headers.ContentDisposition?.ToString() ?? string.Empty);
+                            writer.WriteEndObject();
+                            writer.WriteString(
+                                "Content",
+                                isText ? content.ReadAsStringAsync().Result : "-its not text-");
+                            writer.WriteEndObject();
+                        }
+
+                        writer.WriteEndArray();
+                    }
+
+                    writer.WriteEndObject();
                 }
 
-                return JsonConvert.SerializeObject(
-                    new
-                    {
-                        GotenbergMessage = Message,
-                        GotenbergResponseReceived = includeGotenbergResponse ? _response : null,
-                        ClientRequestSent = _request,
-                        ClientRequestFormContent = clientRequestFormContent
-                    },
-                    new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        Formatting = indentJson ? Formatting.Indented : Formatting.None
-                    });
+                return System.Text.Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
             }
+        }
+
+        static void WriteHeaders(Utf8JsonWriter writer, string name, HttpHeaders headers)
+        {
+            writer.WriteStartObject(name);
+
+            foreach (var header in headers)
+                writer.WriteString(header.Key, string.Join(", ", header.Value));
+
+            writer.WriteEndObject();
         }
     }
 }

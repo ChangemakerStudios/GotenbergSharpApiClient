@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-using Newtonsoft.Json.Linq;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -30,17 +29,17 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <inheritdoc />
         protected override IEnumerable<HttpContent> ToHttpContent()
         {
-            var metadataObject = new JObject();
+            var metadataObject = new Dictionary<string, object>();
             foreach (var kvp in EmbedsData!)
             {
-                metadataObject.Add(kvp.Key, JObject.FromObject(new
+                metadataObject.Add(kvp.Key, new Dictionary<string, object>
                 {
-                    kvp.Value.MimeType,
-                    kvp.Value.Relationship
-                }));
+                    [nameof(Entry.MimeType)] = kvp.Value.MimeType,
+                    [nameof(Entry.Relationship)] = kvp.Value.Relationship
+                });
             }
 
-            var metadataContent = new StringContent(metadataObject.ToString());
+            var metadataContent = new StringContent(JsonObjectWriter.ToJson(metadataObject));
             metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
             metadataContent.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
             {

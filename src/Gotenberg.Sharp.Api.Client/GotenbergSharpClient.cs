@@ -397,8 +397,12 @@ public class GotenbergSharpClient
         var json = await this.ReadResponseAsStringAsync(request.CreateApiRequest(), cancelToken)
             .ConfigureAwait(false);
 
-        var parsed = JsonConvert.DeserializeObject<Dictionary<string, List<Bookmark>?>>(json)
-                     ?? new Dictionary<string, List<Bookmark>?>();
+        // An empty body is not valid JSON; treat it as "no bookmarks" rather than failing.
+        var parsed = string.IsNullOrWhiteSpace(json)
+            ? null
+            : JsonSerializer.Deserialize(json, GotenbergJsonContext.Instance.BookmarksReadResponse);
+
+        parsed ??= new Dictionary<string, List<Bookmark>>();
 
         return parsed.ToDictionary(
             entry => entry.Key,

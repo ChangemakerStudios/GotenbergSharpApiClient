@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
@@ -27,7 +28,8 @@ internal class MultiFormPropertyItem(PropertyInfo property, MultiFormHeaderAttri
     public MultiFormHeaderAttribute Attribute { get; } =
         attribute ?? throw new ArgumentNullException(nameof(attribute));
 
-    internal static IEnumerable<MultiFormPropertyItem> FromType(Type instanceType)
+    internal static IEnumerable<MultiFormPropertyItem> FromType(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type instanceType)
     {
         if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
 

@@ -15,8 +15,6 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 
 /// <summary>
@@ -34,5 +32,5 @@ public class WatermarkOptions : FacetBase
     public PageRanges? Pages { get; set; }
 
     [MultiFormHeader(Constants.Gotenberg.CrossCuttingOptions.WatermarkOptionsJson)]
-    public JObject? Options { get; set; }
+    public IDictionary<string, object>? Options { get; set; }
 }

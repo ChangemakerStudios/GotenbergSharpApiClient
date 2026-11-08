@@ -15,8 +15,6 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 
 /// <summary>
@@ -35,5 +33,5 @@ public class StampOptions : FacetBase
     public PageRanges? Pages { get; set; }
 
     [MultiFormHeader(Constants.Gotenberg.CrossCuttingOptions.StampOptionsJson)]
-    public JObject? Options { get; set; }
+    public IDictionary<string, object>? Options { get; set; }
 }

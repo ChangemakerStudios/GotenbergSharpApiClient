@@ -21,7 +21,7 @@ using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
@@ -139,11 +139,11 @@ public static class PdfEngineBuilders
     /// <summary>
     /// Creates a builder for writing metadata to PDFs.
     /// </summary>
-    public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(JObject metadata)
+    public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(IDictionary<string, object> metadata)
     {
         var request = new WriteMetadataRequest
         {
-            Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata))
+            Metadata = JsonObjectWriter.Snapshot(metadata ?? throw new ArgumentNullException(nameof(metadata)))
         };
         return new PdfEngineBuilder<WriteMetadataRequest>(request);
     }
@@ -151,9 +151,9 @@ public static class PdfEngineBuilders
     /// <summary>
     /// Creates a builder for writing metadata to PDFs.
     /// </summary>
-    public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(IDictionary<string, object> metadata)
+    public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(JsonObject metadata)
     {
-        return WriteMetadata(JObject.FromObject(metadata));
+        return WriteMetadata(JsonObjectWriter.ToDictionary(metadata));
     }
 
     /// <summary>

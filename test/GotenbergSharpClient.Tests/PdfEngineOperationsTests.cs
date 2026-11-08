@@ -9,7 +9,7 @@ using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MimeMapping;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -95,7 +95,7 @@ public class PdfEngineOperationsTests
         var request = builder.Build();
 
         var writeRequest = (WriteMetadataRequest)request;
-        writeRequest.Metadata!["Author"]!.Value<string>().Should().Be("Test");
+        writeRequest.Metadata!["Author"].Should().Be("Test");
     }
 
     [Test]
@@ -226,7 +226,7 @@ public class PdfEngineOperationsTests
         var json = await client.ReadPdfMetadataAsync(builder);
 
         json.Should().NotBeNullOrEmpty();
-        var parsed = JObject.Parse(json);
+        var parsed = JsonNode.Parse(json)!.AsObject();
         parsed.Should().NotBeEmpty();
     }
 
@@ -329,7 +329,7 @@ public class PdfEngineOperationsTests
                 .WithPdfs(a => a.AddItem("plain.pdf", pdfBytes)));
 
         json.Should().NotBeNullOrEmpty();
-        JObject.Parse(json).Should().ContainKey("plain.pdf");
+        JsonNode.Parse(json)!.AsObject().Should().ContainKey("plain.pdf");
     }
 
     [Category("Integration")]

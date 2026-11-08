@@ -1,6 +1,6 @@
 using Gotenberg.Sharp.API.Client;
-using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 

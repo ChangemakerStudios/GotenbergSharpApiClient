@@ -5,7 +5,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 var config = new ConfigurationBuilder()
     .SetBasePath(AppContext.BaseDirectory)
@@ -56,8 +56,9 @@ await SaveStream(writeResult, destinationDirectory, "WithMetadata.pdf");
 Console.WriteLine("Reading metadata...");
 var metadataJson = await sharpClient.ReadPdfMetadataAsync(
     PdfEngineBuilders.ReadMetadata().WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
-var parsed = JObject.Parse(metadataJson);
-Console.WriteLine($"Metadata: {parsed.ToString(Newtonsoft.Json.Formatting.Indented)}");
+using var parsed = JsonDocument.Parse(metadataJson);
+var indented = JsonSerializer.Serialize(parsed.RootElement, new JsonSerializerOptions { WriteIndented = true });
+Console.WriteLine($"Metadata: {indented}");
 
 // Bookmarks require Gotenberg 8.28.0, so skip the demo rather than fail on older services.
 var version = await sharpClient.GetGotenbergVersionAsync();

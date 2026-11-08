@@ -17,7 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.Authentication;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Gotenberg.Sharp.API.Client.Application.PdfOutput;
 
@@ -94,27 +94,33 @@ public sealed class PdfOutputOptionsBuilder
     /// </summary>
     /// <param name="metadata">Metadata as a dictionary.</param>
     /// <returns>The builder instance for method chaining.</returns>
-    public PdfOutputOptionsBuilder SetMetadata(IDictionary<string, object> metadata)
-    {
-        return SetMetadata(JObject.FromObject(metadata));
-    }
-
-    /// <summary>
-    /// Sets the document metadata.
-    /// </summary>
-    /// <param name="metadata">Metadata as a JObject.</param>
-    /// <returns>The builder instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when metadata is null.</exception>
-    public PdfOutputOptionsBuilder SetMetadata(JObject metadata)
+    public PdfOutputOptionsBuilder SetMetadata(IDictionary<string, object> metadata)
     {
         if (metadata == null)
         {
             throw new InvalidOperationException("metadata is null");
         }
 
-        _options.MetaData = metadata;
+        _options.MetaData = JsonObjectWriter.Snapshot(metadata);
 
         return this;
+    }
+
+    /// <summary>
+    /// Sets the document metadata.
+    /// </summary>
+    /// <param name="metadata">Metadata as a <see cref="JsonObject" />.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when metadata is null.</exception>
+    public PdfOutputOptionsBuilder SetMetadata(JsonObject metadata)
+    {
+        if (metadata == null)
+        {
+            throw new InvalidOperationException("metadata is null");
+        }
+
+        return SetMetadata(JsonObjectWriter.ToDictionary(metadata));
     }
 
     /// <summary>

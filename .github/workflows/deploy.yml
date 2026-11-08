@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: [8.x]
+        dotnet-version: [10.x]
 
     steps:
     - name: Checkout
@@ -55,6 +55,17 @@ jobs:
 
     - name: Run tests
       run: dotnet test --no-build -c Release --verbosity normal
+      env:
+        GOTENBERG_URL: http://localhost:3000
+        GOTENBERG_USERNAME: testuser
+        GOTENBERG_PASSWORD: testpass
+
+    # The project treats trim and AOT warnings as errors, so the publish fails if the client regresses.
+    - name: Publish AOT smoke test
+      run: dotnet publish test/GotenbergSharpClient.AotSmokeTest -c Release -r linux-x64 -o aot-smoke-test
+
+    - name: Run AOT smoke test
+      run: ./aot-smoke-test/GotenbergSharpClient.AotSmokeTest
       env:
         GOTENBERG_URL: http://localhost:3000
         GOTENBERG_USERNAME: testuser

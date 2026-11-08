@@ -24,43 +24,47 @@ public sealed record Cookie
     /// <summary>
     /// Cookie name (required)
     /// </summary>
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public required string Name { get; init; }
 
     /// <summary>
     /// Cookie value (required)
     /// </summary>
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public required string Value { get; init; }
 
     /// <summary>
     /// Cookie domain (required)
     /// </summary>
-    [JsonProperty("domain")]
+    [JsonPropertyName("domain")]
     public required string Domain { get; init; }
 
     /// <summary>
     /// Cookie path (optional)
     /// </summary>
-    [JsonProperty("path", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("path")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Path { get; init; }
 
     /// <summary>
     /// Set cookie as secure (optional)
     /// </summary>
-    [JsonProperty("secure", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("secure")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? Secure { get; init; }
 
     /// <summary>
     /// Set cookie as HTTP-only (optional)
     /// </summary>
-    [JsonProperty("httpOnly", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("httpOnly")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? HttpOnly { get; init; }
 
     /// <summary>
     /// SameSite attribute. Accepted values: "Strict", "Lax", or "None" (optional)
     /// </summary>
-    [JsonProperty("sameSite", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("sameSite")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? SameSite { get; init; }
 
     public static void Validate(Cookie cookie)

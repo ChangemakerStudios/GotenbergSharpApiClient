@@ -1,7 +1,6 @@
 using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests.ValueObjects;
 
@@ -53,11 +52,11 @@ public class EmulatedMediaFeatureTests
     {
         var feature = EmulatedMediaFeature.Create("prefers-color-scheme", "dark");
 
-        var json = JsonConvert.SerializeObject(feature);
-        var jObject = JObject.Parse(json);
+        var json = System.Text.Json.JsonSerializer.Serialize(feature);
+        var jObject = JsonNode.Parse(json)!.AsObject();
 
-        jObject["name"]!.Value<string>().Should().Be("prefers-color-scheme");
-        jObject["value"]!.Value<string>().Should().Be("dark");
+        jObject["name"]!.GetValue<string>().Should().Be("prefers-color-scheme");
+        jObject["value"]!.GetValue<string>().Should().Be("dark");
     }
 
     [Test]
@@ -69,13 +68,13 @@ public class EmulatedMediaFeatureTests
             EmulatedMediaFeature.PrefersReducedMotion("reduce")
         };
 
-        var json = JsonConvert.SerializeObject(features);
-        var jArray = JArray.Parse(json);
+        var json = System.Text.Json.JsonSerializer.Serialize(features);
+        var jArray = JsonNode.Parse(json)!.AsArray();
 
         jArray.Should().HaveCount(2);
-        jArray[0]["name"]!.Value<string>().Should().Be("prefers-color-scheme");
-        jArray[0]["value"]!.Value<string>().Should().Be("dark");
-        jArray[1]["name"]!.Value<string>().Should().Be("prefers-reduced-motion");
-        jArray[1]["value"]!.Value<string>().Should().Be("reduce");
+        jArray[0]!["name"]!.GetValue<string>().Should().Be("prefers-color-scheme");
+        jArray[0]!["value"]!.GetValue<string>().Should().Be("dark");
+        jArray[1]!["name"]!.GetValue<string>().Should().Be("prefers-reduced-motion");
+        jArray[1]!["value"]!.GetValue<string>().Should().Be("reduce");
     }
 }

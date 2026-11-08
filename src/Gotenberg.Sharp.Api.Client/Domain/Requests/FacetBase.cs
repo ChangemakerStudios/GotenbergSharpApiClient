@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Gotenberg.Sharp.API.Client.Domain.Authentication;
@@ -27,6 +28,9 @@ using Gotenberg.Sharp.API.Client.Domain.Split;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+// Form fields are discovered by reflecting over the [MultiFormHeader] properties of the concrete type;
+// the annotation keeps those properties when the assembly is trimmed.
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 public abstract class FacetBase : IConvertToHttpContent
 {
     public virtual IEnumerable<HttpContent> ToHttpContent()
@@ -88,12 +92,18 @@ public abstract class FacetBase : IConvertToHttpContent
             LibrePdfFormats format => format.ToFormDataValue(),
             ConversionPdfFormats format => format.ToFormDataValue(),
             PdfPassword password => password.Value,
-            List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
+            List<Cookie> cookies => JsonSerializer.Serialize(cookies, GotenbergJsonContext.Instance.Cookies),
             ScreenshotFormat screenshotFormat => screenshotFormat.ToFormValue(),
-            List<EmulatedMediaFeature> features => JsonConvert.SerializeObject(
-                features.ToDictionary(f => f.Name, f => f.Value)),
-            List<GotenbergStatusCode> codes => JsonConvert.SerializeObject(codes.Select(c => c.Value)),
-            List<DomainName> domains => JsonConvert.SerializeObject(domains.Select(d => d.Value)),
+            List<EmulatedMediaFeature> features => JsonSerializer.Serialize(
+                features.ToDictionary(f => f.Name, f => f.Value),
+                GotenbergJsonContext.Instance.StringMap),
+            List<GotenbergStatusCode> codes => JsonSerializer.Serialize(
+                codes.Select(c => c.Value).ToList(),
+                GotenbergJsonContext.Instance.Integers),
+            List<DomainName> domains => JsonSerializer.Serialize(
+                domains.Select(d => d.Value).ToList(),
+                GotenbergJsonContext.Instance.Strings),
+            IDictionary<string, object> json => JsonObjectWriter.ToJson(json!),
             CssSelector selector => selector.Value,
             OverlaySource overlaySource => overlaySource.ToFormValue(),
             SplitMode splitMode => splitMode.ToFormValue(),

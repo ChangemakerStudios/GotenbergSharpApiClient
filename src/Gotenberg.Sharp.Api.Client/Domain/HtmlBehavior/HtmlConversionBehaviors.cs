@@ -17,8 +17,6 @@ using Gotenberg.Sharp.API.Client.Domain.Cookies;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 
 /// <summary>
@@ -61,7 +59,7 @@ public class HtmlConversionBehaviors : FacetBase
     /// Sets extra HTTP headers that Chromium will send when loading the HTML
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders)]
-    public JObject? ExtraHeaders { get; set; }
+    public IDictionary<string, object>? ExtraHeaders { get; set; }
 
     /// <summary>
     /// Cookies to store in the Chromium cookie jar.

@@ -15,8 +15,6 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Authentication;
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 
 /// <summary>
@@ -55,7 +53,7 @@ public class PdfOutputOptions : FacetBase
     /// Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
     /// </summary>
     [MultiFormHeader(Constants.Gotenberg.PdfOutput.MetaData)]
-    public JObject? MetaData { get; set; }
+    public IDictionary<string, object>? MetaData { get; set; }
 
     /// <summary>
     /// The password required to open the PDF.

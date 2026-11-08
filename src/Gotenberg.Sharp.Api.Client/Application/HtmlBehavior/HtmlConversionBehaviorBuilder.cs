@@ -19,7 +19,7 @@ using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
 
@@ -102,9 +102,7 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <exception cref="InvalidOperationException">Thrown when header name or value is invalid.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(string headerName, string headerValue)
     {
-        var header = string.Format("{0}{2}{1}", "{", "}", $"{'"'}{headerName}{'"'} : {'"'}{headerValue}{'"'}");
-
-        return AddAdditionalHeaders(JObject.Parse(header));
+        return AddAdditionalHeaders(new Dictionary<string, object> { [headerName] = headerValue });
     }
 
     /// <summary>
@@ -113,14 +111,30 @@ public sealed class HtmlConversionBehaviorBuilder
     /// <param name="extraHeaders">JSON object containing header name-value pairs.</param>
     /// <returns>The builder instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when extraHeaders is null.</exception>
-    public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JObject extraHeaders)
+    public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JsonObject extraHeaders)
     {
         if (extraHeaders == null)
         {
             throw new InvalidOperationException("extraHeaders is null");
         }
 
-        _htmlConversionBehaviors.ExtraHeaders = extraHeaders;
+        return AddAdditionalHeaders(JsonObjectWriter.ToDictionary(extraHeaders));
+    }
+
+    /// <summary>
+    /// Adds multiple custom HTTP headers as name-value pairs. Useful for adding several headers at once.
+    /// </summary>
+    /// <param name="extraHeaders">Dictionary containing header name-value pairs.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when extraHeaders is null.</exception>
+    public HtmlConversionBehaviorBuilder AddAdditionalHeaders(IDictionary<string, object> extraHeaders)
+    {
+        if (extraHeaders == null)
+        {
+            throw new InvalidOperationException("extraHeaders is null");
+        }
+
+        _htmlConversionBehaviors.ExtraHeaders = JsonObjectWriter.Snapshot(extraHeaders);
 
         return this;
     }
@@ -385,7 +399,7 @@ public sealed class HtmlConversionBehaviorBuilder
     ///     Sets the document metadata.
     /// </summary>
     [Obsolete("Use SetPdfOutputOptions(o => o.SetMetadata(...)) on the builder instead")]
-    public HtmlConversionBehaviorBuilder SetMetadata(JObject metadata)
+    public HtmlConversionBehaviorBuilder SetMetadata(JsonObject metadata)
     {
         return this;
     }

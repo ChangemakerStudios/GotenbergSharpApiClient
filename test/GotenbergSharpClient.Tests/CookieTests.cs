@@ -1,8 +1,7 @@
 using Gotenberg.Sharp.API.Client.Domain.Cookies;
 using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -21,13 +20,13 @@ public class CookieTests
         };
 
         // Act
-        var json = JsonConvert.SerializeObject(cookie);
-        var jObject = JObject.Parse(json);
+        var json = System.Text.Json.JsonSerializer.Serialize(cookie);
+        var jObject = JsonNode.Parse(json)!.AsObject();
 
         // Assert
-        jObject["name"]!.Value<string>().Should().Be("yummy_cookie");
-        jObject["value"]!.Value<string>().Should().Be("choco");
-        jObject["domain"]!.Value<string>().Should().Be("theyummycookie.com");
+        jObject["name"]!.GetValue<string>().Should().Be("yummy_cookie");
+        jObject["value"]!.GetValue<string>().Should().Be("choco");
+        jObject["domain"]!.GetValue<string>().Should().Be("theyummycookie.com");
         jObject.ContainsKey("path").Should().BeFalse();
         jObject.ContainsKey("secure").Should().BeFalse();
         jObject.ContainsKey("httpOnly").Should().BeFalse();
@@ -50,17 +49,17 @@ public class CookieTests
         };
 
         // Act
-        var json = JsonConvert.SerializeObject(cookie);
-        var jObject = JObject.Parse(json);
+        var json = System.Text.Json.JsonSerializer.Serialize(cookie);
+        var jObject = JsonNode.Parse(json)!.AsObject();
 
         // Assert
-        jObject["name"]!.Value<string>().Should().Be("session_token");
-        jObject["value"]!.Value<string>().Should().Be("abc123");
-        jObject["domain"]!.Value<string>().Should().Be("example.com");
-        jObject["path"]!.Value<string>().Should().Be("/api");
-        jObject["secure"]!.Value<bool>().Should().BeTrue();
-        jObject["httpOnly"]!.Value<bool>().Should().BeTrue();
-        jObject["sameSite"]!.Value<string>().Should().Be("Strict");
+        jObject["name"]!.GetValue<string>().Should().Be("session_token");
+        jObject["value"]!.GetValue<string>().Should().Be("abc123");
+        jObject["domain"]!.GetValue<string>().Should().Be("example.com");
+        jObject["path"]!.GetValue<string>().Should().Be("/api");
+        jObject["secure"]!.GetValue<bool>().Should().BeTrue();
+        jObject["httpOnly"]!.GetValue<bool>().Should().BeTrue();
+        jObject["sameSite"]!.GetValue<string>().Should().Be("Strict");
     }
 
     [Test]
@@ -88,25 +87,25 @@ public class CookieTests
         };
 
         // Act
-        var json = JsonConvert.SerializeObject(cookies);
-        var jArray = JArray.Parse(json);
+        var json = System.Text.Json.JsonSerializer.Serialize(cookies);
+        var jArray = JsonNode.Parse(json)!.AsArray();
 
         // Assert
         jArray.Should().HaveCount(2);
 
-        var first = (JObject)jArray[0];
-        first["name"]!.Value<string>().Should().Be("yummy_cookie");
-        first["value"]!.Value<string>().Should().Be("choco");
-        first["domain"]!.Value<string>().Should().Be("theyummycookie.com");
+        var first = jArray[0]!.AsObject();
+        first["name"]!.GetValue<string>().Should().Be("yummy_cookie");
+        first["value"]!.GetValue<string>().Should().Be("choco");
+        first["domain"]!.GetValue<string>().Should().Be("theyummycookie.com");
 
-        var second = (JObject)jArray[1];
-        second["name"]!.Value<string>().Should().Be("session_token");
-        second["value"]!.Value<string>().Should().Be("abc123");
-        second["domain"]!.Value<string>().Should().Be("example.com");
-        second["path"]!.Value<string>().Should().Be("/");
-        second["secure"]!.Value<bool>().Should().BeTrue();
-        second["httpOnly"]!.Value<bool>().Should().BeTrue();
-        second["sameSite"]!.Value<string>().Should().Be("Lax");
+        var second = jArray[1]!.AsObject();
+        second["name"]!.GetValue<string>().Should().Be("session_token");
+        second["value"]!.GetValue<string>().Should().Be("abc123");
+        second["domain"]!.GetValue<string>().Should().Be("example.com");
+        second["path"]!.GetValue<string>().Should().Be("/");
+        second["secure"]!.GetValue<bool>().Should().BeTrue();
+        second["httpOnly"]!.GetValue<bool>().Should().BeTrue();
+        second["sameSite"]!.GetValue<string>().Should().Be("Lax");
     }
 
     [Test]
@@ -136,13 +135,13 @@ public class CookieTests
         cookieContent.Should().NotBeNull("Cookie content should be present in HTTP content");
 
         var contentString = cookieContent!.ReadAsStringAsync().Result;
-        var jArray = JArray.Parse(contentString);
+        var jArray = JsonNode.Parse(contentString)!.AsArray();
 
         jArray.Should().HaveCount(1);
-        var cookie = (JObject)jArray[0];
-        cookie["name"]!.Value<string>().Should().Be("test_cookie");
-        cookie["value"]!.Value<string>().Should().Be("test_value");
-        cookie["domain"]!.Value<string>().Should().Be("test.com");
+        var cookie = jArray[0]!.AsObject();
+        cookie["name"]!.GetValue<string>().Should().Be("test_cookie");
+        cookie["value"]!.GetValue<string>().Should().Be("test_value");
+        cookie["domain"]!.GetValue<string>().Should().Be("test.com");
     }
 
     [Test]
@@ -165,23 +164,23 @@ public class CookieTests
             c.Headers.ContentDisposition?.Name == "cookies");
 
         var contentString = cookieContent!.ReadAsStringAsync().Result;
-        var jArray = JArray.Parse(contentString);
+        var jArray = JsonNode.Parse(contentString)!.AsArray();
 
         // Assert
         jArray.Should().HaveCount(3);
 
-        var first = (JObject)jArray[0];
-        first["name"]!.Value<string>().Should().Be("cookie1");
+        var first = jArray[0]!.AsObject();
+        first["name"]!.GetValue<string>().Should().Be("cookie1");
         first.ContainsKey("secure").Should().BeFalse();
 
-        var second = (JObject)jArray[1];
-        second["name"]!.Value<string>().Should().Be("cookie2");
-        second["secure"]!.Value<bool>().Should().BeTrue();
+        var second = jArray[1]!.AsObject();
+        second["name"]!.GetValue<string>().Should().Be("cookie2");
+        second["secure"]!.GetValue<bool>().Should().BeTrue();
 
-        var third = (JObject)jArray[2];
-        third["name"]!.Value<string>().Should().Be("cookie3");
-        third["httpOnly"]!.Value<bool>().Should().BeTrue();
-        third["sameSite"]!.Value<string>().Should().Be("None");
+        var third = jArray[2]!.AsObject();
+        third["name"]!.GetValue<string>().Should().Be("cookie3");
+        third["httpOnly"]!.GetValue<bool>().Should().BeTrue();
+        third["sameSite"]!.GetValue<string>().Should().Be("None");
     }
 
     [Test]
@@ -218,7 +217,7 @@ public class CookieTests
             c.Headers.ContentDisposition?.Name == "cookies");
 
         var contentString = cookieContent!.ReadAsStringAsync().Result;
-        var jArray = JArray.Parse(contentString);
+        var jArray = JsonNode.Parse(contentString)!.AsArray();
 
         // Assert
         jArray.Should().HaveCount(0, "Empty cookie list should serialize to empty JSON array");

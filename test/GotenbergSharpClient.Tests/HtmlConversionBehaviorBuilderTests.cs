@@ -3,7 +3,7 @@ using Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.Cookies;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -112,20 +112,20 @@ public class HtmlConversionBehaviorBuilderTests
         cookieContent.Should().NotBeNull("Cookie content should be present in HTTP request");
 
         var contentString = cookieContent.ReadAsStringAsync().Result;
-        var jArray = JArray.Parse(contentString);
+        var jArray = JsonNode.Parse(contentString)!.AsArray();
 
         jArray.Should().HaveCount(3);
-        jArray[0]["name"]!.Value<string>().Should().Be("cookie1");
-        jArray[0]["value"]!.Value<string>().Should().Be("value1");
-        jArray[0]["domain"]!.Value<string>().Should().Be("domain1.com");
+        jArray[0]!["name"]!.GetValue<string>().Should().Be("cookie1");
+        jArray[0]!["value"]!.GetValue<string>().Should().Be("value1");
+        jArray[0]!["domain"]!.GetValue<string>().Should().Be("domain1.com");
 
-        jArray[1]["name"]!.Value<string>().Should().Be("cookie2");
-        jArray[1]["value"]!.Value<string>().Should().Be("value2");
-        jArray[1]["domain"]!.Value<string>().Should().Be("domain2.com");
+        jArray[1]!["name"]!.GetValue<string>().Should().Be("cookie2");
+        jArray[1]!["value"]!.GetValue<string>().Should().Be("value2");
+        jArray[1]!["domain"]!.GetValue<string>().Should().Be("domain2.com");
 
-        jArray[2]["name"]!.Value<string>().Should().Be("cookie3");
-        jArray[2]["value"]!.Value<string>().Should().Be("value3");
-        jArray[2]["domain"]!.Value<string>().Should().Be("domain3.com");
+        jArray[2]!["name"]!.GetValue<string>().Should().Be("cookie3");
+        jArray[2]!["value"]!.GetValue<string>().Should().Be("value3");
+        jArray[2]!["domain"]!.GetValue<string>().Should().Be("domain3.com");
     }
 
     [Test]
@@ -188,22 +188,22 @@ public class HtmlConversionBehaviorBuilderTests
         // Assert
         cookieContent.Should().NotBeNull();
         var contentString = cookieContent.ReadAsStringAsync().Result;
-        var jArray = JArray.Parse(contentString);
+        var jArray = JsonNode.Parse(contentString)!.AsArray();
 
         jArray.Should().HaveCount(2);
 
-        var first = (JObject)jArray[0];
-        first["name"]!.Value<string>().Should().Be("yummy_cookie");
-        first["value"]!.Value<string>().Should().Be("choco");
-        first["domain"]!.Value<string>().Should().Be("theyummycookie.com");
+        var first = jArray[0]!.AsObject();
+        first["name"]!.GetValue<string>().Should().Be("yummy_cookie");
+        first["value"]!.GetValue<string>().Should().Be("choco");
+        first["domain"]!.GetValue<string>().Should().Be("theyummycookie.com");
 
-        var second = (JObject)jArray[1];
-        second["name"]!.Value<string>().Should().Be("session");
-        second["value"]!.Value<string>().Should().Be("token123");
-        second["domain"]!.Value<string>().Should().Be("secure.com");
-        second["path"]!.Value<string>().Should().Be("/");
-        second["secure"]!.Value<bool>().Should().BeTrue();
-        second["httpOnly"]!.Value<bool>().Should().BeTrue();
-        second["sameSite"]!.Value<string>().Should().Be("Lax");
+        var second = jArray[1]!.AsObject();
+        second["name"]!.GetValue<string>().Should().Be("session");
+        second["value"]!.GetValue<string>().Should().Be("token123");
+        second["domain"]!.GetValue<string>().Should().Be("secure.com");
+        second["path"]!.GetValue<string>().Should().Be("/");
+        second["secure"]!.GetValue<bool>().Should().BeTrue();
+        second["httpOnly"]!.GetValue<bool>().Should().BeTrue();
+        second["sameSite"]!.GetValue<string>().Should().Be("Lax");
     }
 }
