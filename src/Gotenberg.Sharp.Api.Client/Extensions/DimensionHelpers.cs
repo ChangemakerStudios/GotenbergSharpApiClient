@@ -32,10 +32,10 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         private static readonly IEnumerable<(PaperSizes Size, (Dimension Width, Dimension Height) Value)> PaperSizer =
         [
             // The ISO A series is defined in millimetres; rounded inch values (8.27 x 11.7) are not exactly A4.
-            (PaperSizes.A3, (Width: Dimension.FromMillimeters(297), Height: Dimension.FromMillimeters(420))),
-            (PaperSizes.A4, (Width: Dimension.FromMillimeters(210), Height: Dimension.FromMillimeters(297))),
-            (PaperSizes.A5, (Width: Dimension.FromMillimeters(148), Height: Dimension.FromMillimeters(210))),
-            (PaperSizes.A6, (Width: Dimension.FromMillimeters(105), Height: Dimension.FromMillimeters(148))),
+            (PaperSizes.A3, (Width: MillimetersAsInches(297), Height: MillimetersAsInches(420))),
+            (PaperSizes.A4, (Width: MillimetersAsInches(210), Height: MillimetersAsInches(297))),
+            (PaperSizes.A5, (Width: MillimetersAsInches(148), Height: MillimetersAsInches(210))),
+            (PaperSizes.A6, (Width: MillimetersAsInches(105), Height: MillimetersAsInches(148))),
             (PaperSizes.Letter, (Width: Inches(8.5), Height: Inches(11.0))),
             (PaperSizes.Legal, (Width: Inches(8.5), Height: Inches(14.0))),
             (PaperSizes.Tabloid, (Width: Inches(11.0), Height: Inches(17.0))),
@@ -44,6 +44,12 @@ namespace Gotenberg.Sharp.API.Client.Extensions
         ];
 
         private static Dimension Inches(double value) => Dimension.FromInches(value);
+
+        /// <summary>
+        /// An exact millimetre length expressed in inches. Gotenberg accepts unit suffixes such as
+        /// "210mm" only from 8.3.0; a bare number of inches works on every supported version.
+        /// </summary>
+        internal static Dimension MillimetersAsInches(double millimeters) => Dimension.FromInches(millimeters / 25.4);
 
         internal static (Dimension Width, Dimension Height) ToSelectedSize(this PaperSizes selectedSize)
         {

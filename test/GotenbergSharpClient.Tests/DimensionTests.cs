@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using Gotenberg.Sharp.API.Client.Application.Pages;
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
@@ -7,19 +9,23 @@ namespace GotenbergSharpClient.Tests;
 [TestFixture]
 public class DimensionTests
 {
-    [TestCase(PaperSizes.A3, "297mm", "420mm")]
-    [TestCase(PaperSizes.A4, "210mm", "297mm")]
-    [TestCase(PaperSizes.A5, "148mm", "210mm")]
-    [TestCase(PaperSizes.A6, "105mm", "148mm")]
-    public void SetPaperSize_ASeries_UsesExactMillimetres(PaperSizes size, string width, string height)
+    [TestCase(PaperSizes.A3, 297d, 420d)]
+    [TestCase(PaperSizes.A4, 210d, 297d)]
+    [TestCase(PaperSizes.A5, 148d, 210d)]
+    [TestCase(PaperSizes.A6, 105d, 148d)]
+    public void SetPaperSize_ASeries_IsExactAndSentAsBareInches(PaperSizes size, double widthMm, double heightMm)
     {
         var props = new PageProperties();
 
         new PagePropertyBuilder(props).SetPaperSize(size);
 
-        props.PaperWidth.ToString().Should().Be(width);
-        props.PaperHeight.ToString().Should().Be(height);
+        SentMillimetres(props.PaperWidth).Should().BeApproximately(widthMm, 1e-9);
+        SentMillimetres(props.PaperHeight).Should().BeApproximately(heightMm, 1e-9);
     }
+
+    // Gotenberg before 8.3.0 parses paper sizes as plain floats, so the sent value must carry no unit.
+    private static double SentMillimetres(Dimension? dimension) =>
+        double.Parse(dimension!.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture) * 25.4;
 
     [TestCase(PaperSizes.Letter, "8.5", "11")]
     [TestCase(PaperSizes.Legal, "8.5", "14")]
@@ -53,12 +59,12 @@ public class DimensionTests
     }
 
     [Test]
-    public void ToA4WithNoMargins_UsesExactMillimetres()
+    public void ToA4WithNoMargins_IsExactAndSentAsBareInches()
     {
         var props = PageProperties.ToA4WithNoMargins();
 
-        props.PaperWidth.ToString().Should().Be("210mm");
-        props.PaperHeight.ToString().Should().Be("297mm");
+        SentMillimetres(props.PaperWidth).Should().BeApproximately(210d, 1e-9);
+        SentMillimetres(props.PaperHeight).Should().BeApproximately(297d, 1e-9);
     }
 
     [Test]

@@ -148,7 +148,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Pages
         #region public methods
 
         public static PageProperties ToA4WithNoMargins() => new()
-            { PaperWidth = Dimension.FromMillimeters(210), PaperHeight = Dimension.FromMillimeters(297) };
+            { PaperWidth = Extensions.DimensionHelpers.MillimetersAsInches(210), PaperHeight = Extensions.DimensionHelpers.MillimetersAsInches(297) };
 
         /// <summary>
         ///     Default Google Chrome printer options
