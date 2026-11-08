@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # lets NuGet/login exchange a GitHub OIDC token for a short-lived API key
     strategy:
       matrix:
         dotnet-version: [8.x]
@@ -63,6 +66,13 @@ jobs:
     - name: Pack
       run: dotnet pack src/Gotenberg.Sharp.Api.Client/Gotenberg.Sharp.Api.Client.csproj -c Release -p:PackageVersion=${{ steps.gitversion.outputs.FullSemVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 
+    - name: NuGet login (Trusted Publishing)
+      id: login
+      if: github.event_name != 'pull_request' && (github.ref_name == 'master')
+      uses: NuGet/login@v1
+      with:
+        user: jaben
+
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')
-      run: dotnet nuget push src/Gotenberg.Sharp.Api.Client/bin/Release/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate        
+      run: dotnet nuget push src/Gotenberg.Sharp.Api.Client/bin/Release/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate        

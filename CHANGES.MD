@@ -1,7 +1,9 @@
 # Release History
 
-## v3.2.0
+## v3.2.1
 Thank you to [@lahma](https://github.com/lahma) for the fixes in this release (PRs #86–#91).
+
+The `3.2.0` tag exists but was never published to NuGet; this is the first release of these changes. Packages are now published with NuGet Trusted Publishing.
 
 - **Added:**
   - `GotenbergApiException.Trace` exposes the `Gotenberg-Trace` header of an error response
