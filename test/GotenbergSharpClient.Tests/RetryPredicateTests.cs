@@ -16,7 +16,7 @@ public class RetryPredicateTests
     [TestCase(429, 1 + RetryCount, TestName = "Queue full (429) is retried")]
     [TestCase(502, 1 + RetryCount, TestName = "Bad gateway (502) is retried")]
     [TestCase(500, 1, TestName = "Conversion failure (500) is not retried")]
-    [TestCase(503, 1, TestName = "Timed-out request (503) is not retried")]
+    [TestCase(503, 1 + RetryCount, TestName = "Service unavailable (503) is retried")]
     [TestCase(408, 1, TestName = "Request timeout (408) is not retried")]
     [TestCase(400, 1, TestName = "Bad request (400) is not retried")]
     public async Task Status_IsRetriedOnlyWhenTransient(int status, int expectedCalls)
