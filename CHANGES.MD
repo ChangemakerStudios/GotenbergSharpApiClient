@@ -1,5 +1,27 @@
 # Release History
 
+## v3.2.0
+Thank you to [@lahma](https://github.com/lahma) for the fixes in this release (PRs #86–#91).
+
+- **Added:**
+  - `GotenbergApiException.Trace` exposes the `Gotenberg-Trace` header of an error response
+  - `GotenbergApiException.CreateAsync()` reads the error body asynchronously with the caller's cancellation token
+  - Options are validated when first read, or at start-up with `ValidateOnStart()`: `ServiceUrl` must be an absolute http or https URL, `TimeOut` must be positive or infinite, and enabled retry settings must not be negative
+- **Changed:**
+  - The built-in retry policy now retries connection failures, 429, 502 and 503, instead of every 5xx and 408. A 500 from a failed conversion is no longer repeated
+  - `PaperSizes.A3`–`A6` and `PageProperties.ToA4WithNoMargins()` are exact to the millimetre instead of rounded inches
+  - The `GotenbergResponseReceived` section of `ToVerboseJson()` has a fixed shape instead of a reflection dump of `HttpResponseMessage`
+  - `GotenbergApiException` no longer holds the response; error responses are disposed once read
+- **Deprecated:**
+  - `GotenbergApiException.Create()`; use `CreateAsync()`
+  - The implicit `int`/`double` to `Dimension` conversions, which mean inches; use `Dimension.FromInches`, `FromMillimeters` and so on. Builds that treat warnings as errors will need to state the unit
+- **Fixes:**
+  - Retry settings on a `GotenbergSharpClientOptions` subclass registered with `AddGotenbergSharpClient<TOptions>()` were ignored
+  - A request with a non-seekable `Stream` asset is no longer retried, which failed with `InvalidOperationException` and hid the original error
+  - Error bodies no longer block a thread with `.Result` in the async conversion path
+- **Docs:**
+  - Quick start pins `gotenberg/gotenberg:8`, since this client does not yet support Gotenberg 9
+
 ## v3.1.0
 - **PDF Bookmarks (Issue #79):**
   - New `PdfEngineBuilders.ReadBookmarks()`, `WriteBookmarks()`, and `WriteBookmarksPerFile()`
