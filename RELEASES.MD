@@ -107,5 +107,5 @@ git branch -d hotfix/X.Y.Z+1
 - **Workflow**: `.github/workflows/deploy.yml`
 - **Triggers**: All pushes and pull requests (build + test). NuGet publish only on push to `master`.
 - **Versioning**: GitVersion with `ContinuousDelivery` mode (`GitVersion.yml`).
-- **NuGet API key**: Stored as `NUGETKEY` repository secret.
+- **NuGet authentication**: [Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing). The `NuGet/login` step exchanges a GitHub OIDC token for a short-lived API key, matched against a policy on nuget.org (owner `ChangemakerStudios`, repository `GotenbergSharpApiClient`, workflow `deploy.yml`). No API key is stored in the repository.
 - **Test infrastructure**: Gotenberg v8 docker container with basic auth (`testuser`/`testpass`).
