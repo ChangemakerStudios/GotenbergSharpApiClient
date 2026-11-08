@@ -59,7 +59,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <param name="stream">The content stream.</param>
         /// <exception cref="ArgumentNullException">Thrown when stream is null.</exception>
         public ContentItem(Stream stream)
-            : this(() => new StreamContent(stream))
+            : this(() => stream is { CanSeek: false }
+                ? new NonReplayableStreamContent(stream)
+                : new StreamContent(stream))
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
         }
