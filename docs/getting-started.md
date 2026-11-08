@@ -105,6 +105,35 @@ services.AddOptions<GotenbergSharpClientOptions>()
 services.AddGotenbergSharpClient();
 ```
 
+### Retry Behavior
+
+Retry is off by default. When `RetryPolicy.Enabled` is `true`, a request is sent again after:
+
+- a connection failure
+- `429` — Gotenberg's queue is full
+- `502` or `503` — usually a proxy that could not reach Gotenberg, for example during a container restart
+
+Other responses are not retried, including `500`, which Gotenberg returns for a conversion that would fail the same way again.
+
+A request with a non-seekable `Stream` asset is sent only once, because the stream cannot be read a second time. Use a seekable stream or a `byte[]` if you want those requests retried.
+
+### Options Validation
+
+Settings that could never work throw an `OptionsValidationException` when the options are first read:
+
+- `ServiceUrl` must be an absolute `http` or `https` URL
+- `TimeOut` must be positive, or `Timeout.InfiniteTimeSpan`
+- `RetryCount` and `BackoffPower` must not be negative when retry is enabled
+
+Add `ValidateOnStart()` to fail at application start-up instead of on the first conversion:
+
+```csharp
+services.AddOptions<GotenbergSharpClientOptions>()
+    .Bind(Configuration.GetSection("GotenbergSharpClient"))
+    .ValidateOnStart();
+services.AddGotenbergSharpClient();
+```
+
 ## Required Using Statements
 
 ```csharp

@@ -97,6 +97,21 @@ builder.ConfigureRequest(config =>
 });
 ```
 
+## Tracing a Failed Request
+
+When Gotenberg returns an error, `GotenbergApiException.Trace` holds the `Gotenberg-Trace` header from the response, so you can find the request in Gotenberg's logs. It is `null` if the response did not carry one.
+
+```csharp
+try
+{
+    var merged = await sharpClient.MergePdfsAsync(mergeBuilder);
+}
+catch (GotenbergApiException ex)
+{
+    logger.LogError("Gotenberg returned {Status}, trace {Trace}", ex.StatusCode, ex.Trace);
+}
+```
+
 ## Version Compatibility
 
 Some Gotenberg routes only exist in newer releases. Requests that use one declare the release that
