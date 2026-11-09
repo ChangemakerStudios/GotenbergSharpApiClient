@@ -45,7 +45,14 @@ public sealed class GotenbergServers
         var url = Environment.GetEnvironmentVariable("GOTENBERG_URL");
         var versions = Environment.GetEnvironmentVariable("GOTENBERG_VERSIONS");
 
-        if (!string.IsNullOrWhiteSpace(url)) return [GotenbergServer.FromUrl(new Uri(url), versions)];
+        if (!string.IsNullOrWhiteSpace(url))
+        {
+            if (versions?.Contains(',') == true)
+                throw new InvalidOperationException(
+                    "With GOTENBERG_URL, GOTENBERG_VERSIONS is the version of that one server; give a single version.");
+
+            return [GotenbergServer.FromUrl(new Uri(url), versions)];
+        }
 
         return (string.IsNullOrWhiteSpace(versions) ? SupportedVersions : versions)
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
