@@ -138,11 +138,13 @@ Currently gated:
 | --- | --- |
 | Split (`PdfEngineBuilders.Split`) | 8.15.0 |
 | Flatten (`PdfEngineBuilders.Flatten`) | 8.16.0 |
+| Encrypt (`PdfEngineBuilders.Encrypt`) | 8.24.0 |
 | Embedded files (`PdfEngineBuilders.Embed`) | 8.25.0 |
 | Bookmarks (`ReadBookmarks` / `WriteBookmarks`) | 8.28.0 |
+| Rotate (`PdfEngineBuilders.Rotate`) | 8.28.0 |
 
-Rotate, metadata, watermark, stamp, merge and the screenshot routes all predate Gotenberg 8.5 and
-are not gated.
+Merge, metadata (8.3.0) and the screenshot routes (8.0.0) are not gated: they predate the
+`/version` route (8.5.0), so a gate would turn away the 8.0–8.4 services that serve them.
 
 ### Checking ahead of time
 
