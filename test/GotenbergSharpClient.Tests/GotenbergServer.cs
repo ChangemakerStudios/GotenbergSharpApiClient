@@ -1,5 +1,6 @@
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
+using DotNet.Testcontainers.Images;
 
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Extensions;
@@ -51,10 +52,11 @@ public sealed class GotenbergServer : IAsyncDisposable
         new($"gotenberg:{tag}", ParseTag(tag), server => server.StartContainerAsync($"gotenberg/gotenberg:{tag}"));
 
     /// <summary>
-    /// A running server set up like <c>docker/docker-compose-basic-auth.yml</c>, assumed to be current.
+    /// A running server set up like <c>docker/docker-compose-basic-auth.yml</c>. Without a
+    /// <paramref name="version"/> it counts as the newest release.
     /// </summary>
-    public static GotenbergServer FromUrl(Uri url) =>
-        new(url.ToString(), new Version(int.MaxValue, 0), _ => Task.FromResult(url));
+    public static GotenbergServer FromUrl(Uri url, string? version) =>
+        new(url.ToString(), ParseTag(version ?? "latest"), _ => Task.FromResult(url));
 
     public Task<Uri> GetUrlAsync() => _url.Value;
 
@@ -90,6 +92,9 @@ public sealed class GotenbergServer : IAsyncDisposable
     private async Task<Uri> StartContainerAsync(string image)
     {
         var builder = new ContainerBuilder(image)
+            // A floating tag such as "8" stands for the newest release, so refresh it rather than
+            // start a copy cached before the routes the floors expect.
+            .WithImagePullPolicy(Version.Build == int.MaxValue ? PullPolicy.Always : PullPolicy.Missing)
             .WithPortBinding(Port, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(
                 request => request.ForPort(Port).ForPath("/health"),
