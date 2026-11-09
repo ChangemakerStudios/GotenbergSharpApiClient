@@ -3,11 +3,8 @@ using System.IO.Compression;
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
-using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Domain.Split;
-using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using MimeMapping;
 using Newtonsoft.Json.Linq;
 
@@ -145,11 +142,10 @@ public class PdfEngineOperationsTests
 
     #region Integration Tests
 
-    [Category("Integration")]
-    [Test]
-    public async Task FlattenPdf_Succeeds()
+    [GotenbergTest(GotenbergVersions.Flatten)]
+    public async Task FlattenPdf_Succeeds(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var builder = PdfEngineBuilders.Flatten()
@@ -161,11 +157,10 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task RotatePdf_Succeeds()
+    [GotenbergTest("8.28.0")] // POST /forms/pdfengines/rotate arrived in 8.28.0
+    public async Task RotatePdf_Succeeds(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var builder = PdfEngineBuilders.Rotate(90)
@@ -177,11 +172,10 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task EncryptPdf_Succeeds()
+    [GotenbergTest("8.25.0")] // POST /forms/pdfengines/encrypt, announced in 8.25.0
+    public async Task EncryptPdf_Succeeds(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var builder = PdfEngineBuilders.Encrypt("user123", "owner456")
@@ -193,11 +187,10 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task WriteMetadata_Succeeds()
+    [GotenbergTest("8.3.0")] // the metadata routes arrived in 8.3.0
+    public async Task WriteMetadata_Succeeds(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var builder = PdfEngineBuilders.WriteMetadata(new Dictionary<string, object>
@@ -213,11 +206,10 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task ReadMetadata_ReturnsJson()
+    [GotenbergTest("8.3.0")]
+    public async Task ReadMetadata_ReturnsJson(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var builder = PdfEngineBuilders.ReadMetadata()
@@ -230,9 +222,8 @@ public class PdfEngineOperationsTests
         parsed.Should().NotBeEmpty();
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task Embed_Succeeds()
+    [GotenbergTest(GotenbergVersions.Embed)]
+    public async Task Embed_Succeeds(GotenbergServer gotenberg)
     {
         const string xml = """
                            <?xml version="1.0" encoding="UTF-8"?>
@@ -253,7 +244,7 @@ public class PdfEngineOperationsTests
             },
         };
         
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var builder = PdfEngineBuilders.Embed(entries)
@@ -261,17 +252,13 @@ public class PdfEngineOperationsTests
 
         await using var result = await client.ExecutePdfEngineAsync(builder);
 
-        var file = File.Create("result.pdf");
-        await result.CopyToAsync(file);
-
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task WriteThenReadBookmarks_RoundTripsTheOutline()
+    [GotenbergTest(GotenbergVersions.Bookmarks)]
+    public async Task WriteThenReadBookmarks_RoundTripsTheOutline(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateMultiPageTestPdf(client);
 
         var written = await client.ExecutePdfEngineAsync(
@@ -302,11 +289,10 @@ public class PdfEngineOperationsTests
         outline[1].Children[1].Page.Should().Be(3);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task ReadBookmarks_WithoutAnOutline_ReturnsEmpty()
+    [GotenbergTest(GotenbergVersions.Bookmarks)]
+    public async Task ReadBookmarks_WithoutAnOutline_ReturnsEmpty(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var outlines = await client.ReadPdfBookmarksAsync(
@@ -317,11 +303,10 @@ public class PdfEngineOperationsTests
         outlines["plain.pdf"].Should().BeEmpty();
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task ReadBookmarks_ReturnsRawJsonKeyedByFilename()
+    [GotenbergTest(GotenbergVersions.Bookmarks)]
+    public async Task ReadBookmarks_ReturnsRawJsonKeyedByFilename(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateTestPdf(client);
 
         var json = await client.ReadPdfBookmarksJsonAsync(
@@ -332,11 +317,10 @@ public class PdfEngineOperationsTests
         JObject.Parse(json).Should().ContainKey("plain.pdf");
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task WriteBookmarksPerFile_AppliesADistinctOutlineToEachPdf()
+    [GotenbergTest(GotenbergVersions.Bookmarks)]
+    public async Task WriteBookmarksPerFile_AppliesADistinctOutlineToEachPdf(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
         var pdfBytes = await GenerateMultiPageTestPdf(client);
 
         // Both PDFs go in one request: sending them separately would pass even if the map were
@@ -379,11 +363,10 @@ public class PdfEngineOperationsTests
         }
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task GetGotenbergVersion_ReportsAKnownVersion()
+    [GotenbergTest("8.5.0")] // GET /version arrived in 8.5.0
+    public async Task GetGotenbergVersion_ReportsAKnownVersion(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
 
         var version = await client.GetGotenbergVersionAsync();
 
@@ -392,21 +375,6 @@ public class PdfEngineOperationsTests
     }
 
     #endregion
-
-    private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateAuthenticatedClient()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(options =>
-            {
-                options.ServiceUrl = new Uri("http://localhost:3000");
-                options.BasicAuthUsername = "testuser";
-                options.BasicAuthPassword = "testpass";
-            });
-        services.AddGotenbergSharpClient();
-        return services.BuildServiceProvider()
-            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
-    }
 
     private static async Task<byte[]> GenerateTestPdf(Gotenberg.Sharp.API.Client.GotenbergSharpClient client)
     {

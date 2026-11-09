@@ -1,10 +1,7 @@
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Authentication;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
-using Gotenberg.Sharp.API.Client.Domain.Settings;
-using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -152,21 +149,10 @@ public class EncryptionOptionsTests
 
     #region Integration Tests
 
-    [Category("Integration")]
-    [Test]
-    public async Task HtmlToPdf_WithEncryption_Succeeds()
+    [GotenbergTest]
+    public async Task HtmlToPdf_WithEncryption_Succeeds(GotenbergServer gotenberg)
     {
-        var services = new ServiceCollection();
-        services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(options =>
-            {
-                options.ServiceUrl = new Uri("http://localhost:3000");
-                options.BasicAuthUsername = "testuser";
-                options.BasicAuthPassword = "testpass";
-            });
-        services.AddGotenbergSharpClient();
-        var client = services.BuildServiceProvider()
-            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
+        var client = await gotenberg.CreateClientAsync();
 
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody(

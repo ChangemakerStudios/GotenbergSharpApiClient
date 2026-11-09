@@ -16,16 +16,17 @@ public class BasicAuthTests
     private const string TestUsername = "testuser";
     private const string TestPassword = "testpass";
 
-    [Test]
-    public async Task Client_WithBasicAuth_ShouldIncludeAuthorizationHeader()
+    [GotenbergTest(GotenbergServer.BasicAuthVersion)]
+    public async Task Client_WithBasicAuth_ShouldIncludeAuthorizationHeader(GotenbergServer gotenberg)
     {
         // Arrange
+        var url = await gotenberg.GetUrlAsync();
         var services = new ServiceCollection();
 
         services.AddOptions<GotenbergSharpClientOptions>()
             .Configure(options =>
             {
-                options.ServiceUrl = new Uri(GotenbergUrl);
+                options.ServiceUrl = url;
                 options.BasicAuthUsername = TestUsername;
                 options.BasicAuthPassword = TestPassword;
             });
@@ -46,16 +47,17 @@ public class BasicAuthTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Test]
-    public async Task Client_WithoutBasicAuth_ShouldFailWhenGotenbergRequiresAuth()
+    [GotenbergTest(GotenbergServer.BasicAuthVersion)]
+    public async Task Client_WithoutBasicAuth_ShouldFailWhenGotenbergRequiresAuth(GotenbergServer gotenberg)
     {
         // Arrange
+        var url = await gotenberg.GetUrlAsync();
         var services = new ServiceCollection();
 
         services.AddOptions<GotenbergSharpClientOptions>()
             .Configure(options =>
             {
-                options.ServiceUrl = new Uri(GotenbergUrl);
+                options.ServiceUrl = url;
                 // Deliberately not setting BasicAuthUsername or BasicAuthPassword
             });
 
@@ -74,16 +76,17 @@ public class BasicAuthTests
         await act.Should().ThrowAsync<Exception>("Gotenberg should reject requests without proper authentication");
     }
 
-    [Test]
-    public async Task Client_WithInvalidCredentials_ShouldFailWithUnauthorized()
+    [GotenbergTest(GotenbergServer.BasicAuthVersion)]
+    public async Task Client_WithInvalidCredentials_ShouldFailWithUnauthorized(GotenbergServer gotenberg)
     {
         // Arrange
+        var url = await gotenberg.GetUrlAsync();
         var services = new ServiceCollection();
 
         services.AddOptions<GotenbergSharpClientOptions>()
             .Configure(options =>
             {
-                options.ServiceUrl = new Uri(GotenbergUrl);
+                options.ServiceUrl = url;
                 options.BasicAuthUsername = "wronguser";
                 options.BasicAuthPassword = "wrongpassword";
             });
@@ -167,13 +170,13 @@ public class BasicAuthTests
         resolvedOptions.ServiceUrl.Should().Be(new Uri(GotenbergUrl), "Configure should set base values");
     }
 
-    [Test]
-    public async Task Client_WithHybridConfigurationAndRunningGotenberg_ShouldAuthenticate()
+    [GotenbergTest(GotenbergServer.BasicAuthVersion)]
+    public async Task Client_WithHybridConfigurationAndRunningGotenberg_ShouldAuthenticate(GotenbergServer gotenberg)
     {
         // This test requires a running Gotenberg instance with basic auth enabled
-        // It will be skipped in CI/CD environments where Gotenberg isn't running
 
         // Arrange
+        var url = await gotenberg.GetUrlAsync();
         var services = new ServiceCollection();
 
         // Hybrid configuration: base configuration + programmatic overrides
@@ -181,7 +184,7 @@ public class BasicAuthTests
             .Configure(options =>
             {
                 // Base configuration (simulating appsettings.json)
-                options.ServiceUrl = new Uri(GotenbergUrl);
+                options.ServiceUrl = url;
                 options.TimeOut = TimeSpan.FromMinutes(3);
             })
             .PostConfigure(options =>
