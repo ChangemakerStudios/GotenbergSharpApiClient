@@ -157,7 +157,7 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [GotenbergTest("8.28.0")] // POST /forms/pdfengines/rotate arrived in 8.28.0
+    [GotenbergTest(GotenbergVersions.Rotate)]
     public async Task RotatePdf_Succeeds(GotenbergServer gotenberg)
     {
         var client = await gotenberg.CreateClientAsync();
@@ -172,7 +172,7 @@ public class PdfEngineOperationsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [GotenbergTest("8.25.0")] // POST /forms/pdfengines/encrypt, announced in 8.25.0
+    [GotenbergTest(GotenbergVersions.Encrypt)]
     public async Task EncryptPdf_Succeeds(GotenbergServer gotenberg)
     {
         var client = await gotenberg.CreateClientAsync();
