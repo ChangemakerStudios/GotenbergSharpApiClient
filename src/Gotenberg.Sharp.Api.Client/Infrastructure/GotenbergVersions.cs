@@ -36,10 +36,10 @@ public static class GotenbergVersions
     public const string Flatten = "8.16.0";
 
     /// <summary>
-    /// The <c>POST /forms/pdfengines/encrypt</c> route. Added in Gotenberg 8.24.0; the release notes
+    /// The <c>POST /forms/pdfengines/encrypt</c> route. Added in Gotenberg 8.23.1; the release notes
     /// first announce it in 8.25.0.
     /// </summary>
-    public const string Encrypt = "8.24.0";
+    public const string Encrypt = "8.23.1";
 
     /// <summary>
     /// Embedded file support, added in Gotenberg 8.25.0 for ZUGFeRD / Factur-X style PDFs.

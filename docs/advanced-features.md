@@ -138,7 +138,7 @@ Currently gated:
 | --- | --- |
 | Split (`PdfEngineBuilders.Split`) | 8.15.0 |
 | Flatten (`PdfEngineBuilders.Flatten`) | 8.16.0 |
-| Encrypt (`PdfEngineBuilders.Encrypt`) | 8.24.0 |
+| Encrypt (`PdfEngineBuilders.Encrypt`) | 8.23.1 |
 | Embedded files (`PdfEngineBuilders.Embed`) | 8.25.0 |
 | Bookmarks (`ReadBookmarks` / `WriteBookmarks`) | 8.28.0 |
 | Rotate (`PdfEngineBuilders.Rotate`) | 8.28.0 |

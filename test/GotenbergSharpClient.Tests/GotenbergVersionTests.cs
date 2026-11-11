@@ -104,7 +104,7 @@ public class GotenbergVersionTests
     {
         new SplitPdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.15.0"));
         new FlattenPdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.16.0"));
-        new EncryptPdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.24.0"));
+        new EncryptPdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.23.1"));
         new RotatePdfRequest().Requires!.MinimumVersion.Should().Be(GotenbergVersion.Parse("8.28.0"));
     }
 
