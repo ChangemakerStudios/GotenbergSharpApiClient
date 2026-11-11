@@ -1,11 +1,8 @@
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
-using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -244,11 +241,10 @@ public class CrossCuttingOptionsTests
 
     #region Integration Tests
 
-    [Category("Integration")]
-    [Test]
-    public async Task HtmlToPdf_WithRotation_Succeeds()
+    [GotenbergTest]
+    public async Task HtmlToPdf_WithRotation_Succeeds(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
 
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody(
@@ -261,11 +257,10 @@ public class CrossCuttingOptionsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task HtmlToPdf_WithWatermark_Succeeds()
+    [GotenbergTest]
+    public async Task HtmlToPdf_WithWatermark_Succeeds(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
 
         var builder = new HtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody(
@@ -276,21 +271,6 @@ public class CrossCuttingOptionsTests
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
-    }
-
-    private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateAuthenticatedClient()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(options =>
-            {
-                options.ServiceUrl = new Uri("http://localhost:3000");
-                options.BasicAuthUsername = "testuser";
-                options.BasicAuthPassword = "testpass";
-            });
-        services.AddGotenbergSharpClient();
-        return services.BuildServiceProvider()
-            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
     }
 
     #endregion

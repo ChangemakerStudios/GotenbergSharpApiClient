@@ -1,9 +1,6 @@
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Domain.Screenshots;
-using Gotenberg.Sharp.API.Client.Domain.Settings;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -230,21 +227,10 @@ public class LibreOfficeOptionsTests
 
     #region Integration Tests
 
-    [Category("Integration")]
-    [Test]
-    public async Task MergeOfficeDocs_WithLibreOfficeOptions_Succeeds()
+    [GotenbergTest]
+    public async Task MergeOfficeDocs_WithLibreOfficeOptions_Succeeds(GotenbergServer gotenberg)
     {
-        var services = new ServiceCollection();
-        services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(options =>
-            {
-                options.ServiceUrl = new Uri("http://localhost:3000");
-                options.BasicAuthUsername = "testuser";
-                options.BasicAuthPassword = "testpass";
-            });
-        services.AddGotenbergSharpClient();
-        var client = services.BuildServiceProvider()
-            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
+        var client = await gotenberg.CreateClientAsync();
 
         var builder = new MergeOfficeBuilder()
             .WithAssets(a =>
