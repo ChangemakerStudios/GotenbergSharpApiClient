@@ -42,6 +42,8 @@ dotnet build
 dotnet test
 ```
 
+  The integration tests start Gotenberg 7 and 8 containers through Testcontainers, so Docker must be running. `dotnet test --filter TestCategory!=Integration` runs the rest without it. `GOTENBERG_VERSIONS` (for example `8.3.0,9`) picks other image tags, and `GOTENBERG_URL` points the tests at a server that is already running, such as the one `docker/docker-compose-basic-auth.yml` starts (set `GOTENBERG_VERSIONS` to its version if it is not the newest).
+
 ### 4. Merge release branch into `master`
 
 ```bash

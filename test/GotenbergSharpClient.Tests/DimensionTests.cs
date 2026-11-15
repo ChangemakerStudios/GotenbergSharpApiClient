@@ -1,5 +1,6 @@
 using System.Globalization;
 
+using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Application.Pages;
 using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
@@ -80,5 +81,22 @@ public class DimensionTests
 
         conversions.Should().HaveCount(2);
         conversions.Should().OnlyContain(m => m.GetCustomAttributes(typeof(ObsoleteAttribute), false).Length == 1);
+    }
+
+    [GotenbergTest]
+    public async Task HtmlToPdf_WithEachPaperSize_IsAccepted(GotenbergServer gotenberg)
+    {
+        var client = await gotenberg.CreateClientAsync();
+
+        foreach (var size in Enum.GetValues<PaperSizes>().Where(size => size != PaperSizes.None))
+        {
+            var builder = new HtmlRequestBuilder()
+                .AddDocument(doc => doc.SetBody("<html><body><p>Paper size</p></body></html>"))
+                .WithPageProperties(page => page.SetPaperSize(size).SetMargins(Margins.Normal));
+
+            await using var pdf = await client.HtmlToPdfAsync(builder);
+
+            pdf.Length.Should().BeGreaterThan(0, $"Gotenberg should accept {size}");
+        }
     }
 }
