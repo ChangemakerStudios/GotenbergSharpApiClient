@@ -9,7 +9,7 @@
 
 .NET C# client for [Gotenberg](https://gotenberg.dev/) v7 & v8 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
 
-> **v3.2.1** — More reliable retries, exact A-series paper sizes, `Gotenberg-Trace` on API errors, async error handling, and options validation. See [CHANGES.MD](CHANGES.MD) for details.
+> **v3.3.0** — Standalone encrypt and rotate check the Gotenberg version first, so older servers get a clear error instead of a 404. v3.2.1 brought more reliable retries, exact A-series paper sizes, `Gotenberg-Trace` on API errors and options validation. See [CHANGES.MD](CHANGES.MD) for details.
 
 ## Features
 

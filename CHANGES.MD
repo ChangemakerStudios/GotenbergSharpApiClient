@@ -1,5 +1,17 @@
 # Release History
 
+## v3.3.0
+Thank you to [@lahma](https://github.com/lahma) for this release (PRs #93 and #94).
+
+- **Changed:**
+  - `PdfEngineBuilders.Encrypt` requires Gotenberg 8.23.1 and `PdfEngineBuilders.Rotate` requires 8.28.0. Older services are rejected with `GotenbergVersionNotSupportedException` before anything is sent, instead of answering with a bare 404
+- **Added:**
+  - `GotenbergVersions.Encrypt` and `GotenbergVersions.Rotate` constants
+- **Testing:**
+  - The integration tests start Gotenberg 7 and 8 containers with Testcontainers and run against both, so a request that only works on newer releases is caught. Docker must be running for `dotnet test`; `--filter TestCategory!=Integration` runs the rest without it
+- **CI:**
+  - GitHub Actions updated to their current releases
+
 ## v3.2.1
 Thank you to [@lahma](https://github.com/lahma) for the fixes in this release (PRs #86–#91).
 
