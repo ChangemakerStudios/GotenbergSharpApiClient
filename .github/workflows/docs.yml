@@ -2,7 +2,9 @@ name: Build and Deploy Docs
 
 on:
   push:
-    branches: [master, develop]
+    # The github-pages environment only allows deployments from develop, so a master push
+    # would build the site and then fail to deploy it.
+    branches: [develop]
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
