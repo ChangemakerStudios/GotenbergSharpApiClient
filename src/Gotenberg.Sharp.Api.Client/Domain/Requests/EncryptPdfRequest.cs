@@ -5,6 +5,7 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+[MinimumGotenbergVersion(GotenbergVersions.Encrypt, Feature = "The standalone encrypt route")]
 public sealed class EncryptPdfRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.Encrypt;

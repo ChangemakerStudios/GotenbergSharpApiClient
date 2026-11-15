@@ -8,6 +8,7 @@ using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+[MinimumGotenbergVersion(GotenbergVersions.Rotate, Feature = "The standalone rotate route")]
 public sealed class RotatePdfRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.Rotate;

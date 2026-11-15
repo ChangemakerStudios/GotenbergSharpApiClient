@@ -36,6 +36,12 @@ public static class GotenbergVersions
     public const string Flatten = "8.16.0";
 
     /// <summary>
+    /// The <c>POST /forms/pdfengines/encrypt</c> route. Added in Gotenberg 8.23.1; the release notes
+    /// first announce it in 8.25.0.
+    /// </summary>
+    public const string Encrypt = "8.23.1";
+
+    /// <summary>
     /// Embedded file support, added in Gotenberg 8.25.0 for ZUGFeRD / Factur-X style PDFs.
     /// </summary>
     public const string Embed = "8.25.0";
@@ -44,4 +50,9 @@ public static class GotenbergVersions
     /// Bookmark read and write routes. Added in Gotenberg 8.28.0.
     /// </summary>
     public const string Bookmarks = "8.28.0";
+
+    /// <summary>
+    /// The <c>POST /forms/pdfengines/rotate</c> route. Added in Gotenberg 8.28.0.
+    /// </summary>
+    public const string Rotate = "8.28.0";
 }
