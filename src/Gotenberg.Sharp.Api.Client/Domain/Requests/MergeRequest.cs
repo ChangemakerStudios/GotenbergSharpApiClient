@@ -13,6 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public sealed class MergeRequest : PdfRequestBase
@@ -20,13 +23,21 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         protected override string ApiPath
             => Constants.Gotenberg.PdfEngines.ApiPaths.MergePdf;
 
-        protected override IEnumerable<HttpContent> ToHttpContent()
+        protected override string GetApiPath(GotenbergApiVersion api)
+            => api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
+
+        // Gotenberg 9 merges with a stage, which must come before those of the cross-cutting options.
+        internal override void AddRouteStages(StageList stages) => stages.Add(Constants.Gotenberg.Stages.Ops.Merge);
+
+        protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
         {
-            foreach (var ci in base.ToHttpContent())
+            foreach (var ci in base.ToHttpContent(api))
                 yield return ci;
 
-            foreach (var ci in Config.IfNullEmptyContent())
-                yield return ci;
+            // The pipe route of Gotenberg 9 takes no page ranges; 8 ignored them there.
+            if (api == GotenbergApiVersion.V8)
+                foreach (var ci in Config.IfNullEmptyContent(api))
+                    yield return ci;
 
             foreach (var item in this.Assets.ToAlphabeticalOrderByIndex()
                          .Where(item => item.IsValid()))

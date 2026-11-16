@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Settings;
 
 /// <summary>
@@ -61,4 +63,12 @@ public class GotenbergSharpClientOptions
     /// an Authorization header with basic auth credentials in all requests.
     /// </summary>
     public string? BasicAuthPassword { get; set; }
+
+    /// <summary>
+    /// The Gotenberg API requests are rendered for. Default: <see cref="GotenbergApiVersion.Auto" />,
+    /// which reads the version of the service once per application and service address.
+    /// Set <see cref="GotenbergApiVersion.V8" /> or <see cref="GotenbergApiVersion.V9" /> to skip that
+    /// lookup, for instance when a proxy hides the <c>/version</c> route.
+    /// </summary>
+    public GotenbergApiVersion ApiVersion { get; set; } = GotenbergApiVersion.Auto;
 }

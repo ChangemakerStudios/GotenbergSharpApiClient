@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Extensions
 {
     public static class RequestInterfaceExtensions
@@ -23,6 +25,20 @@ namespace Gotenberg.Sharp.API.Client.Extensions
             this IConvertToHttpContent? converter)
         {
             return converter?.ToHttpContent() ?? Enumerable.Empty<HttpContent>();
+        }
+
+        internal static IEnumerable<HttpContent> IfNullEmptyContent(
+            this FacetBase? facet,
+            GotenbergApiVersion api)
+        {
+            return facet?.RenderHttpContent(api) ?? Enumerable.Empty<HttpContent>();
+        }
+
+        internal static IEnumerable<HttpContent> IfNullEmptyContent(
+            this RequestConfig? config,
+            GotenbergApiVersion api)
+        {
+            return config?.ToHttpContent(api) ?? Enumerable.Empty<HttpContent>();
         }
 
         /// <summary>

@@ -15,6 +15,7 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Documents;
 using Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -31,14 +32,14 @@ public sealed class UrlRequest : ChromeRequest
 
     public ExtraUrlResources? ExtraResources { get; set; }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (this.Url == null) throw new InvalidOperationException("Url is null");
         if (!this.Url.IsAbsoluteUri)
             throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
-        return base.ToHttpContent()
-            .Concat(Content.IfNullEmptyContent())
+        return base.ToHttpContent(api)
+            .Concat(Content.IfNullEmptyContent(api))
             .Concat(ExtraResources.IfNullEmptyContent())
             .Concat(Assets.IfNullEmptyContent())
             .Concat(

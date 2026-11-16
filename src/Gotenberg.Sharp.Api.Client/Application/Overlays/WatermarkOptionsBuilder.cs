@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 using Newtonsoft.Json.Linq;
@@ -74,4 +75,74 @@ public sealed class WatermarkOptionsBuilder
 
         return this;
     }
+
+    /// <summary>
+    /// Convenience method for an image watermark: sets the source and the file, and clears the expression,
+    /// which Gotenberg takes from the file.
+    /// </summary>
+    /// <remarks>
+    /// Sent to Gotenberg 7 and 8 as a file part of the form field <c>watermark</c> (from Gotenberg 8.28.0 on). Gotenberg 9 draws over the page only: a request with a watermark throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to it; use a stamp there, listed with <c>WithStages</c> (<c>StampImage</c> or <c>StampPdf</c>, made faint with <c>SetOpacity</c>).
+    /// </remarks>
+    /// <param name="fileName">The name of the file, such as <c>logo.png</c>: a relative name with an extension, which gives the media type.</param>
+    /// <param name="content">The content of the file.</param>
+    /// <param name="pages">The pages to draw it on; every page when null.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="fileName" /> is not a relative file name with an extension.</exception>
+    public WatermarkOptionsBuilder SetImageWatermark(string fileName, ContentItem content, string? pages = null)
+    {
+        OverlayFile.ValidateName(fileName);
+        if (content == null) throw new ArgumentNullException(nameof(content));
+
+        SetSource(OverlaySource.Image);
+        _options.Expression = null;
+        _options.FileName = fileName;
+        _options.FileContent = content;
+
+        if (pages != null)
+            SetPages(pages);
+
+        return this;
+    }
+
+    /// <inheritdoc cref="SetImageWatermark(string, ContentItem, string)" />
+    public WatermarkOptionsBuilder SetImageWatermark(string fileName, byte[] content, string? pages = null) =>
+        SetImageWatermark(fileName, new ContentItem(content), pages);
+
+    /// <inheritdoc cref="SetImageWatermark(string, ContentItem, string)" />
+    public WatermarkOptionsBuilder SetImageWatermark(string fileName, Stream content, string? pages = null) =>
+        SetImageWatermark(fileName, new ContentItem(content), pages);
+
+    /// <summary>
+    /// Convenience method for a PDF watermark: sets the source and the file, and clears the expression,
+    /// which Gotenberg takes from the file.
+    /// </summary>
+    /// <remarks>
+    /// Sent to Gotenberg 7 and 8 as a file part of the form field <c>watermark</c> (from Gotenberg 8.28.0 on). Gotenberg 9 draws over the page only: a request with a watermark throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to it; use a stamp there, listed with <c>WithStages</c> (<c>StampImage</c> or <c>StampPdf</c>, made faint with <c>SetOpacity</c>).
+    /// </remarks>
+    /// <param name="fileName">The name of the file, such as <c>letterhead.pdf</c>: a relative name with an extension, which gives the media type.</param>
+    /// <param name="content">The content of the file.</param>
+    /// <param name="pages">The pages to draw it on; every page when null.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="fileName" /> is not a relative file name with an extension.</exception>
+    public WatermarkOptionsBuilder SetPdfWatermark(string fileName, ContentItem content, string? pages = null)
+    {
+        OverlayFile.ValidateName(fileName);
+        if (content == null) throw new ArgumentNullException(nameof(content));
+
+        SetSource(OverlaySource.Pdf);
+        _options.Expression = null;
+        _options.FileName = fileName;
+        _options.FileContent = content;
+
+        if (pages != null)
+            SetPages(pages);
+
+        return this;
+    }
+
+    /// <inheritdoc cref="SetPdfWatermark(string, ContentItem, string)" />
+    public WatermarkOptionsBuilder SetPdfWatermark(string fileName, byte[] content, string? pages = null) =>
+        SetPdfWatermark(fileName, new ContentItem(content), pages);
+
+    /// <inheritdoc cref="SetPdfWatermark(string, ContentItem, string)" />
+    public WatermarkOptionsBuilder SetPdfWatermark(string fileName, Stream content, string? pages = null) =>
+        SetPdfWatermark(fileName, new ContentItem(content), pages);
 }

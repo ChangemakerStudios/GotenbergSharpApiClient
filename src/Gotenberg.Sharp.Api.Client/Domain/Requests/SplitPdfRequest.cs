@@ -14,6 +14,8 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Split;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -21,6 +23,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 public sealed class SplitPdfRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.Split;
+
+    protected override string GetApiPath(GotenbergApiVersion api) =>
+        api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
 
     public SplitMode? Mode { get; set; }
 
@@ -38,15 +43,23 @@ public sealed class SplitPdfRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    // Gotenberg 9 splits with a stage, mapped like the SplitOptions of any request; the mode and span of
+    // this request win over them, as on Gotenberg 8 the first value of the field did.
+    internal override void AddRouteStages(StageList stages) =>
+        stages.RouteSplit = new SplitOptions { Mode = this.Mode, Span = this.Span, Unify = this.Unify };
+
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        yield return CreateFormDataItem(this.Mode!.Value.ToFormValue(), "splitMode");
-        yield return CreateFormDataItem(this.Span!, "splitSpan");
+        if (api == GotenbergApiVersion.V8)
+        {
+            yield return CreateFormDataItem(this.Mode!.Value.ToFormValue(), Constants.Gotenberg.CrossCuttingOptions.SplitMode);
+            yield return CreateFormDataItem(this.Span!, Constants.Gotenberg.CrossCuttingOptions.SplitSpan);
 
-        if (this.Unify == true)
-            yield return CreateFormDataItem("true", "splitUnify");
+            if (this.Unify == true)
+                yield return CreateFormDataItem("true", Constants.Gotenberg.CrossCuttingOptions.SplitUnify);
+        }
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

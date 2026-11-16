@@ -1,0 +1,41 @@
+POST forms/chromium/convert/url
+part name=stages type=text/plain
+    [{"op":"remediate","profile":"PDF/A-3b"}]
+part name=scale type=text/html
+    1
+part name=paperWidth type=text/html
+    8.5
+part name=paperHeight type=text/html
+    11
+part name=marginTop type=text/html
+    1
+part name=marginBottom type=text/html
+    1
+part name=marginLeft type=text/html
+    1
+part name=marginRight type=text/html
+    1
+part name=landscape type=text/html
+    False
+part name=preferCssPageSize type=text/html
+    False
+part name=printBackground type=text/html
+    False
+part name=omitBackground type=text/html
+    False
+part name=nativeBookmarks type=text/html
+    False
+part name=singlePage type=text/html
+    True
+part name=waitForExpression type=text/html
+    window.ready === true
+part name=files filename=header.html type=text/html
+    <html><body>header</body></html>
+part name=files filename=footer.html type=text/html
+    <html><body>footer</body></html>
+part name=extraLinkTags type=text/plain
+    [{"href":"https://example.com/style.css"}]
+part name=extraScriptTags type=text/plain
+    [{"src":"https://example.com/app.js"}]
+part name=url type=text/plain
+    https://example.com/page

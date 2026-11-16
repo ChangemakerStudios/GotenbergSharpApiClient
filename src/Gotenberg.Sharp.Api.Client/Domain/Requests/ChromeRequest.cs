@@ -15,6 +15,7 @@
 
 using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -24,10 +25,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
-        protected override IEnumerable<HttpContent> ToHttpContent() =>
-            base.ToHttpContent()
-                .Concat(Config.IfNullEmptyContent())
-                .Concat(this.PageProperties.IfNullEmptyContent())
-                .Concat(ConversionBehaviors.IfNullEmptyContent());
+        internal override bool ReadsNativeTaggedPdf => true;
+
+        protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api) =>
+            base.ToHttpContent(api)
+                .Concat(Config.IfNullEmptyContent(api))
+                .Concat(this.PageProperties.IfNullEmptyContent(api))
+                .Concat(ConversionBehaviors.IfNullEmptyContent(api));
     }
 }

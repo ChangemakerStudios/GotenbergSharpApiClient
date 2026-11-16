@@ -19,6 +19,7 @@ using System.Net;
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
+using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client;
@@ -57,8 +58,18 @@ public class GotenbergSharpClient
     /// <param name="innerClient"></param>
     /// <remarks>Client was built for DI use</remarks>
     public GotenbergSharpClient(HttpClient innerClient)
+        : this(innerClient, new GotenbergVersionCache())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a client that shares <paramref name="versionCache" /> with the other clients of
+    ///     one <c>AddGotenbergSharpClient()</c> registration.
+    /// </summary>
+    internal GotenbergSharpClient(HttpClient innerClient, GotenbergVersionCache versionCache)
     {
         this.HttpClient = innerClient ?? throw new ArgumentNullException(nameof(innerClient));
+        this._versionCache = versionCache ?? throw new ArgumentNullException(nameof(versionCache));
 
         if (this.HttpClient.BaseAddress == null)
             throw new InvalidOperationException($"{nameof(innerClient.BaseAddress)} is null");
@@ -74,15 +85,16 @@ public class GotenbergSharpClient
 
     protected HttpClient HttpClient { get; }
 
-    private readonly SemaphoreSlim _versionLock = new(1, 1);
+    private readonly GotenbergVersionCache _versionCache;
 
-    private GotenbergVersion? _cachedVersion;
+    private GotenbergApiVersion _apiVersion = GotenbergApiVersion.Auto;
 
     /// <summary>
     /// When true (the default), requests that target a route introduced in a specific Gotenberg
     /// release are checked against the running service before being sent, throwing
     /// <see cref="GotenbergVersionNotSupportedException" /> instead of letting Gotenberg answer with
-    /// an opaque 404. The version is fetched once per client instance and cached.
+    /// an opaque 404. The version is fetched once per service address and cached; see
+    /// <see cref="GetGotenbergVersionAsync" />.
     /// </summary>
     /// <remarks>
     /// Releases predating the <c>/version</c> route report no version at all. Those are older than
@@ -90,6 +102,27 @@ public class GotenbergSharpClient
     /// skip the check entirely — for instance when a proxy hides <c>/version</c> from the client.
     /// </remarks>
     public bool EnforceMinimumVersion { get; set; } = true;
+
+    /// <summary>
+    /// The Gotenberg API requests are rendered for. With <see cref="GotenbergApiVersion.Auto" /> (the
+    /// default) the client reads the version of the service (see <see cref="GetGotenbergVersionAsync" />)
+    /// and uses the API of its major release. <see cref="GotenbergApiVersion.V8" /> (Gotenberg 7 and 8)
+    /// and <see cref="GotenbergApiVersion.V9" /> skip that lookup, for instance when a proxy hides
+    /// <c>/version</c> from the client. Set from <see cref="GotenbergSharpClientOptions.ApiVersion" />
+    /// when the client comes from <c>AddGotenbergSharpClient()</c>.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is not a member of <see cref="GotenbergApiVersion" />.</exception>
+    public GotenbergApiVersion ApiVersion
+    {
+        get => this._apiVersion;
+        set
+        {
+            if (!Enum.IsDefined(typeof(GotenbergApiVersion), value))
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Use Auto, V8 or V9.");
+
+            this._apiVersion = value;
+        }
+    }
 
     /// <summary>
     /// Converts a remote URL to PDF using Gotenberg's Chromium module.
@@ -352,6 +385,12 @@ public class GotenbergSharpClient
     /// <summary>
     /// Reads metadata from PDF files. Returns JSON string keyed by filename.
     /// </summary>
+    /// <remarks>
+    /// The JSON is returned as Gotenberg wrote it, so its shape depends on the service: ExifTool tags
+    /// (<c>Author</c>, <c>PDFVersion</c>, ...) on Gotenberg 7 and 8, eight camelCase fields (<c>title</c>,
+    /// <c>author</c>, <c>subject</c>, <c>keywords</c>, <c>creator</c>, <c>producer</c>, <c>creationDate</c>,
+    /// <c>modDate</c>, those the document has) on Gotenberg 9.
+    /// </remarks>
     public virtual async Task<string> ReadPdfMetadataAsync(
         PdfEngineBuilder<ReadMetadataRequest> builder,
         CancellationToken cancelToken = default)
@@ -410,7 +449,10 @@ public class GotenbergSharpClient
     /// Use <see cref="ReadPdfBookmarksAsync(PdfEngineBuilder{ReadBookmarksRequest},CancellationToken)" />
     /// for a deserialized outline.
     /// </summary>
-    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <remarks>
+    /// Requires Gotenberg 8.28.0 or newer. The JSON is not translated: a bookmark names its page
+    /// <c>page</c> on Gotenberg 8 and <c>pageNumber</c> on Gotenberg 9.
+    /// </remarks>
     /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
     public virtual async Task<string> ReadPdfBookmarksJsonAsync(
         PdfEngineBuilder<ReadBookmarksRequest> builder,
@@ -425,19 +467,27 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    /// Gets the version of the running Gotenberg service, parsed and cached for the lifetime of this
-    /// client. Returns <see cref="GotenbergVersion.Unknown" /> when the service does not expose the
-    /// <c>/version</c> route or reports something unparsable.
+    /// Gets the version of the running Gotenberg service, parsed and cached for its address. Returns
+    /// <see cref="GotenbergVersion.Unknown" /> when the service does not expose the <c>/version</c>
+    /// route or reports something unparsable.
     /// </summary>
+    /// <remarks>
+    /// The clients created by <c>AddGotenbergSharpClient()</c> share the cache of their service
+    /// provider; a client constructed directly has its own. When a response reports, in its
+    /// <c>Gotenberg-Version</c> header, a major release other than the cached one, the cached version
+    /// is replaced, so that a service upgraded while the application runs is noticed on the next request.
+    /// </remarks>
     public virtual async Task<GotenbergVersion> GetGotenbergVersionAsync(CancellationToken token = default)
     {
-        if (this._cachedVersion != null) return this._cachedVersion;
+        var entry = this.VersionCacheEntry;
 
-        await this._versionLock.WaitAsync(token).ConfigureAwait(false);
+        if (entry.Version is { } cached) return cached;
+
+        await entry.Lock.WaitAsync(token).ConfigureAwait(false);
 
         try
         {
-            if (this._cachedVersion != null) return this._cachedVersion;
+            if (entry.Version is { } read) return read;
 
             string? reported;
 
@@ -453,22 +503,43 @@ public class GotenbergSharpClient
                 reported = null;
             }
 
-            this._cachedVersion = GotenbergVersion.TryParse(reported, out var version)
+            var parsed = GotenbergVersion.TryParse(reported, out var version)
                 ? version!
                 : GotenbergVersion.Unknown;
 
-            return this._cachedVersion;
+            entry.Version = parsed;
+
+            return parsed;
         }
         finally
         {
-            this._versionLock.Release();
+            entry.Lock.Release();
         }
     }
 
     /// <summary>
-    /// Determines whether the running Gotenberg is new enough to serve <paramref name="request" />,
-    /// without sending it. Requests that target routes present in every supported release are
-    /// always supported.
+    /// Gets the Gotenberg API requests are rendered for: <see cref="ApiVersion" /> when it is set to
+    /// <see cref="GotenbergApiVersion.V8" /> or <see cref="GotenbergApiVersion.V9" />, without any
+    /// request; otherwise the API of the major release <see cref="GetGotenbergVersionAsync" /> reports.
+    /// A service that does not report its version is older than the <c>/version</c> route and gets
+    /// <see cref="GotenbergApiVersion.V8" />.
+    /// </summary>
+    /// <exception cref="GotenbergApiException">Thrown when reading the version fails for another reason than a missing route.</exception>
+    public virtual async Task<GotenbergApiVersion> GetApiVersionAsync(CancellationToken cancelToken = default)
+    {
+        if (this.ApiVersion != GotenbergApiVersion.Auto) return this.ApiVersion;
+
+        var running = await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false);
+
+        return running.IsKnown && running.Major >= 9 ? GotenbergApiVersion.V9 : GotenbergApiVersion.V8;
+    }
+
+    /// <summary>
+    /// Determines whether the running Gotenberg can serve <paramref name="request" />, without sending
+    /// it: the service is new enough for its route, and the Gotenberg API it is rendered for (see
+    /// <see cref="GetApiVersionAsync" />) has an equivalent for each of its options. Requests that
+    /// target routes present in every supported release and use no option a release removed are
+    /// always supported, without reading the version.
     /// </summary>
     public virtual async Task<bool> SupportsAsync(
         BuildRequestBase request,
@@ -478,18 +549,19 @@ public class GotenbergSharpClient
 
         var requirement = request.Requires;
 
-        if (requirement == null) return true;
+        if (requirement != null
+            && !requirement.IsSatisfiedBy(await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false)))
+            return false;
 
-        var running = await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false);
-
-        return requirement.IsSatisfiedBy(running);
+        return await this.FindUnsupportedOptionAsync(request, cancelToken).ConfigureAwait(false) == null;
     }
 
     /// <summary>
     /// Throws <see cref="GotenbergVersionNotSupportedException" /> when the running Gotenberg is
-    /// older than the release that introduced the route <paramref name="request" /> targets.
+    /// older than the release that introduced the route <paramref name="request" /> targets, or when
+    /// the Gotenberg API it is rendered for has no equivalent for one of its options.
     /// </summary>
-    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old, or has no equivalent for an option of the request.</exception>
     public virtual async Task EnsureSupportedAsync(
         BuildRequestBase request,
         CancellationToken cancelToken = default)
@@ -497,6 +569,54 @@ public class GotenbergSharpClient
         if (request == null) throw new ArgumentNullException(nameof(request));
 
         await this.EnsureSupportedAsync(request.Requires, cancelToken).ConfigureAwait(false);
+
+        var unsupported = await this.FindUnsupportedOptionAsync(request, cancelToken).ConfigureAwait(false);
+
+        if (unsupported != null) throw unsupported;
+    }
+
+    /// <summary>
+    /// The exception for the first option of <paramref name="request" /> that the API of the service
+    /// has no equivalent for, or null. The API is only resolved for a request that uses such an
+    /// option on some API, such as a watermark (none on Gotenberg 9) or explicit stages (none on
+    /// Gotenberg 7 and 8), so that other requests never cause a version lookup here.
+    /// </summary>
+    private async Task<GotenbergVersionNotSupportedException?> FindUnsupportedOptionAsync(
+        BuildRequestBase request,
+        CancellationToken cancelToken)
+    {
+        if (request.FindUnsupportedOn(GotenbergApiVersion.V8, GotenbergVersion.Unknown) == null
+            && request.FindUnsupportedOn(GotenbergApiVersion.V9, GotenbergVersion.Unknown) == null)
+            return null;
+
+        var (api, running) = await this.ResolveRenderingAsync(cancelToken).ConfigureAwait(false);
+
+        return request.FindUnsupportedOn(api, running);
+    }
+
+    private async Task<HttpRequestMessage> RenderAsync(IVersionedApiRequest request, CancellationToken cancelToken)
+    {
+        var (api, running) = await this.ResolveRenderingAsync(cancelToken).ConfigureAwait(false);
+
+        return request.ToApiRequestMessage(api, running);
+    }
+
+    /// <summary>
+    /// The API requests are rendered for, and the version of the service to report when one of its
+    /// options has no equivalent there: <see cref="GotenbergVersion.Unknown" /> when
+    /// <see cref="ApiVersion" /> is set explicitly, which skips the lookup.
+    /// </summary>
+    private async Task<(GotenbergApiVersion Api, GotenbergVersion Running)> ResolveRenderingAsync(
+        CancellationToken cancelToken)
+    {
+        var api = await this.GetApiVersionAsync(cancelToken).ConfigureAwait(false);
+
+        // With Auto, GetApiVersionAsync has just read the version into the cache.
+        var running = this.ApiVersion == GotenbergApiVersion.Auto
+            ? await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false)
+            : GotenbergVersion.Unknown;
+
+        return (api, running);
     }
 
     /// <summary>
@@ -637,11 +757,16 @@ public class GotenbergSharpClient
         await this.EnsureSupportedAsync((request as IRequireGotenbergVersion)?.Requires, cancelToken)
             .ConfigureAwait(false);
 
-        using var message = request.ToApiRequestMessage();
+        // The version lookup is a plain request, so resolving the API here never re-enters itself.
+        using var message = request is IVersionedApiRequest versioned
+            ? await this.RenderAsync(versioned, cancelToken).ConfigureAwait(false)
+            : request.ToApiRequestMessage();
 
         var response = await this.HttpClient
             .SendAsync(message, option, cancelToken)
             .ConfigureAwait(false);
+
+        this.RefreshCachedVersion(response);
 
         cancelToken.ThrowIfCancellationRequested();
 
@@ -668,6 +793,21 @@ public class GotenbergSharpClient
         if (requirement.IsSatisfiedBy(running)) return;
 
         throw GotenbergVersionNotSupportedException.Create(requirement, running);
+    }
+
+    private GotenbergVersionCache.Entry VersionCacheEntry => this._versionCache.For(this.HttpClient.BaseAddress!);
+
+    /// <summary>
+    ///     Both Gotenberg majors report their version on every response, failed ones included.
+    /// </summary>
+    private void RefreshCachedVersion(HttpResponseMessage response)
+    {
+        if (this.HttpClient.BaseAddress == null
+            || !response.Headers.TryGetValues(Constants.Gotenberg.All.VersionHeader, out var values)
+            || !GotenbergVersion.TryParse(values.FirstOrDefault(), out var reported))
+            return;
+
+        this.VersionCacheEntry.Refresh(reported!);
     }
 
     private async Task<string> ReadResponseAsStringAsync(

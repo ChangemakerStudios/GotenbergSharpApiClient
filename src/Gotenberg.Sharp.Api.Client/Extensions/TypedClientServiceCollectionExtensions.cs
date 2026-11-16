@@ -208,9 +208,18 @@ public static class TypedClientServiceCollectionExtensions
         services.TryAddEnumerable(
             ServiceDescriptor.Singleton<IValidateOptions<TOptions>, GotenbergSharpClientOptionsValidator<TOptions>>());
 
+        // The typed client is transient: one cache per service provider keeps the version lookup
+        // to one per service address instead of one per client.
+        services.TryAddSingleton<GotenbergVersionCache>();
+
         var builder = services
             .AddHttpClient(nameof(GotenbergSharpClient), configureClient)
-            .AddTypedClient<GotenbergSharpClient>()
+            .AddTypedClient((httpClient, sp) => new GotenbergSharpClient(
+                httpClient,
+                sp.GetRequiredService<GotenbergVersionCache>())
+            {
+                ApiVersion = sp.GetRequiredService<IOptions<TOptions>>().Value.ApiVersion
+            })
             .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(
                 new HttpClientHandler
                 {

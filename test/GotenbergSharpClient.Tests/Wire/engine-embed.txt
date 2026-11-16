@@ -1,0 +1,12 @@
+POST forms/pdfengines/embed
+part name=embedsMetadata type=application/json
+    {
+      "data.xml": {
+        "MimeType": "application/xml",
+        "Relationship": "Data"
+      }
+    }
+part name=embeds filename=data.xml type=application/xml
+    <x/>
+part name=files filename=in.pdf type=application/pdf
+    %PDF-1.4 fake

@@ -47,8 +47,12 @@ static async Task CreateFromUrl(string headerPath, string footerPath, GotenbergS
         {
             b.AddWebhook(hook =>
             {
+                // Gotenberg 7 and 8 report an error to the error URL. Gotenberg 9 has no error URL and
+                // requires the events URL, which receives a JSON webhook.error (or webhook.success) event.
+                // Setting both runs the example on every release.
                 hook.SetUrl("http://host.docker.internal:5000/api/WebhookReceiver")
                     .SetErrorUrl("http://host.docker.internal:5000/api/WebhookReceiver")
+                    .SetEventsUrl("http://host.docker.internal:5000/api/WebhookReceiver/events")
                     .AddExtraHeader("custom-header", "value");
             }).SetPageRanges("1-2");
         })

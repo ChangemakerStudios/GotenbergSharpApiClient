@@ -14,6 +14,8 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -26,6 +28,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 public sealed class WriteBookmarksRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.WriteBookmarks;
+
+    protected override string GetApiPath(GotenbergApiVersion api) =>
+        api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
 
     /// <summary>
     /// The outline to write, either shared across every uploaded PDF or keyed by file name.
@@ -42,22 +47,36 @@ public sealed class WriteBookmarksRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    // Gotenberg 9 takes one outline for every PDF of a request, as a stage.
+    internal override void AddRouteStages(StageList stages) => stages.RouteBookmarks = this.Bookmarks?.ForAllFiles;
+
+    internal override GotenbergVersionNotSupportedException? FindRouteRemoved(
+        Func<string, string, GotenbergVersionNotSupportedException> removed) =>
+        this.Bookmarks?.IsPerFile == true
+            ? removed(
+                "Writing a different outline to each PDF (a BookmarkSet keyed by file name)",
+                "Gotenberg 9 takes one outline for all the PDFs of a request: send one request per file.")
+            : null;
+
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        var bookmarksContent = new StringContent(this.Bookmarks!.ToJson());
+        if (api == GotenbergApiVersion.V8)
+        {
+            var bookmarksContent = new StringContent(this.Bookmarks!.ToJson());
 
-        bookmarksContent.Headers.ContentType =
-            new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
+            bookmarksContent.Headers.ContentType =
+                new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
 
-        bookmarksContent.Headers.ContentDisposition =
-            new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-            {
-                Name = Constants.Gotenberg.PdfEngines.FormFieldNames.Bookmarks
-            };
+            bookmarksContent.Headers.ContentDisposition =
+                new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                {
+                    Name = Constants.Gotenberg.PdfEngines.FormFieldNames.Bookmarks
+                };
 
-        yield return bookmarksContent;
+            yield return bookmarksContent;
+        }
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

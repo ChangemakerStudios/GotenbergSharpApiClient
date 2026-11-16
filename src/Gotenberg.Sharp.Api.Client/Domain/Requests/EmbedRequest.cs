@@ -1,8 +1,10 @@
 using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using Newtonsoft.Json.Linq;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -16,7 +18,22 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         /// <inheritdoc />
         protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.Embed;
 
+        /// <inheritdoc />
+        protected override string GetApiPath(GotenbergApiVersion api) =>
+            api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
+
+        // Gotenberg 9 attaches each file with a stage that names the uploaded file.
+        internal override void AddRouteStages(StageList stages)
+        {
+            foreach (var kvp in this.EmbedsData.IfNullEmpty())
+                stages.Attach(kvp.Key, kvp.Value.MimeType, kvp.Value.Relationship);
+        }
+
         public IDictionary<string, Entry>? EmbedsData { get; set; }
+
+        // On Gotenberg 9 each embedded file is uploaded under 'files', where its attach stage names it.
+        internal override IEnumerable<(string FileName, string ParamName)> StageFiles() =>
+            base.StageFiles().Concat(this.EmbedsData.IfNullEmpty().Select(kvp => (kvp.Key, nameof(this.EmbedsData))));
 
         /// <inheritdoc />
         protected override void Validate()
@@ -28,8 +45,19 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<HttpContent> ToHttpContent()
+        protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
         {
+            if (api == GotenbergApiVersion.V9)
+            {
+                foreach (var kvp in this.EmbedsData!)
+                    yield return this.ToFilePart(kvp, Constants.Gotenberg.SharedFormFieldNames.Files);
+
+                foreach (var content in base.ToHttpContent(api))
+                    yield return content;
+
+                yield break;
+            }
+
             var metadataObject = new JObject();
             foreach (var kvp in EmbedsData!)
             {
@@ -44,34 +72,37 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
             metadataContent.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
             {
-                Name = "embedsMetadata",
+                Name = Constants.Gotenberg.PdfEngines.FormFieldNames.EmbedsMetadata,
             };
             metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
             
             yield return metadataContent;
 
             foreach (var kvp in EmbedsData)
-            {
-                var contentItem = kvp.Value.Content.ToHttpContentItem();
-                
-                contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-                {
-                    Name = "embeds",
-                    FileName = kvp.Key,
-                };
-                
-                if (!string.IsNullOrEmpty(kvp.Value.MimeType))
-                {
-                    contentItem.Headers.ContentType = new MediaTypeHeaderValue(kvp.Value.MimeType);
-                }
+                yield return this.ToFilePart(kvp, Constants.Gotenberg.PdfEngines.FormFieldNames.Embeds);
 
-                yield return contentItem;
-            }
-
-            foreach (var content in base.ToHttpContent())
+            foreach (var content in base.ToHttpContent(api))
             {
                 yield return content;
             }
+        }
+
+        private HttpContent ToFilePart(KeyValuePair<string, Entry> entry, string fieldName)
+        {
+            var contentItem = entry.Value.Content.ToHttpContentItem();
+
+            contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+            {
+                Name = fieldName,
+                FileName = entry.Key,
+            };
+
+            if (!string.IsNullOrEmpty(entry.Value.MimeType))
+            {
+                contentItem.Headers.ContentType = new MediaTypeHeaderValue(entry.Value.MimeType);
+            }
+
+            return contentItem;
         }
     }
 }

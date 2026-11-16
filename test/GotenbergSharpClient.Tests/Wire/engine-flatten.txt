@@ -1,0 +1,3 @@
+POST forms/pdfengines/flatten
+part name=files filename=in.pdf type=application/pdf
+    %PDF-1.4 fake

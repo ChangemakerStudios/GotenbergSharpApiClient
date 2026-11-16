@@ -1,6 +1,6 @@
 # GotenbergSharpApiClient
 
-.NET C# client for [Gotenberg](https://gotenberg.dev/) — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF.
+.NET C# client for [Gotenberg](https://gotenberg.dev/) — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. It works with Gotenberg 7, 8 and 9: it reads the version of the service and sends each request in the form that version takes. See [Gotenberg 9](gotenberg-9.md) for what changes when you move to it.
 
 [![NuGet version](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client.svg)](https://badge.fury.io/nu/Gotenberg.Sharp.Api.Client)
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client)

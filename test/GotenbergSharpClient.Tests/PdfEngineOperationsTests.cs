@@ -220,6 +220,21 @@ public class PdfEngineOperationsTests
         json.Should().NotBeNullOrEmpty();
         var parsed = JObject.Parse(json);
         parsed.Should().NotBeEmpty();
+
+        var metadata = parsed["test.pdf"].Should().BeOfType<JObject>().Subject;
+
+        if (gotenberg.Version.Major >= 9)
+        {
+            // Eight camelCase fields of the document information, those the document has.
+            metadata.Should().ContainKey("producer");
+            metadata.Properties().Select(p => p.Name).Should().BeSubsetOf(
+                ["title", "author", "subject", "keywords", "creator", "producer", "creationDate", "modDate"]);
+        }
+        else
+        {
+            // ExifTool tags.
+            metadata.Should().ContainKey("PDFVersion");
+        }
     }
 
     [GotenbergTest(GotenbergVersions.Embed)]
@@ -318,6 +333,33 @@ public class PdfEngineOperationsTests
     }
 
     [GotenbergTest(GotenbergVersions.Bookmarks)]
+    public async Task ReadBookmarks_RawJsonNamesThePageAsTheVersionDoes(GotenbergServer gotenberg)
+    {
+        var client = await gotenberg.CreateClientAsync();
+        var pdfBytes = await GenerateMultiPageTestPdf(client);
+
+        await using var written = await client.ExecutePdfEngineAsync(
+            PdfEngineBuilders.WriteBookmarks(b => b.Add("Chapter", 2, c => c.Add("Section", 3)))
+                .WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
+
+        using var ms = new MemoryStream();
+        await written.CopyToAsync(ms);
+
+        var json = await client.ReadPdfBookmarksJsonAsync(
+            PdfEngineBuilders.ReadBookmarks().WithPdfs(a => a.AddItem("bookmarked.pdf", ms.ToArray())));
+
+        // Gotenberg 9 renamed the page of a bookmark, in its answers as in its requests.
+        var (name, other) = gotenberg.Version.Major >= 9 ? ("pageNumber", "page") : ("page", "pageNumber");
+
+        var chapter = (JObject)JObject.Parse(json)["bookmarked.pdf"]!.Single();
+
+        chapter["title"]!.Value<string>().Should().Be("Chapter");
+        chapter[name]!.Value<int>().Should().Be(2);
+        chapter.ContainsKey(other).Should().BeFalse();
+        chapter["children"]!.Single()[name]!.Value<int>().Should().Be(3);
+    }
+
+    [GotenbergTest(GotenbergVersions.Bookmarks, until: "9.0.0")] // 9 takes one outline for all the PDFs of a request
     public async Task WriteBookmarksPerFile_AppliesADistinctOutlineToEachPdf(GotenbergServer gotenberg)
     {
         var client = await gotenberg.CreateClientAsync();

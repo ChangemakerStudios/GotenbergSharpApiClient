@@ -5,7 +5,7 @@
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/) for running Gotenberg
+- [Docker](https://www.docker.com/) for running Gotenberg 7, 8 or 9. The client reads the version of the service and sends each request in the form that version takes; see [Gotenberg 9](gotenberg-9.md)
 - [.NET 8.0+](https://dotnet.microsoft.com/), or any runtime that supports .NET Standard 2.0 or 2.1 (the package also targets .NET 9 and 10)
 
 ## Running Gotenberg
@@ -13,8 +13,8 @@
 ### Docker Run
 
 ```bash
-docker pull gotenberg/gotenberg:8
-docker run --name gotenberg --rm -p 3000:3000 gotenberg/gotenberg:8 gotenberg --api-timeout=1800s --log-level=debug
+docker pull gotenberg/gotenberg:9
+docker run --name gotenberg --rm -p 3000:3000 gotenberg/gotenberg:9 gotenberg --api-timeout=1800s --log-level=debug
 ```
 
 ### Docker Compose (with Basic Auth)

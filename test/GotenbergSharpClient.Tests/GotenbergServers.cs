@@ -13,25 +13,34 @@ namespace GotenbergSharpClient.Tests;
 [SetUpFixture]
 public sealed class GotenbergServers
 {
-    // Add "9" once the client supports Gotenberg 9.
-    private const string SupportedVersions = "7,8";
+    private const string SupportedVersions = "7,8,9";
 
     public static IReadOnlyList<GotenbergServer> All { get; } = Create();
 
-    public static IEnumerable<TestCaseData> TestCases(string? since)
+    public static IEnumerable<TestCaseData> TestCases(string? since, string? until = null)
     {
-        var floor = since == null ? null : Version.Parse(since);
-
         foreach (var server in All)
         {
             var testCase = new TestCaseData(server)
                 .SetArgDisplayNames(server.Name)
                 .SetCategory("Integration");
 
-            if (floor != null && server.Version < floor) testCase.Ignore($"Needs Gotenberg {since} or later");
+            var reason = IgnoreReason(server.Version, since, until);
+            if (reason != null) testCase.Ignore(reason);
 
             yield return testCase;
         }
+    }
+
+    /// <summary>
+    /// Why a server of <paramref name="version"/> is outside <c>[since, until)</c>, or null when it is inside.
+    /// </summary>
+    public static string? IgnoreReason(Version version, string? since, string? until)
+    {
+        if (since != null && version < Version.Parse(since)) return $"Needs Gotenberg {since} or later";
+        if (until != null && version >= Version.Parse(until)) return $"Removed in Gotenberg {until}";
+
+        return null;
     }
 
     [OneTimeTearDown]

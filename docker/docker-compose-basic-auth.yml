@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   gotenberg:
-    image: gotenberg/gotenberg:8
+    image: gotenberg/gotenberg:9
     ports:
       - "3000:3000"
     environment:
