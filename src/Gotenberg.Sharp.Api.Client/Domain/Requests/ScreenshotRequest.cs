@@ -29,7 +29,10 @@ public abstract class ScreenshotRequest : BuildRequestBase
 
     public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
-    // Config.PageRanges (nativePageRanges) is deliberately not sent: no screenshot route has that field.
+    internal override bool AppliesPostProcessing => false;
+
+    // Config.PageRanges (nativePageRanges) and the cross-cutting options are deliberately not sent:
+    // no screenshot route has those fields.
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         return this.ScreenshotProperties.IfNullEmptyContent(api)

@@ -290,7 +290,7 @@ public class GotenbergVersionTests
     /// tell "rejected up front" apart from "sent anyway". Only the version lookup is stubbed at the
     /// client level — everything else runs the real send path down to the message handler.
     /// </summary>
-    private sealed class StubVersionClient : Gotenberg.Sharp.API.Client.GotenbergSharpClient
+    internal sealed class StubVersionClient : Gotenberg.Sharp.API.Client.GotenbergSharpClient
     {
         private readonly ThrowingHandler _handler;
 

@@ -49,12 +49,18 @@ internal sealed class PostApiRequestImpl
     /// <summary>
     /// Builds the message for Gotenberg 7 and 8.
     /// </summary>
-    public HttpRequestMessage ToApiRequestMessage() => this.ToApiRequestMessage(GotenbergApiVersion.V8);
+    public HttpRequestMessage ToApiRequestMessage() =>
+        this.ToApiRequestMessage(GotenbergApiVersion.V8, GotenbergVersion.Unknown);
 
-    public HttpRequestMessage ToApiRequestMessage(GotenbergApiVersion api)
+    public HttpRequestMessage ToApiRequestMessage(GotenbergApiVersion api, GotenbergVersion runningVersion)
     {
         if (api is not (GotenbergApiVersion.V8 or GotenbergApiVersion.V9))
             throw new ArgumentOutOfRangeException(nameof(api), api, "A request is rendered for V8 or V9; resolve Auto first.");
+
+        // Checked here, where the version of the service is known, rather than when the parts are rendered.
+        var unsupported = this._request.FindUnsupportedOn(api, runningVersion);
+
+        if (unsupported != null) throw unsupported;
 
         var formContent = new MultipartFormDataContent($"{BoundaryPrefix}{DateTime.Now.Ticks}");
 

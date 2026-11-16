@@ -526,9 +526,11 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    /// Determines whether the running Gotenberg is new enough to serve <paramref name="request" />,
-    /// without sending it. Requests that target routes present in every supported release are
-    /// always supported.
+    /// Determines whether the running Gotenberg can serve <paramref name="request" />, without sending
+    /// it: the service is new enough for its route, and the Gotenberg API it is rendered for (see
+    /// <see cref="GetApiVersionAsync" />) has an equivalent for each of its options. Requests that
+    /// target routes present in every supported release and use no option a release removed are
+    /// always supported, without reading the version.
     /// </summary>
     public virtual async Task<bool> SupportsAsync(
         BuildRequestBase request,
@@ -538,18 +540,19 @@ public class GotenbergSharpClient
 
         var requirement = request.Requires;
 
-        if (requirement == null) return true;
+        if (requirement != null
+            && !requirement.IsSatisfiedBy(await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false)))
+            return false;
 
-        var running = await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false);
-
-        return requirement.IsSatisfiedBy(running);
+        return await this.FindUnsupportedOptionAsync(request, cancelToken).ConfigureAwait(false) == null;
     }
 
     /// <summary>
     /// Throws <see cref="GotenbergVersionNotSupportedException" /> when the running Gotenberg is
-    /// older than the release that introduced the route <paramref name="request" /> targets.
+    /// older than the release that introduced the route <paramref name="request" /> targets, or when
+    /// the Gotenberg API it is rendered for has no equivalent for one of its options.
     /// </summary>
-    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old, or has no equivalent for an option of the request.</exception>
     public virtual async Task EnsureSupportedAsync(
         BuildRequestBase request,
         CancellationToken cancelToken = default)
@@ -557,6 +560,51 @@ public class GotenbergSharpClient
         if (request == null) throw new ArgumentNullException(nameof(request));
 
         await this.EnsureSupportedAsync(request.Requires, cancelToken).ConfigureAwait(false);
+
+        var unsupported = await this.FindUnsupportedOptionAsync(request, cancelToken).ConfigureAwait(false);
+
+        if (unsupported != null) throw unsupported;
+    }
+
+    /// <summary>
+    /// The exception for the first option of <paramref name="request" /> that the API of the service
+    /// has no equivalent for, or null. The API is only resolved for a request that uses such an
+    /// option on some API, so that other requests never cause a version lookup here.
+    /// </summary>
+    private async Task<GotenbergVersionNotSupportedException?> FindUnsupportedOptionAsync(
+        BuildRequestBase request,
+        CancellationToken cancelToken)
+    {
+        if (request.FindUnsupportedOn(GotenbergApiVersion.V9, GotenbergVersion.Unknown) == null) return null;
+
+        var (api, running) = await this.ResolveRenderingAsync(cancelToken).ConfigureAwait(false);
+
+        return request.FindUnsupportedOn(api, running);
+    }
+
+    private async Task<HttpRequestMessage> RenderAsync(IVersionedApiRequest request, CancellationToken cancelToken)
+    {
+        var (api, running) = await this.ResolveRenderingAsync(cancelToken).ConfigureAwait(false);
+
+        return request.ToApiRequestMessage(api, running);
+    }
+
+    /// <summary>
+    /// The API requests are rendered for, and the version of the service to report when one of its
+    /// options has no equivalent there: <see cref="GotenbergVersion.Unknown" /> when
+    /// <see cref="ApiVersion" /> is set explicitly, which skips the lookup.
+    /// </summary>
+    private async Task<(GotenbergApiVersion Api, GotenbergVersion Running)> ResolveRenderingAsync(
+        CancellationToken cancelToken)
+    {
+        var api = await this.GetApiVersionAsync(cancelToken).ConfigureAwait(false);
+
+        // With Auto, GetApiVersionAsync has just read the version into the cache.
+        var running = this.ApiVersion == GotenbergApiVersion.Auto
+            ? await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false)
+            : GotenbergVersion.Unknown;
+
+        return (api, running);
     }
 
     /// <summary>
@@ -699,7 +747,7 @@ public class GotenbergSharpClient
 
         // The version lookup is a plain request, so resolving the API here never re-enters itself.
         using var message = request is IVersionedApiRequest versioned
-            ? versioned.ToApiRequestMessage(await this.GetApiVersionAsync(cancelToken).ConfigureAwait(false))
+            ? await this.RenderAsync(versioned, cancelToken).ConfigureAwait(false)
             : request.ToApiRequestMessage();
 
         var response = await this.HttpClient

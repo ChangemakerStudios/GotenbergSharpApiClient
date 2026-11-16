@@ -208,7 +208,8 @@ public class Gotenberg9RenameTests
         var v8 = request.RenderFor(GotenbergApiVersion.V8).PartNames.ToList();
         var v9 = request.RenderFor(GotenbergApiVersion.V9).PartNames.ToList();
 
-        v9.Should().Equal(v8);
+        // The merge field of 8 is the first stage on 9, sent where the cross-cutting options go.
+        v9.Should().Equal(v8.Where(name => name != "merge").Append("stages"));
     }
 
     [Test]

@@ -89,7 +89,18 @@ public class WireCharacterisationTests
             .WithPageProperties(p => p.UseChromeDefaults())
             .Build());
 
-        yield return ("url", () => UrlRequest().SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A3b)).Build());
+        yield return ("url", () => new UrlRequestBuilder()
+            .SetUrl("https://example.com/page")
+            .AddHeaderFooter(h => h
+                .SetHeader("<html><body>header</body></html>")
+                .SetFooter("<html><body>footer</body></html>"))
+            .AddExtraResources(r => r
+                .AddLinkTag("https://example.com/style.css")
+                .AddScriptTag("https://example.com/app.js"))
+            .WithPageProperties(p => p.SetPaperSize(PaperSizes.Letter).SetMarginTop(Dimension.FromInches(1)).SetSinglePage())
+            .SetConversionBehaviors(b => b.SetBrowserWaitExpression("window.ready === true"))
+            .SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A3b))
+            .Build());
 
         yield return ("screenshot-html", () => new ScreenshotHtmlRequestBuilder()
             .AddDocument(d => d.SetBody("<html><body>shot</body></html>"))
@@ -211,48 +222,52 @@ public class WireCharacterisationTests
             .Build());
     }
 
-    // The "url" request of the V8 snapshot carries a PDF/A format, a cross-cutting option that Gotenberg 9
-    // takes as a stage: its V9 snapshot is of the same request without it.
-    private static UrlRequestBuilder UrlRequest() => new UrlRequestBuilder()
-        .SetUrl("https://example.com/page")
-        .AddHeaderFooter(h => h
-            .SetHeader("<html><body>header</body></html>")
-            .SetFooter("<html><body>footer</body></html>"))
-        .AddExtraResources(r => r
-            .AddLinkTag("https://example.com/style.css")
-            .AddScriptTag("https://example.com/app.js"))
-        .WithPageProperties(p => p.SetPaperSize(PaperSizes.Letter).SetMarginTop(Dimension.FromInches(1)).SetSinglePage())
-        .SetConversionBehaviors(b => b.SetBrowserWaitExpression("window.ready === true"));
+    /// <summary>
+    /// The requests whose V9 snapshot is of a variant of the V8 case: the V8 "cross-cutting" request
+    /// sets a watermark and encrypts a PDF/A document, which Gotenberg 9 refuses, and has a webhook,
+    /// whose headers differ on 9 (a later step).
+    /// </summary>
+    private static readonly Dictionary<string, Func<BuildRequestBase>> V9Variants = new()
+    {
+        ["cross-cutting"] = () => new HtmlRequestBuilder()
+            .AddDocument(d => d.SetBody("<html><body>body</body></html>"))
+            .SetPdfOutputOptions(o => o
+                .SetPdfFormat(PdfFormat.A2b)
+                .SetPdfUa()
+                .SetFlatten()
+                .SetGenerateTaggedPdf()
+                .SetMetadata(new Dictionary<string, object> { { "Title", "T" }, { "CreateDate", "2006:09:18 16:27:50" } }))
+            .SetRotationOptions(r => r.SetAngle(180).SetPages("1"))
+            .SetSplitOptions(s => s.SplitByIntervals("2"))
+            .SetStampOptions(s => s.SetTextStamp("STAMP", "1"))
+            .ConfigureRequest(c => c.SetPageRanges("1-3").SetResultFileName("result.pdf").SetTrace("trace-42"))
+            .Build()
+    };
 
     /// <summary>
-    /// The requests whose rendering for Gotenberg 9 is complete: none of them carries a cross-cutting
-    /// option, so renames and value formats are all that differs from 8. Snapshots in <c>Wire/V9/</c>.
+    /// The requests whose rendering for Gotenberg 9 is complete: renamed fields, value formats and the
+    /// cross-cutting options as stages. Snapshots in <c>Wire/V9/</c>.
     /// </summary>
     private static readonly string[] CompleteForV9 =
-        ["html", "markdown", "url", "screenshot-html", "screenshot-url"];
+        ["html", "markdown", "url", "screenshot-html", "screenshot-url", "office-merge", "cross-cutting"];
 
     /// <summary>
-    /// The requests that still render for Gotenberg 9 as they do for 8, because they send fields that
-    /// 9 moved into stages or routes it does not have. Each step of the Gotenberg 9 support moves the
-    /// requests it completes from here to <see cref="CompleteForV9" /> with a snapshot in <c>Wire/V9/</c>.
+    /// The requests that still render for Gotenberg 9 as they do for 8, because they target routes
+    /// Gotenberg 9 does not have. Each step of the Gotenberg 9 support moves the requests it completes
+    /// from here to <see cref="CompleteForV9" /> with a snapshot in <c>Wire/V9/</c>.
     /// </summary>
     private static readonly string[] PendingForV9 =
     [
-        "office-merge", "pdf-merge", "pdf-convert",
+        "pdf-merge", "pdf-convert",
         "engine-flatten", "engine-rotate", "engine-split", "engine-encrypt", "engine-read-metadata",
         "engine-write-metadata", "engine-read-bookmarks", "engine-write-bookmarks",
-        "engine-write-bookmarks-per-file", "engine-embed",
-        "cross-cutting", "engine-cross-cutting"
+        "engine-write-bookmarks-per-file", "engine-embed", "engine-cross-cutting"
     ];
 
     public static IEnumerable<TestCaseData> V9Requests()
     {
         foreach (var (name, build) in Cases().Where(c => CompleteForV9.Contains(c.Name)))
-        {
-            Func<BuildRequestBase> forV9 = name == "url" ? () => UrlRequest().Build() : build;
-
-            yield return new TestCaseData(name, forV9).SetArgDisplayNames(name);
-        }
+            yield return new TestCaseData(name, V9Variants.GetValueOrDefault(name, build)).SetArgDisplayNames(name);
     }
 
     [Test]

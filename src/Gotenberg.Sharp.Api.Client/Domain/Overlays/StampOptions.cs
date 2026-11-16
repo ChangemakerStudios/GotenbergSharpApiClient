@@ -23,6 +23,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 /// Cross-cutting stamp options. Applies a foreground overlay to generated PDFs.
 /// Same structure as watermark but rendered in front of content.
 /// </summary>
+/// <remarks>
+/// On Gotenberg 9 a text stamp without <see cref="Options" /> is sent as a <c>stamp-text</c> stage
+/// with its text and pages only, so it is placed, sized and drawn with Gotenberg 9's defaults (from the
+/// bottom-left corner of the page), not where Gotenberg 8 drew it. A stamp with <see cref="Options" />,
+/// or whose source is an image or a PDF, throws <see cref="GotenbergVersionNotSupportedException" />
+/// before it is sent to Gotenberg 9.
+/// </remarks>
 public class StampOptions : FacetBase
 {
     [MultiFormHeader(Constants.Gotenberg.CrossCuttingOptions.StampSource)]

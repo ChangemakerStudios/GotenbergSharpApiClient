@@ -17,6 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -45,6 +46,11 @@ public class MergeOfficeRequest : PdfRequestBase
     /// </summary>
     public LibreOfficeOptions? LibreOfficeOptions { get; set; }
 
+    internal override bool ReadsNativeTaggedPdf => true;
+
+    // Gotenberg 9 merges with a stage, which must come before those of the cross-cutting options.
+    internal override void AddRouteStages(StageList stages) => stages.Add(Constants.Gotenberg.Stages.Ops.Merge);
+
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty().ToList();
@@ -55,7 +61,8 @@ public class MergeOfficeRequest : PdfRequestBase
                     ", ",
                     MergeOfficeConstants.AllowedExtensions)}");
 
-        yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
+        if (api == GotenbergApiVersion.V8)
+            yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
 
         foreach (var item in validItems.ToHttpContent())
             yield return item;
@@ -69,7 +76,8 @@ public class MergeOfficeRequest : PdfRequestBase
             yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
 
         // Gotenberg reads only the first value of a repeated field, so the first one sent wins:
-        // the hard-coded merge over LibreOfficeOptions.Merge, Config.PageRanges over PageRanges.
+        // the hard-coded merge (a field on 8, a stage on 9) over LibreOfficeOptions.Merge,
+        // Config.PageRanges over PageRanges.
         var pageRangesField = api == GotenbergApiVersion.V9
             ? Constants.Gotenberg.LibreOffice.Gotenberg9.PageRanges
             : Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges;

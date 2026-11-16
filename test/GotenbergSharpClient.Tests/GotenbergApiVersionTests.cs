@@ -349,7 +349,7 @@ public class GotenbergApiVersionTests
     public void MigratedSubclass_RendersForEitherApi(GotenbergApiVersion api)
     {
         WithPdf(new MigratedRequest()).RenderFor(api)
-            .PartNames.Should().Equal("files", "pdfa", "custom");
+            .PartNames.Should().Equal("files", PostProcessingField(api), "custom");
     }
 
     [TestCase(GotenbergApiVersion.V8)]
@@ -357,8 +357,11 @@ public class GotenbergApiVersionTests
     public void SubclassOverridingBoth_RendersTheVersionedContent(GotenbergApiVersion api)
     {
         WithPdf(new BothOverridesRequest()).RenderFor(api)
-            .PartNames.Should().Equal("files", "pdfa", "versioned");
+            .PartNames.Should().Equal("files", PostProcessingField(api), "versioned");
     }
+
+    // The PDF/A format WithPdf sets: a flat field on 8, a stage on 9.
+    private static string PostProcessingField(GotenbergApiVersion api) => api == GotenbergApiVersion.V9 ? "stages" : "pdfa";
 
     private static T WithPdf<T>(T request) where T : BuildRequestBase
     {

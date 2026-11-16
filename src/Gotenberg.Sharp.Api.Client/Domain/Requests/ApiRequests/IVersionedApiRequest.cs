@@ -32,5 +32,12 @@ internal interface IVersionedApiRequest
     /// Builds the message with the path, headers and form parts of <paramref name="api" />, which
     /// must be <see cref="GotenbergApiVersion.V8" /> or <see cref="GotenbergApiVersion.V9" />.
     /// </summary>
-    HttpRequestMessage ToApiRequestMessage(GotenbergApiVersion api);
+    /// <param name="api">The API to render for.</param>
+    /// <param name="runningVersion">
+    /// The version the service reported, given to the <see cref="GotenbergVersionNotSupportedException" />
+    /// thrown when the request uses an option <paramref name="api" /> has no equivalent for;
+    /// <see cref="GotenbergVersion.Unknown" /> when the client did not read it.
+    /// </param>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown, before any part is produced, when the request uses an option <paramref name="api" /> has no equivalent for.</exception>
+    HttpRequestMessage ToApiRequestMessage(GotenbergApiVersion api, GotenbergVersion runningVersion);
 }

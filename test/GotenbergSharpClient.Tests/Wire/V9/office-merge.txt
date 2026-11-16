@@ -1,0 +1,29 @@
+POST forms/libreoffice/convert
+part name=files filename=A.docx type=application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    docx-one
+part name=files filename=B.xlsx type=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    xlsx-two
+part name=landscape type=text/plain
+    true
+part name=nativePages type=text/plain
+    1-2
+part name=singlePage type=text/html
+    True
+part name=nativeLosslessImageCompression type=text/html
+    True
+part name=nativeQuality type=text/html
+    90
+part name=nativeBookmarks type=text/html
+    True
+part name=nativeWatermarkText type=text/html
+    CONFIDENTIAL
+part name=nativeWatermarkColor type=text/html
+    #ff0000
+part name=nativeWatermarkFontSize type=text/html
+    20
+part name=nativeWatermarkRotation type=text/html
+    45
+part name=nativeWatermarkFont type=text/html
+    Arial
+part name=stages type=text/plain
+    [{"op":"merge"},{"op":"flatten-form"},{"op":"remediate","profile":["PDF/A-2b","PDF/UA-1"]}]

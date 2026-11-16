@@ -22,6 +22,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 /// <summary>
 /// Cross-cutting watermark options. Applies a background overlay to generated PDFs.
 /// </summary>
+/// <remarks>
+/// Gotenberg 9 draws over the page only: a request with a watermark source throws
+/// <see cref="GotenbergVersionNotSupportedException" /> before it is sent to Gotenberg 9.
+/// </remarks>
 public class WatermarkOptions : FacetBase
 {
     [MultiFormHeader(Constants.Gotenberg.CrossCuttingOptions.WatermarkSource)]

@@ -25,6 +25,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
+        internal override bool ReadsNativeTaggedPdf => true;
+
         protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api) =>
             base.ToHttpContent(api)
                 .Concat(Config.IfNullEmptyContent(api))

@@ -19,6 +19,7 @@ using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -87,15 +88,62 @@ public abstract class BuildRequestBase
 
     /// <summary>
     /// The form parts of this request for <paramref name="api" />: an override returns its own parts
-    /// together with <c>base.ToHttpContent(api)</c>. At this level, the cross-cutting options.
+    /// together with <c>base.ToHttpContent(api)</c>. At this level, the cross-cutting options: flat
+    /// fields on Gotenberg 7 and 8, one <c>stages</c> field on Gotenberg 9.
     /// </summary>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown for Gotenberg 9 when an option has no equivalent there, such as a watermark.</exception>
     protected virtual IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
+        if (api == GotenbergApiVersion.V9) return this.RenderGotenberg9PostProcessing();
+
         return this.PdfOutputOptions.IfNullEmptyContent()
             .Concat(this.RotationOptions.IfNullEmptyContent())
             .Concat(this.SplitOptions.IfNullEmptyContent())
             .Concat(this.WatermarkOptions.IfNullEmptyContent())
             .Concat(this.StampOptions.IfNullEmptyContent());
+    }
+
+    /// <summary>
+    /// Whether the route of this request applies the cross-cutting options. Screenshot routes do not:
+    /// Gotenberg 8 ignored the options there, and Gotenberg 9 refuses <c>stages</c>.
+    /// </summary>
+    internal virtual bool AppliesPostProcessing => true;
+
+    /// <summary>
+    /// Whether the Gotenberg 9 route of this request reads <c>nativeTaggedPdf</c>, the field that
+    /// replaced <c>generateTaggedPdf</c> on the Chromium convert and LibreOffice routes. Gotenberg 8
+    /// ignored <c>generateTaggedPdf</c> on the other routes, so they get nothing for it.
+    /// </summary>
+    internal virtual bool ReadsNativeTaggedPdf => false;
+
+    /// <summary>
+    /// Adds the stages the route of this request runs on Gotenberg 9 before those of the cross-cutting
+    /// options, such as the merge of a LibreOffice conversion, so that the request sends them all in
+    /// its one <c>stages</c> field. Nothing at this level.
+    /// </summary>
+    internal virtual void AddRouteStages(StageList stages)
+    {
+    }
+
+    /// <summary>
+    /// The exception the request would throw when rendered for <paramref name="api" /> because an
+    /// option has no equivalent there, or null; <paramref name="runningVersion" /> goes into it.
+    /// </summary>
+    internal GotenbergVersionNotSupportedException? FindUnsupportedOn(
+        GotenbergApiVersion api,
+        GotenbergVersion runningVersion) =>
+        api == GotenbergApiVersion.V9 ? StageList.FindRemoved(this, runningVersion) : null;
+
+    private IEnumerable<HttpContent> RenderGotenberg9PostProcessing()
+    {
+        // The client has checked FindUnsupportedOn with the version of the service before rendering,
+        // so a request rendered here without that check reports no running version.
+        var parts = StageList.For(this, GotenbergVersion.Unknown).ToHttpContent().ToList();
+
+        if (this.ReadsNativeTaggedPdf && this.PdfOutputOptions?.GenerateTaggedPdf is { } tagged)
+            parts.Add(CreateFormDataItem(tagged ? "true" : "false", Constants.Gotenberg.PdfOutput.NativeTaggedPdf));
+
+        return parts;
     }
 
     protected virtual void Validate()

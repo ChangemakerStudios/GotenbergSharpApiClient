@@ -118,11 +118,17 @@ public static class RequestRendering
     public static RenderedRequest Render(this BuildRequestBase request) => request.CreateApiRequest().Render();
 
     /// <summary>
-    /// Renders for <paramref name="api" /> the way the client does once it knows the API of the service.
+    /// Renders for <paramref name="api" /> the way the client does once it knows the API of the
+    /// service; an exception it throws reports <paramref name="runningVersion" />, unknown by default
+    /// as when the API is set explicitly.
     /// </summary>
-    public static RenderedRequest RenderFor(this IApiRequest request, GotenbergApiVersion api)
+    public static RenderedRequest RenderFor(
+        this IApiRequest request,
+        GotenbergApiVersion api,
+        GotenbergVersion? runningVersion = null)
     {
-        using var message = ((IVersionedApiRequest)request).ToApiRequestMessage(api);
+        using var message = ((IVersionedApiRequest)request)
+            .ToApiRequestMessage(api, runningVersion ?? GotenbergVersion.Unknown);
 
         return RenderedRequest.From(message);
     }
@@ -131,6 +137,9 @@ public static class RequestRendering
     /// Validates <paramref name="request" /> and renders it for <paramref name="api" /> the way the
     /// client does once it knows the API of the service.
     /// </summary>
-    public static RenderedRequest RenderFor(this BuildRequestBase request, GotenbergApiVersion api) =>
-        request.CreateApiRequest().RenderFor(api);
+    public static RenderedRequest RenderFor(
+        this BuildRequestBase request,
+        GotenbergApiVersion api,
+        GotenbergVersion? runningVersion = null) =>
+        request.CreateApiRequest().RenderFor(api, runningVersion);
 }

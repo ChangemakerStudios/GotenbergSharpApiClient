@@ -1,4 +1,6 @@
 POST forms/chromium/convert/url
+part name=stages type=text/plain
+    [{"op":"remediate","profile":"PDF/A-3b"}]
 part name=scale type=text/html
     1
 part name=paperWidth type=text/html

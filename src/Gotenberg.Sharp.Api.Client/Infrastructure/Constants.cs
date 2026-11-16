@@ -152,6 +152,66 @@ public static class Constants
             public const string UserPassword = CrossCutting.UserPassword;
 
             public const string OwnerPassword = CrossCutting.OwnerPassword;
+
+            // The Gotenberg 9 name of GenerateTaggedPdf, read by the Chromium convert and LibreOffice routes only.
+            internal const string NativeTaggedPdf = "nativeTaggedPdf";
+        }
+
+        /// <summary>
+        ///     The Gotenberg 9 <c>stages</c> form field: a JSON array of the operations to run on the
+        ///     resulting PDF, each an object with an <c>op</c> and that operation's options.
+        /// </summary>
+        internal static class Stages
+        {
+            internal const string FieldName = "stages";
+
+            internal const string Op = "op";
+
+            internal static class Ops
+            {
+                internal const string Merge = "merge";
+                internal const string Split = "split";
+                internal const string Select = "select";
+                internal const string Rotate = "rotate";
+                internal const string StampText = "stamp-text";
+                internal const string StampImage = "stamp-image";
+                internal const string StampPdf = "stamp-pdf";
+                internal const string FlattenForm = "flatten-form";
+                internal const string SetMetadata = "set-metadata";
+                internal const string Remediate = "remediate";
+                internal const string Encrypt = "encrypt";
+            }
+
+            internal static class Options
+            {
+                // split, select, rotate, stamp-text
+                internal const string Every = "every";
+                internal const string Pages = "pages";
+                internal const string Angle = "angle";
+                internal const string Text = "text";
+
+                // remediate: one profile, or a PDF/A profile paired with a PDF/UA one
+                internal const string Profile = "profile";
+
+                // encrypt
+                internal const string UserPassword = "userPassword";
+                internal const string OwnerPassword = "ownerPassword";
+
+                // set-metadata: the eight fields Gotenberg 9 writes
+                internal const string Title = "title";
+                internal const string Author = "author";
+                internal const string Subject = "subject";
+                internal const string Keywords = "keywords";
+                internal const string Creator = "creator";
+                internal const string Producer = "producer";
+                internal const string CreationDate = "creationDate";
+                internal const string ModDate = "modDate";
+            }
+
+            internal static class Profiles
+            {
+                internal const string PdfUa1 = "PDF/UA-1";
+            }
         }
 
         /// <summary>
