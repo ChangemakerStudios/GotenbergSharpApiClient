@@ -89,18 +89,7 @@ public class WireCharacterisationTests
             .WithPageProperties(p => p.UseChromeDefaults())
             .Build());
 
-        yield return ("url", () => new UrlRequestBuilder()
-            .SetUrl("https://example.com/page")
-            .AddHeaderFooter(h => h
-                .SetHeader("<html><body>header</body></html>")
-                .SetFooter("<html><body>footer</body></html>"))
-            .AddExtraResources(r => r
-                .AddLinkTag("https://example.com/style.css")
-                .AddScriptTag("https://example.com/app.js"))
-            .WithPageProperties(p => p.SetPaperSize(PaperSizes.Letter).SetMarginTop(Dimension.FromInches(1)).SetSinglePage())
-            .SetConversionBehaviors(b => b.SetBrowserWaitExpression("window.ready === true"))
-            .SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A3b))
-            .Build());
+        yield return ("url", () => UrlRequest().SetPdfOutputOptions(o => o.SetPdfFormat(PdfFormat.A3b)).Build());
 
         yield return ("screenshot-html", () => new ScreenshotHtmlRequestBuilder()
             .AddDocument(d => d.SetBody("<html><body>shot</body></html>"))
@@ -222,6 +211,58 @@ public class WireCharacterisationTests
             .Build());
     }
 
+    // The "url" request of the V8 snapshot carries a PDF/A format, a cross-cutting option that Gotenberg 9
+    // takes as a stage: its V9 snapshot is of the same request without it.
+    private static UrlRequestBuilder UrlRequest() => new UrlRequestBuilder()
+        .SetUrl("https://example.com/page")
+        .AddHeaderFooter(h => h
+            .SetHeader("<html><body>header</body></html>")
+            .SetFooter("<html><body>footer</body></html>"))
+        .AddExtraResources(r => r
+            .AddLinkTag("https://example.com/style.css")
+            .AddScriptTag("https://example.com/app.js"))
+        .WithPageProperties(p => p.SetPaperSize(PaperSizes.Letter).SetMarginTop(Dimension.FromInches(1)).SetSinglePage())
+        .SetConversionBehaviors(b => b.SetBrowserWaitExpression("window.ready === true"));
+
+    /// <summary>
+    /// The requests whose rendering for Gotenberg 9 is complete: none of them carries a cross-cutting
+    /// option, so renames and value formats are all that differs from 8. Snapshots in <c>Wire/V9/</c>.
+    /// </summary>
+    private static readonly string[] CompleteForV9 =
+        ["html", "markdown", "url", "screenshot-html", "screenshot-url"];
+
+    /// <summary>
+    /// The requests that still render for Gotenberg 9 as they do for 8, because they send fields that
+    /// 9 moved into stages or routes it does not have. Each step of the Gotenberg 9 support moves the
+    /// requests it completes from here to <see cref="CompleteForV9" /> with a snapshot in <c>Wire/V9/</c>.
+    /// </summary>
+    private static readonly string[] PendingForV9 =
+    [
+        "office-merge", "pdf-merge", "pdf-convert",
+        "engine-flatten", "engine-rotate", "engine-split", "engine-encrypt", "engine-read-metadata",
+        "engine-write-metadata", "engine-read-bookmarks", "engine-write-bookmarks",
+        "engine-write-bookmarks-per-file", "engine-embed",
+        "cross-cutting", "engine-cross-cutting"
+    ];
+
+    public static IEnumerable<TestCaseData> V9Requests()
+    {
+        foreach (var (name, build) in Cases().Where(c => CompleteForV9.Contains(c.Name)))
+        {
+            Func<BuildRequestBase> forV9 = name == "url" ? () => UrlRequest().Build() : build;
+
+            yield return new TestCaseData(name, forV9).SetArgDisplayNames(name);
+        }
+    }
+
+    [Test]
+    public void EveryRequest_IsCompleteOrPendingForV9()
+    {
+        var all = Cases().Select(c => c.Name).ToList();
+
+        CompleteForV9.Concat(PendingForV9).Should().BeEquivalentTo(all, "every request must be either complete or pending for Gotenberg 9, never both");
+    }
+
     [TestCaseSource(nameof(Requests))]
     public void PublicApiRequest_MatchesSnapshot(string name, Func<BuildRequestBase> build)
     {
@@ -234,17 +275,19 @@ public class WireCharacterisationTests
         AssertMatchesSnapshot(name, build().RenderFor(GotenbergApiVersion.V8));
     }
 
-    // Identical to V8 until the Gotenberg 9 renames, stages, routes and webhook headers land; each
-    // of those steps gives the requests it changes a V9 snapshot of their own.
-    [TestCaseSource(nameof(Requests))]
+    [TestCaseSource(nameof(V9Requests))]
     public void RenderedForV9_MatchesSnapshot(string name, Func<BuildRequestBase> build)
     {
-        AssertMatchesSnapshot(name, build().RenderFor(GotenbergApiVersion.V9));
+        AssertMatchesSnapshot(name, build().RenderFor(GotenbergApiVersion.V9), Path.Combine("Wire", "V9"));
     }
 
-    private static void AssertMatchesSnapshot(string name, RenderedRequest rendered, [CallerFilePath] string sourceFile = "")
+    private static void AssertMatchesSnapshot(
+        string name,
+        RenderedRequest rendered,
+        string folder = "Wire",
+        [CallerFilePath] string sourceFile = "")
     {
-        var directory = Path.Combine(Path.GetDirectoryName(sourceFile)!, "Wire");
+        var directory = Path.Combine(Path.GetDirectoryName(sourceFile)!, folder);
         var snapshotPath = Path.Combine(directory, $"{name}.txt");
         var receivedPath = Path.Combine(directory, $"{name}.received.txt");
 

@@ -45,7 +45,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
             metadataContent.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
             {
-                Name = "embedsMetadata",
+                Name = Constants.Gotenberg.PdfEngines.FormFieldNames.EmbedsMetadata,
             };
             metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
             
@@ -57,7 +57,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 
                 contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
                 {
-                    Name = "embeds",
+                    Name = Constants.Gotenberg.PdfEngines.FormFieldNames.Embeds,
                     FileName = kvp.Key,
                 };
                 

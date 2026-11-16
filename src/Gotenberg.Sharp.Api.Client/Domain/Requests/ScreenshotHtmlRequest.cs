@@ -39,7 +39,7 @@ public sealed class ScreenshotHtmlRequest : ScreenshotRequest
     {
         if (this.Content != null)
         {
-            foreach (var item in this.Content.ToHttpContent())
+            foreach (var item in this.Content.IfNullEmptyContent(api))
                 yield return item;
         }
 

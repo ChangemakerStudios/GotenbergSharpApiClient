@@ -421,11 +421,13 @@ public class GotenbergApiVersionTests
     #region Integration
 
     [GotenbergTest]
-    public async Task GetApiVersionAsync_OnGotenberg7And8_IsV8(GotenbergServer gotenberg)
+    public async Task GetApiVersionAsync_IsTheApiOfTheServersMajor(GotenbergServer gotenberg)
     {
         var client = await gotenberg.CreateClientAsync();
 
-        (await client.GetApiVersionAsync()).Should().Be(GotenbergApiVersion.V8);
+        var expected = gotenberg.Version.Major >= 9 ? GotenbergApiVersion.V9 : GotenbergApiVersion.V8;
+
+        (await client.GetApiVersionAsync()).Should().Be(expected);
     }
 
     #endregion

@@ -51,7 +51,7 @@ public sealed class HtmlRequest(bool containsMarkdown) : ChromeRequest
         if (this.Content.Body == null)
             throw new InvalidOperationException("You need to Add at least a body");
 
-        return base.ToHttpContent(api).Concat(this.Content.IfNullEmptyContent()).Concat(this.Assets.IfNullEmptyContent());
+        return base.ToHttpContent(api).Concat(this.Content.IfNullEmptyContent(api)).Concat(this.Assets.IfNullEmptyContent());
     }
 
     protected override void Validate()

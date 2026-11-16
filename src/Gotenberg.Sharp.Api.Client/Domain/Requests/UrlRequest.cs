@@ -39,7 +39,7 @@ public sealed class UrlRequest : ChromeRequest
             throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
         return base.ToHttpContent(api)
-            .Concat(Content.IfNullEmptyContent())
+            .Concat(Content.IfNullEmptyContent(api))
             .Concat(ExtraResources.IfNullEmptyContent())
             .Concat(Assets.IfNullEmptyContent())
             .Concat(

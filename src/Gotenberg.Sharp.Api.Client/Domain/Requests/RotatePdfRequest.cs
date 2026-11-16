@@ -27,10 +27,10 @@ public sealed class RotatePdfRequest : PdfEngineRequest
 
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        yield return CreateFormDataItem(this.RotateAngle!, "rotateAngle");
+        yield return CreateFormDataItem(this.RotateAngle!, Constants.Gotenberg.CrossCuttingOptions.RotateAngle);
 
         if (this.RotatePages != null)
-            yield return CreateFormDataItem(this.RotatePages.Value, "rotatePages");
+            yield return CreateFormDataItem(this.RotatePages.Value, Constants.Gotenberg.CrossCuttingOptions.RotatePages);
 
         foreach (var content in base.ToHttpContent(api))
             yield return content;

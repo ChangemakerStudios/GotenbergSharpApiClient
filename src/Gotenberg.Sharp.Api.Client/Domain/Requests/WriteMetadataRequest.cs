@@ -42,7 +42,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
         metadataContent.Headers.ContentDisposition =
             new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
             {
-                Name = "metadata"
+                Name = Constants.Gotenberg.PdfOutput.MetaData
             };
         yield return metadataContent;
 

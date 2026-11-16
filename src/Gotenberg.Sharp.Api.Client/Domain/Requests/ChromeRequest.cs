@@ -27,8 +27,8 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api) =>
             base.ToHttpContent(api)
-                .Concat(Config.IfNullEmptyContent())
-                .Concat(this.PageProperties.IfNullEmptyContent())
-                .Concat(ConversionBehaviors.IfNullEmptyContent());
+                .Concat(Config.IfNullEmptyContent(api))
+                .Concat(this.PageProperties.IfNullEmptyContent(api))
+                .Concat(ConversionBehaviors.IfNullEmptyContent(api));
     }
 }

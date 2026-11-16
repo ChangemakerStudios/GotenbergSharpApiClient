@@ -41,11 +41,11 @@ public sealed class SplitPdfRequest : PdfEngineRequest
 
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        yield return CreateFormDataItem(this.Mode!.Value.ToFormValue(), "splitMode");
-        yield return CreateFormDataItem(this.Span!, "splitSpan");
+        yield return CreateFormDataItem(this.Mode!.Value.ToFormValue(), Constants.Gotenberg.CrossCuttingOptions.SplitMode);
+        yield return CreateFormDataItem(this.Span!, Constants.Gotenberg.CrossCuttingOptions.SplitSpan);
 
         if (this.Unify == true)
-            yield return CreateFormDataItem("true", "splitUnify");
+            yield return CreateFormDataItem("true", Constants.Gotenberg.CrossCuttingOptions.SplitUnify);
 
         foreach (var content in base.ToHttpContent(api))
             yield return content;

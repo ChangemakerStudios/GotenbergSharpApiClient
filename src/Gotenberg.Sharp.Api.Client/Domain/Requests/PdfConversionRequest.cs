@@ -43,7 +43,7 @@ public class PdfConversionRequest : PdfRequestBase
             yield return contentItem;
         }
 
-        foreach (var item in Config.IfNullEmptyContent())
+        foreach (var item in Config.IfNullEmptyContent(api))
         {
             yield return item;
         }

@@ -48,7 +48,7 @@ public abstract class PdfEngineRequest : BuildRequestBase
             yield return contentItem;
         }
 
-        foreach (var item in this.Config.IfNullEmptyContent())
+        foreach (var item in this.Config.IfNullEmptyContent(api))
             yield return item;
 
         foreach (var content in base.ToHttpContent(api))

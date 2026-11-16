@@ -13,9 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Concurrent;
-using System.Reflection;
-
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
@@ -133,7 +130,7 @@ public abstract class BuildRequestBase
 
     internal IEnumerable<HttpContent> RenderHttpContent(GotenbergApiVersion api)
     {
-        if (!OverridesOnlyLegacyContent(this.GetType())) return this.ToHttpContent(api);
+        if (!LegacyContentOverrides.OverridesOnlyLegacy(this.GetType())) return this.ToHttpContent(api);
 
         // A subclass written against the parameterless method: on 7 and 8 it is called exactly as
         // before, its base.ToHttpContent() returning the whole content of the class it derives from.
@@ -143,24 +140,4 @@ public abstract class BuildRequestBase
             $"{this.GetType().FullName} overrides ToHttpContent() but not ToHttpContent(GotenbergApiVersion), so it can only be sent to Gotenberg 7 and 8. "
             + $"To send it to Gotenberg {(int)api}, override ToHttpContent(GotenbergApiVersion api) instead and return its parts together with base.ToHttpContent(api).");
     }
-
-    private static readonly ConcurrentDictionary<Type, bool> LegacyContentTypes = new();
-
-    /// <summary>
-    /// True when the most derived override of the parameterless <see cref="ToHttpContent()" /> is
-    /// declared below the most derived override of <see cref="ToHttpContent(GotenbergApiVersion)" />:
-    /// the parts it adds are then unknown to the versioned chain.
-    /// </summary>
-    private static bool OverridesOnlyLegacyContent(Type type) =>
-        LegacyContentTypes.GetOrAdd(
-            type,
-            t =>
-            {
-                const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-                var legacy = t.GetMethod(nameof(ToHttpContent), flags, null, Type.EmptyTypes, null)!;
-                var versioned = t.GetMethod(nameof(ToHttpContent), flags, null, [typeof(GotenbergApiVersion)], null)!;
-
-                return legacy.DeclaringType!.IsSubclassOf(versioned.DeclaringType!);
-            });
 }

@@ -60,7 +60,7 @@ public class MergeOfficeRequest : PdfRequestBase
         foreach (var item in validItems.ToHttpContent())
             yield return item;
 
-        var configItems = this.Config.IfNullEmptyContent().ToList();
+        var configItems = this.Config.IfNullEmptyContent(api).ToList();
 
         foreach (var item in configItems)
             yield return item;
@@ -70,12 +70,16 @@ public class MergeOfficeRequest : PdfRequestBase
 
         // Gotenberg reads only the first value of a repeated field, so the first one sent wins:
         // the hard-coded merge over LibreOfficeOptions.Merge, Config.PageRanges over PageRanges.
-        var rangesSent = configItems.Any(i => FieldName(i) == Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
+        var pageRangesField = api == GotenbergApiVersion.V9
+            ? Constants.Gotenberg.LibreOffice.Gotenberg9.PageRanges
+            : Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges;
+
+        var rangesSent = configItems.Any(i => FieldName(i) == pageRangesField);
 
         if (!rangesSent && this.PageRanges.IsSet())
-            yield return CreateFormDataItem(this.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
+            yield return CreateFormDataItem(this.PageRanges, pageRangesField);
 
-        foreach (var item in this.LibreOfficeOptions.IfNullEmptyContent())
+        foreach (var item in this.LibreOfficeOptions.IfNullEmptyContent(api))
             if (FieldName(item) != Constants.Gotenberg.LibreOffice.Routes.Convert.Merge)
                 yield return item;
 

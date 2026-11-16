@@ -1,0 +1,9 @@
+POST forms/chromium/screenshot/url
+part name=url type=text/plain
+    https://example.com/
+part name=width type=text/html
+    1024
+part name=format type=text/html
+    png
+part name=userAgent type=text/html
+    agent/1.0

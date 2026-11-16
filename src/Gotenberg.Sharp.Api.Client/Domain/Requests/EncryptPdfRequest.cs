@@ -26,10 +26,10 @@ public sealed class EncryptPdfRequest : PdfEngineRequest
 
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        yield return CreateFormDataItem(this.UserPassword!, "userPassword");
+        yield return CreateFormDataItem(this.UserPassword!, Constants.Gotenberg.PdfOutput.UserPassword);
 
         if (!string.IsNullOrWhiteSpace(this.OwnerPassword))
-            yield return CreateFormDataItem(this.OwnerPassword, "ownerPassword");
+            yield return CreateFormDataItem(this.OwnerPassword, Constants.Gotenberg.PdfOutput.OwnerPassword);
 
         foreach (var content in base.ToHttpContent(api))
             yield return content;

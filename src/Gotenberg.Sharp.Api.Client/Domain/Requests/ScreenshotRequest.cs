@@ -32,7 +32,7 @@ public abstract class ScreenshotRequest : BuildRequestBase
     // Config.PageRanges (nativePageRanges) is deliberately not sent: no screenshot route has that field.
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        return this.ScreenshotProperties.ToHttpContent()
-            .Concat(this.ConversionBehaviors.ToHttpContent());
+        return this.ScreenshotProperties.IfNullEmptyContent(api)
+            .Concat(this.ConversionBehaviors.IfNullEmptyContent(api));
     }
 }

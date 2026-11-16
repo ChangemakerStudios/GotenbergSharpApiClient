@@ -27,7 +27,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
             foreach (var ci in base.ToHttpContent(api))
                 yield return ci;
 
-            foreach (var ci in Config.IfNullEmptyContent())
+            foreach (var ci in Config.IfNullEmptyContent(api))
                 yield return ci;
 
             foreach (var item in this.Assets.ToAlphabeticalOrderByIndex()

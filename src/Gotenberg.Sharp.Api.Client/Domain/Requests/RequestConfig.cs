@@ -30,12 +30,19 @@ public sealed class RequestConfig : IConvertToHttpContent
     ///     Converts the instance to a collection of http content items
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<HttpContent> ToHttpContent()
+    public IEnumerable<HttpContent> ToHttpContent() => this.ToHttpContent(GotenbergApiVersion.V8);
+
+    /// <summary>
+    ///     Converts the instance to a collection of http content items for <paramref name="api" />.
+    /// </summary>
+    internal IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (this.PageRanges?.Pages.Any() ?? false)
             yield return BuildRequestBase.CreateFormDataItem(
                 this.PageRanges,
-                Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
+                api == GotenbergApiVersion.V9
+                    ? Constants.Gotenberg.Chromium.Gotenberg9.PageRanges
+                    : Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
     }
 
     #endregion

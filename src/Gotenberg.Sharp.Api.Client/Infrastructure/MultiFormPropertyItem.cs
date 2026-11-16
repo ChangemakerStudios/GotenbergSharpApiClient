@@ -13,13 +13,21 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Collections.Concurrent;
 using System.Reflection;
+
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure;
 
-internal class MultiFormPropertyItem(PropertyInfo property, MultiFormHeaderAttribute attribute)
+internal class MultiFormPropertyItem(
+    PropertyInfo property,
+    MultiFormHeaderAttribute attribute,
+    string? gotenberg9Name = null)
 {
     private static readonly Type _attributeType = typeof(MultiFormHeaderAttribute);
+
+    private static readonly ConcurrentDictionary<Type, MultiFormPropertyItem[]> _itemsByType = new();
 
     public PropertyInfo Property { get; } =
         property ?? throw new ArgumentNullException(nameof(property));
@@ -27,19 +35,43 @@ internal class MultiFormPropertyItem(PropertyInfo property, MultiFormHeaderAttri
     public MultiFormHeaderAttribute Attribute { get; } =
         attribute ?? throw new ArgumentNullException(nameof(attribute));
 
+    /// <summary>
+    ///     The name of the form field on Gotenberg 9, or null when it is the same as on Gotenberg 7 and 8.
+    /// </summary>
+    public string? Gotenberg9Name { get; } = gotenberg9Name;
+
+    /// <summary>
+    ///     The form field name for <paramref name="api" />.
+    /// </summary>
+    public string NameFor(GotenbergApiVersion api) =>
+        api == GotenbergApiVersion.V9 ? this.Gotenberg9Name ?? this.Attribute.Name : this.Attribute.Name;
+
     internal static IEnumerable<MultiFormPropertyItem> FromType(Type instanceType)
     {
         if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
 
+        return _itemsByType.GetOrAdd(instanceType, ReadType);
+    }
+
+    private static MultiFormPropertyItem[] ReadType(Type instanceType)
+    {
         var propertyInfos = instanceType.GetProperties()
             .Where(prop => System.Attribute.IsDefined(prop, _attributeType)).ToList();
+
+        var items = new List<MultiFormPropertyItem>();
 
         foreach (var propertyInfo in propertyInfos)
             if (System.Attribute.GetCustomAttribute(
                     propertyInfo,
                     _attributeType) is MultiFormHeaderAttribute multiFormHeaderAttribute)
-                yield return new MultiFormPropertyItem(
-                    propertyInfo,
-                    multiFormHeaderAttribute);
+                items.Add(
+                    new MultiFormPropertyItem(
+                        propertyInfo,
+                        multiFormHeaderAttribute,
+                        (System.Attribute.GetCustomAttribute(
+                            propertyInfo,
+                            typeof(Gotenberg9FieldAttribute)) as Gotenberg9FieldAttribute)?.Name));
+
+        return items.ToArray();
     }
 }

@@ -85,6 +85,8 @@ public static class Constants
 
             internal const string PageRanges = "nativePageRanges";
 
+            internal const string PageRangesGotenberg9 = "nativePages";
+
             internal const string PdfFormat = "pdfa";
 
             internal const string PdfUa = "pdfua";
@@ -231,6 +233,30 @@ public static class Constants
                 public const string Password = "password";
                 public const string Merge = "merge";
             }
+
+            /// <summary>
+            ///     The form fields of Gotenberg 9 that replace one of <see cref="Options" /> and
+            ///     <see cref="Routes.Convert.PageRanges" /> under another name.
+            /// </summary>
+            public static class Gotenberg9
+            {
+                public const string PageRanges = CrossCutting.PageRangesGotenberg9;
+
+                public const string SinglePage = "singlePage";
+
+                public const string ExportBookmarks = "nativeBookmarks";
+
+                // Image compression
+                public const string LosslessImageCompression = "nativeLosslessImageCompression";
+                public const string Quality = "nativeQuality";
+                public const string ReduceImageResolution = "nativeReduceImageResolution";
+                public const string MaxImageResolution = "nativeMaxImageResolution";
+
+                // Native watermark: the color is "#rrggbb" and the rotation is in degrees
+                public const string NativeWatermarkFontSize = "nativeWatermarkFontSize";
+                public const string NativeWatermarkRotation = "nativeWatermarkRotation";
+                public const string NativeWatermarkFont = "nativeWatermarkFont";
+            }
         }
 
         /// <summary>
@@ -272,6 +298,10 @@ public static class Constants
             public static class FormFieldNames
             {
                 public const string Bookmarks = "bookmarks";
+
+                public const string Embeds = "embeds";
+
+                public const string EmbedsMetadata = "embedsMetadata";
             }
 
             public static class Routes
@@ -336,6 +366,16 @@ public static class Constants
                 public const string ScreenshotHtml = $"{Root}/screenshot/html";
 
                 public const string ScreenshotMarkdown = $"{Root}/screenshot/markdown";
+            }
+
+            /// <summary>
+            ///     The form fields of Gotenberg 9 that replace one of <see cref="Shared.PageProperties" /> under another name.
+            /// </summary>
+            public static class Gotenberg9
+            {
+                public const string PageRanges = CrossCutting.PageRangesGotenberg9;
+
+                public const string GenerateDocumentOutline = "nativeBookmarks";
             }
 
             public static class Screenshot
