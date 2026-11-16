@@ -3,6 +3,8 @@
 //
 //  Licensed under the Apache License, Version 2.0
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 [MinimumGotenbergVersion(GotenbergVersions.Encrypt, Feature = "The standalone encrypt route")]
@@ -22,14 +24,14 @@ public sealed class EncryptPdfRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         yield return CreateFormDataItem(this.UserPassword!, "userPassword");
 
         if (!string.IsNullOrWhiteSpace(this.OwnerPassword))
             yield return CreateFormDataItem(this.OwnerPassword, "ownerPassword");
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

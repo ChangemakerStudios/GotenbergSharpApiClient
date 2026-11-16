@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Split;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -38,7 +39,7 @@ public sealed class SplitPdfRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         yield return CreateFormDataItem(this.Mode!.Value.ToFormValue(), "splitMode");
         yield return CreateFormDataItem(this.Span!, "splitSpan");
@@ -46,7 +47,7 @@ public sealed class SplitPdfRequest : PdfEngineRequest
         if (this.Unify == true)
             yield return CreateFormDataItem("true", "splitUnify");
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

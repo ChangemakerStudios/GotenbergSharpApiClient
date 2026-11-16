@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Newtonsoft.Json.Linq;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -34,7 +35,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         var metadataContent = new StringContent(this.Metadata!.ToString());
         metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
@@ -45,7 +46,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
             };
         yield return metadataContent;
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

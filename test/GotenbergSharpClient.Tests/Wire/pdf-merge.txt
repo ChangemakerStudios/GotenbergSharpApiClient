@@ -1,0 +1,11 @@
+POST forms/pdfengines/merge
+part name=pdfa type=text/html
+    PDF/A-2b
+part name=pdfua type=text/html
+    True
+part name=flatten type=text/html
+    True
+part name=files filename=A.pdf type=application/pdf
+    %PDF-1.4 fake
+part name=files filename=B.pdf type=application/pdf
+    %PDF-1.4 fake

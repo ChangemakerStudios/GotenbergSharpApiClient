@@ -56,6 +56,11 @@ public static class Constants
         {
             public const string Trace = "Gotenberg-Trace";
 
+            /// <summary>
+            /// Response header carrying the version of the service that answered.
+            /// </summary>
+            public const string VersionHeader = "Gotenberg-Version";
+
             public static class ApiPaths
             {
                 public const string Version = "version";

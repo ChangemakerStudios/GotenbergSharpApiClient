@@ -252,7 +252,8 @@ public class GotenbergVersionTests
     [Test]
     public async Task Client_WithEnforcementDisabled_SkipsTheLookupEntirely()
     {
-        var client = new StubVersionClient("8.1.0") { EnforceMinimumVersion = false };
+        // An explicit API keeps the API lookup out of the way of what is tested: the gate.
+        var client = new StubVersionClient("8.1.0") { EnforceMinimumVersion = false, ApiVersion = GotenbergApiVersion.V8 };
 
         var builder = PdfEngineBuilders.ReadBookmarks()
             .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
@@ -268,9 +269,10 @@ public class GotenbergVersionTests
     [Test]
     public async Task Client_DoesNotCheckRequestsWithoutAMinimum()
     {
-        var client = new StubVersionClient("8.1.0");
+        // Writing metadata is an ungated route, so with an explicit API no version lookup should
+        // happen at all. (With Auto, the API lookup reads the version once.)
+        var client = new StubVersionClient("8.1.0") { ApiVersion = GotenbergApiVersion.V8 };
 
-        // Writing metadata is an ungated route, so no version lookup should happen at all.
         var builder = PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { { "Title", "Test" } })
             .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
 

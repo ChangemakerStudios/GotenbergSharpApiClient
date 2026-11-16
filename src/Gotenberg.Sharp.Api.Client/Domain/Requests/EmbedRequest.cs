@@ -3,6 +3,7 @@ using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using Newtonsoft.Json.Linq;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
@@ -28,7 +29,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<HttpContent> ToHttpContent()
+        protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
         {
             var metadataObject = new JObject();
             foreach (var kvp in EmbedsData!)
@@ -68,7 +69,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 yield return contentItem;
             }
 
-            foreach (var content in base.ToHttpContent())
+            foreach (var content in base.ToHttpContent(api))
             {
                 yield return content;
             }

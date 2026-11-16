@@ -17,27 +17,28 @@ using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 
-internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent, IRequireGotenbergVersion
+/// <summary>
+/// A validated <see cref="BuildRequestBase" />, rendered into a message only when it is sent, so that
+/// its path, headers and form parts can follow the API of the service it is sent to.
+/// </summary>
+internal sealed class PostApiRequestImpl
+    : IApiRequest, IVersionedApiRequest, IConvertToHttpContent, IRequireGotenbergVersion
 {
-    private readonly Func<IEnumerable<HttpContent>> _toHttpContent;
+    private readonly BuildRequestBase _request;
 
-    internal PostApiRequestImpl(
-        Func<IEnumerable<HttpContent>> toHttpContent,
-        string apiPath,
-        ILookup<string, string?>? headers,
-        bool isWebhookRequest,
-        GotenbergFeatureRequirement? requires = null)
+    // The API of the last message built, so that an error report describes what was sent.
+    private GotenbergApiVersion _renderedFor = GotenbergApiVersion.V8;
+
+    internal PostApiRequestImpl(BuildRequestBase request, bool isWebhookRequest)
     {
-        _toHttpContent = toHttpContent;
-        ApiPath = apiPath;
-        IsWebhookRequest = isWebhookRequest;
-        Headers = headers;
-        Requires = requires;
+        this._request = request;
+        this.IsWebhookRequest = isWebhookRequest;
+        this.Requires = request.Requires;
     }
 
-    public string ApiPath { get; }
+    public string ApiPath => this._request.RenderApiPath(this._renderedFor);
 
-    public ILookup<string, string?>? Headers { get; }
+    public ILookup<string, string?> Headers => this._request.RenderHeaders(this._renderedFor);
 
     public GotenbergFeatureRequirement? Requires { get; }
 
@@ -45,20 +46,32 @@ internal sealed class PostApiRequestImpl : IApiRequest, IConvertToHttpContent, I
 
     public bool IsWebhookRequest { get; }
 
-    public HttpRequestMessage ToApiRequestMessage()
+    /// <summary>
+    /// Builds the message for Gotenberg 7 and 8.
+    /// </summary>
+    public HttpRequestMessage ToApiRequestMessage() => this.ToApiRequestMessage(GotenbergApiVersion.V8);
+
+    public HttpRequestMessage ToApiRequestMessage(GotenbergApiVersion api)
     {
+        if (api is not (GotenbergApiVersion.V8 or GotenbergApiVersion.V9))
+            throw new ArgumentOutOfRangeException(nameof(api), api, "A request is rendered for V8 or V9; resolve Auto first.");
+
         var formContent = new MultipartFormDataContent($"{BoundaryPrefix}{DateTime.Now.Ticks}");
 
-        foreach (var item in ToHttpContent()) formContent.Add(item);
+        foreach (var item in this._request.RenderHttpContent(api)) formContent.Add(item);
 
-        var message = new HttpRequestMessage(HttpMethod.Post, ApiPath) { Content = formContent };
+        var message = new HttpRequestMessage(HttpMethod.Post, this._request.RenderApiPath(api)) { Content = formContent };
 
-        if (Headers?.Any() ?? false)
-            foreach (var header in Headers)
-                message.Headers.Add(header.Key, header);
+        foreach (var header in this._request.RenderHeaders(api))
+            message.Headers.Add(header.Key, header);
+
+        this._renderedFor = api;
 
         return message;
     }
 
-    public IEnumerable<HttpContent> ToHttpContent() => _toHttpContent();
+    /// <summary>
+    /// The form parts of the last message built; those for Gotenberg 7 and 8 before any.
+    /// </summary>
+    public IEnumerable<HttpContent> ToHttpContent() => this._request.RenderHttpContent(this._renderedFor);
 }

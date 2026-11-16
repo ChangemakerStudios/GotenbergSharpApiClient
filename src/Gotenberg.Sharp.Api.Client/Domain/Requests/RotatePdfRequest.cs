@@ -25,14 +25,14 @@ public sealed class RotatePdfRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         yield return CreateFormDataItem(this.RotateAngle!, "rotateAngle");
 
         if (this.RotatePages != null)
             yield return CreateFormDataItem(this.RotatePages.Value, "rotatePages");
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

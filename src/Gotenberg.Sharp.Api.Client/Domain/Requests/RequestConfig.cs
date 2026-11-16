@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Pages;
+using GotenbergApiVersion = Gotenberg.Sharp.API.Client.Domain.Shared.GotenbergApiVersion;
 using Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -51,7 +52,12 @@ public sealed class RequestConfig : IConvertToHttpContent
         this.Webhook?.Validate();
     }
 
-    public IEnumerable<(string Name, string? Value)> GetHeaders()
+    public IEnumerable<(string Name, string? Value)> GetHeaders() => this.GetHeaders(GotenbergApiVersion.V8);
+
+    /// <summary>
+    ///     The request headers for <paramref name="api" />.
+    /// </summary>
+    internal IEnumerable<(string Name, string? Value)> GetHeaders(GotenbergApiVersion api)
     {
         if (this.Trace.IsSet())
             yield return (Constants.Gotenberg.All.Trace, this.Trace);
@@ -59,7 +65,7 @@ public sealed class RequestConfig : IConvertToHttpContent
         if (this.ResultFileName.IsSet())
             yield return (Constants.Gotenberg.SharedFormFieldNames.OutputFileName, this.ResultFileName);
 
-        foreach (var header in (this.Webhook?.GetHeaders()).IfNullEmpty()) yield return header;
+        foreach (var header in (this.Webhook?.GetHeaders(api)).IfNullEmpty()) yield return header;
     }
 
     #region Basic settings

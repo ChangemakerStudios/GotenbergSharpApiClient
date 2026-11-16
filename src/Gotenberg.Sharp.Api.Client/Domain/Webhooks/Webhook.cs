@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.ExtraHeaders;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
@@ -93,7 +94,12 @@ public sealed class Webhook
         return this.TargetUrl != null && this.ErrorUrl != null;
     }
 
-    public IEnumerable<(string, string?)> GetHeaders()
+    public IEnumerable<(string, string?)> GetHeaders() => this.GetHeaders(GotenbergApiVersion.V8);
+
+    /// <summary>
+    ///     The webhook request headers for <paramref name="api" />.
+    /// </summary>
+    internal IEnumerable<(string, string?)> GetHeaders(GotenbergApiVersion api)
     {
         if (!this.IsConfigured()) return [];
 

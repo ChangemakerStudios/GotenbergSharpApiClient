@@ -13,15 +13,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 public class PdfConversionRequest : PdfRequestBase
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
         {
             yield return content;
         }

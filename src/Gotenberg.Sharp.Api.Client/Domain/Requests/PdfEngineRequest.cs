@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>
@@ -29,7 +31,7 @@ public abstract class PdfEngineRequest : BuildRequestBase
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         foreach (var item in this.Assets.IfNullEmpty().Where(item => item.IsValid()))
         {
@@ -49,7 +51,7 @@ public abstract class PdfEngineRequest : BuildRequestBase
         foreach (var item in this.Config.IfNullEmptyContent())
             yield return item;
 
-        foreach (var content in base.ToHttpContent())
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

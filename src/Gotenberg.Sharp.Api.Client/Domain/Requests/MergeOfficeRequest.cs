@@ -16,6 +16,7 @@
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -44,7 +45,7 @@ public class MergeOfficeRequest : PdfRequestBase
     /// </summary>
     public LibreOfficeOptions? LibreOfficeOptions { get; set; }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty().ToList();
 
@@ -78,7 +79,7 @@ public class MergeOfficeRequest : PdfRequestBase
             if (FieldName(item) != Constants.Gotenberg.LibreOffice.Routes.Convert.Merge)
                 yield return item;
 
-        foreach (var content in base.ToHttpContent()) yield return content;
+        foreach (var content in base.ToHttpContent(api)) yield return content;
     }
 
     private static string? FieldName(HttpContent content) => content.Headers.ContentDisposition?.Name?.Trim('"');

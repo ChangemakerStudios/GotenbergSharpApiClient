@@ -129,8 +129,9 @@ await sharpClient.ExecutePdfEngineAsync(
 //   address reports 8.20.0. Upgrade Gotenberg to use this feature.
 ```
 
-The version is fetched from `/version` once per client instance and cached. Routes available in
-every supported release are never checked, so most requests cost no extra round-trip.
+The version is fetched from `/version` once per service address and cached; the clients created by
+`AddGotenbergSharpClient()` share that cache, and a client constructed directly keeps its own. Routes
+available in every supported release are never checked.
 
 Currently gated:
 
