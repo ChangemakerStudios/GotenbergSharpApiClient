@@ -193,21 +193,11 @@ internal sealed class StageList
                 "Gotenberg 9 draws over the page only, never behind it: its stamp-text, stamp-image and stamp-pdf stages replace watermarks. "
                 + StagesNotSentYet);
 
-        if (request.StampOptions is { Source: { } source } stamp)
-        {
-            if (stamp.Options != null)
-                return Removed(
-                    "A stamp with free-form options (StampOptions.Options)",
-                    "Gotenberg 9 replaces pdfcpu's stamp options with the typed options of its stamp-text, stamp-image and stamp-pdf stages (position, x, y, fontSize, opacity, rotation and others). "
-                    + StagesNotSentYet);
-
-            // Gotenberg 8 took the file from its 'stamp' form field, which this client never sent.
-            if (source != OverlaySource.Text)
-                return Removed(
-                    $"A stamp of source {source} (StampOptions.Source)",
-                    "Gotenberg 9 stamps an image or a PDF with its stamp-image or stamp-pdf stage, which names a file uploaded under 'files'. "
-                    + StagesNotSentYet);
-        }
+        if (request.StampOptions is { Source: not null, Options: not null })
+            return Removed(
+                "A stamp with free-form options (StampOptions.Options)",
+                "Gotenberg 9 replaces pdfcpu's stamp options with the typed options of its stamp-text, stamp-image and stamp-pdf stages (position, x, y, fontSize, opacity, rotation and others). "
+                + StagesNotSentYet);
 
         var output = routeStages.EffectiveOutput(request);
 
@@ -330,12 +320,31 @@ internal sealed class StageList
         }
     }
 
-    // FindRemoved refused every stamp but a text one without free-form options.
+    // FindRemoved refused every stamp with free-form options.
     private void AddStamp(StampOptions? stamp)
     {
-        if (stamp?.Source == null) return;
+        if (stamp?.Source is not { } source) return;
 
-        this.Add(Ops.StampText, (StageOptions.Text, stamp.Expression), (StageOptions.Pages, stamp.Pages?.Value));
+        var pages = (StageOptions.Pages, (object?)stamp.Pages?.Value);
+
+        if (source == OverlaySource.Text)
+        {
+            this.Add(Ops.StampText, (StageOptions.Text, stamp.Expression), pages);
+            return;
+        }
+
+        var (op, fileOption, builderMethod) = source == OverlaySource.Image
+            ? (Ops.StampImage, StageOptions.Image, "SetImageStamp")
+            : (Ops.StampPdf, StageOptions.Source, "SetPdfStamp");
+
+        if (!stamp.SendsFile)
+            throw new ArgumentException(
+                $"A stamp of source {source} needs its file on Gotenberg 9, which stamps it with a {op} stage that names an uploaded file. "
+                + $"Set the stamp with StampOptionsBuilder.{builderMethod}(fileName, content) instead of SetSource and SetExpression.",
+                nameof(StampOptions.FileName));
+
+        // The file is uploaded under 'files' with the request (BuildRequestBase), the stage names it.
+        this.Add(op, (fileOption, stamp.FileName), pages);
     }
 
     private void AddRotation(RotationOptions? rotation)

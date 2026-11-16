@@ -127,11 +127,17 @@ public static class Constants
             public const string WatermarkPages = "watermarkPages";
             public const string WatermarkOptionsJson = "watermarkOptions";
 
+            // The file of an image or PDF watermark on Gotenberg 7 and 8: a file part, not a text field.
+            public const string WatermarkFile = "watermark";
+
             // Stamp
             public const string StampSource = "stampSource";
             public const string StampExpression = "stampExpression";
             public const string StampPages = "stampPages";
             public const string StampOptionsJson = "stampOptions";
+
+            // The file of an image or PDF stamp on Gotenberg 7 and 8: a file part, not a text field.
+            public const string StampFile = "stamp";
         }
 
         /// <summary>
@@ -186,11 +192,15 @@ public static class Constants
 
             internal static class Options
             {
-                // split, select, rotate, stamp-text
+                // split, select, rotate, stamp-text, stamp-image, stamp-pdf
                 internal const string Every = "every";
                 internal const string Pages = "pages";
                 internal const string Angle = "angle";
                 internal const string Text = "text";
+
+                // stamp-image, stamp-pdf: an uploaded file, named by its file name
+                internal const string Image = "image";
+                internal const string Source = "source";
 
                 // remediate: one profile, or a PDF/A profile paired with a PDF/UA one
                 internal const string Profile = "profile";

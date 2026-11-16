@@ -99,8 +99,8 @@ public abstract class BuildRequestBase
         return this.PdfOutputOptions.IfNullEmptyContent()
             .Concat(this.RotationOptions.IfNullEmptyContent())
             .Concat(this.SplitOptions.IfNullEmptyContent())
-            .Concat(this.WatermarkOptions.IfNullEmptyContent())
-            .Concat(this.StampOptions.IfNullEmptyContent());
+            .Concat(this.WatermarkOptions.IfNullEmptyContent(api))
+            .Concat(this.StampOptions.IfNullEmptyContent(api));
     }
 
     /// <summary>
@@ -161,6 +161,10 @@ public abstract class BuildRequestBase
 
         var parts = stages.ToHttpContent().ToList();
 
+        // Gotenberg 9 reads the file of an image or PDF stamp from 'files', where the stage names it.
+        if (this.StampOptions is { SendsFile: true } stamp)
+            parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, stamp.FileName!, stamp.FileContent!));
+
         if (this.ReadsNativeTaggedPdf && this.PdfOutputOptions?.GenerateTaggedPdf is { } tagged)
             parts.Add(CreateFormDataItem(tagged ? "true" : "false", Constants.Gotenberg.PdfOutput.NativeTaggedPdf));
 
@@ -198,6 +202,33 @@ public abstract class BuildRequestBase
         (this.Config?.GetHeaders(api)).IfNullEmpty().ToLookup(s => s.Name, s => s.Value);
 
     internal IEnumerable<HttpContent> RenderHttpContent(GotenbergApiVersion api)
+    {
+        var parts = this.RenderContent(api);
+
+        // Gotenberg 7 and 8 read the file of a stamp from its own form field, so no other file can clash with it.
+        if (api != GotenbergApiVersion.V9 || this.StampOptions is not { SendsFile: true } stamp) return parts;
+
+        return RejectStampFileClash(parts.ToList(), stamp.FileName!);
+    }
+
+    // Gotenberg 9 reads every file from 'files' and stores it under its name, so a stamp file named like
+    // another file of the request would replace it, or be replaced by it.
+    private static List<HttpContent> RejectStampFileClash(List<HttpContent> parts, string stampFileName)
+    {
+        var uploads = parts.Count(
+            p => p.Headers.ContentDisposition is { } d
+                 && d.Name?.Trim('"') == Constants.Gotenberg.SharedFormFieldNames.Files
+                 && d.FileName?.Trim('"') == stampFileName);
+
+        if (uploads > 1)
+            throw new ArgumentException(
+                $"The stamp file '{stampFileName}' has the name of another file of the request. On Gotenberg 9 every file is uploaded under 'files' with its name, so give the stamp file another name.",
+                nameof(StampOptions.FileName));
+
+        return parts;
+    }
+
+    private IEnumerable<HttpContent> RenderContent(GotenbergApiVersion api)
     {
         if (!LegacyContentOverrides.OverridesOnlyLegacy(this.GetType())) return this.ToHttpContent(api);
 

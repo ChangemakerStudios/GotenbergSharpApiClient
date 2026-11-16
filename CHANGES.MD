@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **Added:**
+  - `WatermarkOptionsBuilder.SetImageWatermark` and `SetPdfWatermark`, and `StampOptionsBuilder.SetImageStamp` and `SetPdfStamp`, take the file name and the content (bytes, a stream or a `ContentItem`) of an image or PDF overlay and optionally its pages; `WatermarkOptions` and `StampOptions` carry them as `FileName` and `FileContent`. Gotenberg 7 and 8 receive the file in the `watermark` or `stamp` form field (needs Gotenberg 8.28.0 or newer); Gotenberg 9 receives an image or PDF stamp as a `stamp-image` or `stamp-pdf` stage with the file uploaded under `files`, and refuses a stamp file named like another file of the request with an `ArgumentException`
   - `GotenbergSharpClientOptions.ApiVersion` and `GotenbergSharpClient.ApiVersion` choose the Gotenberg API requests are rendered for: `Auto` (the default) reads the version of the service, `V8` (Gotenberg 7 and 8) and `V9` skip that lookup, for instance behind a proxy that hides `/version`. `GotenbergSharpClient.GetApiVersionAsync` returns the API in use. Requests to Gotenberg 7 and 8 are unchanged
   - The clients created by `AddGotenbergSharpClient()` share one version cache per service address, so the version is read once per application instead of once per client. When a response reports another major release in its `Gotenberg-Version` header, the cached version is replaced
   - `GotenbergVersionNotSupportedException` can also report a feature that a newer Gotenberg release removed: `Feature`, `RemovedInVersion` and `Replacement`. `Requirement` and `RequiredVersion` are null in that case
@@ -11,6 +12,7 @@
 - **Changed:**
   - With `ApiVersion = Auto`, every request first reads the version of the service once, not only requests on routes that need a minimum version. A failure of that lookup other than a 404 is thrown, as it already was for those routes; set `ApiVersion` to `V8` or `V9` to avoid the lookup
 - **Fixed:**
+  - Image and PDF watermarks and stamps can now be sent at all: the client sent their source but never the file Gotenberg reads them from, so Gotenberg answered 400 (8.32.0 and later). On Gotenberg 9 an image or PDF stamp is no longer refused with `GotenbergVersionNotSupportedException` when it has its file; one without it throws an `ArgumentException` naming the builder method to use
   - `ConfigBuilder.SetResultFileName` now works: the name is sent as the `Gotenberg-Output-Filename` request header, the only place Gotenberg reads it, instead of a form field that was ignored. A name with characters other than printable ASCII is rejected with an `ArgumentException`, as HTTP headers cannot carry it
   - Screenshot requests no longer send `nativePageRanges`, which no screenshot route accepts
   - `MergeOfficeBuilder` requests send `merge` and `nativePageRanges` at most once; when both the request and its config set page ranges, the config value is used, as Gotenberg already did

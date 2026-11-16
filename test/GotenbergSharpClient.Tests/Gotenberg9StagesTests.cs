@@ -528,14 +528,14 @@ public class Gotenberg9StagesTests
             "*typed options of its stamp-text*");
 
         yield return Row(
-            "image stamp",
-            b => b.SetStampOptions(s => s.SetSource(OverlaySource.Image).SetExpression("logo.png")),
-            "*stamp-image or stamp-pdf stage*'files'*");
+            "image watermark with its file",
+            b => b.SetWatermarkOptions(w => w.SetImageWatermark("logo.png", new byte[] { 1 })),
+            "*stamp-text, stamp-image and stamp-pdf stages replace watermarks*");
 
         yield return Row(
-            "PDF stamp",
-            b => b.SetStampOptions(s => s.SetSource(OverlaySource.Pdf).SetExpression("annex.pdf")),
-            "*stamp-image or stamp-pdf stage*'files'*");
+            "PDF stamp with free-form options",
+            b => b.SetStampOptions(s => s.SetPdfStamp("annex.pdf", new byte[] { 1 }).SetOptions(new JObject { ["opacity"] = 0.5 })),
+            "*typed options of its stamp-text*");
 
         yield return Row(
             "metadata key outside the eight fields",
