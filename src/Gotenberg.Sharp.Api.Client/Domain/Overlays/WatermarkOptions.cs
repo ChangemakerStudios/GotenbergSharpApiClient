@@ -33,7 +33,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 /// </para>
 /// <para>
 /// Gotenberg 9 draws over the page only: a request with a watermark source throws
-/// <see cref="GotenbergVersionNotSupportedException" /> before it is sent to Gotenberg 9.
+/// <see cref="GotenbergVersionNotSupportedException" /> before it is sent to Gotenberg 9. There, list a
+/// stamp with <c>WithStages</c> (<c>PdfEngineBuilders.Pipe</c> for a PDF operation): <c>StampText</c>,
+/// <c>StampImage</c> or <c>StampPdf</c>, made faint with <c>SetOpacity</c>.
 /// </para>
 /// </remarks>
 public class WatermarkOptions : FacetBase

@@ -578,13 +578,16 @@ public class GotenbergSharpClient
     /// <summary>
     /// The exception for the first option of <paramref name="request" /> that the API of the service
     /// has no equivalent for, or null. The API is only resolved for a request that uses such an
-    /// option on some API, so that other requests never cause a version lookup here.
+    /// option on some API, such as a watermark (none on Gotenberg 9) or explicit stages (none on
+    /// Gotenberg 7 and 8), so that other requests never cause a version lookup here.
     /// </summary>
     private async Task<GotenbergVersionNotSupportedException?> FindUnsupportedOptionAsync(
         BuildRequestBase request,
         CancellationToken cancelToken)
     {
-        if (request.FindUnsupportedOn(GotenbergApiVersion.V9, GotenbergVersion.Unknown) == null) return null;
+        if (request.FindUnsupportedOn(GotenbergApiVersion.V8, GotenbergVersion.Unknown) == null
+            && request.FindUnsupportedOn(GotenbergApiVersion.V9, GotenbergVersion.Unknown) == null)
+            return null;
 
         var (api, running) = await this.ResolveRenderingAsync(cancelToken).ConfigureAwait(false);
 

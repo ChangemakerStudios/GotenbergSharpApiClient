@@ -19,7 +19,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
 namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 
 /// <summary>
-/// The file of an image or PDF watermark or stamp, as a form part.
+/// The file of an image or PDF watermark or stamp, or another file a Gotenberg 9 stage reads, as a form part.
 /// </summary>
 internal static class OverlayFile
 {

@@ -207,6 +207,11 @@ internal static class StageMetadata
     }
 
     /// <summary>
+    /// <paramref name="date" /> as a PDF date, in its own offset.
+    /// </summary>
+    internal static string ToPdfDate(DateTimeOffset date) => FormatPdfDate(date.DateTime, date.Offset);
+
+    /// <summary>
     /// D:YYYYMMDDHHmmSS and the offset: Z for UTC, +HH'mm' or -HH'mm' otherwise, nothing when unknown.
     /// </summary>
     private static string FormatPdfDate(DateTime local, TimeSpan? offset, bool hasTime = true)

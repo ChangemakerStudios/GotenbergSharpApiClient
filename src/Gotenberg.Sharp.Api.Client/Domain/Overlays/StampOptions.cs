@@ -40,7 +40,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 /// the defaults of Gotenberg 9 as well, and its file uploaded under <c>files</c> with the name
 /// <see cref="FileName" />: that name must not be the name of another file of the request. An image or
 /// PDF stamp without its file throws <see cref="ArgumentException" />. A stamp with <see cref="Options" />
-/// throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to Gotenberg 9.
+/// throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to Gotenberg 9. To
+/// place, size, fade or turn a stamp on Gotenberg 9, list it with <c>WithStages</c>
+/// (<c>PdfEngineBuilders.Pipe</c> for a PDF operation) and the typed options of <c>StampText</c>,
+/// <c>StampImage</c> or <c>StampPdf</c> instead.
 /// </para>
 /// </remarks>
 public class StampOptions : FacetBase

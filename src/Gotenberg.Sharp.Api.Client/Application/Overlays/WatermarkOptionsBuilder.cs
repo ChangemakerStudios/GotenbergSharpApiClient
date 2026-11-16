@@ -81,7 +81,7 @@ public sealed class WatermarkOptionsBuilder
     /// which Gotenberg takes from the file.
     /// </summary>
     /// <remarks>
-    /// Sent to Gotenberg 7 and 8 as a file part of the form field <c>watermark</c> (from Gotenberg 8.28.0 on). Gotenberg 9 draws over the page only: a request with a watermark throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to it; use <see cref="StampOptionsBuilder" /> there.
+    /// Sent to Gotenberg 7 and 8 as a file part of the form field <c>watermark</c> (from Gotenberg 8.28.0 on). Gotenberg 9 draws over the page only: a request with a watermark throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to it; use a stamp there, listed with <c>WithStages</c> (<c>StampImage</c> or <c>StampPdf</c>, made faint with <c>SetOpacity</c>).
     /// </remarks>
     /// <param name="fileName">The name of the file, such as <c>logo.png</c>: a relative name with an extension, which gives the media type.</param>
     /// <param name="content">The content of the file.</param>
@@ -116,7 +116,7 @@ public sealed class WatermarkOptionsBuilder
     /// which Gotenberg takes from the file.
     /// </summary>
     /// <remarks>
-    /// Sent to Gotenberg 7 and 8 as a file part of the form field <c>watermark</c> (from Gotenberg 8.28.0 on). Gotenberg 9 draws over the page only: a request with a watermark throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to it; use <see cref="StampOptionsBuilder" /> there.
+    /// Sent to Gotenberg 7 and 8 as a file part of the form field <c>watermark</c> (from Gotenberg 8.28.0 on). Gotenberg 9 draws over the page only: a request with a watermark throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to it; use a stamp there, listed with <c>WithStages</c> (<c>StampImage</c> or <c>StampPdf</c>, made faint with <c>SetOpacity</c>).
     /// </remarks>
     /// <param name="fileName">The name of the file, such as <c>letterhead.pdf</c>: a relative name with an extension, which gives the media type.</param>
     /// <param name="content">The content of the file.</param>

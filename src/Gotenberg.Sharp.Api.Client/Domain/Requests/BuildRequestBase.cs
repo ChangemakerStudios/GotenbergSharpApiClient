@@ -55,6 +55,12 @@ public abstract class BuildRequestBase
     public StampOptions? StampOptions { get; set; }
 
     /// <summary>
+    /// The stages the caller listed with <c>WithStages</c> or <c>PdfEngineBuilders.Pipe</c>, sent to
+    /// Gotenberg 9 as listed in place of the cross-cutting options; null when none were listed.
+    /// </summary>
+    internal ExplicitStages? ExplicitStages { get; set; }
+
+    /// <summary>
     /// The route of this request on Gotenberg 7 and 8.
     /// </summary>
     protected abstract string ApiPath { get; }
@@ -143,13 +149,26 @@ public abstract class BuildRequestBase
     /// <summary>
     /// The exception the request would throw when rendered for <paramref name="api" /> because an
     /// option has no equivalent there, or null; <paramref name="runningVersion" /> goes into it.
+    /// Explicit stages have none on Gotenberg 7 and 8.
     /// </summary>
     internal GotenbergVersionNotSupportedException? FindUnsupportedOn(
         GotenbergApiVersion api,
         GotenbergVersion runningVersion) =>
         api == GotenbergApiVersion.V9
             ? StageList.FindRemoved(this, runningVersion) ?? this.Config?.Webhook?.FindRemoved(runningVersion)
-            : null;
+            : StageList.FindNeedsGotenberg9(this, runningVersion);
+
+    /// <summary>
+    /// The files of this request that a Gotenberg 9 stage reads, uploaded under <c>files</c> with the
+    /// other files of the request, each with the name of the property or parameter that sets it.
+    /// </summary>
+    internal virtual IEnumerable<(string FileName, string ParamName)> StageFiles()
+    {
+        if (this.StampOptions is { SendsFile: true } stamp) yield return (stamp.FileName!, nameof(StampOptions.FileName));
+
+        foreach (var (fileName, _) in (this.ExplicitStages?.Files).IfNullEmpty())
+            yield return (fileName, nameof(fileName));
+    }
 
     private IEnumerable<HttpContent> RenderGotenberg9PostProcessing()
     {
@@ -163,9 +182,12 @@ public abstract class BuildRequestBase
 
         var parts = stages.ToHttpContent().ToList();
 
-        // Gotenberg 9 reads the file of an image or PDF stamp from 'files', where the stage names it.
+        // Gotenberg 9 reads the files of stages from 'files', where the stages name them.
         if (this.StampOptions is { SendsFile: true } stamp)
             parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, stamp.FileName!, stamp.FileContent!));
+
+        foreach (var (fileName, content) in (this.ExplicitStages?.Files).IfNullEmpty())
+            parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, fileName, content));
 
         if (this.ReadsNativeTaggedPdf && this.PdfOutputOptions?.GenerateTaggedPdf is { } tagged)
             parts.Add(CreateFormDataItem(tagged ? "true" : "false", Constants.Gotenberg.PdfOutput.NativeTaggedPdf));
@@ -173,10 +195,19 @@ public abstract class BuildRequestBase
         return parts;
     }
 
+    /// <summary>
+    /// Validates the request before it is wrapped for sending, whatever the Gotenberg it goes to.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the request lists stages and sets a cross-cutting option the client would send as a stage.</exception>
     protected virtual void Validate()
     {
         this.Config?.Validate();
         this.Assets?.Validate();
+
+        if (this.ExplicitStages is { IsEmpty: false } && StageList.FindMappedOption(this) is { } mapped)
+            throw new InvalidOperationException(
+                $"{mapped.Option} cannot be combined with explicit stages (WithStages or PdfEngineBuilders.Pipe), which are sent as listed and replace the stages the client builds from the options. "
+                + $"Remove {mapped.Option} and list its stage where it belongs: {mapped.Replacement}.");
     }
 
     /// <summary>
@@ -207,25 +238,32 @@ public abstract class BuildRequestBase
     {
         var parts = this.RenderContent(api);
 
-        // Gotenberg 7 and 8 read the file of a stamp from its own form field, so no other file can clash with it.
-        if (api != GotenbergApiVersion.V9 || this.StampOptions is not { SendsFile: true } stamp) return parts;
+        // Gotenberg 7 and 8 read the files of stamps and embeds from fields of their own, so no other file can clash with them.
+        if (api != GotenbergApiVersion.V9) return parts;
 
-        return RejectStampFileClash(parts.ToList(), stamp.FileName!);
+        var stageFiles = this.StageFiles().ToList();
+
+        return stageFiles.Count == 0 ? parts : RejectFileClash(parts.ToList(), stageFiles);
     }
 
-    // Gotenberg 9 reads every file from 'files' and stores it under its name, so a stamp file named like
-    // another file of the request would replace it, or be replaced by it.
-    private static List<HttpContent> RejectStampFileClash(List<HttpContent> parts, string stampFileName)
+    // Gotenberg 9 reads every file from 'files' and stores it under its name, so a file a stage reads that
+    // is named like another file of the request would replace it, or be replaced by it.
+    private static List<HttpContent> RejectFileClash(
+        List<HttpContent> parts,
+        IEnumerable<(string FileName, string ParamName)> stageFiles)
     {
-        var uploads = parts.Count(
-            p => p.Headers.ContentDisposition is { } d
-                 && d.Name?.Trim('"') == Constants.Gotenberg.SharedFormFieldNames.Files
-                 && d.FileName?.Trim('"') == stampFileName);
+        foreach (var (fileName, paramName) in stageFiles)
+        {
+            var uploads = parts.Count(
+                p => p.Headers.ContentDisposition is { } d
+                     && d.Name?.Trim('"') == Constants.Gotenberg.SharedFormFieldNames.Files
+                     && d.FileName?.Trim('"') == fileName);
 
-        if (uploads > 1)
-            throw new ArgumentException(
-                $"The stamp file '{stampFileName}' has the name of another file of the request. On Gotenberg 9 every file is uploaded under 'files' with its name, so give the stamp file another name.",
-                nameof(StampOptions.FileName));
+            if (uploads > 1)
+                throw new ArgumentException(
+                    $"The file '{fileName}' that a stage reads has the name of another file of the request. On Gotenberg 9 every file is uploaded under 'files' with its name, so give one of them another name.",
+                    paramName);
+        }
 
         return parts;
     }

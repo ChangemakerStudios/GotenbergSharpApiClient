@@ -33,11 +33,13 @@ namespace Gotenberg.Sharp.API.Client.Domain.Stages;
 /// The post-processing of a request on Gotenberg 9: the operations of its one <c>stages</c> form
 /// field, in the order Gotenberg runs them. Gotenberg 8 took the same options as flat fields and ran
 /// them in a fixed order; <see cref="For" /> lists them in that order, with the two moves Gotenberg 9
-/// requires: metadata before the PDF/A and PDF/UA remediation, and encryption last.
+/// requires: metadata before the PDF/A and PDF/UA remediation, and encryption last. Stages the
+/// caller lists (<see cref="ExplicitStages" />) are sent as listed instead.
 /// </summary>
 /// <remarks>
-/// The only place the stages are written as JSON (<see cref="ToJson" />), so that a change of JSON
-/// library touches this class alone.
+/// The only place the stages are written as JSON (<see cref="ToJson" />) and the options of a stage
+/// the caller describes are read (<see cref="CreateRawStage" />), so that a change of JSON library
+/// touches this class alone.
 /// </remarks>
 internal sealed class StageList
 {
@@ -46,10 +48,15 @@ internal sealed class StageList
     /// </summary>
     internal static readonly GotenbergVersion Gotenberg9 = GotenbergVersion.Parse("9.0.0");
 
-    // Ends the hint of every option a stage of Gotenberg 9 replaces but the client cannot send yet;
-    // the one sentence to change once callers can list stages themselves.
-    private const string StagesNotSentYet =
-        "This client does not send that stage yet: send the request without the option, or to Gotenberg 8.";
+    /// <summary>
+    /// What a request with explicit stages needs.
+    /// </summary>
+    internal static readonly GotenbergFeatureRequirement ExplicitStagesRequirement =
+        new(Gotenberg9, "Explicit stages (WithStages or PdfEngineBuilders.Pipe)");
+
+    // Ends the hints of the options a stage of Gotenberg 9 replaces only when the caller lists it.
+    private const string ListTheStampInstead =
+        "List the stamp with WithStages (PdfEngineBuilders.Pipe for a PDF operation) and its StampText, StampImage or StampPdf method instead.";
 
     private readonly List<Stage> _stages = [];
 
@@ -98,11 +105,48 @@ internal sealed class StageList
     /// </summary>
     internal StageList Add(string op, params (string Name, object? Value)[] options)
     {
-        this._stages.Add(new Stage(
-            op,
-            options.Where(o => o.Value != null).Select(o => (o.Name, o.Value!)).ToList()));
+        this._stages.Add(CreateStage(op, options));
 
         return this;
+    }
+
+    /// <summary>
+    /// The operation <paramref name="op" /> with the options whose value is not null.
+    /// </summary>
+    internal static Stage CreateStage(string op, params (string Name, object? Value)[] options) =>
+        new(op, options.Where(o => o.Value != null).Select(o => (o.Name, o.Value!)).ToList());
+
+    /// <summary>
+    /// The operation <paramref name="op" /> with the options the caller describes: the properties of a
+    /// <see cref="JObject" />, the entries of a dictionary or the properties of any other object, such
+    /// as an anonymous one, as Newtonsoft.Json serializes them. Null options are left out.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="options" /> is not an object with named options, or names an option <c>op</c>.</exception>
+    internal static Stage CreateRawStage(string op, object? options)
+    {
+        var json = options switch
+        {
+            null => new JObject(),
+            JObject given => (JObject)given.DeepClone(),
+            _ => JToken.FromObject(options) as JObject
+        };
+
+        if (json == null)
+            throw new ArgumentException(
+                $"The options of the '{op}' stage must be an object with named options (an anonymous object, a dictionary or a JObject), not {options!.GetType().Name}.",
+                nameof(options));
+
+        if (json.Property(Constants.Gotenberg.Stages.Op) != null)
+            throw new ArgumentException(
+                $"The options of the '{op}' stage must not set 'op': the operation is the first argument.",
+                nameof(options));
+
+        return new Stage(
+            op,
+            json.Properties()
+                .Where(p => p.Value.Type is not (JTokenType.Null or JTokenType.Undefined))
+                .Select(p => (p.Name, (object)p.Value))
+                .ToList());
     }
 
     /// <summary>
@@ -117,12 +161,42 @@ internal sealed class StageList
         {
             var item = new JObject { [Constants.Gotenberg.Stages.Op] = stage.Op };
 
-            foreach (var (name, value) in stage.Options) item[name] = JToken.FromObject(value);
+            foreach (var (name, value) in stage.Options) item[name] = ToJsonValue(value);
 
             array.Add(item);
         }
 
         return array.ToString(Formatting.None);
+    }
+
+    // Gotenberg 9 names the page of a bookmark pageNumber where Gotenberg 8 named it page.
+    private static JToken ToJsonValue(object value) => value switch
+    {
+        JToken json => json.DeepClone(),
+        IEnumerable<Bookmark> bookmarks => ToJsonArray(bookmarks),
+        _ => JToken.FromObject(value)
+    };
+
+    private static JArray ToJsonArray(IEnumerable<Bookmark> bookmarks)
+    {
+        var array = new JArray();
+
+        foreach (var bookmark in bookmarks)
+        {
+            var item = new JObject
+            {
+                [StageOptions.Title] = bookmark.Title,
+                [StageOptions.PageNumber] = bookmark.Page
+            };
+
+            var children = bookmark.Children.IfNullEmpty().ToList();
+
+            if (children.Count > 0) item[StageOptions.Children] = ToJsonArray(children);
+
+            array.Add(item);
+        }
+
+        return array;
     }
 
     /// <summary>
@@ -137,7 +211,8 @@ internal sealed class StageList
 
     /// <summary>
     /// The stages of <paramref name="request" /> on Gotenberg 9: those its route contributes
-    /// (<see cref="BuildRequestBase.AddRouteStages" />), then its cross-cutting options.
+    /// (<see cref="BuildRequestBase.AddRouteStages" />), then the stages the caller listed, or its
+    /// cross-cutting options when it listed none.
     /// </summary>
     /// <param name="request">The request to render.</param>
     /// <param name="runningVersion">The version the service reported, for the exception; <see cref="GotenbergVersion.Unknown" /> when it was not read.</param>
@@ -153,10 +228,48 @@ internal sealed class StageList
 
         if (removed != null) throw removed;
 
-        // Stages the caller lists explicitly will replace this mapping, not add to it.
-        stages.AddCrossCuttingOptions(request);
+        // Validation refused the cross-cutting options that would map to stages next to explicit ones.
+        if (request.ExplicitStages is { IsEmpty: false } explicitStages)
+            stages._stages.AddRange(explicitStages.Stages);
+        else
+            stages.AddCrossCuttingOptions(request);
 
         return stages;
+    }
+
+    /// <summary>
+    /// The exception for a request with explicit stages, which only Gotenberg 9 runs, rendered for
+    /// Gotenberg 7 and 8; null for any other request.
+    /// </summary>
+    internal static GotenbergVersionNotSupportedException? FindNeedsGotenberg9(
+        BuildRequestBase request,
+        GotenbergVersion runningVersion) =>
+        request.ExplicitStages is { IsEmpty: false }
+            ? GotenbergVersionNotSupportedException.RequiresNewerApi(ExplicitStagesRequirement, runningVersion)
+            : null;
+
+    /// <summary>
+    /// The cross-cutting option of <paramref name="request" /> that the client would send as a stage
+    /// on Gotenberg 9, with the stages builder method that replaces it, or null when it has none.
+    /// <see cref="PdfOutputOptions.GenerateTaggedPdf" /> is a form field, not a stage.
+    /// </summary>
+    internal static (string Option, string Replacement)? FindMappedOption(BuildRequestBase request)
+    {
+        var output = request.PdfOutputOptions;
+
+        if (output?.PdfFormat is { } format && format != PdfFormat.PdfFormat.None)
+            return ("PdfOutputOptions.PdfFormat", "Remediate");
+        if (output?.EnablePdfUa == true) return ("PdfOutputOptions.EnablePdfUa", "Remediate");
+        if (output?.Flatten == true) return ("PdfOutputOptions.Flatten", "FlattenForm");
+        if (output?.MetaData != null) return ("PdfOutputOptions.MetaData", "SetMetadata");
+        if (output?.UserPassword != null) return ("PdfOutputOptions.UserPassword", "Encrypt");
+        if (output?.OwnerPassword != null) return ("PdfOutputOptions.OwnerPassword", "Encrypt");
+        if (request.RotationOptions?.RotateAngle != null) return ("RotationOptions", "Rotate");
+        if (request.SplitOptions?.Mode != null) return ("SplitOptions", "SplitEvery, SplitRanges or Select");
+        if (request.WatermarkOptions?.Source != null) return ("WatermarkOptions", "StampText, StampImage or StampPdf");
+        if (request.StampOptions?.Source != null) return ("StampOptions", "StampText, StampImage or StampPdf");
+
+        return null;
     }
 
     /// <summary>
@@ -191,13 +304,13 @@ internal sealed class StageList
             return Removed(
                 "A watermark (WatermarkOptions)",
                 "Gotenberg 9 draws over the page only, never behind it: its stamp-text, stamp-image and stamp-pdf stages replace watermarks. "
-                + StagesNotSentYet);
+                + ListTheStampInstead);
 
         if (request.StampOptions is { Source: not null, Options: not null })
             return Removed(
                 "A stamp with free-form options (StampOptions.Options)",
                 "Gotenberg 9 replaces pdfcpu's stamp options with the typed options of its stamp-text, stamp-image and stamp-pdf stages (position, x, y, fontSize, opacity, rotation and others). "
-                + StagesNotSentYet);
+                + ListTheStampInstead + " Its options builder sets them.");
 
         var output = routeStages.EffectiveOutput(request);
 
@@ -363,34 +476,11 @@ internal sealed class StageList
         if (fields.Count > 0) this.Add(Ops.SetMetadata, fields.ToArray());
     }
 
-    // Gotenberg 9 names the page of a bookmark pageNumber where Gotenberg 8 named it page.
     private void AddBookmarks()
     {
         if (this.RouteBookmarks == null) return;
 
-        this.Add(Ops.SetBookmarks, (StageOptions.Bookmarks, ToJsonArray(this.RouteBookmarks)));
-
-        static JArray ToJsonArray(IEnumerable<Bookmark> bookmarks)
-        {
-            var array = new JArray();
-
-            foreach (var bookmark in bookmarks)
-            {
-                var item = new JObject
-                {
-                    [StageOptions.Title] = bookmark.Title,
-                    [StageOptions.PageNumber] = bookmark.Page
-                };
-
-                var children = bookmark.Children.IfNullEmpty().ToList();
-
-                if (children.Count > 0) item[StageOptions.Children] = ToJsonArray(children);
-
-                array.Add(item);
-            }
-
-            return array;
-        }
+        this.Add(Ops.SetBookmarks, (StageOptions.Bookmarks, this.RouteBookmarks));
     }
 
     private void AddAttachments()
@@ -438,7 +528,8 @@ internal sealed class StageList
 
 /// <summary>
 /// One operation of a <see cref="StageList" />: its name and its options, in camelCase, each a
-/// string, a number or an array of strings.
+/// string, a number, a boolean, an array of strings, a dictionary, a list of bookmarks, or JSON the
+/// caller described (<see cref="StageList.CreateRawStage" />).
 /// </summary>
 internal sealed class Stage(string op, IReadOnlyList<(string Name, object Value)> options)
 {

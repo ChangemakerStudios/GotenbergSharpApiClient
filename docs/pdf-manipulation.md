@@ -239,7 +239,8 @@ stage, drawn with the defaults of Gotenberg 9, and its file is uploaded with the
 request: its name must differ from theirs (an asset, a PDF to process, `index.html`, `header.html`,
 `footer.html`, an embedded file), or an `ArgumentException` names the clash. A stamp with free-form
 `SetOptions` is not available on Gotenberg 9, and an image or PDF stamp set with `SetSource` alone,
-without its file, throws an `ArgumentException` that names the method to use.
+without its file, throws an `ArgumentException` that names the method to use. To place, size, fade or
+turn a stamp on Gotenberg 9, list it with `WithStages` instead: see [Stages](stages.md).
 
 ### Rotation
 

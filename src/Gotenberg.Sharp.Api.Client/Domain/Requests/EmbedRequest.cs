@@ -31,6 +31,10 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
 
         public IDictionary<string, Entry>? EmbedsData { get; set; }
 
+        // On Gotenberg 9 each embedded file is uploaded under 'files', where its attach stage names it.
+        internal override IEnumerable<(string FileName, string ParamName)> StageFiles() =>
+            base.StageFiles().Concat(this.EmbedsData.IfNullEmpty().Select(kvp => (kvp.Key, nameof(this.EmbedsData))));
+
         /// <inheritdoc />
         protected override void Validate()
         {
@@ -45,15 +49,6 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             if (api == GotenbergApiVersion.V9)
             {
-                // Gotenberg 9 reads every file from 'files' and stores it under its name, so an embedded
-                // file named like a PDF of the request would replace it.
-                var clash = this.EmbedsData!.Keys.FirstOrDefault(name => this.Assets.IfNullEmpty().Any(pdf => pdf.Key == name));
-
-                if (clash != null)
-                    throw new ArgumentException(
-                        $"The embedded file '{clash}' has the name of a PDF of the request. On Gotenberg 9 both are uploaded as files under their names, so give the embedded file another name.",
-                        nameof(this.EmbedsData));
-
                 foreach (var kvp in this.EmbedsData!)
                     yield return this.ToFilePart(kvp, Constants.Gotenberg.SharedFormFieldNames.Files);
 

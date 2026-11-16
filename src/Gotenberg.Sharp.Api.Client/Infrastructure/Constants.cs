@@ -188,6 +188,7 @@ public static class Constants
                 internal const string Encrypt = "encrypt";
                 internal const string SetBookmarks = "set-bookmarks";
                 internal const string Attach = "attach";
+                internal const string Optimize = "optimize";
             }
 
             internal static class Options
@@ -197,6 +198,21 @@ public static class Constants
                 internal const string Pages = "pages";
                 internal const string Angle = "angle";
                 internal const string Text = "text";
+                internal const string Ranges = "ranges";
+
+                // stamp-text, stamp-image, stamp-pdf: placement and look
+                internal const string X = "x";
+                internal const string Y = "y";
+                internal const string Position = "position";
+                internal const string Opacity = "opacity";
+                internal const string Rotation = "rotation";
+                internal const string FontSize = "fontSize";
+                internal const string Font = "font";
+                internal const string Color = "color";
+                internal const string Width = "width";
+                internal const string Height = "height";
+                internal const string SourcePage = "sourcePage";
+                internal const string Scale = "scale";
 
                 // stamp-image, stamp-pdf: an uploaded file, named by its file name
                 internal const string Image = "image";
@@ -208,6 +224,8 @@ public static class Constants
                 // encrypt
                 internal const string UserPassword = "userPassword";
                 internal const string OwnerPassword = "ownerPassword";
+                internal const string Algorithm = "algorithm";
+                internal const string Permissions = "permissions";
 
                 // set-metadata: the eight fields Gotenberg 9 writes
                 internal const string Title = "title";
@@ -233,6 +251,18 @@ public static class Constants
             internal static class Profiles
             {
                 internal const string PdfUa1 = "PDF/UA-1";
+            }
+
+            // encrypt: the keys of "permissions", each true or false
+            internal static class PermissionKeys
+            {
+                internal const string Print = "print";
+                internal const string PrintHighQuality = "printHighQuality";
+                internal const string ModifyContent = "modifyContent";
+                internal const string ExtractText = "extractText";
+                internal const string ModifyAnnotations = "modifyAnnotations";
+                internal const string FillForms = "fillForms";
+                internal const string Assemble = "assemble";
             }
         }
 

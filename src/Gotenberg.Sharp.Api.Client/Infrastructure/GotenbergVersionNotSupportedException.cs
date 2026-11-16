@@ -92,6 +92,35 @@ public sealed class GotenbergVersionNotSupportedException : Exception
     }
 
     /// <summary>
+    /// The feature needs the release of <paramref name="requirement" />, but the request is rendered
+    /// for the API of an older major: the service reports an older version, or none, or the client was
+    /// set to that API explicitly. Unlike <see cref="Create" />, the message never suggests skipping the
+    /// version check, which would not make the older API run the feature.
+    /// </summary>
+    internal static GotenbergVersionNotSupportedException RequiresNewerApi(
+        GotenbergFeatureRequirement requirement,
+        GotenbergVersion runningVersion)
+    {
+        if (requirement == null) throw new ArgumentNullException(nameof(requirement));
+        if (runningVersion == null) throw new ArgumentNullException(nameof(runningVersion));
+
+        var minimum = requirement.MinimumVersion;
+
+        var message = runningVersion.IsKnown
+            ? $"{requirement.Feature} requires Gotenberg {minimum} or newer, but the service at this address reports {runningVersion}. Upgrade Gotenberg to use this feature."
+            : $"{requirement.Feature} requires Gotenberg {minimum} or newer, but the request is rendered for Gotenberg 7 and 8: {nameof(GotenbergSharpClient)}.{nameof(GotenbergSharpClient.ApiVersion)} is set to {nameof(GotenbergApiVersion.V8)}, or the service did not report its version. "
+              + $"Send it to a Gotenberg {minimum.Major} service with {nameof(GotenbergSharpClient.ApiVersion)} set to {nameof(GotenbergApiVersion.Auto)} or {nameof(GotenbergApiVersion.V9)}.";
+
+        return new GotenbergVersionNotSupportedException(
+            message,
+            requirement.Feature,
+            requirement,
+            removedInVersion: null,
+            replacement: null,
+            runningVersion);
+    }
+
+    /// <summary>
     /// The feature has no equivalent on <paramref name="removedIn" /> or newer, the release the
     /// request is rendered for. <paramref name="runningVersion" /> is unknown when the client was set
     /// to that API explicitly instead of reading the version of the service.
