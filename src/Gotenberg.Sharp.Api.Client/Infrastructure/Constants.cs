@@ -440,6 +440,8 @@ public static class Constants
 
             public const string ErrorHttpMethod = "Gotenberg-Webhook-Error-Method";
 
+            public const string EventsUrl = "Gotenberg-Webhook-Events-Url";
+
             public const string ExtraHeaders = "Gotenberg-Webhook-Extra-Http-Headers";
         }
 

@@ -225,8 +225,8 @@ public class WireCharacterisationTests
 
     /// <summary>
     /// The requests whose V9 snapshot is of a variant of the V8 case: the V8 "cross-cutting" request
-    /// sets a watermark and encrypts a PDF/A document, which Gotenberg 9 refuses, and has a webhook,
-    /// whose headers differ on 9 (a later step).
+    /// sets a watermark and encrypts a PDF/A document, which Gotenberg 9 refuses, and has a webhook
+    /// with an error url, which Gotenberg 9 replaced with an events url.
     /// </summary>
     private static readonly Dictionary<string, Func<BuildRequestBase>> V9Variants = new()
     {
@@ -241,7 +241,14 @@ public class WireCharacterisationTests
             .SetRotationOptions(r => r.SetAngle(180).SetPages("1"))
             .SetSplitOptions(s => s.SplitByIntervals("2"))
             .SetStampOptions(s => s.SetTextStamp("STAMP", "1"))
-            .ConfigureRequest(c => c.SetPageRanges("1-3").SetResultFileName("result.pdf").SetTrace("trace-42"))
+            .ConfigureRequest(c => c
+                .SetPageRanges("1-3")
+                .SetResultFileName("result.pdf")
+                .SetTrace("trace-42")
+                .AddWebhook(w => w
+                    .SetUrl("https://hooks.example.com/done", HttpMethod.Put)
+                    .SetEventsUrl("https://hooks.example.com/events")
+                    .AddExtraHeader("X-Hook-Key", "secret")))
             .Build()
     };
 

@@ -15,12 +15,15 @@
 
 using Gotenberg.Sharp.API.Client.Domain.ExtraHeaders;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
 public sealed class Webhook
 {
     private Uri? _errorUrl;
+
+    private Uri? _eventsUrl;
 
     private Uri? _targetUrl;
 
@@ -53,7 +56,9 @@ public sealed class Webhook
     public string? HttpMethod { get; set; }
 
     /// <summary>
-    ///     The callback url to use if an error occurs
+    ///     The callback url to use if an error occurs. Gotenberg 7 and 8 post the error as the raw body of
+    ///     the failure there. Gotenberg 9.0.0 removed it: it never sends this url, and a request with a
+    ///     webhook that has no <see cref="EventsUrl" /> cannot be sent to it.
     /// </summary>
     public Uri? ErrorUrl
     {
@@ -70,8 +75,30 @@ public sealed class Webhook
 
     /// <summary>
     ///     The HTTP method to use when an error occurs. Defaults to post if nothing is set.
+    ///     Not sent to Gotenberg 9, which has no error url.
     /// </summary>
     public string? ErrorHttpMethod { get; set; }
+
+    /// <summary>
+    ///     The url that receives a JSON event for each outcome of the webhook: <c>webhook.success</c> once
+    ///     the file is delivered, <c>webhook.error</c> (with the status and message of the failure) when
+    ///     the conversion or the delivery fails. Gotenberg 9 requires it with the webhook url and reports
+    ///     errors only there. Gotenberg 7 and 8 take it as an alternative to <see cref="ErrorUrl" />
+    ///     (Gotenberg 8.40.0 accepts a webhook with either or both); only Gotenberg 8.29.0 and newer
+    ///     read it, and the client does not check the release of Gotenberg 7 or 8 for it.
+    /// </summary>
+    public Uri? EventsUrl
+    {
+        get => this._eventsUrl;
+        set
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (!value.IsAbsoluteUri)
+                throw new InvalidOperationException("WebHook url must be absolute");
+
+            this._eventsUrl = value;
+        }
+    }
 
     public ExtraHttpHeaders ExtraHttpHeaders { get; } = new();
 
@@ -83,15 +110,30 @@ public sealed class Webhook
 
     public void Validate()
     {
-        if (this.TargetUrl != null && this.ErrorUrl == null)
+        if (this.TargetUrl != null && this.ErrorUrl == null && this.EventsUrl == null)
             throw new ArgumentNullException(
                 nameof(this.ErrorUrl),
-                "An webhook error url is required");
+                "A webhook error url or events url is required");
     }
 
     public bool IsConfigured()
     {
-        return this.TargetUrl != null && this.ErrorUrl != null;
+        return this.TargetUrl != null && (this.ErrorUrl != null || this.EventsUrl != null);
+    }
+
+    /// <summary>
+    ///     The exception for a configured webhook that Gotenberg 9 cannot be given, or null: it requires
+    ///     the events url and has no error url to send in its place.
+    /// </summary>
+    internal GotenbergVersionNotSupportedException? FindRemoved(GotenbergVersion runningVersion)
+    {
+        if (!this.IsConfigured() || this.EventsUrl != null) return null;
+
+        return GotenbergVersionNotSupportedException.Removed(
+            "A webhook with an error url (Webhook.ErrorUrl)",
+            StageList.Gotenberg9,
+            runningVersion,
+            "Gotenberg 9 reports errors as webhook.error events sent to the webhook events url, together with the success events: set one with WebhookBuilder.SetEventsUrl.");
     }
 
     public IEnumerable<(string, string?)> GetHeaders() => this.GetHeaders(GotenbergApiVersion.V8);
@@ -103,13 +145,26 @@ public sealed class Webhook
     {
         if (!this.IsConfigured()) return [];
 
-        var webHookHeaders = new List<(string Name, string? Value)>
-        {
-            (Constants.Gotenberg.Webhook.Url, this.TargetUrl?.ToString()),
-            (Constants.Gotenberg.Webhook.HttpMethod, this.HttpMethod),
-            (Constants.Gotenberg.Webhook.ErrorUrl, this.ErrorUrl?.ToString()),
-            (Constants.Gotenberg.Webhook.ErrorHttpMethod, this.ErrorHttpMethod)
-        };
+        // The client has checked FindRemoved before rendering for Gotenberg 9; rendering without that
+        // check must fail the same way rather than drop the webhook.
+        if (api == GotenbergApiVersion.V9 && this.FindRemoved(GotenbergVersion.Unknown) is { } removed) throw removed;
+
+        // Gotenberg 9 has no error url or error method; Gotenberg 7 and 8 get the headers they always did.
+        var webHookHeaders = api == GotenbergApiVersion.V9
+            ? new List<(string Name, string? Value)>
+            {
+                (Constants.Gotenberg.Webhook.Url, this.TargetUrl?.ToString()),
+                (Constants.Gotenberg.Webhook.HttpMethod, this.HttpMethod),
+                (Constants.Gotenberg.Webhook.EventsUrl, this.EventsUrl?.ToString())
+            }
+            : new List<(string Name, string? Value)>
+            {
+                (Constants.Gotenberg.Webhook.Url, this.TargetUrl?.ToString()),
+                (Constants.Gotenberg.Webhook.HttpMethod, this.HttpMethod),
+                (Constants.Gotenberg.Webhook.ErrorUrl, this.ErrorUrl?.ToString()),
+                (Constants.Gotenberg.Webhook.ErrorHttpMethod, this.ErrorHttpMethod),
+                (Constants.Gotenberg.Webhook.EventsUrl, this.EventsUrl?.ToString())
+            };
 
         return webHookHeaders.Concat(this.ExtraHttpHeaders.GetHeaders())
             .Where(entry => !string.IsNullOrWhiteSpace(entry.Value));

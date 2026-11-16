@@ -1,6 +1,10 @@
 POST forms/chromium/convert/html
 header Gotenberg-Trace: trace-42
 header Gotenberg-Output-Filename: result.pdf
+header Gotenberg-Webhook-Url: https://hooks.example.com/done
+header Gotenberg-Webhook-Method: PUT
+header Gotenberg-Webhook-Events-Url: https://hooks.example.com/events
+header Gotenberg-Webhook-Extra-Http-Headers: {"X-Hook-Key":"secret"}
 part name=stages type=text/plain
     [{"op":"split","every":2},{"op":"stamp-text","text":"STAMP","pages":"1"},{"op":"rotate","angle":180,"pages":"1"},{"op":"flatten-form"},{"op":"set-metadata","title":"T","creationDate":"D:20060918162750"},{"op":"remediate","profile":["PDF/A-2b","PDF/UA-1"]}]
 part name=nativeTaggedPdf type=text/plain

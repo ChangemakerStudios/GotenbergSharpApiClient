@@ -147,7 +147,9 @@ public abstract class BuildRequestBase
     internal GotenbergVersionNotSupportedException? FindUnsupportedOn(
         GotenbergApiVersion api,
         GotenbergVersion runningVersion) =>
-        api == GotenbergApiVersion.V9 ? StageList.FindRemoved(this, runningVersion) : null;
+        api == GotenbergApiVersion.V9
+            ? StageList.FindRemoved(this, runningVersion) ?? this.Config?.Webhook?.FindRemoved(runningVersion)
+            : null;
 
     private IEnumerable<HttpContent> RenderGotenberg9PostProcessing()
     {
