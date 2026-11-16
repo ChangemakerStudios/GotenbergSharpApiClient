@@ -104,8 +104,9 @@ public abstract class BuildRequestBase
     }
 
     /// <summary>
-    /// Whether the route of this request applies the cross-cutting options. Screenshot routes do not:
-    /// Gotenberg 8 ignored the options there, and Gotenberg 9 refuses <c>stages</c>.
+    /// Whether the route of this request applies the cross-cutting options. Screenshot routes and the
+    /// routes that read PDFs do not: Gotenberg 8 ignored the options there, and Gotenberg 9 refuses
+    /// <c>stages</c> and every other field it does not know.
     /// </summary>
     internal virtual bool AppliesPostProcessing => true;
 
@@ -126,6 +127,20 @@ public abstract class BuildRequestBase
     }
 
     /// <summary>
+    /// The exception for an option of this request's own route that Gotenberg 9 has no equivalent
+    /// for, built with <paramref name="removed" /> (the feature, then what to use instead), or null.
+    /// </summary>
+    internal virtual GotenbergVersionNotSupportedException? FindRouteRemoved(
+        Func<string, string, GotenbergVersionNotSupportedException> removed) => null;
+
+    /// <summary>
+    /// What to tell the caller when the request has no stage on Gotenberg 9 although its route runs
+    /// stages and refuses an empty list, or null when an empty list is fine (Chromium and
+    /// LibreOffice) or cannot happen.
+    /// </summary>
+    internal virtual string? NoStagesMessage => null;
+
+    /// <summary>
     /// The exception the request would throw when rendered for <paramref name="api" /> because an
     /// option has no equivalent there, or null; <paramref name="runningVersion" /> goes into it.
     /// </summary>
@@ -136,9 +151,15 @@ public abstract class BuildRequestBase
 
     private IEnumerable<HttpContent> RenderGotenberg9PostProcessing()
     {
+        if (!this.AppliesPostProcessing) return [];
+
         // The client has checked FindUnsupportedOn with the version of the service before rendering,
         // so a request rendered here without that check reports no running version.
-        var parts = StageList.For(this, GotenbergVersion.Unknown).ToHttpContent().ToList();
+        var stages = StageList.For(this, GotenbergVersion.Unknown);
+
+        if (stages.IsEmpty && this.NoStagesMessage is { } message) throw new InvalidOperationException(message);
+
+        var parts = stages.ToHttpContent().ToList();
 
         if (this.ReadsNativeTaggedPdf && this.PdfOutputOptions?.GenerateTaggedPdf is { } tagged)
             parts.Add(CreateFormDataItem(tagged ? "true" : "false", Constants.Gotenberg.PdfOutput.NativeTaggedPdf));

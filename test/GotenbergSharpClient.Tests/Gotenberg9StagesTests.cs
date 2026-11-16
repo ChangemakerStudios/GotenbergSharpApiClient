@@ -35,7 +35,7 @@ namespace GotenbergSharpClient.Tests;
 [TestFixture]
 public class Gotenberg9StagesTests
 {
-    private const string StagesField = "stages";
+    internal const string StagesField = "stages";
 
     // Every flat field Gotenberg 8 took for post-processing; Gotenberg 9 refuses each of them.
     private static readonly string[] Gotenberg8PostProcessingFields =
@@ -52,9 +52,9 @@ public class Gotenberg9StagesTests
     private static MergeOfficeBuilder Office() => new MergeOfficeBuilder()
         .WithAssets(a => a.AddItem("one.docx", new byte[] { 1, 2, 3 }));
 
-    private static JArray Stages(RenderedRequest rendered) => JArray.Parse(rendered.Part(StagesField).Value);
+    internal static JArray Stages(RenderedRequest rendered) => JArray.Parse(rendered.Part(StagesField).Value);
 
-    private static void ShouldHaveStages(RenderedRequest rendered, string expectedJson)
+    internal static void ShouldHaveStages(RenderedRequest rendered, string expectedJson)
     {
         rendered.PartNames.Count(n => n == StagesField).Should().Be(1, "a request sends all its stages in one field");
 

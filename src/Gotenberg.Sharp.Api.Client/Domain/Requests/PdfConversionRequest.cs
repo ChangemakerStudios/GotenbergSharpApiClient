@@ -21,6 +21,15 @@ public class PdfConversionRequest : PdfRequestBase
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.ConvertPdf;
 
+    protected override string GetApiPath(GotenbergApiVersion api) =>
+        api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
+
+    // The conversion of Gotenberg 9 is the remediate stage the PDF format and PDF/UA options map to.
+    // Gotenberg 8 answered a request with neither with a 400; Gotenberg 9 refuses an empty list of stages.
+    internal override string? NoStagesMessage =>
+        "A PDF conversion needs a target: set PdfOutputOptions.PdfFormat (PDF/A) or PdfOutputOptions.EnablePdfUa, "
+        + "or another post-processing option, for Gotenberg 9 to have a stage to run.";
+
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         foreach (var content in base.ToHttpContent(api))
@@ -43,9 +52,11 @@ public class PdfConversionRequest : PdfRequestBase
             yield return contentItem;
         }
 
-        foreach (var item in Config.IfNullEmptyContent(api))
-        {
-            yield return item;
-        }
+        // The pipe route of Gotenberg 9 takes no page ranges; 8 ignored them there.
+        if (api == GotenbergApiVersion.V8)
+            foreach (var item in Config.IfNullEmptyContent(api))
+            {
+                yield return item;
+            }
     }
 }

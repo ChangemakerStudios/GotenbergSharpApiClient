@@ -15,6 +15,7 @@
 
 using System.Globalization;
 
+using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
@@ -51,6 +52,46 @@ internal sealed class StageList
         "This client does not send that stage yet: send the request without the option, or to Gotenberg 8.";
 
     private readonly List<Stage> _stages = [];
+
+    private readonly List<(string File, string? MimeType, string? Relationship)> _attachments = [];
+
+    /// <summary>
+    /// The options the route of the request takes itself, such as the passwords of an encrypt request.
+    /// They become stages at their place in the order, and win over the same option of the request,
+    /// as the first value of a repeated field did on Gotenberg 8.
+    /// </summary>
+    internal PdfOutputOptions? RouteOutput { get; set; }
+
+    /// <summary>
+    /// <see cref="RouteOutput" /> for the rotation: the route's own angle, and its pages when it sets them.
+    /// </summary>
+    internal RotationOptions? RouteRotation { get; set; }
+
+    /// <summary>
+    /// <see cref="RouteOutput" /> for the split: the route's own mode and span, and unify when it is true.
+    /// </summary>
+    internal SplitOptions? RouteSplit { get; set; }
+
+    /// <summary>
+    /// The outline a write-bookmarks request sets, one <c>set-bookmarks</c> stage; it has no
+    /// cross-cutting counterpart.
+    /// </summary>
+    internal IReadOnlyList<Bookmark>? RouteBookmarks { get; set; }
+
+    /// <summary>
+    /// Whether the list has no stage, which Gotenberg 9 refuses for a route that takes stages.
+    /// </summary>
+    internal bool IsEmpty => this._stages.Count == 0;
+
+    /// <summary>
+    /// Attaches the uploaded file <paramref name="file" /> to the PDFs: one <c>attach</c> stage.
+    /// </summary>
+    internal StageList Attach(string file, string? mimeType, string? relationship)
+    {
+        this._attachments.Add((file, mimeType, relationship));
+
+        return this;
+    }
 
     /// <summary>
     /// Appends the operation <paramref name="op" /> with the options whose value is not null.
@@ -100,17 +141,17 @@ internal sealed class StageList
     /// </summary>
     /// <param name="request">The request to render.</param>
     /// <param name="runningVersion">The version the service reported, for the exception; <see cref="GotenbergVersion.Unknown" /> when it was not read.</param>
-    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when an option has no equivalent on Gotenberg 9 (see <see cref="FindRemoved" />).</exception>
+    /// <exception cref="GotenbergVersionNotSupportedException">Thrown when an option has no equivalent on Gotenberg 9 (see <see cref="FindRemoved(BuildRequestBase, GotenbergVersion)" />).</exception>
     /// <exception cref="ArgumentException">Thrown when an option holds a value Gotenberg 9 cannot be given, such as an unreadable metadata date.</exception>
     internal static StageList For(BuildRequestBase request, GotenbergVersion runningVersion)
     {
-        var removed = FindRemoved(request, runningVersion);
-
-        if (removed != null) throw removed;
-
         var stages = new StageList();
 
         request.AddRouteStages(stages);
+
+        var removed = FindRemoved(request, stages, runningVersion);
+
+        if (removed != null) throw removed;
 
         // Stages the caller lists explicitly will replace this mapping, not add to it.
         stages.AddCrossCuttingOptions(request);
@@ -127,6 +168,22 @@ internal sealed class StageList
         BuildRequestBase request,
         GotenbergVersion runningVersion)
     {
+        var routeStages = new StageList();
+
+        request.AddRouteStages(routeStages);
+
+        return FindRemoved(request, routeStages, runningVersion);
+    }
+
+    private static GotenbergVersionNotSupportedException? FindRemoved(
+        BuildRequestBase request,
+        StageList routeStages,
+        GotenbergVersion runningVersion)
+    {
+        var routeRemoved = request.FindRouteRemoved(Removed);
+
+        if (routeRemoved != null) return routeRemoved;
+
         if (!request.AppliesPostProcessing) return null;
 
         // Gotenberg 8 draws no watermark or stamp without a source, so neither is refused then.
@@ -152,7 +209,7 @@ internal sealed class StageList
                     + StagesNotSentYet);
         }
 
-        var output = request.PdfOutputOptions;
+        var output = routeStages.EffectiveOutput(request);
 
         if (output?.MetaData is { } metadata && StageMetadata.FindUnknownKey(metadata) is { } key)
             return Removed(
@@ -170,19 +227,70 @@ internal sealed class StageList
             GotenbergVersionNotSupportedException.Removed(feature, Gotenberg9, runningVersion, replacement);
     }
 
+    // The options of the request and those of its route, the route's winning field by field.
+    private PdfOutputOptions? EffectiveOutput(BuildRequestBase request)
+    {
+        var route = this.RouteOutput;
+        var shared = request.PdfOutputOptions;
+
+        if (route == null) return shared;
+        if (shared == null) return route;
+
+        return new PdfOutputOptions
+        {
+            PdfFormat = route.PdfFormat ?? shared.PdfFormat,
+            EnablePdfUa = route.EnablePdfUa ?? shared.EnablePdfUa,
+            Flatten = route.Flatten ?? shared.Flatten,
+            GenerateTaggedPdf = route.GenerateTaggedPdf ?? shared.GenerateTaggedPdf,
+            MetaData = route.MetaData ?? shared.MetaData,
+            UserPassword = route.UserPassword ?? shared.UserPassword,
+            OwnerPassword = route.OwnerPassword ?? shared.OwnerPassword
+        };
+    }
+
+    private RotationOptions? EffectiveRotation(BuildRequestBase request)
+    {
+        var route = this.RouteRotation;
+        var shared = request.RotationOptions;
+
+        if (route == null) return shared;
+
+        return new RotationOptions
+        {
+            RotateAngle = route.RotateAngle ?? shared?.RotateAngle,
+            RotatePages = route.RotatePages ?? shared?.RotatePages
+        };
+    }
+
+    private SplitOptions? EffectiveSplit(BuildRequestBase request)
+    {
+        var route = this.RouteSplit;
+        var shared = request.SplitOptions;
+
+        if (route == null) return shared;
+
+        // A split request sent splitUnify only when it was true, otherwise the value of the shared option stood.
+        return new SplitOptions
+        {
+            Mode = route.Mode ?? shared?.Mode,
+            Span = route.Span ?? shared?.Span,
+            Unify = route.Unify == true ? true : shared?.Unify
+        };
+    }
+
     private void AddCrossCuttingOptions(BuildRequestBase request)
     {
-        var output = request.PdfOutputOptions;
+        var output = this.EffectiveOutput(request);
 
-        this.AddSplit(request.SplitOptions);
+        this.AddSplit(this.EffectiveSplit(request));
         this.AddStamp(request.StampOptions);
-        this.AddRotation(request.RotationOptions);
+        this.AddRotation(this.EffectiveRotation(request));
 
         if (output?.Flatten == true) this.Add(Ops.FlattenForm);
 
         this.AddMetadata(output?.MetaData);
-
-        // The embedded files of the request (one attach stage each) belong here, before remediate.
+        this.AddBookmarks();
+        this.AddAttachments();
 
         this.AddRemediation(output);
         this.AddEncryption(output);
@@ -244,6 +352,46 @@ internal sealed class StageList
         var fields = StageMetadata.ToStageOptions(metadata);
 
         if (fields.Count > 0) this.Add(Ops.SetMetadata, fields.ToArray());
+    }
+
+    // Gotenberg 9 names the page of a bookmark pageNumber where Gotenberg 8 named it page.
+    private void AddBookmarks()
+    {
+        if (this.RouteBookmarks == null) return;
+
+        this.Add(Ops.SetBookmarks, (StageOptions.Bookmarks, ToJsonArray(this.RouteBookmarks)));
+
+        static JArray ToJsonArray(IEnumerable<Bookmark> bookmarks)
+        {
+            var array = new JArray();
+
+            foreach (var bookmark in bookmarks)
+            {
+                var item = new JObject
+                {
+                    [StageOptions.Title] = bookmark.Title,
+                    [StageOptions.PageNumber] = bookmark.Page
+                };
+
+                var children = bookmark.Children.IfNullEmpty().ToList();
+
+                if (children.Count > 0) item[StageOptions.Children] = ToJsonArray(children);
+
+                array.Add(item);
+            }
+
+            return array;
+        }
+    }
+
+    private void AddAttachments()
+    {
+        foreach (var (file, mimeType, relationship) in this._attachments)
+            this.Add(
+                Ops.Attach,
+                (StageOptions.File, file),
+                (StageOptions.MimeType, mimeType.IsSet() ? mimeType : null),
+                (StageOptions.Relationship, relationship.IsSet() ? relationship : null));
     }
 
     private void AddRemediation(PdfOutputOptions? output)

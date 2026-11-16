@@ -180,6 +180,8 @@ public static class Constants
                 internal const string SetMetadata = "set-metadata";
                 internal const string Remediate = "remediate";
                 internal const string Encrypt = "encrypt";
+                internal const string SetBookmarks = "set-bookmarks";
+                internal const string Attach = "attach";
             }
 
             internal static class Options
@@ -206,6 +208,16 @@ public static class Constants
                 internal const string Producer = "producer";
                 internal const string CreationDate = "creationDate";
                 internal const string ModDate = "modDate";
+
+                // set-bookmarks: a list of bookmarks, each with a title, a page and its children
+                internal const string Bookmarks = "bookmarks";
+                internal const string PageNumber = "pageNumber";
+                internal const string Children = "children";
+
+                // attach: an uploaded file, named by its file name
+                internal const string File = "file";
+                internal const string MimeType = "mimeType";
+                internal const string Relationship = "relationship";
             }
 
             internal static class Profiles
@@ -353,6 +365,21 @@ public static class Constants
                 public const string ReadBookmarks = $"{Root}/bookmarks/read";
 
                 public const string WriteBookmarks = $"{Root}/bookmarks/write";
+            }
+
+            /// <summary>
+            ///     The routes of Gotenberg 9, which replaced those of <see cref="ApiPaths" />: every write
+            ///     operation is a stage of the pipe, the two read operations have a route of their own.
+            /// </summary>
+            public static class Gotenberg9
+            {
+                private const string Root = "forms/pdf";
+
+                public const string Pipe = $"{Root}/pipe";
+
+                public const string ReadMetadata = $"{Root}/metadata";
+
+                public const string ReadBookmarks = $"{Root}/bookmarks";
             }
 
             public static class FormFieldNames

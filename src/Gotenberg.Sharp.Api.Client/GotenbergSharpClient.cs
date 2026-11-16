@@ -385,6 +385,12 @@ public class GotenbergSharpClient
     /// <summary>
     /// Reads metadata from PDF files. Returns JSON string keyed by filename.
     /// </summary>
+    /// <remarks>
+    /// The JSON is returned as Gotenberg wrote it, so its shape depends on the service: ExifTool tags
+    /// (<c>Author</c>, <c>PDFVersion</c>, ...) on Gotenberg 7 and 8, eight camelCase fields (<c>title</c>,
+    /// <c>author</c>, <c>subject</c>, <c>keywords</c>, <c>creator</c>, <c>producer</c>, <c>creationDate</c>,
+    /// <c>modDate</c>, those the document has) on Gotenberg 9.
+    /// </remarks>
     public virtual async Task<string> ReadPdfMetadataAsync(
         PdfEngineBuilder<ReadMetadataRequest> builder,
         CancellationToken cancelToken = default)
@@ -443,7 +449,10 @@ public class GotenbergSharpClient
     /// Use <see cref="ReadPdfBookmarksAsync(PdfEngineBuilder{ReadBookmarksRequest},CancellationToken)" />
     /// for a deserialized outline.
     /// </summary>
-    /// <remarks>Requires Gotenberg 8.28.0 or newer.</remarks>
+    /// <remarks>
+    /// Requires Gotenberg 8.28.0 or newer. The JSON is not translated: a bookmark names its page
+    /// <c>page</c> on Gotenberg 8 and <c>pageNumber</c> on Gotenberg 9.
+    /// </remarks>
     /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old.</exception>
     public virtual async Task<string> ReadPdfBookmarksJsonAsync(
         PdfEngineBuilder<ReadBookmarksRequest> builder,

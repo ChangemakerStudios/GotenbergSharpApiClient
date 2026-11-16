@@ -28,6 +28,7 @@ using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Screenshots;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
+using Gotenberg.Sharp.API.Client.Infrastructure;
 
 // SetUserAgent is obsolete but still sends userAgent, so it is part of the wire format pinned here.
 #pragma warning disable CS0618
@@ -245,37 +246,29 @@ public class WireCharacterisationTests
     };
 
     /// <summary>
-    /// The requests whose rendering for Gotenberg 9 is complete: renamed fields, value formats and the
-    /// cross-cutting options as stages. Snapshots in <c>Wire/V9/</c>.
+    /// The requests Gotenberg 9 has no equivalent for: they have no snapshot in <c>Wire/V9/</c>, and
+    /// rendering them for 9 throws. Every other request has one.
     /// </summary>
-    private static readonly string[] CompleteForV9 =
-        ["html", "markdown", "url", "screenshot-html", "screenshot-url", "office-merge", "cross-cutting"];
-
-    /// <summary>
-    /// The requests that still render for Gotenberg 9 as they do for 8, because they target routes
-    /// Gotenberg 9 does not have. Each step of the Gotenberg 9 support moves the requests it completes
-    /// from here to <see cref="CompleteForV9" /> with a snapshot in <c>Wire/V9/</c>.
-    /// </summary>
-    private static readonly string[] PendingForV9 =
-    [
-        "pdf-merge", "pdf-convert",
-        "engine-flatten", "engine-rotate", "engine-split", "engine-encrypt", "engine-read-metadata",
-        "engine-write-metadata", "engine-read-bookmarks", "engine-write-bookmarks",
-        "engine-write-bookmarks-per-file", "engine-embed", "engine-cross-cutting"
-    ];
+    private static readonly string[] RefusedOnV9 = ["engine-write-bookmarks-per-file"];
 
     public static IEnumerable<TestCaseData> V9Requests()
     {
-        foreach (var (name, build) in Cases().Where(c => CompleteForV9.Contains(c.Name)))
+        foreach (var (name, build) in Cases().Where(c => !RefusedOnV9.Contains(c.Name)))
             yield return new TestCaseData(name, V9Variants.GetValueOrDefault(name, build)).SetArgDisplayNames(name);
     }
 
-    [Test]
-    public void EveryRequest_IsCompleteOrPendingForV9()
+    public static IEnumerable<TestCaseData> RefusedRequests()
     {
-        var all = Cases().Select(c => c.Name).ToList();
+        foreach (var (name, build) in Cases().Where(c => RefusedOnV9.Contains(c.Name)))
+            yield return new TestCaseData(name, build).SetArgDisplayNames(name);
+    }
 
-        CompleteForV9.Concat(PendingForV9).Should().BeEquivalentTo(all, "every request must be either complete or pending for Gotenberg 9, never both");
+    [TestCaseSource(nameof(RefusedRequests))]
+    public void RequestWithoutAV9Equivalent_IsRefusedForV9(string name, Func<BuildRequestBase> build)
+    {
+        var act = () => build().RenderFor(GotenbergApiVersion.V9);
+
+        act.Should().Throw<GotenbergVersionNotSupportedException>().Which.RemovedInVersion.Should().NotBeNull(name);
     }
 
     [TestCaseSource(nameof(Requests))]

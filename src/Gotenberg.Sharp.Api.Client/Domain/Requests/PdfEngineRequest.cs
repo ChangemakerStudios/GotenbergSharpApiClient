@@ -48,8 +48,10 @@ public abstract class PdfEngineRequest : BuildRequestBase
             yield return contentItem;
         }
 
-        foreach (var item in this.Config.IfNullEmptyContent(api))
-            yield return item;
+        // The routes of Gotenberg 9 take no page ranges; 8 ignored them on the PDF routes.
+        if (api == GotenbergApiVersion.V8)
+            foreach (var item in this.Config.IfNullEmptyContent(api))
+                yield return item;
 
         foreach (var content in base.ToHttpContent(api))
             yield return content;
