@@ -167,7 +167,8 @@ await sharpClient.ExecutePdfEngineAsync(
 
 The version is fetched from `/version` once per service address and cached; the clients created by
 `AddGotenbergSharpClient()` share that cache, and a client constructed directly keeps its own. Routes
-available in every supported release are never checked.
+available in every supported release have no minimum to check. Which Gotenberg API the client renders
+requests for, and when the lookup runs, is described in [Gotenberg 9](gotenberg-9.md#how-the-client-picks-the-api).
 
 Currently gated:
 

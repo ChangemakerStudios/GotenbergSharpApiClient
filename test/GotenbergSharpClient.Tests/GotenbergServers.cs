@@ -13,8 +13,7 @@ namespace GotenbergSharpClient.Tests;
 [SetUpFixture]
 public sealed class GotenbergServers
 {
-    // Add "9" once the client supports Gotenberg 9.
-    private const string SupportedVersions = "7,8";
+    private const string SupportedVersions = "7,8,9";
 
     public static IReadOnlyList<GotenbergServer> All { get; } = Create();
 
