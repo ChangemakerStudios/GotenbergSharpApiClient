@@ -35,17 +35,19 @@ public sealed class RequestConfig : IConvertToHttpContent
             yield return BuildRequestBase.CreateFormDataItem(
                 this.PageRanges,
                 Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
-
-        if (this.ResultFileName.IsSet())
-            yield return BuildRequestBase.CreateFormDataItem(
-                this.ResultFileName,
-                Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
     }
 
     #endregion
 
     public void Validate()
     {
+        // Sent as a request header; HttpClient rejects non-ASCII values only when it sends
+        // (net8.0) or mangles them silently (.NET Framework), and refuses line breaks outright.
+        if (this.ResultFileName.IsSet() && this.ResultFileName!.Any(c => c < ' ' || c > '~'))
+            throw new ArgumentException(
+                "The result file name may only contain printable ASCII characters, because it is sent as an HTTP header.",
+                nameof(this.ResultFileName));
+
         this.Webhook?.Validate();
     }
 
@@ -53,6 +55,9 @@ public sealed class RequestConfig : IConvertToHttpContent
     {
         if (this.Trace.IsSet())
             yield return (Constants.Gotenberg.All.Trace, this.Trace);
+
+        if (this.ResultFileName.IsSet())
+            yield return (Constants.Gotenberg.SharedFormFieldNames.OutputFileName, this.ResultFileName);
 
         foreach (var header in (this.Webhook?.GetHeaders()).IfNullEmpty()) yield return header;
     }
@@ -64,13 +69,14 @@ public sealed class RequestConfig : IConvertToHttpContent
     /// </summary>
     /// <remarks>
     ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
+    ///     Not sent on screenshot requests: no screenshot route accepts it.
     ///     This may move...
     /// </remarks>
     public PageRanges? PageRanges { get; set; }
 
     /// <summary>
     ///     If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is
-    ///     used.
+    ///     used. Sent as the <c>Gotenberg-Output-Filename</c> request header, so it must be printable ASCII.
     /// </summary>
     /// <remarks>
     ///     Attention: this feature does not work if the form field webHookURL is given.

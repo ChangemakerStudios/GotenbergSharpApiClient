@@ -41,7 +41,7 @@ public class PdfConversionRequest : PdfRequestBase
             yield return contentItem;
         }
 
-        foreach (var item in Config.IfNullEmptyContent().Concat(this.Assets.IfNullEmptyContent()))
+        foreach (var item in Config.IfNullEmptyContent())
         {
             yield return item;
         }

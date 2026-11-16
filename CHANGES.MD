@@ -1,5 +1,15 @@
 # Release History
 
+## Unreleased
+
+- **Fixed:**
+  - `ConfigBuilder.SetResultFileName` now works: the name is sent as the `Gotenberg-Output-Filename` request header, the only place Gotenberg reads it, instead of a form field that was ignored. A name with characters other than printable ASCII is rejected with an `ArgumentException`, as HTTP headers cannot carry it
+  - Screenshot requests no longer send `nativePageRanges`, which no screenshot route accepts
+  - `MergeOfficeBuilder` requests send `merge` and `nativePageRanges` at most once; when both the request and its config set page ranges, the config value is used, as Gotenberg already did
+  - `PdfConversionBuilder` requests send each PDF once instead of twice
+- **Testing:**
+  - `[GotenbergTest]` takes an optional exclusive `until` version, so a test can skip servers that dropped a route, for example `[GotenbergTest("8.15.0", until: "9.0.0")]`
+
 ## v3.3.0
 Thank you to [@lahma](https://github.com/lahma) for this release (PRs #93 and #94).
 

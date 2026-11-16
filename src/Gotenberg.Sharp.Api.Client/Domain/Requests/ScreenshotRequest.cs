@@ -28,10 +28,10 @@ public abstract class ScreenshotRequest : BuildRequestBase
 
     public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
+    // Config.PageRanges (nativePageRanges) is deliberately not sent: no screenshot route has that field.
     protected override IEnumerable<HttpContent> ToHttpContent()
     {
         return this.ScreenshotProperties.ToHttpContent()
-            .Concat(this.ConversionBehaviors.ToHttpContent())
-            .Concat(this.Config.IfNullEmptyContent());
+            .Concat(this.ConversionBehaviors.ToHttpContent());
     }
 }
