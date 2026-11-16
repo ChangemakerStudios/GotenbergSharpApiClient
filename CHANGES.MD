@@ -25,6 +25,7 @@ The client now supports Gotenberg 9 next to 7 and 8. It reads the version of the
 - **Testing:**
   - The integration tests start Gotenberg 7, 8 and 9 containers and run against all three. The containers run with `--api-timeout=5m`, so the first Chromium conversion of a freshly started container no longer fails with a 503 after Gotenberg's default 30 seconds on a busy machine
   - `[GotenbergTest]` takes an optional exclusive `until` version, so a test can skip servers that dropped a route, for example `[GotenbergTest("8.15.0", until: "9.0.0")]`
+  - The solution holds every project under `examples/`, so `dotnet build` and CI compile them. Six were missing from it, and five of those had not compiled since the namespaces changed in 3.0
 - **Docs:**
   - New pages [Gotenberg 9](docs/gotenberg-9.md) and [Stages](docs/stages.md). The quick starts and `docker/docker-compose-basic-auth.yml` pin `gotenberg/gotenberg:9`
 
