@@ -48,7 +48,7 @@ await client.ExecutePdfEngineAsync(PdfEngineBuilders
 | `Merge()` | `merge` | |
 | `SplitEvery(pages)`, `SplitRanges("1-3", "4")` | `split` | |
 | `Select("1-3,5")` | `select` | |
-| `Rotate(90, "1-2")` | `rotate` | a multiple of 90; every page without pages |
+| `Rotate(90, "1-2")` | `rotate` | 90, 180 or 270 (an `int` or a `RotationAngle`); every page without pages |
 | `StampText(text, o => ...)` | `stamp-text` | `SetPages`, `SetPosition`, `SetOffset`, `SetOpacity`, `SetRotation`, `SetFontSize`, `SetFont`, `SetColor` |
 | `StampImage(fileName, content, o => ...)` | `stamp-image` | the same, then `SetWidth`, `SetHeight` instead of the font |
 | `StampPdf(fileName, content, o => ...)` | `stamp-pdf` | the same, then `SetSourcePage`, `SetScale` |

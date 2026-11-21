@@ -16,6 +16,7 @@
 using Gotenberg.Sharp.API.Client.Application.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
+using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 using Newtonsoft.Json.Linq;
@@ -121,17 +122,26 @@ public sealed class StagesBuilder
     /// <summary>
     /// Rotates the given pages, every page when <paramref name="pages" /> is null (<c>rotate</c>).
     /// </summary>
-    /// <param name="angle">The angle, in degrees: a multiple of 90, such as 90, 180 or 270.</param>
+    /// <param name="angle">The angle, in degrees: 90, 180 or 270, as for <c>SetRotationOptions</c> and <c>PdfEngineBuilders.Rotate</c>.</param>
     /// <param name="pages">The pages to rotate, such as <c>1-3,5</c> or <c>odd</c>; every page when null.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="angle" /> is not a multiple of 90.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="angle" /> is not 90, 180 or 270, or <paramref name="pages" /> is empty.</exception>
+    public StagesBuilder Rotate(int angle, string? pages = null) =>
+        this.Rotate(RotationAngle.Create(angle), pages);
+
+    /// <summary>
+    /// Rotates the given pages, every page when <paramref name="pages" /> is null (<c>rotate</c>).
+    /// </summary>
+    /// <param name="angle">The angle: 90, 180 or 270 degrees.</param>
+    /// <param name="pages">The pages to rotate, such as <c>1-3,5</c> or <c>odd</c>; every page when null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="angle" /> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="pages" /> is empty.</exception>
-    public StagesBuilder Rotate(int angle, string? pages = null)
+    public StagesBuilder Rotate(RotationAngle angle, string? pages = null)
     {
-        if (angle % 90 != 0) throw new ArgumentOutOfRangeException(nameof(angle), angle, "The angle must be a multiple of 90.");
+        if (angle == null) throw new ArgumentNullException(nameof(angle));
 
         return this.Append(
             Ops.Rotate,
-            (StageOptions.Angle, angle),
+            (StageOptions.Angle, angle.Value),
             (StageOptions.Pages, pages == null ? null : StageArguments.Pages(pages, nameof(pages))));
     }
 

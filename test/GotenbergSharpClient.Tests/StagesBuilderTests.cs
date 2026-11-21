@@ -21,6 +21,7 @@ using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
 using Gotenberg.Sharp.API.Client.Infrastructure;
@@ -65,7 +66,9 @@ public class StagesBuilderTests
         yield return Row("split ranges", s => s.SplitRanges("1-3", "4", "5,7"), """[{"op":"split","ranges":["1-3","4","5,7"]}]""");
         yield return Row("select", s => s.Select("odd"), """[{"op":"select","pages":"odd"}]""");
         yield return Row("rotate every page", s => s.Rotate(90), """[{"op":"rotate","angle":90}]""");
-        yield return Row("rotate pages", s => s.Rotate(-180, "1-2"), """[{"op":"rotate","angle":-180,"pages":"1-2"}]""");
+        yield return Row("rotate pages", s => s.Rotate(270, "1-2"), """[{"op":"rotate","angle":270,"pages":"1-2"}]""");
+        yield return Row("rotate by a RotationAngle", s => s.Rotate(RotationAngle.Degrees180), """[{"op":"rotate","angle":180}]""");
+        yield return Row("rotate pages by a RotationAngle", s => s.Rotate(RotationAngle.Create(90), "odd"), """[{"op":"rotate","angle":90,"pages":"odd"}]""");
         yield return Row("stamp text", s => s.StampText("DRAFT"), """[{"op":"stamp-text","text":"DRAFT"}]""");
 
         yield return Row(
@@ -239,7 +242,13 @@ public class StagesBuilderTests
         yield return Row("split without ranges", s => s.SplitRanges(), invalid, "ranges");
         yield return Row("split with an empty range", s => s.SplitRanges("1", " "), invalid, "ranges");
         yield return Row("select nothing", s => s.Select(""), invalid, "pages");
-        yield return Row("rotate by 45", s => s.Rotate(45), outOfRange, "angle");
+        yield return Row("rotate by 45", s => s.Rotate(45), invalid, "angle");
+        yield return Row("rotate by 0", s => s.Rotate(0), invalid, "angle");
+        yield return Row("rotate by -90", s => s.Rotate(-90), invalid, "angle");
+        yield return Row("rotate by 360", s => s.Rotate(360), invalid, "angle");
+        yield return Row("rotate by 450", s => s.Rotate(450), invalid, "angle");
+        yield return Row("rotate by no RotationAngle", s => s.Rotate((RotationAngle)null!), typeof(ArgumentNullException), "angle");
+        yield return Row("rotate empty pages by a RotationAngle", s => s.Rotate(RotationAngle.Degrees90, " "), invalid, "pages");
         yield return Row("rotate empty pages", s => s.Rotate(90, " "), invalid, "pages");
         yield return Row("stamp no text", s => s.StampText(""), invalid, "text");
         yield return Row("stamp empty pages", s => s.StampText("X", o => o.SetPages("")), invalid, "pages");
