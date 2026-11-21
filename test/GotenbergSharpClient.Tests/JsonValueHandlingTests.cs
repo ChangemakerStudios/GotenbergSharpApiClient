@@ -310,6 +310,109 @@ public class JsonValueHandlingTests
 
     #endregion
 
+    #region Enums, keys and nesting depth
+
+    private enum UnsignedEnum : ulong
+    {
+        Max = ulong.MaxValue
+    }
+
+    private enum SignedEnum : sbyte
+    {
+        Negative = -1
+    }
+
+    [Test]
+    public void Enums_AreWrittenAsTheirFullUnderlyingValue()
+    {
+        var request = PdfEngineBuilders.WriteMetadata(
+                new Dictionary<string, object> { ["Unsigned"] = UnsignedEnum.Max, ["Signed"] = SignedEnum.Negative })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }))
+            .Build();
+
+        JsonObjectWriter.ToJson(request.Metadata!).Should().Be("""{"Unsigned":18446744073709551615,"Signed":-1}""");
+    }
+
+    [Test]
+    public void WriteMetadata_WithKeysThatConvertToTheSameName_ThrowsNotSupported()
+    {
+        var nested = new Dictionary<object, object> { [1] = "first", ["1"] = "second" };
+
+        var act = () => PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Nested"] = nested });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void Send_WithKeysThatConvertToTheSameNameSetDirectly_ThrowsNotSupported()
+    {
+        var nested = new Dictionary<object, object> { [1] = "first", ["1"] = "second" };
+        var options = new PdfOutputOptions { MetaData = new Dictionary<string, object> { ["Nested"] = nested } };
+
+        var act = () => options.ToHttpContent().ToList();
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WithDistinctNonStringKeys_IsAccepted()
+    {
+        var nested = new Dictionary<object, object> { [1] = "a", [2] = "b" };
+
+        var request = PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Nested"] = nested })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }))
+            .Build();
+
+        JsonObjectWriter.ToJson(request.Metadata!).Should().Be("""{"Nested":{"1":"a","2":"b"}}""");
+    }
+
+    private static Dictionary<string, object> NestedLists(int lists)
+    {
+        object value = "leaf";
+
+        for (var i = 0; i < lists; i++)
+            value = new List<object> { value };
+
+        return new Dictionary<string, object> { ["Deep"] = value };
+    }
+
+    [Test]
+    public void WriteMetadata_AtTheDepthLimit_IsAccepted()
+    {
+        // The outer dictionary is the first level.
+        var act = () => PdfEngineBuilders.WriteMetadata(NestedLists(JsonObjectWriter.MaxDepth - 1));
+
+        act.Should().NotThrow();
+    }
+
+    [Test]
+    public void WriteMetadata_OneLevelPastTheDepthLimit_ThrowsNotSupported()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(NestedLists(JsonObjectWriter.MaxDepth));
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_FarPastTheDepthLimit_ThrowsInsteadOfExhaustingTheStack()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(NestedLists(1_000_000));
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void Send_PastTheDepthLimitSetDirectly_ThrowsNotSupported()
+    {
+        var options = new PdfOutputOptions { MetaData = NestedLists(JsonObjectWriter.MaxDepth) };
+
+        var act = () => options.ToHttpContent().ToList();
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    #endregion
+
     #region Null arguments
 
     [Test]

@@ -32,11 +32,18 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure.Json;
 /// <see cref="decimal" />, <see cref="DateTime" />, <see cref="DateTimeOffset" />, <see cref="Guid" />,
 /// <see cref="Uri" />, enums (written as their number), <see cref="T:byte[]" /> (written as base64),
 /// <see cref="JsonNode" />, <see cref="JsonElement" />, <see cref="JsonDocument" />, dictionaries and other
-/// collections of supported values. Anything else, a non-finite <see cref="float" /> or <see cref="double" />,
-/// or a collection that contains itself throws <see cref="NotSupportedException" />.
+/// collections of supported values. Anything else throws <see cref="NotSupportedException" />, as does a
+/// non-finite <see cref="float" /> or <see cref="double" />, a collection that contains itself, nesting deeper
+/// than <see cref="MaxDepth" /> levels, and a dictionary with two keys that convert to the same property name.
 /// </remarks>
 internal static class JsonObjectWriter
 {
+    /// <summary>
+    /// The deepest nesting accepted. Matches the default limit of <see cref="Utf8JsonWriter" />, and stops the
+    /// recursive copy before it can exhaust the stack.
+    /// </summary>
+    internal const int MaxDepth = 1000;
+
     private static readonly JsonWriterOptions _writerOptions = new() { Encoder = GotenbergJsonContext.Encoder };
 
     /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
@@ -48,7 +55,7 @@ internal static class JsonObjectWriter
 
         using (var writer = new Utf8JsonWriter(stream, _writerOptions))
         {
-            WriteObject(writer, values!, new ReferenceSet());
+            WriteObject(writer, values!, new Traversal());
         }
 
         return Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
@@ -64,10 +71,10 @@ internal static class JsonObjectWriter
     {
         if (values == null) throw new ArgumentNullException(nameof(values));
 
-        var visiting = new ReferenceSet();
-        visiting.Enter(values);
+        var traversal = new Traversal();
+        traversal.Enter(values);
 
-        var copy = CopyObject(values!, visiting);
+        var copy = CopyObject(values!, traversal);
 
         ToJson(copy);
 
@@ -95,17 +102,21 @@ internal static class JsonObjectWriter
 
     private static Dictionary<string, object> CopyObject(
         IEnumerable<KeyValuePair<string, object?>> values,
-        ReferenceSet visiting)
+        Traversal traversal)
     {
         var copy = new Dictionary<string, object>();
 
         foreach (var entry in values)
-            copy[entry.Key] = Copy(entry.Value, visiting)!;
+        {
+            if (copy.ContainsKey(entry.Key)) throw DuplicateKey(entry.Key);
+
+            copy[entry.Key] = Copy(entry.Value, traversal)!;
+        }
 
         return copy;
     }
 
-    private static object? Copy(object? value, ReferenceSet visiting)
+    private static object? Copy(object? value, Traversal traversal)
     {
         switch (value)
         {
@@ -122,27 +133,33 @@ internal static class JsonObjectWriter
                 return documentValue.RootElement.Clone();
             case IEnumerable<KeyValuePair<string, object?>> objectValue:
             {
-                visiting.Enter(objectValue);
-                var copy = CopyObject(objectValue, visiting);
-                visiting.Exit(objectValue);
+                traversal.Enter(objectValue);
+                var copy = CopyObject(objectValue, traversal);
+                traversal.Exit(objectValue);
                 return copy;
             }
             case IDictionary dictionaryValue:
             {
-                visiting.Enter(dictionaryValue);
+                traversal.Enter(dictionaryValue);
                 var copy = new Dictionary<string, object>();
                 foreach (DictionaryEntry entry in dictionaryValue)
-                    copy[KeyToString(entry.Key)] = Copy(entry.Value, visiting)!;
-                visiting.Exit(dictionaryValue);
+                {
+                    var key = KeyToString(entry.Key);
+                    if (copy.ContainsKey(key)) throw DuplicateKey(key);
+
+                    copy[key] = Copy(entry.Value, traversal)!;
+                }
+
+                traversal.Exit(dictionaryValue);
                 return copy;
             }
             case IEnumerable enumerableValue:
             {
-                visiting.Enter(enumerableValue);
+                traversal.Enter(enumerableValue);
                 var copy = new List<object?>();
                 foreach (var item in enumerableValue)
-                    copy.Add(Copy(item, visiting));
-                visiting.Exit(enumerableValue);
+                    copy.Add(Copy(item, traversal));
+                traversal.Exit(enumerableValue);
                 return copy;
             }
             default:
@@ -151,7 +168,7 @@ internal static class JsonObjectWriter
         }
     }
 
-    private static void WriteValue(Utf8JsonWriter writer, object? value, ReferenceSet visiting)
+    private static void WriteValue(Utf8JsonWriter writer, object? value, Traversal traversal)
     {
         switch (value)
         {
@@ -218,7 +235,11 @@ internal static class JsonObjectWriter
                 writer.WriteBase64StringValue(bytesValue);
                 break;
             case Enum enumValue:
-                writer.WriteNumberValue(Convert.ToInt64(enumValue, CultureInfo.InvariantCulture));
+                // A ulong-backed value can exceed long.MaxValue; every other underlying type fits in a long.
+                if (Enum.GetUnderlyingType(enumValue.GetType()) == typeof(ulong))
+                    writer.WriteNumberValue(Convert.ToUInt64(enumValue, CultureInfo.InvariantCulture));
+                else
+                    writer.WriteNumberValue(Convert.ToInt64(enumValue, CultureInfo.InvariantCulture));
                 break;
             case JsonNode nodeValue:
                 nodeValue.WriteTo(writer);
@@ -230,27 +251,31 @@ internal static class JsonObjectWriter
                 documentValue.RootElement.WriteTo(writer);
                 break;
             case IEnumerable<KeyValuePair<string, object?>> objectValue:
-                WriteObject(writer, objectValue, visiting);
+                WriteObject(writer, objectValue, traversal);
                 break;
             case IDictionary dictionaryValue:
-                visiting.Enter(dictionaryValue);
+                traversal.Enter(dictionaryValue);
                 writer.WriteStartObject();
+                var dictionaryKeys = new HashSet<string>(StringComparer.Ordinal);
                 foreach (DictionaryEntry entry in dictionaryValue)
                 {
-                    writer.WritePropertyName(KeyToString(entry.Key));
-                    WriteValue(writer, entry.Value, visiting);
+                    var key = KeyToString(entry.Key);
+                    if (!dictionaryKeys.Add(key)) throw DuplicateKey(key);
+
+                    writer.WritePropertyName(key);
+                    WriteValue(writer, entry.Value, traversal);
                 }
 
                 writer.WriteEndObject();
-                visiting.Exit(dictionaryValue);
+                traversal.Exit(dictionaryValue);
                 break;
             case IEnumerable enumerableValue:
-                visiting.Enter(enumerableValue);
+                traversal.Enter(enumerableValue);
                 writer.WriteStartArray();
                 foreach (var item in enumerableValue)
-                    WriteValue(writer, item, visiting);
+                    WriteValue(writer, item, traversal);
                 writer.WriteEndArray();
-                visiting.Exit(enumerableValue);
+                traversal.Exit(enumerableValue);
                 break;
             default:
                 throw new NotSupportedException(
@@ -263,24 +288,33 @@ internal static class JsonObjectWriter
     private static void WriteObject(
         Utf8JsonWriter writer,
         IEnumerable<KeyValuePair<string, object?>> values,
-        ReferenceSet visiting)
+        Traversal traversal)
     {
-        visiting.Enter(values);
+        traversal.Enter(values);
         writer.WriteStartObject();
+        var keys = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var entry in values)
         {
+            if (!keys.Add(entry.Key)) throw DuplicateKey(entry.Key);
+
             writer.WritePropertyName(entry.Key);
-            WriteValue(writer, entry.Value, visiting);
+            WriteValue(writer, entry.Value, traversal);
         }
 
         writer.WriteEndObject();
-        visiting.Exit(values);
+        traversal.Exit(values);
     }
 
     private static string KeyToString(object key)
     {
         return Convert.ToString(key, CultureInfo.InvariantCulture) ?? string.Empty;
+    }
+
+    private static NotSupportedException DuplicateKey(string key)
+    {
+        return new NotSupportedException(
+            $"Two keys are both written as the JSON property name '{key}'. Each key must convert to a distinct string.");
     }
 
     private static NotSupportedException NotFinite(object value)
@@ -291,15 +325,24 @@ internal static class JsonObjectWriter
     }
 
     /// <summary>
-    /// The collections currently being walked, compared by reference, so a collection that contains
-    /// itself is reported instead of recursing until the writer's depth limit.
+    /// Tracks the collections currently being walked. Compares them by reference so a collection that
+    /// contains itself is reported, and counts the depth so a deep chain of distinct collections is
+    /// rejected before the recursion can exhaust the stack.
     /// </summary>
-    private sealed class ReferenceSet
+    private sealed class Traversal
     {
         private readonly HashSet<object> _items = new(ReferenceComparer.Instance);
 
+        private int _depth;
+
         internal void Enter(object value)
         {
+            if (++_depth > MaxDepth)
+            {
+                throw new NotSupportedException(
+                    $"Values nested more than {MaxDepth} levels deep cannot be written as JSON.");
+            }
+
             if (!_items.Add(value))
             {
                 throw new NotSupportedException(
@@ -310,6 +353,7 @@ internal static class JsonObjectWriter
         internal void Exit(object value)
         {
             _items.Remove(value);
+            _depth--;
         }
     }
 
