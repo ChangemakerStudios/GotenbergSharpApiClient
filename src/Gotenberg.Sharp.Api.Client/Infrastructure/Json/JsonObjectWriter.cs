@@ -126,6 +126,8 @@ internal static class JsonObjectWriter
             case byte[] bytesValue:
                 return bytesValue.Clone();
             case JsonNode nodeValue:
+                // DeepClone recurses without a limit, so measure the depth first.
+                traversal.CheckNodeDepth(nodeValue);
                 return nodeValue.DeepClone();
             case JsonElement elementValue:
                 return elementValue.Clone();
@@ -242,6 +244,7 @@ internal static class JsonObjectWriter
                     writer.WriteNumberValue(Convert.ToInt64(enumValue, CultureInfo.InvariantCulture));
                 break;
             case JsonNode nodeValue:
+                traversal.CheckNodeDepth(nodeValue);
                 nodeValue.WriteTo(writer);
                 break;
             case JsonElement elementValue:
@@ -337,11 +340,7 @@ internal static class JsonObjectWriter
 
         internal void Enter(object value)
         {
-            if (++_depth > MaxDepth)
-            {
-                throw new NotSupportedException(
-                    $"Values nested more than {MaxDepth} levels deep cannot be written as JSON.");
-            }
+            if (++_depth > MaxDepth) throw TooDeep();
 
             if (!_items.Add(value))
             {
@@ -354,6 +353,47 @@ internal static class JsonObjectWriter
         {
             _items.Remove(value);
             _depth--;
+        }
+
+        /// <summary>
+        /// Throws when <paramref name="node" />'s objects and arrays, counted on top of the levels already
+        /// entered, nest deeper than <see cref="MaxDepth" />. Walks the tree with an explicit stack, so a
+        /// deep tree cannot exhaust the call stack here either.
+        /// </summary>
+        internal void CheckNodeDepth(JsonNode node)
+        {
+            var pending = new Stack<(JsonNode Node, int Depth)>();
+            pending.Push((node, _depth + 1));
+
+            while (pending.Count > 0)
+            {
+                var (current, depth) = pending.Pop();
+
+                switch (current)
+                {
+                    case JsonObject objectNode:
+                        if (depth > MaxDepth) throw TooDeep();
+                        foreach (var property in objectNode)
+                        {
+                            if (property.Value != null) pending.Push((property.Value, depth + 1));
+                        }
+
+                        break;
+                    case JsonArray arrayNode:
+                        if (depth > MaxDepth) throw TooDeep();
+                        foreach (var item in arrayNode)
+                        {
+                            if (item != null) pending.Push((item, depth + 1));
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        private static NotSupportedException TooDeep()
+        {
+            return new NotSupportedException($"Values nested more than {MaxDepth} levels deep cannot be written as JSON.");
         }
     }
 

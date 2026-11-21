@@ -411,6 +411,65 @@ public class JsonValueHandlingTests
         act.Should().ThrowExactly<NotSupportedException>();
     }
 
+    private static Dictionary<string, object> NestedJsonArrays(int arrays)
+    {
+        JsonNode value = JsonValue.Create("leaf");
+
+        for (var i = 0; i < arrays; i++)
+            value = new JsonArray(value);
+
+        return new Dictionary<string, object> { ["Deep"] = value };
+    }
+
+    [Test]
+    public void WriteMetadata_JsonNodeAtTheDepthLimit_IsAccepted()
+    {
+        // The outer dictionary is the first level.
+        var act = () => PdfEngineBuilders.WriteMetadata(NestedJsonArrays(JsonObjectWriter.MaxDepth - 1));
+
+        act.Should().NotThrow();
+    }
+
+    [Test]
+    public void WriteMetadata_JsonNodeOneLevelPastTheDepthLimit_ThrowsNotSupported()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(NestedJsonArrays(JsonObjectWriter.MaxDepth));
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_JsonNodeFarPastTheDepthLimit_ThrowsInsteadOfExhaustingTheStack()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(NestedJsonArrays(1_000_000));
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_JsonNodeInsideNestedListsPastTheLimit_ThrowsNotSupported()
+    {
+        // Half the levels come from lists and half from the node, so only the combined depth exceeds the limit.
+        var node = NestedJsonArrays(JsonObjectWriter.MaxDepth / 2)["Deep"];
+        object value = node;
+        for (var i = 0; i < JsonObjectWriter.MaxDepth / 2; i++)
+            value = new List<object> { value };
+
+        var act = () => PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Deep"] = value });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void Send_JsonNodePastTheDepthLimitSetDirectly_ThrowsNotSupported()
+    {
+        var options = new PdfOutputOptions { MetaData = NestedJsonArrays(JsonObjectWriter.MaxDepth) };
+
+        var act = () => options.ToHttpContent().ToList();
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
     #endregion
 
     #region Null arguments
