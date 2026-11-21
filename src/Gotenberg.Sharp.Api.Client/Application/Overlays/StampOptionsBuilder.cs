@@ -30,6 +30,15 @@ public sealed class StampOptionsBuilder
         _options = options;
     }
 
+    /// <summary>
+    /// Sets the source of the stamp.
+    /// </summary>
+    /// <remarks>
+    /// An image or PDF source with <see cref="SetExpression" /> naming a file on the server, instead of
+    /// <see cref="SetImageStamp(string, ContentItem, string)" /> or <see cref="SetPdfStamp(string, ContentItem, string)" />,
+    /// is not available on Gotenberg 9: it reads every file from the upload, so the request throws
+    /// <see cref="GotenbergVersionNotSupportedException" /> there.
+    /// </remarks>
     public StampOptionsBuilder SetSource(OverlaySource source)
     {
         _options.Source = source;

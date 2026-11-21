@@ -39,8 +39,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 /// and without <see cref="Options" /> is sent as a <c>stamp-image</c> or <c>stamp-pdf</c> stage, with
 /// the defaults of Gotenberg 9 as well, and its file uploaded under <c>files</c> with the name
 /// <see cref="FileName" />: that name must not be the name of another file of the request. An image or
-/// PDF stamp without its file throws <see cref="ArgumentException" />. A stamp with <see cref="Options" />
-/// throws <see cref="GotenbergVersionNotSupportedException" /> before it is sent to Gotenberg 9. To
+/// PDF stamp without its file (an expression naming a file on the server) and a stamp with <see cref="Options" />
+/// throw <see cref="GotenbergVersionNotSupportedException" /> before they are sent to Gotenberg 9, and
+/// <c>SupportsAsync</c> answers false for them: Gotenberg 9 has no way to name a file on the server. To
 /// place, size, fade or turn a stamp on Gotenberg 9, list it with <c>WithStages</c>
 /// (<c>PdfEngineBuilders.Pipe</c> for a PDF operation) and the typed options of <c>StampText</c>,
 /// <c>StampImage</c> or <c>StampPdf</c> instead.

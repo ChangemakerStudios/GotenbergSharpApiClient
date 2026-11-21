@@ -409,24 +409,34 @@ public class OverlayFileTests
 
     #region Gotenberg 9: what stays refused
 
+    private static readonly GotenbergVersion RemovedIn9 = GotenbergVersion.Parse("9.0.0");
+
     [Test]
-    public void V9_AnImageStampWithoutItsFile_NamesTheBuilderMethod()
+    public void V9_AnImageStampWithoutItsFile_IsRemoved_AndNamesTheBuilderMethod()
     {
         var request = Html().SetStampOptions(s => s.SetSource(OverlaySource.Image).SetExpression("logo.png")).Build();
 
         var act = () => request.RenderFor(GotenbergApiVersion.V9);
 
-        act.Should().ThrowExactly<ArgumentException>().WithMessage("*Image*stamp-image*SetImageStamp(fileName, content)*");
+        var thrown = act.Should().ThrowExactly<GotenbergVersionNotSupportedException>()
+            .WithMessage("*image stamp without its file*no way to name a file on the server*SetImageStamp(fileName, content)*").Which;
+
+        thrown.RemovedInVersion.Should().Be(RemovedIn9);
+        thrown.Replacement.Should().Contain("SetImageStamp").And.Contain("WithStages").And.Contain("StampImage");
     }
 
     [Test]
-    public void V9_APdfStampWithoutItsFile_NamesTheBuilderMethod()
+    public void V9_APdfStampWithoutItsFile_IsRemoved_AndNamesTheBuilderMethod()
     {
         var request = Html().SetStampOptions(s => s.SetSource(OverlaySource.Pdf).SetExpression("letterhead.pdf")).Build();
 
         var act = () => request.RenderFor(GotenbergApiVersion.V9);
 
-        act.Should().ThrowExactly<ArgumentException>().WithMessage("*Pdf*stamp-pdf*SetPdfStamp(fileName, content)*");
+        var thrown = act.Should().ThrowExactly<GotenbergVersionNotSupportedException>()
+            .WithMessage("*PDF stamp without its file*no way to name a file on the server*SetPdfStamp(fileName, content)*").Which;
+
+        thrown.RemovedInVersion.Should().Be(RemovedIn9);
+        thrown.Replacement.Should().Contain("SetPdfStamp").And.Contain("WithStages").And.Contain("StampPdf");
     }
 
     [Test]
@@ -437,7 +447,20 @@ public class OverlayFileTests
 
         var act = () => request.RenderFor(GotenbergApiVersion.V9);
 
-        act.Should().ThrowExactly<ArgumentException>().WithMessage("*SetImageStamp*");
+        act.Should().ThrowExactly<GotenbergVersionNotSupportedException>()
+            .WithMessage("*SetImageStamp*").Which.RemovedInVersion.Should().Be(RemovedIn9);
+    }
+
+    [Test]
+    public void V8_AStampWithoutItsFile_StillRendersTheFlatFields()
+    {
+        var rendered = Html()
+            .SetStampOptions(s => s.SetSource(OverlaySource.Pdf).SetExpression("/srv/letterhead.pdf"))
+            .Build()
+            .RenderFor(GotenbergApiVersion.V8);
+
+        rendered.Part("stampSource").Value.Should().Be("pdf");
+        rendered.Part("stampExpression").Value.Should().Be("/srv/letterhead.pdf");
     }
 
     [TestCase(true)]
@@ -505,17 +528,27 @@ public class OverlayFileTests
     }
 
     [Test]
-    public async Task SupportsAsync_IsTrueForAStampWithoutItsFile_ForOnlyTheFileIsMissing()
+    public async Task SupportsAsync_AgreesWithTheSend_ForAStampWithoutItsFile()
     {
         var nine = new GotenbergVersionTests.StubVersionClient("9.5.1");
+        var eight = new GotenbergVersionTests.StubVersionClient("8.40.0");
+
         var request = Html().SetStampOptions(s => s.SetSource(OverlaySource.Pdf).SetExpression("a.pdf")).Build();
 
-        (await nine.SupportsAsync(request)).Should().BeTrue();
+        (await nine.SupportsAsync(request)).Should().BeFalse();
+        (await eight.SupportsAsync(request)).Should().BeTrue();
 
-        var act = async () => await nine.HtmlToPdfAsync(Html().SetStampOptions(s => s.SetSource(OverlaySource.Pdf).SetExpression("a.pdf")));
+        var ensure = await nine.Awaiting(c => c.EnsureSupportedAsync(request))
+            .Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
 
-        await act.Should().ThrowExactlyAsync<ArgumentException>().WithMessage("*SetPdfStamp*");
-        nine.SendCount.Should().Be(0);
+        ensure.Which.RemovedInVersion.Should().Be(RemovedIn9);
+
+        var send = await nine.Awaiting(c => c.HtmlToPdfAsync(Html().SetStampOptions(s => s.SetSource(OverlaySource.Pdf).SetExpression("a.pdf"))))
+            .Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
+
+        send.Which.RemovedInVersion.Should().Be(RemovedIn9);
+        send.Which.Replacement.Should().Contain("SetPdfStamp");
+        nine.SendCount.Should().Be(0, "nothing is sent to Gotenberg 9");
     }
 
     #endregion
@@ -724,7 +757,8 @@ public class OverlayFileTests
 
         if (gotenberg.Version.Major >= 9)
         {
-            await act.Should().ThrowExactlyAsync<ArgumentException>().WithMessage("*SetImageStamp*");
+            (await act.Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>()).Which
+                .RemovedInVersion.Should().Be(RemovedIn9);
             return;
         }
 

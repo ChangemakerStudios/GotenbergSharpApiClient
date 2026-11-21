@@ -312,6 +312,19 @@ internal sealed class StageList
                 "Gotenberg 9 replaces pdfcpu's stamp options with the typed options of its stamp-text, stamp-image and stamp-pdf stages (position, x, y, fontSize, opacity, rotation and others). "
                 + ListTheStampInstead + " Its options builder sets them.");
 
+        if (request.StampOptions is { Source: OverlaySource.Image or OverlaySource.Pdf, SendsFile: false } fileless)
+        {
+            var (kind, builderMethod) = fileless.Source == OverlaySource.Image
+                ? ("An image", "SetImageStamp")
+                : ("A PDF", "SetPdfStamp");
+
+            return Removed(
+                $"{kind} stamp without its file (StampOptions with SetSource and an expression naming a file on the server)",
+                "Gotenberg 9 has no way to name a file on the server: it reads every file from the upload. "
+                + $"Set the stamp with StampOptionsBuilder.{builderMethod}(fileName, content) instead of SetSource and SetExpression. "
+                + ListTheStampInstead);
+        }
+
         var output = routeStages.EffectiveOutput(request);
 
         if (output?.MetaData is { } metadata && StageMetadata.FindUnknownKey(metadata) is { } key)
@@ -433,7 +446,7 @@ internal sealed class StageList
         }
     }
 
-    // FindRemoved refused every stamp with free-form options.
+    // FindRemoved refused every stamp with free-form options, and every image or PDF stamp without its file.
     private void AddStamp(StampOptions? stamp)
     {
         if (stamp?.Source is not { } source) return;
@@ -446,15 +459,9 @@ internal sealed class StageList
             return;
         }
 
-        var (op, fileOption, builderMethod) = source == OverlaySource.Image
-            ? (Ops.StampImage, StageOptions.Image, "SetImageStamp")
-            : (Ops.StampPdf, StageOptions.Source, "SetPdfStamp");
-
-        if (!stamp.SendsFile)
-            throw new ArgumentException(
-                $"A stamp of source {source} needs its file on Gotenberg 9, which stamps it with a {op} stage that names an uploaded file. "
-                + $"Set the stamp with StampOptionsBuilder.{builderMethod}(fileName, content) instead of SetSource and SetExpression.",
-                nameof(StampOptions.FileName));
+        var (op, fileOption) = source == OverlaySource.Image
+            ? (Ops.StampImage, StageOptions.Image)
+            : (Ops.StampPdf, StageOptions.Source);
 
         // The file is uploaded under 'files' with the request (BuildRequestBase), the stage names it.
         this.Add(op, (fileOption, stamp.FileName), pages);
