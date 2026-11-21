@@ -95,21 +95,203 @@ public class GotenbergApiVersionTests
     }
 
     [TestCase(HttpStatusCode.Unauthorized)]
+    [TestCase(HttpStatusCode.Forbidden)]
+    [TestCase(HttpStatusCode.InternalServerError)]
     [TestCase(HttpStatusCode.ServiceUnavailable)]
-    public async Task Auto_WhenTheVersionLookupFails_PropagatesAndDoesNotCache(HttpStatusCode status)
+    public async Task Auto_WhenTheVersionLookupFails_ThrowsAClearErrorAndDoesNotCache(HttpStatusCode status)
     {
         var gotenberg = new FakeGotenberg("8.30.0") { VersionFailure = status };
         var client = DirectClient(gotenberg);
 
         var lookup = async () => await client.GetApiVersionAsync();
-        (await lookup.Should().ThrowExactlyAsync<GotenbergApiException>()).Which.StatusCode.Should().Be(status);
+        var thrown = (await lookup.Should().ThrowExactlyAsync<GotenbergApiException>()).Which;
+
+        thrown.StatusCode.Should().Be(status);
+        thrown.RequestUri!.AbsolutePath.Should().Be("/version");
+        thrown.Message.Should().Contain($"Gotenberg answered {(int)status} (")
+            .And.Contain("GET /version")
+            .And.Contain("GotenbergSharpClientOptions.ApiVersion")
+            .And.Contain("V8 or V9")
+            .And.Contain("With V8, a request that needs a minimum Gotenberg release")
+            .And.EndWith("Gotenberg's response: failed");
+        thrown.InnerException.Should().BeOfType<GotenbergApiException>()
+            .Which.Should().Match<GotenbergApiException>(inner => inner.Message == "failed" && inner.StatusCode == status);
+
+        if (status == HttpStatusCode.Unauthorized)
+            thrown.Message.Should().Contain("refused the credentials").And.Contain("BasicAuthUsername").And.Contain("BasicAuthPassword");
+        else
+            thrown.Message.Should().NotContain("credentials");
 
         var convert = async () => await client.HtmlToPdfAsync(Html());
-        await convert.Should().ThrowExactlyAsync<GotenbergApiException>();
+        (await convert.Should().ThrowExactlyAsync<GotenbergApiException>()).Which.Message.Should().Be(thrown.Message);
 
         gotenberg.ConversionRequests.Should().Be(0, "nothing is sent while the API is unknown");
         gotenberg.VersionRequests.Should().Be(2, "a failed lookup is retried by the next request, not cached");
     }
+
+    [Test]
+    public async Task Auto_ErrorOfTheVersionLookup_KeepsWhatTheOriginalReports()
+    {
+        var gotenberg = new FakeGotenberg("8.30.0")
+        {
+            VersionFailure = HttpStatusCode.BadGateway,
+            ResponseTrace = "trace-1"
+        };
+        var client = DirectClient(gotenberg);
+
+        var lookup = async () => await client.GetGotenbergVersionAsync();
+        var thrown = (await lookup.Should().ThrowExactlyAsync<GotenbergApiException>()).Which;
+        var original = (GotenbergApiException)thrown.InnerException!;
+
+        thrown.StatusCode.Should().Be(original.StatusCode);
+        thrown.ReasonPhrase.Should().Be(original.ReasonPhrase).And.Be("Bad Gateway");
+        thrown.RequestUri.Should().Be(original.RequestUri);
+        thrown.Trace.Should().Be(original.Trace).And.Be("trace-1");
+        thrown.Message.Should().Contain("502 (Bad Gateway)");
+        thrown.ToVerboseJson().Should().Contain("GotenbergResponseReceived").And.Contain("Bad Gateway").And.Contain("/version");
+        thrown.ToVerboseJson(includeGotenbergResponse: false, indentJson: true).Should().Contain("GotenbergMessage");
+    }
+
+    [Test]
+    public async Task Auto_WhenTheVersionLookupFailsWithoutABody_StillSaysWhatToDo()
+    {
+        var gotenberg = new FakeGotenberg("8.30.0") { VersionFailure = HttpStatusCode.Forbidden, VersionFailureBody = "" };
+        var client = DirectClient(gotenberg);
+
+        var lookup = async () => await client.GetApiVersionAsync();
+        var thrown = (await lookup.Should().ThrowExactlyAsync<GotenbergApiException>()).Which;
+
+        thrown.Message.Should().Contain("403 (Forbidden)").And.Contain("to skip the lookup.").And.EndWith("EnforceMinimumVersion is false.");
+    }
+
+    [Test]
+    public async Task Auto_DoesNotRewrapAConnectionFailure()
+    {
+        var gotenberg = new FakeGotenberg("8.30.0") { VersionException = new HttpRequestException("refused") };
+        var client = DirectClient(gotenberg);
+
+        var lookup = async () => await client.GetApiVersionAsync();
+
+        (await lookup.Should().ThrowExactlyAsync<HttpRequestException>()).Which.Message.Should().Be("refused");
+    }
+
+    [Test]
+    public async Task Auto_ARecoveredServiceIsReadOnTheNextRequest()
+    {
+        var gotenberg = new FakeGotenberg("9.5.1") { VersionFailure = HttpStatusCode.ServiceUnavailable };
+        var client = DirectClient(gotenberg);
+
+        var failing = async () => await client.HtmlToPdfAsync(Html());
+        await failing.Should().ThrowExactlyAsync<GotenbergApiException>();
+
+        gotenberg.VersionFailure = null;
+        await client.HtmlToPdfAsync(Html());
+
+        (await client.GetApiVersionAsync()).Should().Be(GotenbergApiVersion.V9);
+        gotenberg.VersionRequests.Should().Be(2);
+    }
+
+    [TestCase(HttpStatusCode.Unauthorized)]
+    [TestCase(HttpStatusCode.Forbidden)]
+    [TestCase(HttpStatusCode.InternalServerError)]
+    [TestCase(HttpStatusCode.ServiceUnavailable)]
+    public async Task ExplicitV8_WhenTheVersionLookupForAGatedRequestFails_NamesEnforceMinimumVersion(HttpStatusCode status)
+    {
+        var gotenberg = new FakeGotenberg("8.30.0") { VersionFailure = status };
+        var client = DirectClient(gotenberg);
+        client.ApiVersion = GotenbergApiVersion.V8;
+
+        var rotate = async () => await client.ExecutePdfEngineAsync(Rotate());
+        var thrown = (await rotate.Should().ThrowExactlyAsync<GotenbergApiException>()).Which;
+
+        thrown.StatusCode.Should().Be(status);
+        thrown.InnerException.Should().BeOfType<GotenbergApiException>();
+        thrown.Message.Should().Contain($"Gotenberg answered {(int)status} (")
+            .And.Contain("GET /version")
+            .And.Contain("minimum Gotenberg release")
+            .And.Contain("GotenbergSharpClient.EnforceMinimumVersion")
+            .And.Contain("to false")
+            .And.EndWith("Gotenberg's response: failed")
+            .And.NotContain("V8 or V9");
+        (thrown.Message.Contains("refused the credentials")).Should().Be(status == HttpStatusCode.Unauthorized);
+
+        gotenberg.ConversionRequests.Should().Be(0);
+
+        await rotate.Should().ThrowExactlyAsync<GotenbergApiException>();
+        gotenberg.VersionRequests.Should().Be(2, "a failed lookup is not cached");
+    }
+
+    [Test]
+    public async Task ExplicitV8_WithTheCheckDisabled_NeverReadsTheVersion()
+    {
+        var gotenberg = new FakeGotenberg("8.30.0") { VersionFailure = HttpStatusCode.Forbidden };
+        var client = DirectClient(gotenberg);
+        client.ApiVersion = GotenbergApiVersion.V8;
+        client.EnforceMinimumVersion = false;
+
+        await client.ExecutePdfEngineAsync(Rotate());
+
+        gotenberg.VersionRequests.Should().Be(0);
+        gotenberg.ConversionRequests.Should().Be(1);
+    }
+
+    [Test]
+    public async Task ExplicitV9_SatisfiesTheMinimumOfAGatedRequestWithoutReadingTheVersion()
+    {
+        // Were the version read, the 403 would stop the request.
+        var gotenberg = new FakeGotenberg("8.1.0") { VersionFailure = HttpStatusCode.Forbidden };
+        var client = DirectClient(gotenberg);
+        client.ApiVersion = GotenbergApiVersion.V9;
+
+        var request = Rotate().Build();
+
+        (await client.SupportsAsync(request)).Should().BeTrue();
+        await client.Invoking(c => c.EnsureSupportedAsync(request)).Should().NotThrowAsync();
+        await client.ExecutePdfEngineAsync(Rotate());
+
+        gotenberg.VersionRequests.Should().Be(0);
+        gotenberg.ConversionRequests.Should().Be(1);
+    }
+
+    [Test]
+    public async Task ExplicitV8_ReadsTheVersionForTheMinimumOfAGatedRequest()
+    {
+        var gotenberg = new FakeGotenberg("8.1.0");
+        var client = DirectClient(gotenberg);
+        client.ApiVersion = GotenbergApiVersion.V8;
+
+        var request = Rotate().Build();
+
+        (await client.SupportsAsync(request)).Should().BeFalse();
+        await client.Invoking(c => c.EnsureSupportedAsync(request)).Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
+        gotenberg.VersionRequests.Should().Be(1);
+    }
+
+    [TestCase("8.30.0", false)]
+    [TestCase("9.0.0", true)]
+    [TestCase("9.2.0", true)]
+    public async Task ExplicitV9_ReadsTheVersionForAMinimumOfGotenberg9OrNewer(string reported, bool supported)
+    {
+        var gotenberg = new FakeGotenberg(reported);
+        var client = DirectClient(gotenberg);
+        client.ApiVersion = GotenbergApiVersion.V9;
+
+        var request = WithPdf(new NewerThanEightRequest());
+
+        (await client.SupportsAsync(request)).Should().Be(supported);
+
+        var ensure = async () => await client.EnsureSupportedAsync(request);
+
+        if (supported)
+            await ensure.Should().NotThrowAsync();
+        else
+            await ensure.Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
+
+        gotenberg.VersionRequests.Should().Be(1);
+    }
+
+    private static PdfEngineBuilder<RotatePdfRequest> Rotate() =>
+        PdfEngineBuilders.Rotate(90).WithPdfs(a => a.AddItem("in.pdf", Pdf));
 
     [Test]
     public async Task Auto_ReadsTheVersionOnceForGatedAndUngatedRequests()
@@ -401,6 +583,15 @@ public class GotenbergApiVersionTests
         protected override IEnumerable<HttpContent> ToHttpContent() => [Field("only", "value")];
     }
 
+    /// <summary>
+    /// A route of Gotenberg 9 or newer: the floors of the client's own routes are all 8.x releases.
+    /// </summary>
+    [MinimumGotenbergVersion("9.0.0", Feature = "A route of Gotenberg 9")]
+    private sealed class NewerThanEightRequest : PdfEngineRequest
+    {
+        protected override string ApiPath => "forms/custom/newer";
+    }
+
     private sealed class MigratedRequest : PdfEngineRequest
     {
         protected override string ApiPath => "forms/custom/migrated";
@@ -449,7 +640,13 @@ public class GotenbergApiVersionTests
 
         public TimeSpan VersionDelay { get; init; }
 
-        public HttpStatusCode? VersionFailure { get; init; }
+        public HttpStatusCode? VersionFailure { get; set; }
+
+        public string VersionFailureBody { get; init; } = "failed";
+
+        public Exception? VersionException { get; init; }
+
+        public string? ResponseTrace { get; init; }
 
         public HttpStatusCode? ConversionFailure { get; set; }
 
@@ -474,10 +671,12 @@ public class GotenbergApiVersionTests
             {
                 await Task.Delay(this.VersionDelay, cancellationToken);
 
+                if (this.VersionException != null) throw this.VersionException;
+
                 var reported = version(request);
 
                 response = this.VersionFailure is { } failure
-                    ? new HttpResponseMessage(failure) { Content = new StringContent("failed") }
+                    ? new HttpResponseMessage(failure) { Content = new StringContent(this.VersionFailureBody) }
                     : reported == null
                         ? new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("Not Found") }
                         : new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(reported) };
@@ -493,6 +692,9 @@ public class GotenbergApiVersionTests
 
             if (this.ResponseVersionHeader != null)
                 response.Headers.Add(Constants.Gotenberg.All.VersionHeader, this.ResponseVersionHeader);
+
+            if (this.ResponseTrace != null)
+                response.Headers.Add(Constants.Gotenberg.All.Trace, this.ResponseTrace);
 
             response.RequestMessage = request;
 

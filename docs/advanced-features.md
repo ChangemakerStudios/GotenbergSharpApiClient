@@ -212,6 +212,10 @@ the check off:
 sharpClient.EnforceMinimumVersion = false;
 ```
 
+With `ApiVersion = V9` the check passes without reading the version, as every gated route predates
+Gotenberg 9. When `/version` answers with an error other than a 404, the request throws a
+`GotenbergApiException` that says so and names the setting to change.
+
 ### Declaring a minimum on your own requests
 
 Custom requests deriving from the built-in request types can declare their own floor with

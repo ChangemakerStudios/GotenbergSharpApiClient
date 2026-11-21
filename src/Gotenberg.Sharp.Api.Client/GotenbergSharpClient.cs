@@ -1,4 +1,4 @@
-﻿//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
+//  Copyright 2019-2025 Chris Mohan, Jaben Cargman
 //  and GotenbergSharpApiClient Contributors
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client;
 
@@ -100,6 +101,8 @@ public class GotenbergSharpClient
     /// Releases predating the <c>/version</c> route report no version at all. Those are older than
     /// every version this client gates on, so they are treated as unsupported. Set this to false to
     /// skip the check entirely — for instance when a proxy hides <c>/version</c> from the client.
+    /// With <see cref="ApiVersion" /> set to <see cref="GotenbergApiVersion.V9" /> the check passes
+    /// without reading the version, as every route it gates is older than Gotenberg 9.
     /// </remarks>
     public bool EnforceMinimumVersion { get; set; } = true;
 
@@ -108,7 +111,8 @@ public class GotenbergSharpClient
     /// default) the client reads the version of the service (see <see cref="GetGotenbergVersionAsync" />)
     /// and uses the API of its major release. <see cref="GotenbergApiVersion.V8" /> (Gotenberg 7 and 8)
     /// and <see cref="GotenbergApiVersion.V9" /> skip that lookup, for instance when a proxy hides
-    /// <c>/version</c> from the client. Set from <see cref="GotenbergSharpClientOptions.ApiVersion" />
+    /// <c>/version</c> from the client; a request on a route with a minimum release still reads the
+    /// version for <see cref="EnforceMinimumVersion" />, except with <c>V9</c>. Set from <see cref="GotenbergSharpClientOptions.ApiVersion" />
     /// when the client comes from <c>AddGotenbergSharpClient()</c>.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is not a member of <see cref="GotenbergApiVersion" />.</exception>
@@ -471,6 +475,12 @@ public class GotenbergSharpClient
     /// <see cref="GotenbergVersion.Unknown" /> when the service does not expose the <c>/version</c>
     /// route or reports something unparsable.
     /// </summary>
+    /// <exception cref="GotenbergApiException">
+    /// Thrown when <c>GET /version</c> fails with anything but a 404: its message says what Gotenberg
+    /// answered and whether to set <see cref="ApiVersion" /> or <see cref="EnforceMinimumVersion" />,
+    /// and the original exception is its <see cref="Exception.InnerException" />. The failure is not
+    /// cached, so the next call tries again.
+    /// </exception>
     /// <remarks>
     /// The clients created by <c>AddGotenbergSharpClient()</c> share the cache of their service
     /// provider; a client constructed directly has its own. When a response reports, in its
@@ -498,9 +508,13 @@ public class GotenbergSharpClient
             catch (GotenbergApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 // Releases predating the /version route answer with a 404. Any other failure —
-                // auth, proxy, 5xx — says nothing about the version and is left to propagate
-                // rather than being cached as "unknown" for the life of the client.
+                // auth, proxy, 5xx — says nothing about the version and is thrown, with what to do
+                // about it, rather than being cached as "unknown" for the life of the client.
                 reported = null;
+            }
+            catch (GotenbergApiException ex)
+            {
+                throw new GotenbergApiException(this.DescribeVersionLookupFailure(ex), ex);
             }
 
             var parsed = GotenbergVersion.TryParse(reported, out var version)
@@ -518,13 +532,40 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
+    /// The message of the exception that reports <paramref name="failure" />, the answer to
+    /// <c>GET /version</c>: what Gotenberg answered, why the client reads the version, what to do, then
+    /// what Gotenberg said.
+    /// </summary>
+    private string DescribeVersionLookupFailure(GotenbergApiException failure)
+    {
+        var answered = $"{(int)failure.StatusCode} ({failure.ReasonPhrase ?? failure.StatusCode.ToString()})";
+
+        var message = this.ApiVersion == GotenbergApiVersion.Auto
+            ? $"Gotenberg answered {answered} to GET /version, which the client reads to choose between the Gotenberg 7 and 8 API and the Gotenberg 9 API. If a proxy blocks /version, set {nameof(GotenbergSharpClientOptions)}.{nameof(GotenbergSharpClientOptions.ApiVersion)} (or {nameof(GotenbergSharpClient)}.{nameof(this.ApiVersion)}) to {nameof(GotenbergApiVersion.V8)} or {nameof(GotenbergApiVersion.V9)} to skip the lookup. With {nameof(GotenbergApiVersion.V8)}, a request that needs a minimum Gotenberg release (split, flatten, encrypt, rotate, embed, bookmarks) still reads it unless {nameof(GotenbergSharpClient)}.{nameof(this.EnforceMinimumVersion)} is false."
+            : $"Gotenberg answered {answered} to GET /version, which the client reads to check that the service is new enough for a request that needs a minimum Gotenberg release. If a proxy blocks /version, set {nameof(GotenbergSharpClient)}.{nameof(this.EnforceMinimumVersion)} to false to skip the check.";
+
+        if (failure.StatusCode == HttpStatusCode.Unauthorized)
+            message += $" Gotenberg refused the credentials, so the conversion would fail as well: check {nameof(GotenbergSharpClientOptions.BasicAuthUsername)} and {nameof(GotenbergSharpClientOptions.BasicAuthPassword)}.";
+
+        return failure.Message.IsSet() ? $"{message} Gotenberg's response: {failure.Message}" : message;
+    }
+
+    /// <summary>
+    /// True when <see cref="ApiVersion" /> alone satisfies <paramref name="requirement" />: the service
+    /// is declared as Gotenberg 9, which has every route that an earlier release introduced. A
+    /// requirement of Gotenberg 9 itself or newer is not settled by that and reads the version.
+    /// </summary>
+    private bool ApiVersionSatisfies(GotenbergFeatureRequirement requirement) =>
+        this.ApiVersion == GotenbergApiVersion.V9 && requirement.MinimumVersion < StageList.Gotenberg9;
+
+    /// <summary>
     /// Gets the Gotenberg API requests are rendered for: <see cref="ApiVersion" /> when it is set to
     /// <see cref="GotenbergApiVersion.V8" /> or <see cref="GotenbergApiVersion.V9" />, without any
     /// request; otherwise the API of the major release <see cref="GetGotenbergVersionAsync" /> reports.
     /// A service that does not report its version is older than the <c>/version</c> route and gets
     /// <see cref="GotenbergApiVersion.V8" />.
     /// </summary>
-    /// <exception cref="GotenbergApiException">Thrown when reading the version fails for another reason than a missing route.</exception>
+    /// <exception cref="GotenbergApiException">Thrown when reading the version fails for another reason than a missing route; see <see cref="GetGotenbergVersionAsync" />.</exception>
     public virtual async Task<GotenbergApiVersion> GetApiVersionAsync(CancellationToken cancelToken = default)
     {
         if (this.ApiVersion != GotenbergApiVersion.Auto) return this.ApiVersion;
@@ -550,6 +591,7 @@ public class GotenbergSharpClient
         var requirement = request.Requires;
 
         if (requirement != null
+            && !this.ApiVersionSatisfies(requirement)
             && !requirement.IsSatisfiedBy(await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false)))
             return false;
 
@@ -786,7 +828,7 @@ public class GotenbergSharpClient
         GotenbergFeatureRequirement? requirement,
         CancellationToken cancelToken)
     {
-        if (requirement == null || !this.EnforceMinimumVersion) return;
+        if (requirement == null || !this.EnforceMinimumVersion || this.ApiVersionSatisfies(requirement)) return;
 
         var running = await this.GetGotenbergVersionAsync(cancelToken).ConfigureAwait(false);
 

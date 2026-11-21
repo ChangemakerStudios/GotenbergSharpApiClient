@@ -210,17 +210,67 @@ public class GotenbergVersionTests
 
     [TestCase(HttpStatusCode.Unauthorized)]
     [TestCase(HttpStatusCode.Forbidden)]
+    [TestCase(HttpStatusCode.InternalServerError)]
     [TestCase(HttpStatusCode.BadGateway)]
     [TestCase(HttpStatusCode.ServiceUnavailable)]
     public async Task Client_DoesNotTreatOtherVersionFailuresAsAnOldService(HttpStatusCode statusCode)
     {
         // An auth or proxy failure says nothing about the version. Swallowing it would cache
         // "unknown" for the client's lifetime and mis-report every gated feature as unsupported.
+        // The caller is told so, and what to set, in a GotenbergApiException of the same status.
         var client = StubVersionClient.WithVersionFailure(statusCode);
 
         var act = async () => await client.GetGotenbergVersionAsync();
 
-        await act.Should().ThrowExactlyAsync<GotenbergApiException>();
+        var thrown = (await act.Should().ThrowExactlyAsync<GotenbergApiException>()).Which;
+
+        thrown.StatusCode.Should().Be(statusCode);
+        thrown.InnerException.Should().BeOfType<GotenbergApiException>()
+            .Which.Message.Should().Be($"{statusCode}");
+        thrown.Message.Should().Contain($"Gotenberg answered {(int)statusCode} (")
+            .And.Contain("GET /version")
+            .And.Contain("ApiVersion")
+            .And.Contain($"Gotenberg's response: {statusCode}");
+        thrown.Message.Contains("BasicAuthUsername").Should().Be(statusCode == HttpStatusCode.Unauthorized);
+        thrown.ToVerboseJson().Should().Contain("GotenbergMessage");
+    }
+
+    [TestCase(HttpStatusCode.Unauthorized)]
+    [TestCase(HttpStatusCode.ServiceUnavailable)]
+    public async Task Client_WithAnExplicitApi_NamesTheMinimumVersionCheckWhenItsLookupFails(HttpStatusCode statusCode)
+    {
+        var client = StubVersionClient.WithVersionFailure(statusCode);
+        client.ApiVersion = GotenbergApiVersion.V8;
+
+        var builder = PdfEngineBuilders.ReadBookmarks()
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
+
+        var act = async () => await client.ReadPdfBookmarksAsync(builder);
+
+        var thrown = (await act.Should().ThrowExactlyAsync<GotenbergApiException>()).Which;
+
+        thrown.StatusCode.Should().Be(statusCode);
+        thrown.Message.Should().Contain("GET /version")
+            .And.Contain("EnforceMinimumVersion")
+            .And.NotContain("V8 or V9");
+
+        client.SendCount.Should().Be(0, "the request must never reach the wire");
+    }
+
+    [Test]
+    public async Task Client_WithAnExplicitV9Api_SkipsTheLookupForGatedRequests()
+    {
+        var client = StubVersionClient.WithVersionFailure(HttpStatusCode.Forbidden);
+        client.ApiVersion = GotenbergApiVersion.V9;
+
+        var builder = PdfEngineBuilders.ReadBookmarks()
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }));
+
+        var act = async () => await client.ReadPdfBookmarksAsync(builder);
+
+        await act.Should().ThrowExactlyAsync<StubVersionClient.SendReachedException>();
+
+        client.VersionCallCount.Should().Be(0);
     }
 
     [Test]

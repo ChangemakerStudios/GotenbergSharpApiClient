@@ -31,12 +31,16 @@ moves to 9 with its release.
   service address and shared by the clients that `AddGotenbergSharpClient()` creates; a client you construct
   yourself keeps its own cache.
 - **When `/version` cannot be read.** A `404`, or an answer that is not a version, counts as Gotenberg 7 or 8:
-  the client uses that API and `GetGotenbergVersionAsync()` returns `GotenbergVersion.Unknown`. Any other
-  failure (`401` from wrong credentials, a proxy error, `5xx`, a refused connection) is thrown to the caller
-  and not cached, so the next request tries again.
+  the client uses that API and `GetGotenbergVersionAsync()` returns `GotenbergVersion.Unknown`. A `401`, `403`,
+  `5xx` or other error answer is thrown as a `GotenbergApiException` that says what Gotenberg answered to
+  `GET /version` and to set `ApiVersion` (or, with `ApiVersion` already set, `EnforceMinimumVersion = false`);
+  a `401` also points at the credentials. It keeps the status code, has the original exception as
+  `InnerException`, and is not cached, so the next request tries again. A refused connection or a timeout is
+  thrown as it is.
 - **Skipping the lookup.** Set `ApiVersion` to `V8` or `V9`, for instance behind a proxy that hides `/version`.
-  A request on a route with a minimum release (split, flatten, encrypt, rotate, embed, bookmarks) still reads
-  the version for that check; set `EnforceMinimumVersion = false` as well to avoid it (see
+  `V9` skips the version check of the routes with a minimum release (split, flatten, encrypt, rotate, embed,
+  bookmarks) too, as they all predate Gotenberg 9. With `V8` those requests still read the version; set
+  `EnforceMinimumVersion = false` as well to avoid it (see
   [Version Compatibility](advanced-features.md#version-compatibility)).
 - **Refresh.** Every response, an error response too, carries a `Gotenberg-Version` header. When its major
   release differs from the cached version, or the cached version is unknown, the cache takes the new one, so a
