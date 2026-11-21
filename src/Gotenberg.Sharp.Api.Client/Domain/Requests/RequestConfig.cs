@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Globalization;
+using System.Text;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
 using GotenbergApiVersion = Gotenberg.Sharp.API.Client.Domain.Shared.GotenbergApiVersion;
 using Gotenberg.Sharp.API.Client.Domain.Webhooks;
@@ -49,13 +51,6 @@ public sealed class RequestConfig : IConvertToHttpContent
 
     public void Validate()
     {
-        // Sent as a request header; HttpClient rejects non-ASCII values only when it sends
-        // (net8.0) or mangles them silently (.NET Framework), and refuses line breaks outright.
-        if (this.ResultFileName.IsSet() && this.ResultFileName!.Any(c => c < ' ' || c > '~'))
-            throw new ArgumentException(
-                "The result file name may only contain printable ASCII characters, because it is sent as an HTTP header.",
-                nameof(this.ResultFileName));
-
         this.Webhook?.Validate();
     }
 
@@ -70,9 +65,65 @@ public sealed class RequestConfig : IConvertToHttpContent
             yield return (Constants.Gotenberg.All.Trace, this.Trace);
 
         if (this.ResultFileName.IsSet())
-            yield return (Constants.Gotenberg.SharedFormFieldNames.OutputFileName, this.ResultFileName);
+            yield return (Constants.Gotenberg.SharedFormFieldNames.OutputFileName, ToHeaderValue(this.ResultFileName!));
 
         foreach (var header in (this.Webhook?.GetHeaders(api)).IfNullEmpty()) yield return header;
+    }
+
+    /// <summary>
+    ///     Makes a result file name fit an HTTP header value: accents are stripped (Müller becomes Muller), and
+    ///     every other character outside printable ASCII (0x20-0x7E), line breaks included, becomes <c>_</c>.
+    ///     A character outside the Basic Multilingual Plane, such as an emoji, gives one <c>_</c>.
+    /// </summary>
+    /// <remarks>
+    ///     HttpClient refuses line breaks outright and rejects or mangles non-ASCII values, depending on the runtime.
+    /// </remarks>
+    internal static string ToHeaderValue(string name)
+    {
+        var result = new StringBuilder(name.Length);
+
+        for (var i = 0; i < name.Length; i++)
+        {
+            var c = name[i];
+
+            if (c >= ' ' && c <= '~')
+            {
+                result.Append(c);
+                continue;
+            }
+
+            // A surrogate pair is one character; a lone surrogate cannot be normalized.
+            if (char.IsSurrogate(c))
+            {
+                if (char.IsHighSurrogate(c) && i + 1 < name.Length && char.IsLowSurrogate(name[i + 1])) i++;
+                result.Append('_');
+                continue;
+            }
+
+            // One character at a time, so that a character that decomposes into several (a Hangul
+            // syllable into its jamo) still gives one '_'.
+            var decomposed = c.ToString().Normalize(NormalizationForm.FormD);
+            var letters = new StringBuilder(decomposed.Length);
+
+            foreach (var d in decomposed)
+            {
+                var category = CharUnicodeInfo.GetUnicodeCategory(d);
+
+                if (category is UnicodeCategory.NonSpacingMark
+                    or UnicodeCategory.SpacingCombiningMark
+                    or UnicodeCategory.EnclosingMark)
+                    continue;
+
+                letters.Append(d);
+            }
+
+            // Nothing left: the character was a combining mark by itself.
+            if (letters.Length == 0) continue;
+
+            result.Append(letters.ToString().All(l => l >= ' ' && l <= '~') ? letters.ToString() : "_");
+        }
+
+        return result.ToString();
     }
 
     #region Basic settings
@@ -89,7 +140,9 @@ public sealed class RequestConfig : IConvertToHttpContent
 
     /// <summary>
     ///     If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is
-    ///     used. Sent as the <c>Gotenberg-Output-Filename</c> request header, so it must be printable ASCII.
+    ///     used. Sent as the <c>Gotenberg-Output-Filename</c> request header, with accents stripped
+    ///     (<c>Müller</c> is sent as <c>Muller</c>) and every other character outside printable ASCII, line breaks
+    ///     included, replaced by <c>_</c>. This property keeps the name as set.
     /// </summary>
     /// <remarks>
     ///     Attention: this feature does not work if the form field webHookURL is given.

@@ -16,6 +16,7 @@ using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 namespace GotenbergSharpClient.Tests;
@@ -69,20 +70,59 @@ public class StrictFormFieldTests
         message.Headers.Contains(Constants.Gotenberg.SharedFormFieldNames.OutputFileName).Should().BeFalse();
     }
 
-    [TestCase("résumé")]
-    [TestCase("日本語")]
-    [TestCase("a\r\nb")]
-    [TestCase("a\tb")]
-    public void ResultFileName_NotPrintableAscii_ThrowsClearly(string name)
+    [TestCase("Müller-Bericht", "Muller-Bericht")]
+    [TestCase("résumé", "resume")]
+    [TestCase("résumé", "resume")] // already decomposed
+    [TestCase("日本語", "___")]
+    [TestCase("한글", "__")] // a Hangul syllable is one character, not its jamo
+    [TestCase("a\r\nb", "a__b")]
+    [TestCase("a\tb", "a_b")]
+    [TestCase("report 2026", "report 2026")]
+    [TestCase("Straße", "Stra_e")]
+    [TestCase("a\U0001F600b", "a_b")] // one character outside the BMP gives one '_'
+    [TestCase("a\u007Fb", "a_b")]
+    public void ResultFileName_NotPrintableAscii_IsCleanedUpInTheHeader(string name, string sent)
     {
         var request = new HtmlRequestBuilder()
             .AddDocument(d => d.SetBody("<html></html>"))
             .ConfigureRequest(c => c.SetResultFileName(name))
+            .Build()
+            .CreateApiRequest();
+
+        request.RenderFor(GotenbergApiVersion.V8).Header(Constants.Gotenberg.SharedFormFieldNames.OutputFileName)
+            .Should().Equal(sent);
+        request.RenderFor(GotenbergApiVersion.V9).Header(Constants.Gotenberg.SharedFormFieldNames.OutputFileName)
+            .Should().Equal(sent);
+    }
+
+    [Test]
+    public void ResultFileName_ALoneSurrogate_IsCleanedUpToo()
+    {
+        // Built here: a lone surrogate does not survive an attribute argument.
+        var name = "a" + (char)0xD83D + "b" + (char)0xDE00 + "c";
+
+        var request = new HtmlRequestBuilder()
+            .AddDocument(d => d.SetBody("<html></html>"))
+            .ConfigureRequest(c => c.SetResultFileName(name))
+            .Build()
+            .CreateApiRequest();
+
+        request.RenderFor(GotenbergApiVersion.V8).Header(Constants.Gotenberg.SharedFormFieldNames.OutputFileName)
+            .Should().Equal("a_b_c");
+    }
+
+    [Test]
+    public void ResultFileName_NotPrintableAscii_KeepsTheValueSetAndValidates()
+    {
+        var request = new HtmlRequestBuilder()
+            .AddDocument(d => d.SetBody("<html></html>"))
+            .ConfigureRequest(c => c.SetResultFileName("Müller\r\n"))
             .Build();
 
-        var act = () => request.CreateApiRequest();
-
-        act.Should().ThrowExactly<ArgumentException>().WithMessage("*ASCII*");
+        request.Config!.ResultFileName.Should().Be("Müller\r\n");
+        request.Config.Invoking(c => c.Validate()).Should().NotThrow();
+        request.Invoking(r => r.CreateApiRequest()).Should().NotThrow();
+        request.Config.ResultFileName.Should().Be("Müller\r\n");
     }
 
     #endregion
@@ -179,15 +219,18 @@ public class StrictFormFieldTests
 
         var client = new DispositionCapturingClient(http);
 
-        var builder = new HtmlRequestBuilder()
-            .AddDocument(d => d.SetBody("<html><body>named</body></html>"))
-            .ConfigureRequest(c => c.SetResultFileName("report"));
+        // Gotenberg appends the extension; the accent of the second name is stripped before it is sent.
+        foreach (var (name, returned) in new[] { ("report", "report.pdf"), ("Müller", "Muller.pdf") })
+        {
+            var builder = new HtmlRequestBuilder()
+                .AddDocument(d => d.SetBody("<html><body>named</body></html>"))
+                .ConfigureRequest(c => c.SetResultFileName(name));
 
-        using var result = await client.HtmlToPdfAsync(builder);
+            using var result = await client.HtmlToPdfAsync(builder);
 
-        result.Length.Should().BeGreaterThan(0);
-        // Gotenberg appends the extension.
-        client.ContentDisposition.Should().Contain("report.pdf");
+            result.Length.Should().BeGreaterThan(0);
+            client.ContentDisposition.Should().Contain(returned);
+        }
     }
 
     private sealed class DispositionCapturingClient(HttpClient http)
