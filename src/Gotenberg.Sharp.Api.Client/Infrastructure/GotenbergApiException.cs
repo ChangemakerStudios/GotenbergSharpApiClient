@@ -29,14 +29,17 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
     {
         readonly IApiRequest _request;
 
-        readonly HttpResponseMessage _response;
+        readonly ResponseSnapshot _response;
 
         /// <summary>
         /// Initializes a new instance of GotenbergApiException.
         /// </summary>
         /// <param name="message">Error message from Gotenberg.</param>
         /// <param name="request">The request that failed.</param>
-        /// <param name="response">The HTTP response containing the error.</param>
+        /// <param name="response">
+        /// The HTTP response containing the error. What the exception reports is copied from it, and it
+        /// is not kept: the caller remains responsible for disposing it.
+        /// </param>
         public GotenbergApiException(
             string message,
             IApiRequest request,
@@ -44,10 +47,11 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             : base(message)
         {
             this._request = request;
-            this._response = response;
-            this.StatusCode = _response.StatusCode;
-            this.RequestUri = _response.RequestMessage?.RequestUri;
-            this.ReasonPhrase = _response.ReasonPhrase;
+            this._response = new ResponseSnapshot(response);
+            this.StatusCode = response.StatusCode;
+            this.RequestUri = response.RequestMessage?.RequestUri;
+            this.ReasonPhrase = response.ReasonPhrase;
+            this.Trace = this._response.Trace;
         }
 
         /// <summary>
@@ -66,17 +70,53 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         public string? ReasonPhrase { get; }
 
         /// <summary>
-        /// Creates a GotenbergApiException from a failed HTTP response.
+        /// Gets the value of the <c>Gotenberg-Trace</c> header of the error response, which identifies the
+        /// request in Gotenberg's logs. Null when the response did not carry one.
+        /// </summary>
+        public string? Trace { get; }
+
+        /// <summary>
+        /// Creates a GotenbergApiException from a failed HTTP response, blocking the calling thread while
+        /// the error body is read.
         /// </summary>
         /// <param name="request">The request that failed.</param>
-        /// <param name="response">The HTTP response containing the error.</param>
+        /// <param name="response">The HTTP response containing the error. It is disposed.</param>
         /// <returns>A new GotenbergApiException with error details.</returns>
+        [Obsolete("Use CreateAsync, which does not block the calling thread and honours cancellation.")]
         public static GotenbergApiException Create(
             IApiRequest request,
             HttpResponseMessage response)
         {
-            var message = response.Content.ReadAsStringAsync().Result;
-            return new GotenbergApiException(message, request, response);
+            using (response)
+            {
+                var message = response.Content.ReadAsStringAsync().Result;
+                return new GotenbergApiException(message, request, response);
+            }
+        }
+
+        /// <summary>
+        /// Creates a GotenbergApiException from a failed HTTP response, reading the error body
+        /// asynchronously.
+        /// </summary>
+        /// <param name="request">The request that failed.</param>
+        /// <param name="response">The HTTP response containing the error. It is disposed.</param>
+        /// <param name="cancelToken">Cancels reading the error body.</param>
+        /// <returns>A new GotenbergApiException with error details.</returns>
+        public static async Task<GotenbergApiException> CreateAsync(
+            IApiRequest request,
+            HttpResponseMessage response,
+            CancellationToken cancelToken = default)
+        {
+            using (response)
+            {
+#if NET5_0_OR_GREATER
+                var message = await response.Content.ReadAsStringAsync(cancelToken).ConfigureAwait(false);
+#else
+                cancelToken.ThrowIfCancellationRequested();
+                var message = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+#endif
+                return new GotenbergApiException(message, request, response);
+            }
         }
 
         /// <summary>
@@ -91,77 +131,122 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
             bool includeRequestContent = true,
             bool indentJson = false)
         {
-            using (_response)
+            using var stream = new MemoryStream();
+
+            using (var writer = new Utf8JsonWriter(
+                       stream,
+                       new JsonWriterOptions { Indented = indentJson, Encoder = GotenbergJsonContext.Encoder }))
             {
-                using var stream = new MemoryStream();
+                writer.WriteStartObject();
+                writer.WriteString("GotenbergMessage", Message);
 
-                using (var writer = new Utf8JsonWriter(
-                           stream,
-                           new JsonWriterOptions { Indented = indentJson, Encoder = GotenbergJsonContext.Encoder }))
+                if (includeGotenbergResponse)
                 {
-                    writer.WriteStartObject();
-                    writer.WriteString("GotenbergMessage", Message);
-
-                    if (includeGotenbergResponse)
-                    {
-                        writer.WriteStartObject("GotenbergResponseReceived");
-                        writer.WriteNumber("StatusCode", (int)_response.StatusCode);
-                        if (_response.ReasonPhrase != null)
-                            writer.WriteString("ReasonPhrase", _response.ReasonPhrase);
-                        writer.WriteString("Version", _response.Version.ToString());
-                        writer.WriteBoolean("IsSuccessStatusCode", _response.IsSuccessStatusCode);
-                        if (_response.RequestMessage?.RequestUri != null)
-                            writer.WriteString("RequestUri", _response.RequestMessage.RequestUri.ToString());
-                        WriteHeaders(writer, "Headers", _response.Headers);
-                        if (_response.Content != null)
-                            WriteHeaders(writer, "ContentHeaders", _response.Content.Headers);
-                        writer.WriteEndObject();
-                    }
-
-                    writer.WriteStartObject("ClientRequestSent");
-                    writer.WriteString("Type", _request.GetType().Name);
-                    writer.WriteBoolean("IsWebhookRequest", _request.IsWebhookRequest);
-                    writer.WriteEndObject();
-
-                    if (includeRequestContent
-                        && this._request is IConvertToHttpContent convertToHttpContent)
-                    {
-                        writer.WriteStartArray("ClientRequestFormContent");
-
-                        foreach (var content in convertToHttpContent.IfNullEmptyContent())
-                        {
-                            var contentType = content.Headers.ContentType?.ToString();
-                            var isText = contentType?.StartsWith("text", StringComparison.Ordinal) ?? false;
-
-                            writer.WriteStartObject();
-                            writer.WriteStartObject("Headers");
-                            writer.WriteString("ContentType", contentType ?? string.Empty);
-                            writer.WriteString(
-                                "Disposition",
-                                content.Headers.ContentDisposition?.ToString() ?? string.Empty);
-                            writer.WriteEndObject();
-                            writer.WriteString(
-                                "Content",
-                                isText ? content.ReadAsStringAsync().Result : "-its not text-");
-                            writer.WriteEndObject();
-                        }
-
-                        writer.WriteEndArray();
-                    }
-
+                    writer.WriteStartObject("GotenbergResponseReceived");
+                    writer.WriteNumber("StatusCode", (int)_response.StatusCode);
+                    if (_response.ReasonPhrase != null)
+                        writer.WriteString("ReasonPhrase", _response.ReasonPhrase);
+                    writer.WriteString("Version", _response.Version);
+                    writer.WriteBoolean("IsSuccessStatusCode", _response.IsSuccessStatusCode);
+                    if (_response.RequestUri != null)
+                        writer.WriteString("RequestUri", _response.RequestUri);
+                    if (_response.RequestMethod != null)
+                        writer.WriteString("RequestMethod", _response.RequestMethod);
+                    WriteHeaders(writer, "Headers", _response.Headers);
+                    if (_response.ContentHeaders != null)
+                        WriteHeaders(writer, "ContentHeaders", _response.ContentHeaders);
                     writer.WriteEndObject();
                 }
 
-                return System.Text.Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
+                writer.WriteStartObject("ClientRequestSent");
+                writer.WriteString("Type", _request.GetType().Name);
+                writer.WriteBoolean("IsWebhookRequest", _request.IsWebhookRequest);
+                writer.WriteEndObject();
+
+                if (includeRequestContent
+                    && this._request is IConvertToHttpContent convertToHttpContent)
+                {
+                    writer.WriteStartArray("ClientRequestFormContent");
+
+                    foreach (var content in convertToHttpContent.IfNullEmptyContent())
+                    {
+                        var contentType = content.Headers.ContentType?.ToString();
+                        var isText = contentType?.StartsWith("text", StringComparison.Ordinal) ?? false;
+
+                        writer.WriteStartObject();
+                        writer.WriteStartObject("Headers");
+                        writer.WriteString("ContentType", contentType ?? string.Empty);
+                        writer.WriteString(
+                            "Disposition",
+                            content.Headers.ContentDisposition?.ToString() ?? string.Empty);
+                        writer.WriteEndObject();
+                        writer.WriteString(
+                            "Content",
+                            isText ? content.ReadAsStringAsync().Result : "-its not text-");
+                        writer.WriteEndObject();
+                    }
+
+                    writer.WriteEndArray();
+                }
+
+                writer.WriteEndObject();
             }
+
+            return System.Text.Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
         }
 
-        static void WriteHeaders(Utf8JsonWriter writer, string name, HttpHeaders headers)
+        /// <summary>
+        /// What the exception reports about the error response, copied so that the response itself can be
+        /// disposed.
+        /// </summary>
+        sealed class ResponseSnapshot
+        {
+            public ResponseSnapshot(HttpResponseMessage response)
+            {
+                this.StatusCode = response.StatusCode;
+                this.ReasonPhrase = response.ReasonPhrase;
+                this.Version = response.Version.ToString();
+                this.IsSuccessStatusCode = response.IsSuccessStatusCode;
+                this.RequestUri = response.RequestMessage?.RequestUri?.ToString();
+                this.RequestMethod = response.RequestMessage?.Method.Method;
+                this.Headers = Copy(response.Headers);
+
+                if (response.Content != null) this.ContentHeaders = Copy(response.Content.Headers);
+
+                this.Trace = response.Headers.TryGetValues(Constants.Gotenberg.All.Trace, out var values)
+                    ? values.FirstOrDefault()
+                    : null;
+            }
+
+            public HttpStatusCode StatusCode { get; }
+
+            public string? ReasonPhrase { get; }
+
+            public string Version { get; }
+
+            public bool IsSuccessStatusCode { get; }
+
+            public string? RequestUri { get; }
+
+            public string? RequestMethod { get; }
+
+            public Dictionary<string, string> Headers { get; }
+
+            public Dictionary<string, string>? ContentHeaders { get; }
+
+            /// <summary>Exposed on the exception, and left out of <see cref="ToVerboseJson" />.</summary>
+            public string? Trace { get; }
+
+            static Dictionary<string, string> Copy(HttpHeaders headers) =>
+                headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
+        }
+
+        static void WriteHeaders(Utf8JsonWriter writer, string name, Dictionary<string, string> headers)
         {
             writer.WriteStartObject(name);
 
             foreach (var header in headers)
-                writer.WriteString(header.Key, string.Join(", ", header.Value));
+                writer.WriteString(header.Key, header.Value);
 
             writer.WriteEndObject();
         }

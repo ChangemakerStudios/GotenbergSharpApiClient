@@ -2,9 +2,6 @@ using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Compression;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Screenshots;
-using Gotenberg.Sharp.API.Client.Domain.Settings;
-using Gotenberg.Sharp.API.Client.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -136,11 +133,10 @@ public class ScreenshotTests
 
     #region Integration Tests
 
-    [Category("Integration")]
-    [Test]
-    public async Task ScreenshotHtml_ReturnsImage()
+    [GotenbergTest("8.0.0")] // the screenshot routes arrived in 8.0.0
+    public async Task ScreenshotHtml_ReturnsImage(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
 
         var builder = new ScreenshotHtmlRequestBuilder()
             .AddDocument(doc => doc.SetBody(
@@ -164,11 +160,10 @@ public class ScreenshotTests
         header[3].Should().Be(0x47); // 'G'
     }
 
-    [Category("Integration")]
-    [Test]
-    public async Task ScreenshotUrl_ReturnsImage()
+    [GotenbergTest("8.0.0")]
+    public async Task ScreenshotUrl_ReturnsImage(GotenbergServer gotenberg)
     {
-        var client = CreateAuthenticatedClient();
+        var client = await gotenberg.CreateClientAsync();
 
         var builder = new ScreenshotUrlRequestBuilder()
             .SetUrl("https://example.com")
@@ -181,21 +176,6 @@ public class ScreenshotTests
 
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
-    }
-
-    private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateAuthenticatedClient()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(options =>
-            {
-                options.ServiceUrl = new Uri("http://localhost:3000");
-                options.BasicAuthUsername = "testuser";
-                options.BasicAuthPassword = "testpass";
-            });
-        services.AddGotenbergSharpClient();
-        return services.BuildServiceProvider()
-            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
     }
 
     #endregion

@@ -5,45 +5,31 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: [10.x]
+    permissions:
+      contents: read
+      id-token: write # lets NuGet/login exchange a GitHub OIDC token for a short-lived API key
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
-    - name: Start Gotenberg with Basic Auth
-      run: |
-        docker run -d \
-          --name gotenberg \
-          -p 3000:3000 \
-          -e GOTENBERG_API_BASIC_AUTH_USERNAME=testuser \
-          -e GOTENBERG_API_BASIC_AUTH_PASSWORD=testpass \
-          gotenberg/gotenberg:8 \
-          gotenberg \
-          --api-enable-basic-auth \
-          --api-timeout=1800s \
-          --log-level=debug
-
-        # Wait for Gotenberg to be ready
-        timeout 30 bash -c 'until curl -f http://localhost:3000/health; do sleep 1; done'
-
     - name: Setup Dotnet
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
-        
+        dotnet-version: |
+          8.x
+          10.x
+
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.1.0
+      uses: gittools/actions/gitversion/setup@v4.7.0
       with:
         versionSpec: '6.x'
 
     - name: GitVersion
       id: gitversion
-      uses: gittools/actions/gitversion/execute@v4.1.0
+      uses: gittools/actions/gitversion/execute@v4.7.0
       with:
         configFilePath: GitVersion.yml
 
@@ -55,14 +41,16 @@ jobs:
 
     - name: Run tests
       run: dotnet test --no-build -c Release --verbosity normal
-      env:
-        GOTENBERG_URL: http://localhost:3000
-        GOTENBERG_USERNAME: testuser
-        GOTENBERG_PASSWORD: testpass
 
     # The project treats trim and AOT warnings as errors, so the publish fails if the client regresses.
     - name: Publish AOT smoke test
       run: dotnet publish test/GotenbergSharpClient.AotSmokeTest -c Release -r linux-x64 -o aot-smoke-test
+
+    # The integration tests start their own containers; the native smoke test needs one running.
+    - name: Start Gotenberg for AOT smoke test
+      run: |
+        docker run -d --name gotenberg-aot -p 3000:3000           -e GOTENBERG_API_BASIC_AUTH_USERNAME=testuser           -e GOTENBERG_API_BASIC_AUTH_PASSWORD=testpass           gotenberg/gotenberg:8 gotenberg --api-enable-basic-auth
+        curl --silent --fail --retry 30 --retry-delay 2 --retry-all-errors http://localhost:3000/health > /dev/null
 
     - name: Run AOT smoke test
       run: ./aot-smoke-test/GotenbergSharpClient.AotSmokeTest
@@ -74,6 +62,13 @@ jobs:
     - name: Pack
       run: dotnet pack src/Gotenberg.Sharp.Api.Client/Gotenberg.Sharp.Api.Client.csproj -c Release -p:PackageVersion=${{ steps.gitversion.outputs.FullSemVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 
+    - name: NuGet login (Trusted Publishing)
+      id: login
+      if: github.event_name != 'pull_request' && (github.ref_name == 'master')
+      uses: NuGet/login@v1
+      with:
+        user: jaben
+
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')
-      run: dotnet nuget push src/Gotenberg.Sharp.Api.Client/bin/Release/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate        
+      run: dotnet nuget push src/Gotenberg.Sharp.Api.Client/bin/Release/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate        

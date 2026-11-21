@@ -14,7 +14,9 @@
 //  limitations under the License.
 
 using System.Diagnostics.Contracts;
+using System.Net;
 
+using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 
 
@@ -24,26 +26,29 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Polly;
-using Polly.Timeout;
-
-using static Polly.Extensions.Http.HttpPolicyExtensions;
 
 namespace Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
 internal static class PolicyFactory
 {
-    internal static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings(
+    internal static IAsyncPolicy<HttpResponseMessage> CreatePolicyFromSettings<TOptions>(
         IServiceProvider sp,
-        HttpRequestMessage _)
+        HttpRequestMessage request)
+        where TOptions : GotenbergSharpClientOptions, new()
     {
         Contract.Ensures(Contract.Result<IAsyncPolicy<HttpResponseMessage>>() != null);
 
-        var retryOps = GetRetryOptions(sp);
+        var retryOps = GetRetryOptions<TOptions>(sp);
 
         if (!(retryOps?.Enabled ?? false)) return Policy.NoOpAsync<HttpResponseMessage>();
 
-        return HandleTransientHttpError()
-            .Or<TimeoutRejectedException>()
+        // A consumed non-seekable stream cannot be sent again: a retry would only replace the
+        // original failure with an InvalidOperationException.
+        if (HasNonReplayableContent(request)) return Policy.NoOpAsync<HttpResponseMessage>();
+
+        return Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()
+            .OrResult(response => IsRetryable(response.StatusCode))
             .WaitAndRetryAsync(
                 retryOps.RetryCount,
                 retryCount => TimeSpan.FromSeconds(Math.Pow(retryOps.BackoffPower, retryCount)),
@@ -67,9 +72,27 @@ internal static class PolicyFactory
             .WithPolicyKey(nameof(GotenbergSharpClient));
     }
 
-    private static RetryOptions? GetRetryOptions(IServiceProvider sp)
+    /// <summary>
+    /// Whether a response is worth sending again unchanged. Gotenberg answers 500 for a conversion
+    /// that will fail the same way again, so it is not retried. A full queue (429) asks to be retried
+    /// shortly, and 502 and 503 come from a proxy that could not reach Gotenberg, for example during a
+    /// container restart. Gotenberg also answers 503 for a request that ran out of time; the client
+    /// cannot tell the two apart, so 503 stays retried. Connection failures surface as
+    /// <see cref="HttpRequestException" /> and are retried too.
+    /// </summary>
+    internal static bool IsRetryable(HttpStatusCode statusCode) =>
+        statusCode is TooManyRequests or HttpStatusCode.BadGateway or HttpStatusCode.ServiceUnavailable;
+
+    // HttpStatusCode.TooManyRequests is missing from netstandard2.0.
+    private const HttpStatusCode TooManyRequests = (HttpStatusCode)429;
+
+    private static bool HasNonReplayableContent(HttpRequestMessage request) =>
+        request.Content is MultipartContent parts && parts.Any(part => part is NonReplayableStreamContent);
+
+    private static RetryOptions? GetRetryOptions<TOptions>(IServiceProvider sp)
+        where TOptions : GotenbergSharpClientOptions, new()
     {
-        return sp.GetRequiredService<IOptions<GotenbergSharpClientOptions>>().Value
+        return sp.GetRequiredService<IOptions<TOptions>>().Value
             ?.RetryPolicy;
     }
 }

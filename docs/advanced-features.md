@@ -97,6 +97,21 @@ builder.ConfigureRequest(config =>
 });
 ```
 
+## Tracing a Failed Request
+
+When Gotenberg returns an error, `GotenbergApiException.Trace` holds the `Gotenberg-Trace` header from the response, so you can find the request in Gotenberg's logs. It is `null` if the response did not carry one.
+
+```csharp
+try
+{
+    var merged = await sharpClient.MergePdfsAsync(mergeBuilder);
+}
+catch (GotenbergApiException ex)
+{
+    logger.LogError("Gotenberg returned {Status}, trace {Trace}", ex.StatusCode, ex.Trace);
+}
+```
+
 ## Version Compatibility
 
 Some Gotenberg routes only exist in newer releases. Requests that use one declare the release that
@@ -123,11 +138,13 @@ Currently gated:
 | --- | --- |
 | Split (`PdfEngineBuilders.Split`) | 8.15.0 |
 | Flatten (`PdfEngineBuilders.Flatten`) | 8.16.0 |
+| Encrypt (`PdfEngineBuilders.Encrypt`) | 8.23.1 |
 | Embedded files (`PdfEngineBuilders.Embed`) | 8.25.0 |
 | Bookmarks (`ReadBookmarks` / `WriteBookmarks`) | 8.28.0 |
+| Rotate (`PdfEngineBuilders.Rotate`) | 8.28.0 |
 
-Rotate, metadata, watermark, stamp, merge and the screenshot routes all predate Gotenberg 8.5 and
-are not gated.
+Merge, metadata (8.3.0) and the screenshot routes (8.0.0) are not gated: they predate the
+`/version` route (8.5.0), so a gate would turn away the 8.0–8.4 services that serve them.
 
 ### Checking ahead of time
 

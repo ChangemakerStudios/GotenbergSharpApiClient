@@ -6,10 +6,13 @@
 [![Downloads](https://img.shields.io/nuget/dt/Gotenberg.Sharp.API.Client.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Gotenberg.Sharp.API.Client)
 ![Build status](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/actions/workflows/deploy.yml/badge.svg)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/Jaben?logo=githubsponsors&label=sponsors)](https://github.com/sponsors/Jaben)
+[![GitHub stars](https://img.shields.io/github/stars/ChangemakerStudios/GotenbergSharpApiClient?style=flat&logo=github&label=stars)](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)
 
 .NET C# client for [Gotenberg](https://gotenberg.dev/) v7 & v8 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
 
-> **v3.1.0** — PDF bookmark read/write, embed files into PDFs (ZUGFeRD / Factur-X), and Gotenberg version compatibility checking with clear errors for unsupported features. See [CHANGES.MD](CHANGES.MD) for details.
+**If this library saves you time, please [⭐ star it on GitHub](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)** — stars are how other developers find it — **and consider [sponsoring](https://github.com/sponsors/Jaben)** to keep it maintained.
+
+> **v3.3.0** — Standalone encrypt and rotate check the Gotenberg version first, so older servers get a clear error instead of a 404. v3.2.1 brought more reliable retries, exact A-series paper sizes, `Gotenberg-Trace` on API errors and options validation. See [CHANGES.MD](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/blob/master/CHANGES.MD) for details.
 
 ## Features
 
@@ -24,7 +27,7 @@
 ## Quick Start
 
 ```bash
-docker run --rm -p 3000:3000 gotenberg/gotenberg:latest
+docker run --rm -p 3000:3000 gotenberg/gotenberg:8
 ```
 
 ```bash
@@ -99,11 +102,11 @@ See the **[full documentation](https://changemakerstudios.github.io/GotenbergSha
 
 ## Examples
 
-See the [examples folder](examples/) for complete working console applications.
+See the [examples folder](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/master/examples) for complete working console applications.
 
 ## Release History
 
-See [CHANGES.MD](CHANGES.MD) for the full release history.
+See [CHANGES.MD](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/blob/master/CHANGES.MD) for the full release history.
 
 ## Star History
 
@@ -117,8 +120,13 @@ See [CHANGES.MD](CHANGES.MD) for the full release history.
 
 ## Support This Project
 
-GotenbergSharpApiClient is free and open source. If it saves you time, consider [sponsoring](https://github.com/sponsors/Jaben) — sponsorships go directly toward the costs of maintaining Changemaker Studios' open-source projects, like code-signing certificates and development tooling.
+GotenbergSharpApiClient is free and open source. If it saves you time:
+
+- **[⭐ Star the repository](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)** — it takes a second and helps other .NET developers find it.
+- **[Sponsor the project](https://github.com/sponsors/Jaben)** — sponsorships go directly toward the costs of maintaining Changemaker Studios' open-source projects, like code-signing certificates and development tooling.
+
+If your team relies on GotenbergSharpApiClient in production, a company sponsorship keeps it maintained and puts your logo here and in the docs. GitHub can invoice your organization, so no personal card is needed.
 
 ## License
 
-[Apache 2.0](LICENSE)
+[Apache 2.0](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/blob/master/LICENSE)

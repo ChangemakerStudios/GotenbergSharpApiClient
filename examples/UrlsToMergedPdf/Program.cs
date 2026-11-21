@@ -1,5 +1,6 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
@@ -58,8 +59,8 @@ static IEnumerable<UrlRequestBuilder> CreateRequestBuilders(IEnumerable<Uri> uri
             .WithPageProperties(b =>
             {
                 b.SetMargins(Margins.None)
-                 .SetMarginLeft(.3)
-                 .SetMarginRight(.3);
+                 .SetMarginLeft(Dimension.FromInches(.3))
+                 .SetMarginRight(Dimension.FromInches(.3));
             });
     }
 }

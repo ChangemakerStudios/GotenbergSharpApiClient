@@ -1,5 +1,6 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
@@ -50,8 +51,8 @@ static async Task<string> CreateFromUrl(string destinationPath, string headerPat
         .WithPageProperties(b =>
             b.SetPaperSize(PaperSizes.A4)
                 .UseChromeDefaults()
-                .SetMarginLeft(0)
-                .SetMarginRight(0)
+                .SetMarginLeft(Dimension.FromInches(0))
+                .SetMarginRight(Dimension.FromInches(0))
         );
 
     var request = await builder.BuildAsync();
