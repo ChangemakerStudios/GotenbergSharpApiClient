@@ -128,7 +128,14 @@ internal static class JsonObjectWriter
             case JsonNode nodeValue:
                 // DeepClone recurses without a limit, so measure the depth first.
                 traversal.CheckNodeDepth(nodeValue);
-                return nodeValue.DeepClone();
+                try
+                {
+                    return nodeValue.DeepClone();
+                }
+                catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+                {
+                    throw NodeNotWritable(exception);
+                }
             case JsonElement elementValue:
                 return elementValue.Clone();
             case JsonDocument documentValue:
@@ -245,7 +252,17 @@ internal static class JsonObjectWriter
                 break;
             case JsonNode nodeValue:
                 traversal.CheckNodeDepth(nodeValue);
-                nodeValue.WriteTo(writer);
+                try
+                {
+                    nodeValue.WriteTo(writer);
+                }
+                catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+                {
+                    // A JsonValue can wrap a collection or object, which the serializer writes. Its depth is
+                    // not visible to CheckNodeDepth, so report its failures with the documented exception.
+                    throw NodeNotWritable(exception);
+                }
+
                 break;
             case JsonElement elementValue:
                 elementValue.WriteTo(writer);
@@ -314,6 +331,11 @@ internal static class JsonObjectWriter
         return Convert.ToString(key, CultureInfo.InvariantCulture) ?? string.Empty;
     }
 
+    private static NotSupportedException NodeNotWritable(Exception inner)
+    {
+        return new NotSupportedException($"A JsonNode value cannot be written as JSON: {inner.Message}", inner);
+    }
+
     private static NotSupportedException DuplicateKey(string key)
     {
         return new NotSupportedException(
@@ -357,11 +379,24 @@ internal static class JsonObjectWriter
 
         /// <summary>
         /// Throws when <paramref name="node" />'s objects and arrays, counted on top of the levels already
-        /// entered, nest deeper than <see cref="MaxDepth" />. Walks the tree with an explicit stack, so a
-        /// deep tree cannot exhaust the call stack here either.
+        /// entered, nest deeper than <see cref="MaxDepth" />, or when the node has more than
+        /// <see cref="MaxDepth" /> parents. Walks both with loops, so a deep tree cannot exhaust the call
+        /// stack here either.
         /// </summary>
         internal void CheckNodeDepth(JsonNode node)
         {
+            // System.Text.Json resolves a node's options by recursing up its parents, which DeepClone
+            // triggers, so a node attached far down another tree can exhaust the stack.
+            var ancestors = 0;
+            for (var parent = node.Parent; parent != null; parent = parent.Parent)
+            {
+                if (++ancestors > MaxDepth)
+                {
+                    throw new NotSupportedException(
+                        $"A JsonNode with more than {MaxDepth} parents cannot be written as JSON.");
+                }
+            }
+
             var pending = new Stack<(JsonNode Node, int Depth)>();
             pending.Push((node, _depth + 1));
 

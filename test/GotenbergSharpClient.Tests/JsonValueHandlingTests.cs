@@ -470,6 +470,99 @@ public class JsonValueHandlingTests
         act.Should().ThrowExactly<NotSupportedException>();
     }
 
+    [Test]
+    public void WriteMetadata_JsonNodeWithTooManyParents_ThrowsInsteadOfExhaustingTheStack()
+    {
+        var leaf = JsonValue.Create("leaf");
+        JsonNode outer = leaf;
+        for (var i = 0; i < 1_000_000; i++)
+            outer = new JsonArray(outer);
+
+        // The retained leaf is supplied, not the outer array, so only its parents are deep.
+        var act = () => PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Leaf"] = leaf });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_JsonNodeWithOrdinaryParents_IsAccepted()
+    {
+        var leaf = JsonValue.Create("leaf");
+        JsonNode outer = leaf;
+        for (var i = 0; i < 100; i++)
+            outer = new JsonArray(outer);
+
+        var request = PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Leaf"] = leaf })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }))
+            .Build();
+
+        JsonObjectWriter.ToJson(request.Metadata!).Should().Be("""{"Leaf":"leaf"}""");
+    }
+
+    private static Dictionary<string, object> WrappedListInsideNestedLists(int lists)
+    {
+        object value = JsonValue.Create(new List<int> { 1 });
+        for (var i = 0; i < lists; i++)
+            value = new List<object> { value };
+
+        return new Dictionary<string, object> { ["Deep"] = value };
+    }
+
+    [Test]
+    public void WriteMetadata_WrappedCollectionPastTheDepthLimit_ThrowsNotSupported()
+    {
+        // The outer dictionary and the lists fill the limit, so only the wrapped list goes past it.
+        var act = () => PdfEngineBuilders.WriteMetadata(WrappedListInsideNestedLists(JsonObjectWriter.MaxDepth - 1));
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void Send_WrappedCollectionPastTheDepthLimitSetDirectly_ThrowsNotSupported()
+    {
+        var options = new PdfOutputOptions { MetaData = WrappedListInsideNestedLists(JsonObjectWriter.MaxDepth - 1) };
+
+        var act = () => options.ToHttpContent().ToList();
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WrappedCollectionWithinTheLimit_IsAccepted()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(WrappedListInsideNestedLists(JsonObjectWriter.MaxDepth - 2));
+
+        act.Should().NotThrow();
+    }
+
+    [Test]
+    public void WriteMetadata_WrappedObjectGraphTooDeepForTheSerializer_ThrowsNotSupported()
+    {
+        object graph = "leaf";
+        for (var i = 0; i < 200; i++)
+            graph = new List<object> { graph };
+
+        var act = () => PdfEngineBuilders.WriteMetadata(
+            new Dictionary<string, object> { ["Wrapped"] = JsonValue.Create(graph)! });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WrappedCollectionChangedAfterTheCall_IsNotSent()
+    {
+        var list = new List<int> { 1 };
+
+        var request = PdfEngineBuilders.WriteMetadata(
+                new Dictionary<string, object> { ["Wrapped"] = JsonValue.Create(list)! })
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }))
+            .Build();
+
+        list.Add(2);
+
+        JsonObjectWriter.ToJson(request.Metadata!).Should().Be("""{"Wrapped":[1]}""");
+    }
+
     #endregion
 
     #region Null arguments
