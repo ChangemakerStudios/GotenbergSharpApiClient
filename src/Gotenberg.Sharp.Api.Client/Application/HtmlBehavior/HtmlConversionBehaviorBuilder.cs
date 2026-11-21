@@ -96,21 +96,36 @@ public sealed class HtmlConversionBehaviorBuilder
     /// Adds custom HTTP headers that Chromium will send when loading the HTML. Useful for authentication tokens,
     /// custom request identification, or triggering specific server behavior.
     /// </summary>
+    /// <remarks>
+    /// Headers from earlier calls are kept. A header whose name matches an earlier one, ignoring case,
+    /// replaces it.
+    /// </remarks>
     /// <param name="headerName">HTTP header name.</param>
     /// <param name="headerValue">HTTP header value.</param>
     /// <returns>The builder instance for method chaining.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when header name or value is invalid.</exception>
+    /// <exception cref="ArgumentException">Thrown when headerName is null, empty or whitespace.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when headerValue is null.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(string headerName, string headerValue)
     {
+        if (headerName.IsNotSet())
+            throw new ArgumentException("Header name is null, empty or whitespace.", nameof(headerName));
+
+        if (headerValue == null) throw new ArgumentNullException(nameof(headerValue));
+
         return AddAdditionalHeaders(new Dictionary<string, object> { [headerName] = headerValue });
     }
 
     /// <summary>
     /// Adds multiple custom HTTP headers as a JSON object. Useful for adding several headers at once.
     /// </summary>
+    /// <remarks>
+    /// Headers from earlier calls are kept. A header whose name matches an earlier one, ignoring case,
+    /// replaces it.
+    /// </remarks>
     /// <param name="extraHeaders">JSON object containing header name-value pairs.</param>
     /// <returns>The builder instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when extraHeaders is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(JsonObject extraHeaders)
     {
         if (extraHeaders == null)
@@ -118,15 +133,20 @@ public sealed class HtmlConversionBehaviorBuilder
             throw new InvalidOperationException("extraHeaders is null");
         }
 
-        return AddAdditionalHeaders(JsonObjectWriter.ToDictionary(extraHeaders));
+        return AddAdditionalHeaders(JsonObjectWriter.ToDictionary(extraHeaders, nameof(extraHeaders)));
     }
 
     /// <summary>
     /// Adds multiple custom HTTP headers as name-value pairs. Useful for adding several headers at once.
     /// </summary>
+    /// <remarks>
+    /// Headers from earlier calls are kept. A header whose name matches an earlier one, ignoring case,
+    /// replaces it. The dictionary is copied, so later changes to it are not sent.
+    /// </remarks>
     /// <param name="extraHeaders">Dictionary containing header name-value pairs.</param>
     /// <returns>The builder instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when extraHeaders is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
     public HtmlConversionBehaviorBuilder AddAdditionalHeaders(IDictionary<string, object> extraHeaders)
     {
         if (extraHeaders == null)
@@ -134,7 +154,25 @@ public sealed class HtmlConversionBehaviorBuilder
             throw new InvalidOperationException("extraHeaders is null");
         }
 
-        _htmlConversionBehaviors.ExtraHeaders = JsonObjectWriter.Snapshot(extraHeaders);
+        var added = JsonObjectWriter.Snapshot(extraHeaders);
+
+        // HTTP header names are case-insensitive, so a later "x-token" replaces an earlier "X-Token".
+        var merged = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+        if (_htmlConversionBehaviors.ExtraHeaders != null)
+        {
+            foreach (var header in _htmlConversionBehaviors.ExtraHeaders)
+                merged[header.Key] = header.Value;
+        }
+
+        foreach (var header in added)
+        {
+            // Remove first so the new spelling of the name is the one sent.
+            merged.Remove(header.Key);
+            merged[header.Key] = header.Value;
+        }
+
+        _htmlConversionBehaviors.ExtraHeaders = merged;
 
         return this;
     }

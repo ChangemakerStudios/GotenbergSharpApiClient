@@ -153,7 +153,7 @@ public static class PdfEngineBuilders
     /// </summary>
     public static PdfEngineBuilder<WriteMetadataRequest> WriteMetadata(JsonObject metadata)
     {
-        return WriteMetadata(JsonObjectWriter.ToDictionary(metadata));
+        return WriteMetadata(JsonObjectWriter.ToDictionary(metadata, nameof(metadata)));
     }
 
     /// <summary>

@@ -205,7 +205,7 @@ static void ExpectField(IReadOnlyDictionary<string, string> fields, string name,
     Expect(actual == expected, $"form field '{name}' was '{actual}', expected '{expected}'");
 }
 
-// Some fields are written indented; compare them with the whitespace removed.
+// Compare JSON fields with whitespace removed, so the check does not depend on how they are formatted.
 static void ExpectJsonField(IReadOnlyDictionary<string, string> fields, string name, string expected)
 {
     Expect(fields.TryGetValue(name, out var actual), $"form field '{name}' is missing");

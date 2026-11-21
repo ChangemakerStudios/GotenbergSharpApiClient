@@ -92,15 +92,13 @@ public sealed class PdfOutputOptionsBuilder
     /// Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf
     /// for an (exhaustive?) list of available metadata.
     /// </summary>
-    /// <param name="metadata">Metadata as a dictionary.</param>
+    /// <param name="metadata">Metadata as a dictionary. It is copied, so later changes to it are not sent.</param>
     /// <returns>The builder instance for method chaining.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when metadata is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when metadata is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
     public PdfOutputOptionsBuilder SetMetadata(IDictionary<string, object> metadata)
     {
-        if (metadata == null)
-        {
-            throw new InvalidOperationException("metadata is null");
-        }
+        if (metadata == null) throw new ArgumentNullException(nameof(metadata));
 
         _options.MetaData = JsonObjectWriter.Snapshot(metadata);
 
@@ -113,6 +111,7 @@ public sealed class PdfOutputOptionsBuilder
     /// <param name="metadata">Metadata as a <see cref="JsonObject" />.</param>
     /// <returns>The builder instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when metadata is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
     public PdfOutputOptionsBuilder SetMetadata(JsonObject metadata)
     {
         if (metadata == null)
@@ -120,7 +119,7 @@ public sealed class PdfOutputOptionsBuilder
             throw new InvalidOperationException("metadata is null");
         }
 
-        return SetMetadata(JsonObjectWriter.ToDictionary(metadata));
+        return SetMetadata(JsonObjectWriter.ToDictionary(metadata, nameof(metadata)));
     }
 
     /// <summary>

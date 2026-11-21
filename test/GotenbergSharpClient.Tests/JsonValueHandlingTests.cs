@@ -2,10 +2,15 @@ using System.Net;
 using System.Text.Json.Nodes;
 
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
+using Gotenberg.Sharp.API.Client.Application.Overlays;
+using Gotenberg.Sharp.API.Client.Application.PdfOutput;
+using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Infrastructure.Json;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -153,6 +158,243 @@ public class JsonValueHandlingTests
         }
 
         requests.Select(r => r.Metadata!["Title"]).Should().Equal("One", "Two", "Three");
+    }
+
+    #endregion
+
+    #region The copy is deep
+
+    [Test]
+    public void WriteMetadata_NestedChangesAfterTheCall_AreNotSent()
+    {
+        var nested = new Dictionary<string, object> { ["Flag"] = true };
+        var list = new List<object> { "a" };
+        var bytes = new byte[] { 1, 2, 3 };
+        var node = new JsonObject { ["x"] = 1 };
+        var metadata = new Dictionary<string, object>
+        {
+            ["Nested"] = nested,
+            ["List"] = list,
+            ["Bytes"] = bytes,
+            ["Node"] = node
+        };
+
+        var request = PdfEngineBuilders.WriteMetadata(metadata)
+            .WithPdfs(a => a.AddItem("test.pdf", new byte[] { 1, 2, 3 }))
+            .Build();
+
+        nested["Flag"] = false;
+        nested["Added"] = "later";
+        list.Add("b");
+        bytes[0] = 9;
+        node["x"] = 2;
+
+        var json = JsonNode.Parse(JsonObjectWriter.ToJson(request.Metadata!))!;
+
+        json["Nested"]!.ToJsonString().Should().Be("""{"Flag":true}""");
+        json["List"]!.ToJsonString().Should().Be("""["a"]""");
+        json["Bytes"]!.GetValue<string>().Should().Be("AQID");
+        json["Node"]!["x"]!.GetValue<int>().Should().Be(1);
+    }
+
+    [Test]
+    public async Task SetMetadata_UnsupportedValueAddedToNestedDictionaryLater_DoesNotBreakTheSend()
+    {
+        var nested = new Dictionary<string, object> { ["Title"] = "Report" };
+        var options = new PdfOutputOptions();
+
+        new PdfOutputOptionsBuilder(options).SetMetadata(new Dictionary<string, object> { ["Nested"] = nested });
+        nested["Info"] = new { Author = "x" };
+
+        var json = await ReadFormField(options, "metadata");
+
+        JsonNode.Parse(json)!["Nested"]!.ToJsonString().Should().Be("""{"Title":"Report"}""");
+    }
+
+    [Test]
+    public async Task SetMetadata_JsonObjectChangedAfterTheCall_IsNotSent()
+    {
+        var metadata = new JsonObject { ["Nested"] = new JsonObject { ["Title"] = "First" } };
+        var options = new PdfOutputOptions();
+
+        new PdfOutputOptionsBuilder(options).SetMetadata(metadata);
+        metadata["Nested"]!["Title"] = "Second";
+
+        var json = await ReadFormField(options, "metadata");
+
+        JsonNode.Parse(json)!["Nested"]!["Title"]!.GetValue<string>().Should().Be("First");
+    }
+
+    [Test]
+    public void WriteMetadata_SameCollectionReferencedTwice_IsAccepted()
+    {
+        var shared = new List<object> { 1, 2 };
+        var metadata = new Dictionary<string, object> { ["A"] = shared, ["B"] = new List<object> { shared } };
+
+        var act = () => PdfEngineBuilders.WriteMetadata(metadata);
+
+        act.Should().NotThrow();
+    }
+
+    #endregion
+
+    #region Values JSON cannot represent throw NotSupportedException
+
+    private static IEnumerable<object> NonFiniteNumbers()
+    {
+        yield return double.NaN;
+        yield return double.PositiveInfinity;
+        yield return double.NegativeInfinity;
+        yield return float.NaN;
+        yield return float.PositiveInfinity;
+    }
+
+    [TestCaseSource(nameof(NonFiniteNumbers))]
+    public void WriteMetadata_WithNonFiniteNumber_ThrowsNotSupported(object value)
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Value"] = value });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WithDictionaryThatContainsItself_ThrowsNotSupported()
+    {
+        var metadata = new Dictionary<string, object>();
+        metadata["Self"] = metadata;
+
+        var act = () => PdfEngineBuilders.WriteMetadata(metadata);
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WithListThatContainsItself_ThrowsNotSupported()
+    {
+        var list = new List<object>();
+        list.Add(list);
+
+        var act = () => PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["List"] = list });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void Send_WithDictionaryThatContainsItselfSetDirectly_ThrowsNotSupported()
+    {
+        var metadata = new Dictionary<string, object>();
+        metadata["Self"] = metadata;
+        var options = new PdfOutputOptions { MetaData = metadata };
+
+        var act = () => options.ToHttpContent().ToList();
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WithDateOnly_ThrowsNotSupported()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(
+            new Dictionary<string, object> { ["Date"] = new DateOnly(2026, 1, 1) });
+
+        act.Should().ThrowExactly<NotSupportedException>();
+    }
+
+    [Test]
+    public void WriteMetadata_WithGuid_IsAccepted()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata(new Dictionary<string, object> { ["Id"] = Guid.NewGuid() });
+
+        act.Should().NotThrow();
+    }
+
+    #endregion
+
+    #region Null arguments
+
+    [Test]
+    public void SetMetadata_WithNullDictionary_ThrowsArgumentNull()
+    {
+        var act = () => new PdfOutputOptionsBuilder(new PdfOutputOptions())
+            .SetMetadata((IDictionary<string, object>)null!);
+
+        act.Should().ThrowExactly<ArgumentNullException>().WithParameterName("metadata");
+    }
+
+    [Test]
+    public void WriteMetadata_WithNullJsonObject_ReportsMetadata()
+    {
+        var act = () => PdfEngineBuilders.WriteMetadata((JsonObject)null!);
+
+        act.Should().ThrowExactly<ArgumentNullException>().WithParameterName("metadata");
+    }
+
+    [Test]
+    public void SetWatermarkOptions_WithNullJsonObject_ReportsOptions()
+    {
+        var act = () => new WatermarkOptionsBuilder(new WatermarkOptions()).SetOptions((JsonObject)null!);
+
+        act.Should().ThrowExactly<ArgumentNullException>().WithParameterName("options");
+    }
+
+    [Test]
+    public void SetStampOptions_WithNullJsonObject_ReportsOptions()
+    {
+        var act = () => new StampOptionsBuilder(new StampOptions()).SetOptions((JsonObject)null!);
+
+        act.Should().ThrowExactly<ArgumentNullException>().WithParameterName("options");
+    }
+
+    #endregion
+
+    #region Additional headers
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("   ")]
+    public void AddAdditionalHeaders_WithMissingName_ThrowsArgument(string? name)
+    {
+        var act = () => new HtmlConversionBehaviorBuilder(new HtmlConversionBehaviors())
+            .AddAdditionalHeaders(name!, "value");
+
+        act.Should().ThrowExactly<ArgumentException>().WithParameterName("headerName");
+    }
+
+    [Test]
+    public void AddAdditionalHeaders_WithNullValue_ThrowsArgumentNull()
+    {
+        var act = () => new HtmlConversionBehaviorBuilder(new HtmlConversionBehaviors())
+            .AddAdditionalHeaders("X-Token", null!);
+
+        act.Should().ThrowExactly<ArgumentNullException>().WithParameterName("headerValue");
+    }
+
+    [Test]
+    public async Task AddAdditionalHeaders_CalledTwice_KeepsBothCallsHeaders()
+    {
+        var behaviors = new HtmlConversionBehaviors();
+
+        new HtmlConversionBehaviorBuilder(behaviors)
+            .AddAdditionalHeaders("X-One", "1")
+            .AddAdditionalHeaders(new Dictionary<string, object> { ["X-Two"] = "2", ["X-Three"] = "3" });
+
+        var json = await ReadFormField(behaviors, Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders);
+
+        json.Should().Be("""{"X-One":"1","X-Two":"2","X-Three":"3"}""");
+    }
+
+    [Test]
+    public async Task AddAdditionalHeaders_SameNameDifferentCase_ReplacesTheEarlierHeader()
+    {
+        var behaviors = new HtmlConversionBehaviors();
+
+        new HtmlConversionBehaviorBuilder(behaviors)
+            .AddAdditionalHeaders("X-Token", "old")
+            .AddAdditionalHeaders("x-token", "new");
+
+        var json = await ReadFormField(behaviors, Constants.Gotenberg.Chromium.Shared.HtmlConvert.ExtraHttpHeaders);
+
+        json.Should().Be("""{"x-token":"new"}""");
     }
 
     #endregion

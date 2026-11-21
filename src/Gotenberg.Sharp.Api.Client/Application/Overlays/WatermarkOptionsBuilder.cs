@@ -63,7 +63,7 @@ public sealed class WatermarkOptionsBuilder
 
     public WatermarkOptionsBuilder SetOptions(JsonObject options)
     {
-        return SetOptions(JsonObjectWriter.ToDictionary(options));
+        return SetOptions(JsonObjectWriter.ToDictionary(options, nameof(options)));
     }
 
     /// <summary>

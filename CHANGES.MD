@@ -8,7 +8,11 @@
 - **Breaking Changes:**
   - `JObject` is gone from the public API. `PdfOutputOptions.MetaData`, `WriteMetadataRequest.Metadata`, `WatermarkOptions.Options`, `StampOptions.Options`, and `HtmlConversionBehaviors.ExtraHeaders` are now `IDictionary<string, object>`
   - Builder overloads that took a `JObject` (`SetMetadata`, `WriteMetadata`, `SetOptions`, `AddAdditionalHeaders`) now take an `IDictionary<string, object>` or a `System.Text.Json.Nodes.JsonObject`
-  - Dictionary values must be strings, numbers, booleans, dates, dictionaries, collections, or `JsonNode`/`JsonElement`; other object types throw `NotSupportedException` instead of being serialized by reflection
+  - Dictionary values must be one of: `null`, `string`, `char`, `bool`, `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `float`, `double`, `decimal`, `DateTime`, `DateTimeOffset`, `Guid`, `Uri`, an enum (written as its number), `byte[]` (written as base64), `JsonNode`, `JsonElement`, `JsonDocument`, or a dictionary or collection of these. Anything else throws `NotSupportedException` when it is supplied, instead of being serialized by reflection. This includes `DateOnly`, `TimeOnly`, `TimeSpan`, anonymous types and other classes, `NaN` and infinite numbers, and a dictionary or collection that contains itself
+  - Dictionaries passed to `SetMetadata`, `WriteMetadata`, `SetOptions` and `AddAdditionalHeaders` are deep-copied, as `JObject.FromObject` did, so later changes to them or to nested dictionaries and collections are not sent
+  - `PdfOutputOptionsBuilder.SetMetadata(IDictionary)` throws `ArgumentNullException` for null, as it did before; the `JsonObject` overloads report the caller's parameter name
+  - `AddAdditionalHeaders(string, string)` throws `ArgumentException` for a missing header name and `ArgumentNullException` for a null value
+  - Calling `AddAdditionalHeaders` more than once now keeps the headers from every call instead of only the last. A header with the same name, ignoring case, replaces the earlier one
   - `ReadPdfBookmarksAsync()` throws `System.Text.Json.JsonException` on malformed JSON instead of a Newtonsoft exception
   - `GotenbergApiException.ToVerboseJson()` writes a fixed set of response and request fields rather than a reflection dump of the underlying objects
   - JSON form fields are sent compact rather than indented
