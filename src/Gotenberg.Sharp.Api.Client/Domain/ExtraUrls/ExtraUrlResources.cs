@@ -17,6 +17,11 @@
 
 namespace Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
 
+/// <summary>
+/// The link and script tags of a URL conversion, written as the <c>extraLinkTags</c> and <c>extraScriptTags</c>
+/// form fields. Gotenberg 7 may read them; Gotenberg 8.40 and 9.5 do not, and Gotenberg 9 answers 400 to them, so a
+/// request for Gotenberg 9 does not send them.
+/// </summary>
 public class ExtraUrlResources : IConvertToHttpContent
 {
     public List<ExtraUrlResourceItem> Items { get;  set; } = new();

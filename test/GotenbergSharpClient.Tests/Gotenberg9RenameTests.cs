@@ -233,6 +233,22 @@ public class Gotenberg9RenameTests
         v9.Should().Equal(v8);
     }
 
+    [Test]
+    public void ExtraResources_AreSentToGotenberg8_AndNotToGotenberg9()
+    {
+        // Neither Gotenberg 8.40 nor 9.5 reads them; the URL route of Gotenberg 9 answers 400 to a field it does not know.
+        var request = Url()
+            .AddExtraResources(r => r.AddLinkTag("https://example.com/style.css").AddScriptTag("https://example.com/app.js"))
+            .Build();
+
+        var eight = request.RenderFor(GotenbergApiVersion.V8);
+
+        eight.Part("extraLinkTags").Value.Should().Be("""[{"href":"https://example.com/style.css"}]""");
+        eight.Part("extraScriptTags").Value.Should().Be("""[{"src":"https://example.com/app.js"}]""");
+
+        request.RenderFor(GotenbergApiVersion.V9).PartNames.Should().NotContain(["extraLinkTags", "extraScriptTags"]);
+    }
+
     #region Custom facets
 
     private sealed class SampleFacet : FacetBase

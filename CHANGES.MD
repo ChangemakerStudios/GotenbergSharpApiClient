@@ -19,7 +19,7 @@ The client now supports Gotenberg 9 next to 7 and 8. It reads the version of the
   - A webhook needs an error URL or an events URL. The `ArgumentNullException` of a webhook with neither says "A webhook error url or events url is required" instead of "An webhook error url is required", and a webhook with only an events URL counts as configured
 - **Fixed:**
   - Image and PDF watermarks and stamps can now be sent at all: the client sent their source but never the file Gotenberg reads them from, so Gotenberg answered 400 (8.32.0 and later). On Gotenberg 9, an image or PDF stamp without its file throws an `ArgumentException` naming the builder method to use
-  - Screenshot requests no longer send `nativePageRanges`, which no screenshot route accepts
+  - Screenshot requests no longer send `nativePageRanges`, which no screenshot route accepts. URL requests for Gotenberg 9 no longer send `extraLinkTags` and `extraScriptTags` (`AddExtraResources`): Gotenberg 9 answers `400` to them, and Gotenberg 8.40 ignored them, so the page is converted without the tags on both. Requests to Gotenberg 7 and 8 still send them
   - `MergeOfficeBuilder` requests send `merge` and `nativePageRanges` at most once; when both the request and its config set page ranges, the config value is used, as Gotenberg already did
   - `PdfConversionBuilder` requests send each PDF once instead of twice
 - **Testing:**
