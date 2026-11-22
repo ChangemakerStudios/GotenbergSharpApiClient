@@ -447,14 +447,82 @@ public class GotenbergApiVersionTests
     }
 
     [Test]
-    public async Task ResponseFromTheSameMajor_KeepsTheCachedVersion()
+    public async Task ResponseFromTheSameVersion_KeepsTheCachedVersion()
+    {
+        var gotenberg = new FakeGotenberg("8.30.0") { ResponseVersionHeader = "8.30.0" };
+        var client = DirectClient(gotenberg);
+
+        await client.HtmlToPdfAsync(Html());
+
+        (await client.GetGotenbergVersionAsync()).Should().Be(GotenbergVersion.Parse("8.30.0"));
+        gotenberg.VersionRequests.Should().Be(1);
+    }
+
+    [Test]
+    public async Task ResponseFromAnotherMinor_ReplacesTheCachedVersion()
     {
         var gotenberg = new FakeGotenberg("8.30.0") { ResponseVersionHeader = "8.31.0" };
         var client = DirectClient(gotenberg);
 
         await client.HtmlToPdfAsync(Html());
 
-        (await client.GetGotenbergVersionAsync()).Should().Be(GotenbergVersion.Parse("8.30.0"));
+        (await client.GetGotenbergVersionAsync()).Should().Be(GotenbergVersion.Parse("8.31.0"));
+        gotenberg.VersionRequests.Should().Be(1);
+    }
+
+    [Test]
+    public async Task InPlaceMinorUpgrade_IsSeenByAClientSharingTheCache()
+    {
+        // 8.20.0 predates the rotate route (8.28.0). The service is upgraded to 8.30.0 in place; a
+        // conversion by one client tells the cache, and the route is then open to every client.
+        var gotenberg = new FakeGotenberg("8.20.0");
+        using var provider = SharedCacheProvider(gotenberg);
+        var first = provider.GetRequiredService<Client>();
+        var second = provider.GetRequiredService<Client>();
+        var rotate = PdfEngineBuilders.Rotate(90).WithPdfs(a => a.AddItem("in.pdf", Pdf));
+
+        (await second.SupportsAsync(rotate.Build())).Should().BeFalse();
+
+        gotenberg.Version = "8.30.0";
+        gotenberg.ResponseVersionHeader = "8.30.0";
+        await first.HtmlToPdfAsync(Html());
+
+        (await second.SupportsAsync(rotate.Build())).Should().BeTrue();
+        await second.EnsureSupportedAsync(rotate.Build());
+        await second.ExecutePdfEngineAsync(rotate);
+        gotenberg.VersionRequests.Should().Be(1, "the header replaces the cached version without another lookup");
+    }
+
+    [Test]
+    public async Task InPlaceRollback_IsSeenByAClientSharingTheCache()
+    {
+        // The service goes back from 8.30.0 to 8.20.0: the rotate route is gone, and the next request
+        // is refused with the reason instead of answering with a bare 404.
+        var gotenberg = new FakeGotenberg("8.30.0");
+        using var provider = SharedCacheProvider(gotenberg);
+        var first = provider.GetRequiredService<Client>();
+        var second = provider.GetRequiredService<Client>();
+        var rotate = PdfEngineBuilders.Rotate(90).WithPdfs(a => a.AddItem("in.pdf", Pdf));
+
+        (await second.SupportsAsync(rotate.Build())).Should().BeTrue();
+
+        gotenberg.ResponseVersionHeader = "8.20.0";
+        await first.HtmlToPdfAsync(Html());
+
+        (await second.SupportsAsync(rotate.Build())).Should().BeFalse();
+
+        var act = async () => await second.ExecutePdfEngineAsync(rotate);
+        await act.Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
+        gotenberg.VersionRequests.Should().Be(1);
+    }
+
+    private static ServiceProvider SharedCacheProvider(FakeGotenberg gotenberg)
+    {
+        var services = new ServiceCollection();
+        services.AddOptions<GotenbergSharpClientOptions>().Configure(o => o.ServiceUrl = Address);
+        services.AddGotenbergSharpClient().ConfigurePrimaryHttpMessageHandler(() => gotenberg);
+
+        return services.BuildServiceProvider();
     }
 
     [Test]
@@ -636,7 +704,13 @@ public class GotenbergApiVersionTests
 
         public FakeGotenberg(string? version) : this(_ => version)
         {
+            this.Version = version;
         }
+
+        /// <summary>
+        /// What <c>/version</c> answers when the fake was built with a fixed version; set it to move the service.
+        /// </summary>
+        public string? Version { get; set; }
 
         public TimeSpan VersionDelay { get; init; }
 
@@ -673,7 +747,7 @@ public class GotenbergApiVersionTests
 
                 if (this.VersionException != null) throw this.VersionException;
 
-                var reported = version(request);
+                var reported = this.Version ?? version(request);
 
                 response = this.VersionFailure is { } failure
                     ? new HttpResponseMessage(failure) { Content = new StringContent(this.VersionFailureBody) }

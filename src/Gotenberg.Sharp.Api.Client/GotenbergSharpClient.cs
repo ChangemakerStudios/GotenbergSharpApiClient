@@ -484,8 +484,9 @@ public class GotenbergSharpClient
     /// <remarks>
     /// The clients created by <c>AddGotenbergSharpClient()</c> share the cache of their service
     /// provider; a client constructed directly has its own. When a response reports, in its
-    /// <c>Gotenberg-Version</c> header, a major release other than the cached one, the cached version
-    /// is replaced, so that a service upgraded while the application runs is noticed on the next request.
+    /// <c>Gotenberg-Version</c> header, a version other than the cached one, the cached version is
+    /// replaced, so that a service upgraded or rolled back while the application runs is noticed on
+    /// the next request.
     /// </remarks>
     public virtual async Task<GotenbergVersion> GetGotenbergVersionAsync(CancellationToken token = default)
     {

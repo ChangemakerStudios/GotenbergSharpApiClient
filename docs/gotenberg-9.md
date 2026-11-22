@@ -42,9 +42,10 @@ moves to 9 with its release.
   bookmarks) too, as they all predate Gotenberg 9. With `V8` those requests still read the version; set
   `EnforceMinimumVersion = false` as well to avoid it (see
   [Version Compatibility](advanced-features.md#version-compatibility)).
-- **Refresh.** Every response, an error response too, carries a `Gotenberg-Version` header. When its major
-  release differs from the cached version, or the cached version is unknown, the cache takes the new one, so a
-  service you upgrade while your application runs is rendered for correctly from the next request on.
+- **Refresh.** Every response, an error response too, carries a `Gotenberg-Version` header. When its version
+  differs from the cached one (an unknown cached version always does), the cache takes the new one, so a
+  service you upgrade or roll back while your application runs, to another minor release as well as another
+  major, is rendered for and checked against its minimum releases correctly from the next request on.
   With `V8` or `V9` set, the rendering never changes.
 - `GetApiVersionAsync()` returns the API in use, `GetGotenbergVersionAsync()` the version of the service.
 

@@ -55,15 +55,16 @@ internal sealed class GotenbergVersionCache
         }
 
         /// <summary>
-        /// Replaces the cached version with the one a response reported, when it is of another major
-        /// release or the cached one is unknown: the service was replaced while the application ran.
-        /// Nothing is cached when the version has not been read yet.
+        /// Replaces the cached version with the one a response reported, when it differs from it (an
+        /// unknown cached version always does): the service was upgraded or rolled back while the
+        /// application ran, and a route gated at a minimum release must be judged against the release
+        /// that now answers. Nothing is cached when the version has not been read yet.
         /// </summary>
         internal void Refresh(GotenbergVersion reported)
         {
             var cached = this.Version;
 
-            if (cached == null || (cached.IsKnown && cached.Major == reported.Major)) return;
+            if (cached == null || (cached.IsKnown && cached.Equals(reported))) return;
 
             Interlocked.CompareExchange(ref this._version, reported, cached);
         }
