@@ -65,15 +65,6 @@ namespace Gotenberg.Sharp.API.Client.Application.Stages;
 /// </example>
 public sealed class StagesBuilder
 {
-    private static readonly string[] Relationships =
-    [
-        Constants.Gotenberg.PdfEngines.EmbedRelation.Source,
-        Constants.Gotenberg.PdfEngines.EmbedRelation.Data,
-        Constants.Gotenberg.PdfEngines.EmbedRelation.Alternative,
-        Constants.Gotenberg.PdfEngines.EmbedRelation.Supplement,
-        Constants.Gotenberg.PdfEngines.EmbedRelation.Unspecified
-    ];
-
     private readonly ExplicitStages _stages;
 
     internal StagesBuilder(ExplicitStages stages)
@@ -282,8 +273,8 @@ public sealed class StagesBuilder
     /// <param name="mimeType">Its media type; Gotenberg derives it from the extension when null.</param>
     /// <param name="relationship">
     /// Its relationship to the document, which makes it a PDF/A-3 associated file: <c>Source</c>,
-    /// <c>Data</c>, <c>Alternative</c>, <c>Supplement</c> or <c>Unspecified</c>
-    /// (<see cref="Constants.Gotenberg.PdfEngines.EmbedRelation" />); a plain attachment when null.
+    /// <c>Data</c>, <c>Alternative</c>, <c>Supplement</c> or <c>Unspecified</c>, in any case and sent
+    /// with the capitals shown here (<see cref="Constants.Gotenberg.PdfEngines.EmbedRelation" />); a plain attachment when null.
     /// </param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="fileName" /> is not a relative file name with an extension, a file of that name is already uploaded for the stages, <paramref name="mimeType" /> is empty or <paramref name="relationship" /> is not one of the five.</exception>
     public StagesBuilder Attach(string fileName, ContentItem content, string? mimeType = null, string? relationship = null)
@@ -292,10 +283,15 @@ public sealed class StagesBuilder
 
         if (mimeType != null) StageArguments.Text(mimeType, nameof(mimeType));
 
-        if (relationship != null && !Relationships.Contains(relationship))
-            throw new ArgumentException(
-                $"The relationship must be {string.Join(", ", Relationships)}, but got '{relationship}'.",
-                nameof(relationship));
+        if (relationship != null)
+        {
+            var canonical = StageList.CanonicalRelationship(relationship)
+                            ?? throw new ArgumentException(
+                                $"The relationship must be {string.Join(", ", StageList.AttachRelationships)} (in any case), but got '{relationship}'.",
+                                nameof(relationship));
+
+            relationship = canonical;
+        }
 
         return this.AppendWithFile(
             fileName,

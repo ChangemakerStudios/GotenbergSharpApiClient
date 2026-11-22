@@ -58,6 +58,27 @@ internal sealed class StageList
     private const string ListTheStampInstead =
         "List the stamp with WithStages (PdfEngineBuilders.Pipe for a PDF operation) and its StampText, StampImage or StampPdf method instead.";
 
+    /// <summary>
+    /// The relationships the <c>attach</c> stage of Gotenberg 9 takes, in the form it reads them. It
+    /// compares them case-sensitively; Gotenberg 8 wrote any string it was given.
+    /// </summary>
+    internal static readonly IReadOnlyList<string> AttachRelationships =
+    [
+        Constants.Gotenberg.PdfEngines.EmbedRelation.Source,
+        Constants.Gotenberg.PdfEngines.EmbedRelation.Data,
+        Constants.Gotenberg.PdfEngines.EmbedRelation.Alternative,
+        Constants.Gotenberg.PdfEngines.EmbedRelation.Supplement,
+        Constants.Gotenberg.PdfEngines.EmbedRelation.Unspecified
+    ];
+
+    /// <summary>
+    /// The relationship <paramref name="relationship" /> names in the form Gotenberg 9 reads, whatever
+    /// its case (<c>data</c> gives <c>Data</c>), or null when it is none of the five.
+    /// </summary>
+    internal static string? CanonicalRelationship(string? relationship) =>
+        AttachRelationships.FirstOrDefault(
+            r => string.Equals(r, relationship, StringComparison.OrdinalIgnoreCase));
+
     private readonly List<Stage> _stages = [];
 
     private readonly List<(string File, string? MimeType, string? Relationship)> _attachments = [];
@@ -95,7 +116,9 @@ internal sealed class StageList
     /// </summary>
     internal StageList Attach(string file, string? mimeType, string? relationship)
     {
-        this._attachments.Add((file, mimeType, relationship));
+        // One of the five in another case is sent in the form Gotenberg 9 reads; anything else is
+        // refused before this point (EmbedRequest.FindRouteRemoved, StagesBuilder.Attach).
+        this._attachments.Add((file, mimeType, CanonicalRelationship(relationship) ?? relationship));
 
         return this;
     }

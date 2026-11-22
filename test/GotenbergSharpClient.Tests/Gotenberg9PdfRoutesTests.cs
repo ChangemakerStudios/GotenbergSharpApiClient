@@ -717,6 +717,57 @@ public class Gotenberg9PdfRoutesTests
         Stages(request.RenderFor(GotenbergApiVersion.V9))[0]["relationship"]!.Value<string>().Should().Be(relationship);
     }
 
+    [TestCase("data", "Data")]
+    [TestCase("SOURCE", "Source")]
+    [TestCase("unSpecified", "Unspecified")]
+    public void EmbeddedFile_WithARelationshipInAnotherCase_SendsItInTheFormGotenberg9Reads(string given, string sent)
+    {
+        var request = Embed(("data.xml", Xml(relationship: given)))
+            .WithPdfs(a => a.AddItem("in.pdf", Pdf))
+            .Build();
+
+        Stages(request.RenderFor(GotenbergApiVersion.V9))[0]["relationship"]!.Value<string>().Should().Be(sent);
+
+        // Gotenberg 8 wrote it as given.
+        JObject.Parse(request.RenderFor(GotenbergApiVersion.V8).Part("embedsMetadata").Value)["data.xml"]!["Relationship"]!
+            .Value<string>().Should().Be(given);
+    }
+
+    [Test]
+    public async Task EmbeddedFile_WithAnotherRelationship_IsRefusedBeforeAnythingIsSentToGotenberg9()
+    {
+        // Gotenberg 8 wrote any string; the attach stage of Gotenberg 9 answers 400 to all but five.
+        var request = Embed(("data.xml", Xml(relationship: "Other")))
+            .WithPdfs(a => a.AddItem("in.pdf", Pdf))
+            .Build();
+
+        var render = () => request.RenderFor(GotenbergApiVersion.V9);
+
+        var thrown = render.Should().ThrowExactly<GotenbergVersionNotSupportedException>().Which;
+
+        thrown.RemovedInVersion.Should().Be(GotenbergVersion.Parse("9.0.0"));
+        thrown.Message.Should().Contain("'Other'").And.Contain("data.xml");
+        thrown.Replacement.Should().Contain("Source, Data, Alternative, Supplement, Unspecified");
+
+        var nine = new GotenbergVersionTests.StubVersionClient("9.5.1");
+
+        (await nine.SupportsAsync(request)).Should().BeFalse();
+
+        var ensure = async () => await nine.EnsureSupportedAsync(request);
+        await ensure.Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
+
+        var send = async () => await nine.ExecutePdfEngineAsync(request);
+        await send.Should().ThrowExactlyAsync<GotenbergVersionNotSupportedException>();
+        nine.SendCount.Should().Be(0);
+
+        // Gotenberg 8 is unchanged.
+        var eight = new GotenbergVersionTests.StubVersionClient("8.40.0");
+
+        (await eight.SupportsAsync(request)).Should().BeTrue();
+        JObject.Parse(request.RenderFor(GotenbergApiVersion.V8).Part("embedsMetadata").Value)["data.xml"]!["Relationship"]!
+            .Value<string>().Should().Be("Other");
+    }
+
     #endregion
 
     #region Integration

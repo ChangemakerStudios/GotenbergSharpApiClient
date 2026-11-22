@@ -29,6 +29,25 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 stages.Attach(kvp.Key, kvp.Value.MimeType, kvp.Value.Relationship);
         }
 
+        // Gotenberg 8 wrote the relationship of an embedded file as given; the attach stage of Gotenberg 9
+        // takes five and answers 400 to any other.
+        internal override GotenbergVersionNotSupportedException? FindRouteRemoved(
+            Func<string, string, GotenbergVersionNotSupportedException> removed)
+        {
+            foreach (var kvp in this.EmbedsData.IfNullEmpty())
+            {
+                var relationship = kvp.Value.Relationship;
+
+                if (!relationship.IsSet() || StageList.CanonicalRelationship(relationship) != null) continue;
+
+                return removed(
+                    $"The embedded file relationship '{relationship}' of '{kvp.Key}' (Entry.Relationship)",
+                    $"Gotenberg 9 takes only {string.Join(", ", StageList.AttachRelationships)} (Constants.Gotenberg.PdfEngines.EmbedRelation), in any case: use one of them.");
+            }
+
+            return null;
+        }
+
         public IDictionary<string, Entry>? EmbedsData { get; set; }
 
         // On Gotenberg 9 each embedded file is uploaded under 'files', where its attach stage names it.

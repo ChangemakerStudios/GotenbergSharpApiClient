@@ -145,6 +145,11 @@ public class StagesBuilderTests
         yield return Row("attach", s => s.Attach("data.xml", "<x/>"u8.ToArray()), """[{"op":"attach","file":"data.xml"}]""");
 
         yield return Row(
+            "attach with a relationship in another case",
+            s => s.Attach("data.xml", "<x/>"u8.ToArray(), "application/xml", "data"),
+            """[{"op":"attach","file":"data.xml","mimeType":"application/xml","relationship":"Data"}]""");
+
+        yield return Row(
             "attach with its type and relationship",
             s => s.Attach("data.xml", "<x/>"u8.ToArray(), "application/xml", Constants.Gotenberg.PdfEngines.EmbedRelation.Data),
             """[{"op":"attach","file":"data.xml","mimeType":"application/xml","relationship":"Data"}]""");

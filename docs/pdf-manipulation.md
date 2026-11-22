@@ -183,7 +183,9 @@ using var result = await sharpClient.ExecutePdfEngineAsync(
 ```
 
 `Constants.Gotenberg.PdfEngines.EmbedRelation` provides the valid relationship values: `Source`,
-`Data`, `Alternative`, `Supplement`, and `Unspecified`.
+`Data`, `Alternative`, `Supplement`, and `Unspecified`. Gotenberg 8 wrote any other value as it was given;
+Gotenberg 9 answers 400 to it, so the client refuses it there before sending (`GotenbergVersionNotSupportedException`).
+A value that differs only in case, such as `data`, is sent as `Data`.
 
 ## Cross-Cutting Options
 
