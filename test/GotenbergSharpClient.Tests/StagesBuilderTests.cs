@@ -21,6 +21,7 @@ using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
+using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
@@ -493,6 +494,11 @@ public class StagesBuilderTests
             () => Html().WithAssets(a => a.AddItem("logo.png", Png)).WithStages(s => s.StampImage("logo.png", Png)).Build(),
             "logo.png");
 
+        yield return Row(
+            "an asset, with a name outside ASCII",
+            () => Html().WithAssets(a => a.AddItem("café.png", Png)).WithStages(s => s.StampImage("café.png", Png)).Build(),
+            "café.png");
+
         yield return Row("index.html", () => Html().WithStages(s => s.AddFile("index.html", Png)).Build(), "index.html");
 
         yield return Row(
@@ -504,6 +510,29 @@ public class StagesBuilderTests
             "a document to merge",
             () => new MergeOfficeBuilder().WithAssets(a => a.AddItem("one.docx", new byte[] { 1 })).WithStages(s => s.AddFile("A.docx", Pdf)).Build(),
             "A.docx");
+    }
+
+    [Test]
+    public async Task StageFile_WithANameOutsideAscii_IsWrittenAsAnExtendedParameterForGotenberg9()
+    {
+        // The multipart reader of Go does not decode the RFC 2047 encoded word .NET writes for filename.
+        var request = Html().WithStages(s => s.StampImage("café.png", Png)).Build();
+
+        using var message = ((IVersionedApiRequest)request.CreateApiRequest()).ToApiRequestMessage(GotenbergApiVersion.V9, GotenbergVersion.Unknown);
+        var body = await message.Content!.ReadAsStringAsync();
+
+        body.Should().Contain("filename*=utf-8''caf%C3%A9.png").And.NotContain("=?utf-8?");
+    }
+
+    [Test]
+    public async Task StampFile_WithANameOutsideAscii_IsWrittenAsBeforeForGotenberg8()
+    {
+        var request = Html().SetStampOptions(s => s.SetImageStamp("café.png", Png)).Build();
+
+        using var message = ((IVersionedApiRequest)request.CreateApiRequest()).ToApiRequestMessage(GotenbergApiVersion.V8, GotenbergVersion.Unknown);
+        var body = await message.Content!.ReadAsStringAsync();
+
+        body.Should().Contain("filename=\"=?utf-8?B?").And.NotContain("filename*=");
     }
 
     [TestCaseSource(nameof(Clashes))]
@@ -822,6 +851,17 @@ public class StagesBuilderTests
         var client = await gotenberg.CreateClientAsync();
 
         var builder = Html().WithStages(s => s.StampImage("logo.png", Png, o => o.SetOffset(36, 36).SetWidth(40).SetHeight(40).SetOpacity(0.5)));
+
+        ShouldBeAPdf(await ReadAll(await client.HtmlToPdfAsync(builder)));
+    }
+
+    // .NET writes a file name outside ASCII as an RFC 2047 encoded word, and a stage names its file: the name must arrive as written.
+    [GotenbergTest("9.0.0")]
+    public async Task Gotenberg9_StampsAnImageWhoseNameIsNotAscii(GotenbergServer gotenberg)
+    {
+        var client = await gotenberg.CreateClientAsync();
+
+        var builder = Html().WithStages(s => s.StampImage("café.png", Png, o => o.SetOffset(36, 36).SetWidth(40).SetHeight(40)));
 
         ShouldBeAPdf(await ReadAll(await client.HtmlToPdfAsync(builder)));
     }

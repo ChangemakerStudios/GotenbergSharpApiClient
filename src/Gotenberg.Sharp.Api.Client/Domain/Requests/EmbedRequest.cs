@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
+using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
 using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
@@ -113,11 +114,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
         {
             var contentItem = entry.Value.Content.ToHttpContentItem();
 
-            contentItem.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-            {
-                Name = fieldName,
-                FileName = entry.Key,
-            };
+            // The attach stage of Gotenberg 9 finds the file by its name, under 'files'.
+            contentItem.Headers.ContentDisposition = OverlayFile.ToDisposition(
+                fieldName,
+                entry.Key,
+                exactName: fieldName == Constants.Gotenberg.SharedFormFieldNames.Files);
 
             if (!string.IsNullOrEmpty(entry.Value.MimeType))
             {

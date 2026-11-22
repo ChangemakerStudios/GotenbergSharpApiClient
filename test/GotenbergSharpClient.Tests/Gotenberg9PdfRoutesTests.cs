@@ -875,6 +875,49 @@ public class Gotenberg9PdfRoutesTests
         json["embedded.pdf"]!.Select(a => a["name"]!.Value<string>()).Should().BeEquivalentTo("first.xml", "second.xml");
     }
 
+    // .NET writes a file name outside ASCII as an RFC 2047 encoded word, and a stage names its file: the name must arrive as written.
+    [GotenbergTest("9.0.0")]
+    public async Task Gotenberg9_EmbedsAFileWhoseNameIsNotAscii(GotenbergServer gotenberg)
+    {
+        var client = await gotenberg.CreateClientAsync();
+        var pdf = await ThreePagePdf(client);
+
+        var embedded = await ReadAll(await client.ExecutePdfEngineAsync(
+            Embed(("données.xml", Xml("<x/>"))).WithPdfs(a => a.AddItem("test.pdf", pdf))));
+
+        (await AttachmentNames(gotenberg, embedded)).Should().BeEquivalentTo("données.xml");
+    }
+
+    [GotenbergTest("9.0.0")]
+    public async Task Gotenberg9_AttachesAFileWhoseNameIsNotAscii_ThroughPipe(GotenbergServer gotenberg)
+    {
+        var client = await gotenberg.CreateClientAsync();
+        var pdf = await ThreePagePdf(client);
+
+        var attached = await ReadAll(await client.ExecutePdfEngineAsync(
+            PdfEngineBuilders.Pipe(s => s.Attach("données.xml", "<x/>"u8.ToArray(), "application/xml"))
+                .WithPdfs(a => a.AddItem("test.pdf", pdf))));
+
+        (await AttachmentNames(gotenberg, attached)).Should().BeEquivalentTo("données.xml");
+    }
+
+    // The client has no method for the attachments read route of Gotenberg 9.
+    private static async Task<string[]> AttachmentNames(GotenbergServer gotenberg, byte[] pdf)
+    {
+        using var http = RawClient(gotenberg, await gotenberg.GetUrlAsync());
+        using var form = new MultipartFormDataContent();
+        var file = new ByteArrayContent(pdf);
+        file.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+        form.Add(file, "files", "attached.pdf");
+
+        using var response = await http.PostAsync("forms/pdf/attachments", form);
+        var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+        response.IsSuccessStatusCode.Should().BeTrue(json.ToString());
+
+        return json["attached.pdf"]!.Select(a => a["name"]!.Value<string>()!).ToArray();
+    }
+
     [GotenbergTest("9.0.0")]
     public async Task Gotenberg9_RefusesAnOutlinePerFileBeforeSending(GotenbergServer gotenberg)
     {

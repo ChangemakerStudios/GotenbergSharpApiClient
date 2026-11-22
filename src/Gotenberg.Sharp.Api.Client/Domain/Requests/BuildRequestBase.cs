@@ -218,10 +218,10 @@ public abstract class BuildRequestBase
 
         // Gotenberg 9 reads the files of stages from 'files', where the stages name them.
         if (this.StampOptions is { SendsFile: true } stamp)
-            parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, stamp.FileName!, stamp.FileContent!));
+            parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, stamp.FileName!, stamp.FileContent!, exactName: true));
 
         foreach (var (fileName, content) in (this.ExplicitStages?.Files).IfNullEmpty())
-            parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, fileName, content));
+            parts.Add(OverlayFile.ToPart(Constants.Gotenberg.SharedFormFieldNames.Files, fileName, content, exactName: true));
 
         if (this.ReadsNativeTaggedPdf && this.PdfOutputOptions?.GenerateTaggedPdf is { } tagged)
             parts.Add(CreateFormDataItem(tagged ? "true" : "false", Constants.Gotenberg.PdfOutput.NativeTaggedPdf));
@@ -291,7 +291,7 @@ public abstract class BuildRequestBase
             var uploads = parts.Count(
                 p => p.Headers.ContentDisposition is { } d
                      && d.Name?.Trim('"') == Constants.Gotenberg.SharedFormFieldNames.Files
-                     && d.FileName?.Trim('"') == fileName);
+                     && (d.FileNameStar ?? d.FileName)?.Trim('"') == fileName);
 
             if (uploads > 1)
                 throw new ArgumentException(

@@ -33,17 +33,43 @@ internal static class OverlayFile
         source is OverlaySource.Image or OverlaySource.Pdf && fileName != null && content != null;
 
     /// <summary>
+    /// The <c>Content-Disposition</c> of the file part named <paramref name="fieldName" />.
+    /// </summary>
+    /// <param name="fieldName">The form field.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <param name="exactName">
+    /// True when a stage of Gotenberg 9 finds the file by its name. .NET writes <c>filename</c> outside ASCII as an
+    /// RFC 2047 encoded word (<c>=?utf-8?B?...?=</c>), which the multipart reader of Go does not decode: the file would
+    /// be stored under that text and the stage would not find it. Such a name goes as <c>filename*</c> (RFC 5987)
+    /// instead, which Go decodes.
+    /// </param>
+    internal static ContentDispositionHeaderValue ToDisposition(string fieldName, string fileName, bool exactName)
+    {
+        var disposition = new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+        {
+            Name = fieldName
+        };
+
+        if (exactName && fileName.Any(c => c > 127))
+            disposition.FileNameStar = fileName;
+        else
+            disposition.FileName = fileName;
+
+        return disposition;
+    }
+
+    /// <summary>
     /// The file part named <paramref name="fieldName" />, with the media type of the extension of its file name.
     /// </summary>
-    internal static HttpContent ToPart(string fieldName, string fileName, ContentItem content)
+    /// <param name="fieldName">The form field.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <param name="content">The content.</param>
+    /// <param name="exactName">True when a stage of Gotenberg 9 finds the file by its name; see <see cref="ToDisposition" />.</param>
+    internal static HttpContent ToPart(string fieldName, string fileName, ContentItem content, bool exactName = false)
     {
         var part = content.ToHttpContentItem();
 
-        part.Headers.ContentDisposition =
-            new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-            {
-                Name = fieldName, FileName = fileName
-            };
+        part.Headers.ContentDisposition = ToDisposition(fieldName, fileName, exactName);
 
         part.Headers.ContentType = new MediaTypeHeaderValue(ContentTypes.GetContentType(fileName));
 
