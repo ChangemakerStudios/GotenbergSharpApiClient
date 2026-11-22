@@ -26,7 +26,8 @@ public class PdfConversionRequest : PdfRequestBase
 
     // The conversion of Gotenberg 9 is the remediate stage the PDF format and PDF/UA options map to.
     // Gotenberg 8 answered a request with neither with a 400; Gotenberg 9 refuses an empty list of stages.
-    internal override string? NoStagesMessage =>
+    // BuildRequestBase.FindUnrenderableOn says it before the request is sent.
+    internal override string NoStagesMessage =>
         "A PDF conversion needs a target: set PdfOutputOptions.PdfFormat (PDF/A) or PdfOutputOptions.EnablePdfUa, "
         + "or another post-processing option, for Gotenberg 9 to have a stage to run.";
 

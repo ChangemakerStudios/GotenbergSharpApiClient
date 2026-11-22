@@ -18,6 +18,8 @@ using System.Net;
 using System.Net.Http.Headers;
 
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Embed;
+using Gotenberg.Sharp.API.Client.Domain.Pages;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
@@ -26,6 +28,8 @@ using Gotenberg.Sharp.API.Client.Extensions;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using Newtonsoft.Json.Linq;
 
 using Client = Gotenberg.Sharp.API.Client.GotenbergSharpClient;
 
@@ -594,6 +598,114 @@ public class GotenbergApiVersionTests
         gotenberg.ConversionRequests.Should().Be(0);
     }
 
+    [Test]
+    public async Task LegacySubclass_IsRefusedAlikeBySupportsEnsureAndTheSend()
+    {
+        var request = WithPdf(new LegacyRequest());
+
+        await ShouldBeRefusedForGotenberg9(request, client => client.ExecutePdfEngineAsync(request), typeof(LegacyRequest).FullName!);
+    }
+
+    [Test]
+    public async Task LegacyFacet_IsRefusedAlikeBySupportsEnsureAndTheSend()
+    {
+        var request = new HtmlRequestBuilder()
+            .AddDocument(d => d.SetBody("<html><body>hi</body></html>"))
+            .Build();
+
+        request.PageProperties = new LegacyPageProperties();
+
+        await ShouldBeRefusedForGotenberg9(request, client => client.HtmlToPdfAsync(request), typeof(LegacyPageProperties).FullName!);
+
+        // The facet is sent to Gotenberg 7 and 8 as before.
+        request.RenderFor(GotenbergApiVersion.V8).PartNames.Should().Contain("legacyFacet");
+    }
+
+    [Test]
+    public async Task MetadataWithoutAValue_IsRefusedAlikeBySupportsEnsureAndTheSend()
+    {
+        // Gotenberg 9 answers 400 (stages is required) to the empty list this gives.
+        var request = PdfEngineBuilders.WriteMetadata(new JObject { ["Title"] = null })
+            .WithPdfs(a => a.AddItem("in.pdf", Pdf))
+            .Build();
+
+        await ShouldBeRefusedForGotenberg9(request, client => client.ExecutePdfEngineAsync(request), "no value to write");
+
+        // Gotenberg 8 is sent the request as before.
+        request.RenderFor(GotenbergApiVersion.V8).Part("metadata").Value.Should().Contain("Title");
+    }
+
+    [Test]
+    public async Task EmbedWithoutFiles_IsRefusedAlikeBySupportsEnsureAndTheSend()
+    {
+        var request = PdfEngineBuilders.Embed(new Dictionary<string, Entry>())
+            .WithPdfs(a => a.AddItem("in.pdf", Pdf))
+            .Build();
+
+        var gotenberg = new FakeGotenberg("9.5.1");
+        var client = DirectClient(gotenberg);
+
+        (await client.SupportsAsync(request)).Should().BeFalse();
+
+        var ensure = async () => await client.EnsureSupportedAsync(request);
+        await ensure.Should().ThrowExactlyAsync<InvalidOperationException>().WithMessage("*no file to embed*");
+
+        request.FindUnrenderableOn(GotenbergApiVersion.V9)!.Message.Should().Contain("no file to embed");
+
+        // Sending validates the request first, which refuses it for every Gotenberg.
+        var sending = async () => await client.ExecutePdfEngineAsync(request);
+        await sending.Should().ThrowExactlyAsync<InvalidOperationException>().WithMessage("*EmbedsData is required*");
+        gotenberg.ConversionRequests.Should().Be(0);
+    }
+
+    [Test]
+    public async Task RequestWithAStage_IsNotRefusedForTheStagesItHas()
+    {
+        var request = PdfEngineBuilders.WriteMetadata(new JObject { ["Title"] = "T" })
+            .WithPdfs(a => a.AddItem("in.pdf", Pdf))
+            .Build();
+
+        var client = DirectClient(new FakeGotenberg("9.5.1"));
+
+        (await client.SupportsAsync(request)).Should().BeTrue();
+        await client.EnsureSupportedAsync(request);
+        request.FindUnrenderableOn(GotenbergApiVersion.V9).Should().BeNull();
+        request.FindUnrenderableOn(GotenbergApiVersion.V8).Should().BeNull();
+    }
+
+    /// <summary>
+    /// The request cannot be rendered for Gotenberg 9: <c>SupportsAsync</c> answers false, <c>EnsureSupportedAsync</c>
+    /// and the send throw the same <see cref="InvalidOperationException" /> and nothing is sent. Gotenberg 8 is unchanged.
+    /// </summary>
+    private static async Task ShouldBeRefusedForGotenberg9(
+        BuildRequestBase request,
+        Func<Client, Task> send,
+        string messagePart)
+    {
+        var gotenberg = new FakeGotenberg("9.5.1");
+        var client = DirectClient(gotenberg);
+
+        (await client.SupportsAsync(request)).Should().BeFalse();
+
+        var ensure = async () => await client.EnsureSupportedAsync(request);
+        var thrown = (await ensure.Should().ThrowExactlyAsync<InvalidOperationException>().WithMessage($"*{messagePart}*")).Which;
+
+        var sending = async () => await send(client);
+        var sent = (await sending.Should().ThrowExactlyAsync<InvalidOperationException>()).Which;
+
+        sent.Message.Should().Be(thrown.Message);
+
+        gotenberg.ConversionRequests.Should().Be(0);
+
+        var rendering = () => request.RenderFor(GotenbergApiVersion.V9);
+        rendering.Should().ThrowExactly<InvalidOperationException>().Which.Message.Should().Be(thrown.Message);
+
+        var eight = DirectClient(new FakeGotenberg("8.40.0"));
+
+        (await eight.SupportsAsync(request)).Should().BeTrue();
+        await eight.EnsureSupportedAsync(request);
+    }
+
     [TestCase(GotenbergApiVersion.V8)]
     [TestCase(GotenbergApiVersion.V9)]
     public void MigratedSubclass_RendersForEitherApi(GotenbergApiVersion api)
@@ -642,6 +754,15 @@ public class GotenbergApiVersionTests
 
             foreach (var content in base.ToHttpContent()) yield return content;
         }
+    }
+
+    /// <summary>
+    /// A facet written against the parameterless method only.
+    /// </summary>
+    private sealed class LegacyPageProperties : PageProperties
+    {
+        public override IEnumerable<HttpContent> ToHttpContent() =>
+            base.ToHttpContent().Append(Field("legacyFacet", "value"));
     }
 
     private sealed class ReplacingLegacyRequest : PdfEngineRequest

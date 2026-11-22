@@ -29,6 +29,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests
                 stages.Attach(kvp.Key, kvp.Value.MimeType, kvp.Value.Relationship);
         }
 
+        internal override string NoStagesMessage =>
+            $"{nameof(this.EmbedsData)} holds no file to embed: Gotenberg 9 answers 400 (stages is required) to a request with no stage. Add at least one file.";
+
         // Gotenberg 8 wrote the relationship of an embedded file as given; the attach stage of Gotenberg 9
         // takes five and answers 400 to any other.
         internal override GotenbergVersionNotSupportedException? FindRouteRemoved(

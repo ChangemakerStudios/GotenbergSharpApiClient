@@ -54,11 +54,10 @@ public abstract class FacetBase : IConvertToHttpContent
         if (!LegacyContentOverrides.OverridesOnlyLegacy(this.GetType())) return this.ToHttpContent(api);
 
         // A facet written against the parameterless method: on 7 and 8 it is called exactly as before.
-        if (api == GotenbergApiVersion.V8) return this.ToHttpContent();
-
-        throw new InvalidOperationException(
-            $"{this.GetType().FullName} overrides ToHttpContent() but not ToHttpContent(GotenbergApiVersion), so it can only be sent to Gotenberg 7 and 8. "
-            + $"To send it to Gotenberg {(int)api}, override ToHttpContent(GotenbergApiVersion api) instead and return its parts together with base.ToHttpContent(api).");
+        // The request that holds it has refused it for Gotenberg 9 already (BuildRequestBase.FindUnrenderableOn).
+        return LegacyContentOverrides.FindRefusal(this.GetType(), api) is { } refusal
+            ? throw refusal
+            : this.ToHttpContent();
     }
 
     private IEnumerable<HttpContent> RenderProperties(GotenbergApiVersion api)

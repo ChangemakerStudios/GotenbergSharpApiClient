@@ -140,11 +140,13 @@ public abstract class BuildRequestBase
         Func<string, string, GotenbergVersionNotSupportedException> removed) => null;
 
     /// <summary>
-    /// What to tell the caller when the request has no stage on Gotenberg 9 although its route runs
-    /// stages and refuses an empty list, or null when an empty list is fine (Chromium and
-    /// LibreOffice) or cannot happen.
+    /// What to tell the caller when the request has no stage for the <c>forms/pdf/pipe</c> route of
+    /// Gotenberg 9, which refuses an empty list (<c>stages is required</c>): what is missing. A
+    /// request overrides it to name its own option.
     /// </summary>
-    internal virtual string? NoStagesMessage => null;
+    internal virtual string NoStagesMessage =>
+        $"{this.GetType().Name} has nothing for Gotenberg 9 to run: its forms/pdf/pipe route answers 400 (stages is required) to an empty list of stages. "
+        + "Set at least one option that the client sends as a stage, or list the stages with PdfEngineBuilders.Pipe.";
 
     /// <summary>
     /// The exception the request would throw when rendered for <paramref name="api" /> because an
@@ -157,6 +159,42 @@ public abstract class BuildRequestBase
         api == GotenbergApiVersion.V9
             ? StageList.FindRemoved(this, runningVersion) ?? this.Config?.Webhook?.FindRemoved(runningVersion)
             : StageList.FindNeedsGotenberg9(this, runningVersion);
+
+    /// <summary>
+    /// The exception rendering this request for <paramref name="api" /> throws because it cannot be
+    /// rendered for that API, or null. Not a feature that API lacks (that is
+    /// <see cref="FindUnsupportedOn" />, which is reported first): a request or facet class that
+    /// overrides only <c>ToHttpContent()</c> cannot be rendered for Gotenberg 9, and neither can a
+    /// request for the <c>forms/pdf/pipe</c> route that ends up with no stage. Gotenberg 7 and 8
+    /// render every request. Rendering throws what this returns, and the client answers
+    /// <c>SupportsAsync</c> and <c>EnsureSupportedAsync</c> with it, so that all three agree.
+    /// </summary>
+    internal InvalidOperationException? FindUnrenderableOn(GotenbergApiVersion api)
+    {
+        if (api != GotenbergApiVersion.V9) return null;
+
+        var legacy = LegacyContentOverrides.FindRefusal(this, api);
+
+        if (legacy != null) return legacy;
+
+        if (!this.AppliesPostProcessing
+            || this.RenderApiPath(api) != Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe
+            || this.FindUnsupportedOn(api, GotenbergVersion.Unknown) != null)
+            return null;
+
+        try
+        {
+            return StageList.For(this, GotenbergVersion.Unknown).IsEmpty
+                ? new InvalidOperationException(this.NoStagesMessage)
+                : null;
+        }
+        catch (ArgumentException)
+        {
+            // An option that holds a value Gotenberg 9 cannot be given: rendering throws that, and the
+            // request has a stage to say it for.
+            return null;
+        }
+    }
 
     /// <summary>
     /// The files of this request that a Gotenberg 9 stage reads, uploaded under <c>files</c> with the
@@ -176,11 +214,7 @@ public abstract class BuildRequestBase
 
         // The client has checked FindUnsupportedOn with the version of the service before rendering,
         // so a request rendered here without that check reports no running version.
-        var stages = StageList.For(this, GotenbergVersion.Unknown);
-
-        if (stages.IsEmpty && this.NoStagesMessage is { } message) throw new InvalidOperationException(message);
-
-        var parts = stages.ToHttpContent().ToList();
+        var parts = StageList.For(this, GotenbergVersion.Unknown).ToHttpContent().ToList();
 
         // Gotenberg 9 reads the files of stages from 'files', where the stages name them.
         if (this.StampOptions is { SendsFile: true } stamp)
@@ -270,14 +304,10 @@ public abstract class BuildRequestBase
 
     private IEnumerable<HttpContent> RenderContent(GotenbergApiVersion api)
     {
-        if (!LegacyContentOverrides.OverridesOnlyLegacy(this.GetType())) return this.ToHttpContent(api);
+        if (this.FindUnrenderableOn(api) is { } unrenderable) throw unrenderable;
 
         // A subclass written against the parameterless method: on 7 and 8 it is called exactly as
         // before, its base.ToHttpContent() returning the whole content of the class it derives from.
-        if (api == GotenbergApiVersion.V8) return this.ToHttpContent();
-
-        throw new InvalidOperationException(
-            $"{this.GetType().FullName} overrides ToHttpContent() but not ToHttpContent(GotenbergApiVersion), so it can only be sent to Gotenberg 7 and 8. "
-            + $"To send it to Gotenberg {(int)api}, override ToHttpContent(GotenbergApiVersion api) instead and return its parts together with base.ToHttpContent(api).");
+        return LegacyContentOverrides.OverridesOnlyLegacy(this.GetType()) ? this.ToHttpContent() : this.ToHttpContent(api);
     }
 }

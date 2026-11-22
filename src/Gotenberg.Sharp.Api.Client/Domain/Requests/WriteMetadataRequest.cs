@@ -45,6 +45,11 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
     internal override void AddRouteStages(StageList stages) =>
         stages.RouteOutput = new PdfOutputOptions { MetaData = this.Metadata };
 
+    // A metadata object with no value (empty, or all null) gives no stage, and Gotenberg 9 refuses an empty list.
+    internal override string NoStagesMessage =>
+        $"{nameof(this.Metadata)} holds no value to write: Gotenberg 9 answers 400 (stages is required) to a request with no stage. "
+        + "Set at least one metadata value, such as Title or Author.";
+
     protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (api == GotenbergApiVersion.V8)

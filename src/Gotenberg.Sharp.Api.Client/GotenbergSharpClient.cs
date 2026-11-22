@@ -578,8 +578,10 @@ public class GotenbergSharpClient
 
     /// <summary>
     /// Determines whether the running Gotenberg can serve <paramref name="request" />, without sending
-    /// it: the service is new enough for its route, and the Gotenberg API it is rendered for (see
-    /// <see cref="GetApiVersionAsync" />) has an equivalent for each of its options. Requests that
+    /// it: the service is new enough for its route, the Gotenberg API it is rendered for (see
+    /// <see cref="GetApiVersionAsync" />) has an equivalent for each of its options, and the request
+    /// can be rendered for that API (a class that overrides only <c>ToHttpContent()</c> cannot be
+    /// rendered for Gotenberg 9, nor can a PDF operation with nothing to run there). Requests that
     /// target routes present in every supported release and use no option a release removed are
     /// always supported, without reading the version.
     /// </summary>
@@ -602,9 +604,12 @@ public class GotenbergSharpClient
     /// <summary>
     /// Throws <see cref="GotenbergVersionNotSupportedException" /> when the running Gotenberg is
     /// older than the release that introduced the route <paramref name="request" /> targets, or when
-    /// the Gotenberg API it is rendered for has no equivalent for one of its options.
+    /// the Gotenberg API it is rendered for has no equivalent for one of its options; throws the
+    /// <see cref="InvalidOperationException" /> that sending the request would throw when it cannot
+    /// be rendered for that API.
     /// </summary>
     /// <exception cref="GotenbergVersionNotSupportedException">Thrown when the running Gotenberg is too old, or has no equivalent for an option of the request.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the request cannot be rendered for the Gotenberg API of the service: a class that overrides only <c>ToHttpContent()</c> (for Gotenberg 9), or a PDF operation that gives Gotenberg 9 no stage to run.</exception>
     public virtual async Task EnsureSupportedAsync(
         BuildRequestBase request,
         CancellationToken cancelToken = default)
@@ -619,22 +624,25 @@ public class GotenbergSharpClient
     }
 
     /// <summary>
-    /// The exception for the first option of <paramref name="request" /> that the API of the service
-    /// has no equivalent for, or null. The API is only resolved for a request that uses such an
-    /// option on some API, such as a watermark (none on Gotenberg 9) or explicit stages (none on
+    /// The exception sending <paramref name="request" /> would throw before anything goes out because
+    /// the API of the service cannot serve it, or null: the first option it has no equivalent for
+    /// (<see cref="GotenbergVersionNotSupportedException" />), else the reason it cannot be rendered
+    /// (<see cref="InvalidOperationException" />). The API is only resolved for a request that fails
+    /// on some API, such as one with a watermark (none on Gotenberg 9) or explicit stages (none on
     /// Gotenberg 7 and 8), so that other requests never cause a version lookup here.
     /// </summary>
-    private async Task<GotenbergVersionNotSupportedException?> FindUnsupportedOptionAsync(
+    private async Task<Exception?> FindUnsupportedOptionAsync(
         BuildRequestBase request,
         CancellationToken cancelToken)
     {
         if (request.FindUnsupportedOn(GotenbergApiVersion.V8, GotenbergVersion.Unknown) == null
-            && request.FindUnsupportedOn(GotenbergApiVersion.V9, GotenbergVersion.Unknown) == null)
+            && request.FindUnsupportedOn(GotenbergApiVersion.V9, GotenbergVersion.Unknown) == null
+            && request.FindUnrenderableOn(GotenbergApiVersion.V9) == null)
             return null;
 
         var (api, running) = await this.ResolveRenderingAsync(cancelToken).ConfigureAwait(false);
 
-        return request.FindUnsupportedOn(api, running);
+        return (Exception?)request.FindUnsupportedOn(api, running) ?? request.FindUnrenderableOn(api);
     }
 
     private async Task<HttpRequestMessage> RenderAsync(IVersionedApiRequest request, CancellationToken cancelToken)
