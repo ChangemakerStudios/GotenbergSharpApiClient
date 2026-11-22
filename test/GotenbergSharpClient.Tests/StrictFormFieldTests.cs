@@ -81,6 +81,9 @@ public class StrictFormFieldTests
     [TestCase("Straße", "Stra_e")]
     [TestCase("a\U0001F600b", "a_b")] // one character outside the BMP gives one '_'
     [TestCase("a\u007Fb", "a_b")]
+    [TestCase("a\uFFFFb", "a_b")] // noncharacters and unassigned code points: .NET Framework cannot normalize them
+    [TestCase("a\uFFFEb", "a_b")]
+    [TestCase("a\uFDD0b", "a_b")]
     public void ResultFileName_NotPrintableAscii_IsCleanedUpInTheHeader(string name, string sent)
     {
         var request = new HtmlRequestBuilder()

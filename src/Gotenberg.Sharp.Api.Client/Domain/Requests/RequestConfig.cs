@@ -102,7 +102,15 @@ public sealed class RequestConfig : IConvertToHttpContent
 
             // One character at a time, so that a character that decomposes into several (a Hangul
             // syllable into its jamo) still gives one '_'.
-            var decomposed = c.ToString().Normalize(NormalizationForm.FormD);
+            var decomposed = Decompose(c);
+
+            // Not decomposable, and not ASCII: it gives '_' like any other character left over.
+            if (decomposed == null)
+            {
+                result.Append('_');
+                continue;
+            }
+
             var letters = new StringBuilder(decomposed.Length);
 
             foreach (var d in decomposed)
@@ -124,6 +132,31 @@ public sealed class RequestConfig : IConvertToHttpContent
         }
 
         return result.ToString();
+    }
+
+    /// <summary>
+    ///     The canonical decomposition of <paramref name="c" />, or null when it has none to give: a noncharacter
+    ///     or a code point Unicode has not assigned.
+    /// </summary>
+    /// <remarks>
+    ///     .NET Framework throws <see cref="ArgumentException" /> ("Invalid Unicode code point found") from
+    ///     <see cref="string.Normalize(NormalizationForm)" /> for noncharacters (U+FFFF, U+FFFE, U+FDD0) and some
+    ///     unassigned code points, where .NET 5 and later return them unchanged. Skipping the category
+    ///     <see cref="UnicodeCategory.OtherNotAssigned" /> covers those; the <c>catch</c> is for any other
+    ///     code point of that kind, as the list of them depends on the Unicode version of the runtime.
+    /// </remarks>
+    private static string? Decompose(char c)
+    {
+        if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.OtherNotAssigned) return null;
+
+        try
+        {
+            return c.ToString().Normalize(NormalizationForm.FormD);
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
     }
 
     #region Basic settings
