@@ -25,6 +25,11 @@ public sealed class GotenbergServer : IAsyncDisposable
 
     private const int Port = 3000;
 
+    /// <summary>
+    /// The time limit of a request on the container (<c>--api-timeout</c>).
+    /// </summary>
+    private const string ApiTimeout = "5m";
+
     private readonly Lazy<Task<Uri>> _url;
     private IContainer? _container;
 
@@ -100,13 +105,19 @@ public sealed class GotenbergServer : IAsyncDisposable
                 request => request.ForPort(Port).ForPath("/health"),
                 wait => wait.WithTimeout(TimeSpan.FromMinutes(2))));
 
+        // Gotenberg 7, 8 and 9 all read --api-timeout. Its default of 30 s is shorter than the first
+        // Chromium conversion of a fresh container takes when several containers start at once.
+        var command = new List<string> { "gotenberg", $"--api-timeout={ApiTimeout}" };
+
         if (UsesBasicAuth)
         {
             builder = builder
                 .WithEnvironment("GOTENBERG_API_BASIC_AUTH_USERNAME", Username)
-                .WithEnvironment("GOTENBERG_API_BASIC_AUTH_PASSWORD", Password)
-                .WithCommand("gotenberg", "--api-enable-basic-auth");
+                .WithEnvironment("GOTENBERG_API_BASIC_AUTH_PASSWORD", Password);
+            command.Add("--api-enable-basic-auth");
         }
+
+        builder = builder.WithCommand(command.ToArray());
 
         _container = builder.Build();
         await _container.StartAsync();

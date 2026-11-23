@@ -14,6 +14,9 @@
 //  limitations under the License.
 
 using Newtonsoft.Json.Linq;
+using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -23,6 +26,9 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 public sealed class WriteMetadataRequest : PdfEngineRequest
 {
     protected override string ApiPath => Constants.Gotenberg.PdfEngines.ApiPaths.WriteMetadata;
+
+    protected override string GetApiPath(GotenbergApiVersion api) =>
+        api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
 
     public JObject? Metadata { get; set; }
 
@@ -34,18 +40,31 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
-    {
-        var metadataContent = new StringContent(this.Metadata!.ToString());
-        metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
-        metadataContent.Headers.ContentDisposition =
-            new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
-            {
-                Name = "metadata"
-            };
-        yield return metadataContent;
+    // Gotenberg 9 writes metadata with a stage, mapped like the metadata of PdfOutputOptions, which this
+    // request's metadata wins over, as on Gotenberg 8 the first value of the field did.
+    internal override void AddRouteStages(StageList stages) =>
+        stages.RouteOutput = new PdfOutputOptions { MetaData = this.Metadata };
 
-        foreach (var content in base.ToHttpContent())
+    // A metadata object with no value (empty, or all null) gives no stage, and Gotenberg 9 refuses an empty list.
+    internal override string NoStagesMessage =>
+        $"{nameof(this.Metadata)} holds no value to write: Gotenberg 9 answers 400 (stages is required) to a request with no stage. "
+        + "Set at least one metadata value, such as Title or Author.";
+
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
+    {
+        if (api == GotenbergApiVersion.V8)
+        {
+            var metadataContent = new StringContent(this.Metadata!.ToString());
+            metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
+            metadataContent.Headers.ContentDisposition =
+                new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)
+                {
+                    Name = Constants.Gotenberg.PdfOutput.MetaData
+                };
+            yield return metadataContent;
+        }
+
+        foreach (var content in base.ToHttpContent(api))
             yield return content;
     }
 }

@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 using Microsoft.Extensions.Options;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Settings;
@@ -37,6 +39,11 @@ internal sealed class GotenbergSharpClientOptionsValidator<TOptions> : IValidate
         if (options.TimeOut <= TimeSpan.Zero && options.TimeOut != Timeout.InfiniteTimeSpan)
         {
             failures.Add($"{nameof(options.TimeOut)} must be positive, or Timeout.InfiniteTimeSpan.");
+        }
+
+        if (!Enum.IsDefined(typeof(GotenbergApiVersion), options.ApiVersion))
+        {
+            failures.Add($"{nameof(options.ApiVersion)} must be Auto, V8 or V9.");
         }
 
         if (options.RetryPolicy is { Enabled: true } retry)

@@ -8,7 +8,7 @@
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/Jaben?logo=githubsponsors&label=sponsors)](https://github.com/sponsors/Jaben)
 [![GitHub stars](https://img.shields.io/github/stars/ChangemakerStudios/GotenbergSharpApiClient?style=flat&logo=github&label=stars)](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)
 
-.NET C# client for [Gotenberg](https://gotenberg.dev/) v7 & v8 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
+.NET C# client for [Gotenberg](https://gotenberg.dev/) v7, v8 & v9 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
 
 **If this library saves you time, please [⭐ star it on GitHub](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)** — stars are how other developers find it — **and consider [sponsoring](https://github.com/sponsors/Jaben)** to keep it maintained.
 
@@ -27,7 +27,7 @@
 ## Quick Start
 
 ```bash
-docker run --rm -p 3000:3000 gotenberg/gotenberg:8
+docker run --rm -p 3000:3000 gotenberg/gotenberg:9
 ```
 
 ```bash
@@ -99,6 +99,8 @@ See the **[full documentation](https://changemakerstudios.github.io/GotenbergSha
 - [Office Conversion](https://changemakerstudios.github.io/GotenbergSharpApiClient/office-conversion/) — LibreOffice options
 - [PDF Manipulation](https://changemakerstudios.github.io/GotenbergSharpApiClient/pdf-manipulation/) — merge, rotate, split, encrypt, watermark, bookmarks, embedded files
 - [Advanced Features](https://changemakerstudios.github.io/GotenbergSharpApiClient/advanced-features/) — webhooks, value objects, version compatibility, multi-URL merge
+- [Gotenberg 9](https://changemakerstudios.github.io/GotenbergSharpApiClient/gotenberg-9/) — how the client picks the API, what changes on Gotenberg 9, how to move to it
+- [Stages](https://changemakerstudios.github.io/GotenbergSharpApiClient/stages/) — list the post-processing steps of Gotenberg 9 yourself
 
 ## Examples
 

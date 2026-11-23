@@ -73,7 +73,8 @@ public sealed class WebhookBuilder
 
     /// <summary>
     /// Sets the URL where Gotenberg will POST error details if PDF generation fails.
-    /// Optional - only set if you want to handle conversion errors separately.
+    /// Optional - only set if you want to handle conversion errors separately. Gotenberg 9 has no error URL
+    /// and never gets it: use <see cref="SetEventsUrl(string)" /> there.
     /// </summary>
     /// <param name="errorUrl">Absolute URL for error callback.</param>
     /// <param name="method">HTTP method for the error webhook (defaults to POST if not specified).</param>
@@ -89,7 +90,8 @@ public sealed class WebhookBuilder
 
     /// <summary>
     /// Sets the URL where Gotenberg will POST error details if PDF generation fails.
-    /// Optional - only set if you want to handle conversion errors separately.
+    /// Optional - only set if you want to handle conversion errors separately. Gotenberg 9 has no error URL
+    /// and never gets it: use <see cref="SetEventsUrl(Uri)" /> there.
     /// </summary>
     /// <param name="url">Absolute URI for error callback.</param>
     /// <param name="method">HTTP method for the error webhook (defaults to POST if not specified).</param>
@@ -104,6 +106,46 @@ public sealed class WebhookBuilder
 
         this._webhook.ErrorUrl = url;
         this._webhook.ErrorHttpMethod = method?.ToString();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the URL where Gotenberg will POST a JSON event for each outcome of the webhook:
+    /// <c>webhook.success</c> once the file is delivered, <c>webhook.error</c> when the conversion or the
+    /// delivery fails. Required on Gotenberg 9, which reports errors only there; on Gotenberg 7 and 8 it is
+    /// an alternative to <see cref="SetErrorUrl(string, HttpMethod?)" /> (Gotenberg 8.40.0 accepts either or both),
+    /// read by Gotenberg 8.29.0 and newer. The client does not check the release of Gotenberg 7 or 8 for it.
+    /// </summary>
+    /// <param name="eventsUrl">Absolute URL for the events callback.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown when URL is null or empty.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when URL is not absolute.</exception>
+    public WebhookBuilder SetEventsUrl(string eventsUrl)
+    {
+        if (eventsUrl.IsNotSet()) throw new ArgumentException("url is either null or empty");
+
+        return this.SetEventsUrl(new Uri(eventsUrl));
+    }
+
+    /// <summary>
+    /// Sets the URL where Gotenberg will POST a JSON event for each outcome of the webhook:
+    /// <c>webhook.success</c> once the file is delivered, <c>webhook.error</c> when the conversion or the
+    /// delivery fails. Required on Gotenberg 9, which reports errors only there; on Gotenberg 7 and 8 it is
+    /// an alternative to <see cref="SetErrorUrl(Uri, HttpMethod?)" /> (Gotenberg 8.40.0 accepts either or both),
+    /// read by Gotenberg 8.29.0 and newer. The client does not check the release of Gotenberg 7 or 8 for it.
+    /// </summary>
+    /// <param name="url">Absolute URI for the events callback.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when URL is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when URL is not absolute.</exception>
+    public WebhookBuilder SetEventsUrl(Uri url)
+    {
+        if (url == null) throw new ArgumentNullException(nameof(url));
+        if (!url.IsAbsoluteUri)
+            throw new InvalidOperationException("Url base href is not absolute");
+
+        this._webhook.EventsUrl = url;
 
         return this;
     }

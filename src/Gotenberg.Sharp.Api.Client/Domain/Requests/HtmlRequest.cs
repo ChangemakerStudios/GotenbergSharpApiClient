@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Documents;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -45,12 +46,12 @@ public sealed class HtmlRequest(bool containsMarkdown) : ChromeRequest
     /// <summary>
     ///     Transforms the instance to a list of HttpContent items
     /// </summary>
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (this.Content.Body == null)
             throw new InvalidOperationException("You need to Add at least a body");
 
-        return base.ToHttpContent().Concat(this.Content.IfNullEmptyContent()).Concat(this.Assets.IfNullEmptyContent());
+        return base.ToHttpContent(api).Concat(this.Content.IfNullEmptyContent(api)).Concat(this.Assets.IfNullEmptyContent());
     }
 
     protected override void Validate()

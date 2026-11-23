@@ -15,6 +15,7 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Documents;
 using Gotenberg.Sharp.API.Client.Domain.ExtraUrls;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -29,17 +30,22 @@ public sealed class UrlRequest : ChromeRequest
     /// </summary>
     public HeaderFooterDocument? Content { get; set; }
 
+    /// <summary>
+    /// Link and script tags to inject into the page, sent as <c>extraLinkTags</c> and <c>extraScriptTags</c> to
+    /// Gotenberg 7 and 8. Not sent to Gotenberg 9, whose URL route answers 400 to fields it does not know;
+    /// neither Gotenberg 8.40 nor 9.5 reads them, so the result is what Gotenberg 8 gave.
+    /// </summary>
     public ExtraUrlResources? ExtraResources { get; set; }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (this.Url == null) throw new InvalidOperationException("Url is null");
         if (!this.Url.IsAbsoluteUri)
             throw new InvalidOperationException("Url.IsAbsoluteUri equals false");
 
-        return base.ToHttpContent()
-            .Concat(Content.IfNullEmptyContent())
-            .Concat(ExtraResources.IfNullEmptyContent())
+        return base.ToHttpContent(api)
+            .Concat(Content.IfNullEmptyContent(api))
+            .Concat(api == GotenbergApiVersion.V9 ? [] : ExtraResources.IfNullEmptyContent())
             .Concat(Assets.IfNullEmptyContent())
             .Concat(
             [

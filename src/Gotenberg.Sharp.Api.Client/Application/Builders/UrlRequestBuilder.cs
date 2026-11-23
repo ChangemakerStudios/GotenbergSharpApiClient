@@ -105,6 +105,11 @@ public sealed class UrlRequestBuilder() : BaseChromiumBuilder<UrlRequest, UrlReq
     /// Injects additional CSS stylesheets or JavaScript files into the page before rendering.
     /// Useful for customizing pages you don't control or adding additional styling.
     /// </summary>
+    /// <remarks>
+    /// The tags are sent as the <c>extraLinkTags</c> and <c>extraScriptTags</c> form fields to Gotenberg 7 and 8, which
+    /// 8.40 ignores. They are not sent to Gotenberg 9, whose URL route answers 400 to fields it does not know: the
+    /// page is converted without them, as it is on Gotenberg 8.
+    /// </remarks>
     /// <param name="action">Configuration action for adding link and script tags.</param>
     /// <returns>The builder instance for method chaining.</returns>
     public UrlRequestBuilder AddExtraResources(Action<UrlExtraResourcesBuilder> action)

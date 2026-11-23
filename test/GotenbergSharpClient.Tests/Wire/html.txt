@@ -1,0 +1,57 @@
+POST forms/chromium/convert/html
+part name=scale type=text/html
+    0.9
+part name=paperWidth type=text/html
+    8.267716535433072
+part name=paperHeight type=text/html
+    11.692913385826772
+part name=marginTop type=text/html
+    1
+part name=marginBottom type=text/html
+    1
+part name=marginLeft type=text/html
+    1
+part name=marginRight type=text/html
+    1
+part name=landscape type=text/html
+    True
+part name=preferCssPageSize type=text/html
+    True
+part name=printBackground type=text/html
+    True
+part name=omitBackground type=text/html
+    False
+part name=generateDocumentOutline type=text/html
+    True
+part name=singlePage type=text/html
+    False
+part name=waitDelay type=text/html
+    2s
+part name=userAgent type=text/html
+    agent/1.0
+part name=extraHttpHeaders type=text/html
+    {
+      "X-Extra": "1"
+    }
+part name=cookies type=text/html
+    [{"name":"session","value":"abc","domain":"example.com"}]
+part name=failOnConsoleExceptions type=text/html
+    True
+part name=emulatedMediaType type=text/html
+    screen
+part name=skipNetworkIdleEvent type=text/html
+    True
+part name=waitForSelector type=text/html
+    #ready
+part name=failOnHttpStatusCodes type=text/html
+    [499,599]
+part name=files filename=index.html type=text/html
+    <html><body>body</body></html>
+part name=files filename=header.html type=text/html
+    <html><body>header</body></html>
+part name=files filename=footer.html type=text/html
+    <html><body>footer</body></html>
+part name=files filename=logo.png type=image/png
+    AB
+part name=files filename=style.css type=text/css
+    p { }

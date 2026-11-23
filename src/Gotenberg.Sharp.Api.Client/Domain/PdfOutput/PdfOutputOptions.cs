@@ -23,6 +23,12 @@ namespace Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 /// PDF output options shared across all Gotenberg modules (Chromium, LibreOffice, PDF Engines).
 /// Controls PDF/A format, accessibility, flattening, tagged PDF generation, and metadata.
 /// </summary>
+/// <remarks>
+/// Gotenberg 9 takes these options as stages, in this order: flatten-form, set-metadata, one
+/// remediate for PDF/A and PDF/UA together, then encrypt. It forbids encrypting a PDF/A document, so
+/// <see cref="PdfFormat" /> with a password throws <see cref="GotenbergVersionNotSupportedException" />
+/// before the request is sent to Gotenberg 9.
+/// </remarks>
 public class PdfOutputOptions : FacetBase
 {
     /// <summary>
@@ -46,6 +52,10 @@ public class PdfOutputOptions : FacetBase
     /// <summary>
     /// Embeds logical structure tags for accessibility during generation.
     /// </summary>
+    /// <remarks>
+    /// Read by the Chromium convert and LibreOffice routes only (<c>nativeTaggedPdf</c> on Gotenberg 9);
+    /// requests to the PDF engine routes do not send it to Gotenberg 9, as Gotenberg 8 ignored it there.
+    /// </remarks>
     [MultiFormHeader(Constants.Gotenberg.PdfOutput.GenerateTaggedPdf)]
     public bool? GenerateTaggedPdf { get; set; }
 
@@ -54,6 +64,14 @@ public class PdfOutputOptions : FacetBase
     /// Not all metadata are writable.
     /// Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf for an (exhaustive?) list of available metadata.
     /// </summary>
+    /// <remarks>
+    /// Gotenberg 9 writes eight fields only: Title, Author, Subject, Keywords (text, or a list joined
+    /// with ", "), Creator, Producer, CreationDate (or CreateDate) and ModDate (or ModifyDate), the
+    /// keys matched without regard to case. A date may be a date value, ISO 8601 text, ExifTool text
+    /// (<c>2006:09:18 16:27:50-04:00</c>) or a PDF date (<c>D:20060918162750-04'00'</c>). Another key
+    /// throws <see cref="GotenbergVersionNotSupportedException" />, and a date that cannot be read an
+    /// <see cref="ArgumentException" />, before the request is sent to Gotenberg 9.
+    /// </remarks>
     [MultiFormHeader(Constants.Gotenberg.PdfOutput.MetaData)]
     public JObject? MetaData { get; set; }
 

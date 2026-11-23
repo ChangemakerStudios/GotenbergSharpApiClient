@@ -1,0 +1,9 @@
+POST forms/pdfengines/split
+part name=splitMode type=text/plain
+    pages
+part name=splitSpan type=text/plain
+    1-2
+part name=splitUnify type=text/plain
+    true
+part name=files filename=in.pdf type=application/pdf
+    %PDF-1.4 fake

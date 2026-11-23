@@ -15,6 +15,7 @@
 
 using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.Screenshots;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -28,10 +29,13 @@ public abstract class ScreenshotRequest : BuildRequestBase
 
     public HtmlConversionBehaviors ConversionBehaviors { get; set; } = new();
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    internal override bool AppliesPostProcessing => false;
+
+    // Config.PageRanges (nativePageRanges) and the cross-cutting options are deliberately not sent:
+    // no screenshot route has those fields.
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
-        return this.ScreenshotProperties.ToHttpContent()
-            .Concat(this.ConversionBehaviors.ToHttpContent())
-            .Concat(this.Config.IfNullEmptyContent());
+        return this.ScreenshotProperties.IfNullEmptyContent(api)
+            .Concat(this.ConversionBehaviors.IfNullEmptyContent(api));
     }
 }

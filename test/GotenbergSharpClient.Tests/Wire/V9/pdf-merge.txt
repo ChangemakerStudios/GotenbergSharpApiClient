@@ -1,0 +1,7 @@
+POST forms/pdf/pipe
+part name=stages type=text/plain
+    [{"op":"merge"},{"op":"flatten-form"},{"op":"remediate","profile":["PDF/A-2b","PDF/UA-1"]}]
+part name=files filename=A.pdf type=application/pdf
+    %PDF-1.4 fake
+part name=files filename=B.pdf type=application/pdf
+    %PDF-1.4 fake

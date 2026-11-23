@@ -44,8 +44,19 @@ public sealed class Bookmark
     /// <summary>
     /// The 1-based page the bookmark jumps to.
     /// </summary>
+    /// <remarks>
+    /// Read from <c>page</c>, the name Gotenberg 7 and 8 use, and from <c>pageNumber</c>, the name of
+    /// Gotenberg 9. Written as <c>page</c>; a request for Gotenberg 9 writes <c>pageNumber</c> itself.
+    /// </remarks>
     [JsonProperty("page")]
     public int Page { get; set; }
+
+    // The name Gotenberg 9 gives the page when it answers; the reading side of Page.
+    [JsonProperty("pageNumber")]
+    private int PageNumber
+    {
+        set => this.Page = value;
+    }
 
     /// <summary>
     /// Nested bookmarks. Empty when the bookmark is a leaf.

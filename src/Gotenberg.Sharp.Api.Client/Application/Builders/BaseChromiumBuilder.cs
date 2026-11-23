@@ -16,6 +16,7 @@
 using Gotenberg.Sharp.API.Client.Application.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Application.Pages;
 using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Application.Stages;
 using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
 
@@ -130,6 +131,23 @@ public abstract class BaseChromiumBuilder<TRequest, TBuilder>(TRequest request)
     {
         this.Request.ConversionBehaviors =
             behaviors ?? throw new ArgumentNullException(nameof(behaviors));
+        return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Lists the post-processing of the PDF as Gotenberg 9 stages, run on it in the order given after
+    /// Chromium converts it. Calling it again adds stages after those already listed.
+    /// </summary>
+    /// <remarks>
+    /// Needs Gotenberg 9, and replaces the cross-cutting options the client would send as stages, which
+    /// must not be set as well: see <see cref="StagesBuilder" />.
+    /// </remarks>
+    /// <param name="stages">Configuration action for the stages.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public TBuilder WithStages(Action<StagesBuilder> stages)
+    {
+        this.AddStages(stages);
+
         return (TBuilder)this;
     }
 }
