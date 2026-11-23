@@ -42,7 +42,7 @@ dotnet build
 dotnet test
 ```
 
-  The integration tests start Gotenberg 7 and 8 containers through Testcontainers, so Docker must be running. `dotnet test --filter TestCategory!=Integration` runs the rest without it. `GOTENBERG_VERSIONS` (for example `8.3.0,9`) picks other image tags, and `GOTENBERG_URL` points the tests at a server that is already running, such as the one `docker/docker-compose-basic-auth.yml` starts (set `GOTENBERG_VERSIONS` to its version if it is not the newest).
+  The integration tests start Gotenberg 7, 8 and 9 containers through Testcontainers, so Docker must be running. `dotnet test --filter TestCategory!=Integration` runs the rest without it. `GOTENBERG_VERSIONS` (for example `8.3.0,9`) picks other image tags, and `GOTENBERG_URL` points the tests at a server that is already running, such as the one `docker/docker-compose-basic-auth.yml` starts (set `GOTENBERG_VERSIONS` to its version if it is not the newest).
 
 ### 4. Merge release branch into `master`
 
@@ -55,7 +55,7 @@ git push origin master --tags
 ```
 
 This push triggers the GitHub Actions workflow which will:
-1. Build and test against a Gotenberg docker container with basic auth.
+1. Build and test. The integration tests start their own Gotenberg 7, 8 and 9 containers through Testcontainers.
 2. Calculate the package version via GitVersion.
 3. Pack the NuGet package (with symbols).
 4. Publish to nuget.org.
@@ -110,4 +110,4 @@ git branch -d hotfix/X.Y.Z+1
 - **Triggers**: All pushes and pull requests (build + test). NuGet publish only on push to `master`.
 - **Versioning**: GitVersion with `ContinuousDelivery` mode (`GitVersion.yml`).
 - **NuGet authentication**: [Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing). The `NuGet/login` step exchanges a GitHub OIDC token for a short-lived API key, matched against a policy on nuget.org (owner `ChangemakerStudios`, repository `GotenbergSharpApiClient`, workflow `deploy.yml`). No API key is stored in the repository.
-- **Test infrastructure**: Gotenberg v8 docker container with basic auth (`testuser`/`testpass`).
+- **Test infrastructure**: The integration tests start Gotenberg 7, 8 and 9 containers through Testcontainers, so the runner needs Docker. The workflow does not start a Gotenberg server itself.
