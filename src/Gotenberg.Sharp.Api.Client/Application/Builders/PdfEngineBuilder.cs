@@ -15,6 +15,7 @@
 
 using Gotenberg.Sharp.API.Client.Application.Bookmarks;
 using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Application.Stages;
 using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Embed;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
@@ -249,6 +250,35 @@ public static class PdfEngineBuilders
         IDictionary<string, IEnumerable<Bookmark>> bookmarksByFile)
     {
         return WriteBookmarks(BookmarkSet.CreatePerFile(bookmarksByFile));
+    }
+
+    /// <summary>
+    /// Creates a builder that runs Gotenberg 9 stages on the PDFs, in the order listed, through
+    /// <c>forms/pdf/pipe</c>: the way to combine operations, or to use one the other methods do not
+    /// offer, such as a positioned stamp, PDF/UA-2 or a signature.
+    /// </summary>
+    /// <param name="stages">Configuration action for the stages; at least one.</param>
+    /// <remarks>
+    /// Requires Gotenberg 9.0.0 or newer. The uploaded PDFs that no stage reads are the documents to
+    /// process. The cross-cutting options the client would send as stages must not be set as well:
+    /// see <see cref="StagesBuilder" />.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// PdfEngineBuilders.Pipe(s => s
+    ///         .Merge()
+    ///         .StampText("CONFIDENTIAL", o => o.SetPosition(StampPosition.Top).SetOpacity(0.5))
+    ///         .Optimize())
+    ///     .WithPdfs(a => a.AddItem("one.pdf", one).AddItem("two.pdf", two));
+    /// </code>
+    /// </example>
+    public static PdfEngineBuilder<PipePdfRequest> Pipe(Action<StagesBuilder> stages)
+    {
+        var builder = new PdfEngineBuilder<PipePdfRequest>(new PipePdfRequest());
+
+        builder.AddStages(stages);
+
+        return builder;
     }
 
     /// <summary>

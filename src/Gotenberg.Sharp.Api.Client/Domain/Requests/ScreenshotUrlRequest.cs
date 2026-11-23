@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
 /// <summary>
@@ -43,11 +45,11 @@ public sealed class ScreenshotUrlRequest : ScreenshotRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         yield return CreateFormDataItem(this.Url!, Constants.Gotenberg.Chromium.Routes.Url.RemoteUrl);
 
-        foreach (var item in base.ToHttpContent())
+        foreach (var item in base.ToHttpContent(api))
             yield return item;
     }
 }

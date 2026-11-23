@@ -33,6 +33,8 @@ internal sealed class DynamicallyAccessedMembersAttribute(DynamicallyAccessedMem
 internal enum DynamicallyAccessedMemberTypes
 {
     None = 0,
+    PublicMethods = 0x0008,
+    NonPublicMethods = 0x0010,
     PublicProperties = 0x0200
 }
 

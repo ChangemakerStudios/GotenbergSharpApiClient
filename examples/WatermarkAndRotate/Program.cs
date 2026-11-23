@@ -1,5 +1,6 @@
 using Gotenberg.Sharp.API.Client;
 using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
@@ -44,11 +45,23 @@ static async Task<string> CreateWatermarkedAndRotatedPdf(string destinationDirec
                 <p>This PDF has a text watermark and is rotated 90 degrees.</p>
                 <p>Page 2 content here...</p>
             </body></html>"))
-        // Add a text watermark behind the content
-        .SetWatermarkOptions(w => w.SetTextWatermark("CONFIDENTIAL"))
-        // Rotate all pages 90 degrees
-        .SetRotationOptions(r => r.SetAngle(RotationAngle.Degrees90))
         .WithPageProperties(pp => pp.UseChromeDefaults());
+
+    if (await sharpClient.GetApiVersionAsync() == GotenbergApiVersion.V9)
+    {
+        // Gotenberg 9 draws over the page only, so it has no watermark and refuses SetWatermarkOptions:
+        // list the stages yourself. The rotation comes first, so the stamp stays upright.
+        builder.WithStages(s => s
+            .Rotate(90)
+            .StampText("CONFIDENTIAL"));
+    }
+    else
+    {
+        // Add a text watermark behind the content
+        builder.SetWatermarkOptions(w => w.SetTextWatermark("CONFIDENTIAL"))
+            // Rotate all pages 90 degrees
+            .SetRotationOptions(r => r.SetAngle(RotationAngle.Degrees90));
+    }
 
     var request = builder.Build();
     var response = await sharpClient.HtmlToPdfAsync(request);

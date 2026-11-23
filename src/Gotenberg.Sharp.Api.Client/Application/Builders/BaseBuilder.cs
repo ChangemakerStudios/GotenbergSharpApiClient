@@ -18,10 +18,12 @@ using Gotenberg.Sharp.API.Client.Application.PdfOutput;
 using Gotenberg.Sharp.API.Client.Application.Requests;
 using Gotenberg.Sharp.API.Client.Application.Rotation;
 using Gotenberg.Sharp.API.Client.Application.Split;
+using Gotenberg.Sharp.API.Client.Application.Stages;
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Split;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
@@ -153,6 +155,17 @@ public abstract class BaseBuilder<TRequest, TBuilder>(TRequest request)
         action(new StampOptionsBuilder(this.Request.StampOptions));
 
         return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Adds the stages <paramref name="stages" /> lists to those of the request, for the builders whose
+    /// route takes stages on Gotenberg 9 to offer as <c>WithStages</c>.
+    /// </summary>
+    internal void AddStages(Action<StagesBuilder> stages)
+    {
+        if (stages == null) throw new ArgumentNullException(nameof(stages));
+
+        stages(new StagesBuilder(this.Request.ExplicitStages ??= new ExplicitStages()));
     }
 
     /// <summary>

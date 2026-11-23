@@ -1,0 +1,5 @@
+POST forms/pdf/pipe
+part name=files filename=in.pdf type=application/pdf
+    %PDF-1.4 fake
+part name=stages type=text/plain
+    [{"op":"select","pages":"1-2"}]

@@ -13,13 +13,15 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Requests
 {
     public abstract class PdfRequestBase : BuildRequestBase
     {
-        protected override IEnumerable<HttpContent> ToHttpContent()
+        protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
         {
-            return base.ToHttpContent();
+            return base.ToHttpContent(api);
         }
     }
 }

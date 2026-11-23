@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Domain.Documents;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -34,18 +35,18 @@ public sealed class ScreenshotHtmlRequest : ScreenshotRequest
         base.Validate();
     }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (this.Content != null)
         {
-            foreach (var item in this.Content.ToHttpContent())
+            foreach (var item in this.Content.IfNullEmptyContent(api))
                 yield return item;
         }
 
         foreach (var item in this.Assets.IfNullEmptyContent())
             yield return item;
 
-        foreach (var item in base.ToHttpContent())
+        foreach (var item in base.ToHttpContent(api))
             yield return item;
     }
 }

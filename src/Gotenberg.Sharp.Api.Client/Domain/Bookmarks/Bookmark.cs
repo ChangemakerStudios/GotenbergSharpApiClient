@@ -44,8 +44,26 @@ public sealed class Bookmark
     /// <summary>
     /// The 1-based page the bookmark jumps to.
     /// </summary>
+    /// <remarks>
+    /// Read from <c>page</c>, the name Gotenberg 7 and 8 use, and from <c>pageNumber</c>, the name of
+    /// Gotenberg 9. Written as <c>page</c>; a request for Gotenberg 9 writes <c>pageNumber</c> itself.
+    /// </remarks>
     [JsonPropertyName("page")]
     public int Page { get; set; }
+
+    // The name Gotenberg 9 gives the page when it answers; the reading side of Page. Internal, not
+    // private, so the source generator can reach it; never written, as its getter is always null.
+    [JsonInclude]
+    [JsonPropertyName("pageNumber")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal int? PageNumber
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue) this.Page = value.Value;
+        }
+    }
 
     /// <summary>
     /// Nested bookmarks. Empty when the bookmark is a leaf.

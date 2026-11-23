@@ -1,4 +1,5 @@
 using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,10 @@ public class OptionsValidationTests
     public void NegativeRetryCount_IsIgnoredWhenRetryIsDisabled() =>
         Read<GotenbergSharpClientOptions>(o => o.RetryPolicy = new RetryOptions { Enabled = false, RetryCount = -1 })
             .RetryPolicy.RetryCount.Should().Be(-1);
+
+    [Test]
+    public void UndefinedApiVersion_IsRejected() =>
+        AssertRejected(o => o.ApiVersion = (GotenbergApiVersion)7, nameof(GotenbergSharpClientOptions.ApiVersion));
 
     [Test]
     public void OptionsSubclass_IsValidated()

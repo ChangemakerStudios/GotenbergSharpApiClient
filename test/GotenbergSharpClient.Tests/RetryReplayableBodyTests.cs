@@ -1,5 +1,6 @@
 using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -67,6 +68,8 @@ public class RetryReplayableBodyTests
             {
                 o.ServiceUrl = new Uri("http://gotenberg.invalid");
                 o.RetryPolicy = new RetryOptions { Enabled = true, RetryCount = RetryCount, BackoffPower = 0 };
+                // An explicit API sends no /version lookup, so the handler sees only the conversion.
+                o.ApiVersion = GotenbergApiVersion.V8;
             });
         services.AddGotenbergSharpClient()
             .ConfigurePrimaryHttpMessageHandler(() => handler);

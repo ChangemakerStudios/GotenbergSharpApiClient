@@ -1,0 +1,23 @@
+POST forms/chromium/screenshot/html
+part name=files filename=index.html type=text/html
+    <html><body>shot</body></html>
+part name=files filename=style.css type=text/css
+    p { }
+part name=width type=text/html
+    800
+part name=height type=text/html
+    600
+part name=clip type=text/html
+    True
+part name=format type=text/html
+    jpeg
+part name=quality type=text/html
+    80
+part name=omitBackground type=text/html
+    True
+part name=optimizeForSpeed type=text/html
+    True
+part name=waitDelay type=text/html
+    1s
+part name=emulatedMediaType type=text/html
+    screen

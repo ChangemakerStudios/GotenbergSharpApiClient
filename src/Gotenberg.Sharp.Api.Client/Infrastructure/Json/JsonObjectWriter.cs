@@ -62,6 +62,30 @@ internal static class JsonObjectWriter
     }
 
     /// <summary>
+    /// A JSON array of objects, each written as <see cref="ToJson" /> writes one, in the order given.
+    /// </summary>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
+    internal static string ToJsonArray(IEnumerable<IEnumerable<KeyValuePair<string, object>>> items)
+    {
+        if (items == null) throw new ArgumentNullException(nameof(items));
+
+        using var stream = new MemoryStream();
+
+        using (var writer = new Utf8JsonWriter(stream, _writerOptions))
+        {
+            var traversal = new Traversal();
+
+            writer.WriteStartArray();
+
+            foreach (var item in items) WriteObject(writer, item!, traversal);
+
+            writer.WriteEndArray();
+        }
+
+        return Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
+    }
+
+    /// <summary>
     /// Deep-copies the caller's dictionary, including nested dictionaries, collections, byte arrays and JSON
     /// values, so later changes to any of them do not leak into the request. The copy is written once so an
     /// unsupported value fails where it is supplied rather than when the request is sent.

@@ -257,7 +257,8 @@ public class CrossCuttingOptionsTests
         result.Length.Should().BeGreaterThan(0);
     }
 
-    [GotenbergTest]
+    // Gotenberg 9 has no watermark: Gotenberg9StagesTests.Gotenberg9_RefusesAWatermarkBeforeSending.
+    [GotenbergTest(until: "9.0.0")]
     public async Task HtmlToPdf_WithWatermark_Succeeds(GotenbergServer gotenberg)
     {
         var client = await gotenberg.CreateClientAsync();

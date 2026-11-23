@@ -1,0 +1,7 @@
+POST forms/pdf/pipe
+header Gotenberg-Trace: trace-7
+header Gotenberg-Output-Filename: out.pdf
+part name=files filename=in.pdf type=application/pdf
+    %PDF-1.4 fake
+part name=stages type=text/plain
+    [{"op":"stamp-text","text":"STAMP","pages":"2"},{"op":"rotate","angle":270},{"op":"flatten-form"},{"op":"set-metadata","author":"me"},{"op":"remediate","profile":"PDF/A-1b"}]

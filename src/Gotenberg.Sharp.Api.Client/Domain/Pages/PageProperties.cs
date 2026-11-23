@@ -135,6 +135,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Pages
         /// Get or set a value indicating weather the document outline should be embedded into the PDF.
         /// </summary>
         [MultiFormHeader(Constants.Gotenberg.Chromium.Shared.PageProperties.GenerateDocumentOutline)]
+        [Gotenberg9Field(Constants.Gotenberg.Chromium.Gotenberg9.GenerateDocumentOutline)]
         public bool GenerateDocumentOutline { get; set; }
 
         /// <summary>

@@ -55,6 +55,22 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         }
 
         /// <summary>
+        /// An exception that reports <paramref name="original" /> under a clearer message: what it
+        /// reports (status, URI, trace, the request and response of
+        /// <see cref="ToVerboseJson" />) is the original's, which is kept as <see cref="Exception.InnerException" />.
+        /// </summary>
+        internal GotenbergApiException(string message, GotenbergApiException original)
+            : base(message, original)
+        {
+            this._request = original._request;
+            this._response = original._response;
+            this.StatusCode = original.StatusCode;
+            this.RequestUri = original.RequestUri;
+            this.ReasonPhrase = original.ReasonPhrase;
+            this.Trace = original.Trace;
+        }
+
+        /// <summary>
         /// Gets the HTTP status code returned by Gotenberg.
         /// </summary>
         public HttpStatusCode StatusCode { get; }

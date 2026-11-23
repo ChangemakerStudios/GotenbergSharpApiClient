@@ -56,6 +56,11 @@ public static class Constants
         {
             public const string Trace = "Gotenberg-Trace";
 
+            /// <summary>
+            /// Response header carrying the version of the service that answered.
+            /// </summary>
+            public const string VersionHeader = "Gotenberg-Version";
+
             public static class ApiPaths
             {
                 public const string Version = "version";
@@ -79,6 +84,8 @@ public static class Constants
             internal const string Landscape = "landscape";
 
             internal const string PageRanges = "nativePageRanges";
+
+            internal const string PageRangesGotenberg9 = "nativePages";
 
             internal const string PdfFormat = "pdfa";
 
@@ -120,11 +127,17 @@ public static class Constants
             public const string WatermarkPages = "watermarkPages";
             public const string WatermarkOptionsJson = "watermarkOptions";
 
+            // The file of an image or PDF watermark on Gotenberg 7 and 8: a file part, not a text field.
+            public const string WatermarkFile = "watermark";
+
             // Stamp
             public const string StampSource = "stampSource";
             public const string StampExpression = "stampExpression";
             public const string StampPages = "stampPages";
             public const string StampOptionsJson = "stampOptions";
+
+            // The file of an image or PDF stamp on Gotenberg 7 and 8: a file part, not a text field.
+            public const string StampFile = "stamp";
         }
 
         /// <summary>
@@ -145,6 +158,112 @@ public static class Constants
             public const string UserPassword = CrossCutting.UserPassword;
 
             public const string OwnerPassword = CrossCutting.OwnerPassword;
+
+            // The Gotenberg 9 name of GenerateTaggedPdf, read by the Chromium convert and LibreOffice routes only.
+            internal const string NativeTaggedPdf = "nativeTaggedPdf";
+        }
+
+        /// <summary>
+        ///     The Gotenberg 9 <c>stages</c> form field: a JSON array of the operations to run on the
+        ///     resulting PDF, each an object with an <c>op</c> and that operation's options.
+        /// </summary>
+        internal static class Stages
+        {
+            internal const string FieldName = "stages";
+
+            internal const string Op = "op";
+
+            internal static class Ops
+            {
+                internal const string Merge = "merge";
+                internal const string Split = "split";
+                internal const string Select = "select";
+                internal const string Rotate = "rotate";
+                internal const string StampText = "stamp-text";
+                internal const string StampImage = "stamp-image";
+                internal const string StampPdf = "stamp-pdf";
+                internal const string FlattenForm = "flatten-form";
+                internal const string SetMetadata = "set-metadata";
+                internal const string Remediate = "remediate";
+                internal const string Encrypt = "encrypt";
+                internal const string SetBookmarks = "set-bookmarks";
+                internal const string Attach = "attach";
+                internal const string Optimize = "optimize";
+            }
+
+            internal static class Options
+            {
+                // split, select, rotate, stamp-text, stamp-image, stamp-pdf
+                internal const string Every = "every";
+                internal const string Pages = "pages";
+                internal const string Angle = "angle";
+                internal const string Text = "text";
+                internal const string Ranges = "ranges";
+
+                // stamp-text, stamp-image, stamp-pdf: placement and look
+                internal const string X = "x";
+                internal const string Y = "y";
+                internal const string Position = "position";
+                internal const string Opacity = "opacity";
+                internal const string Rotation = "rotation";
+                internal const string FontSize = "fontSize";
+                internal const string Font = "font";
+                internal const string Color = "color";
+                internal const string Width = "width";
+                internal const string Height = "height";
+                internal const string SourcePage = "sourcePage";
+                internal const string Scale = "scale";
+
+                // stamp-image, stamp-pdf: an uploaded file, named by its file name
+                internal const string Image = "image";
+                internal const string Source = "source";
+
+                // remediate: one profile, or a PDF/A profile paired with a PDF/UA one
+                internal const string Profile = "profile";
+
+                // encrypt
+                internal const string UserPassword = "userPassword";
+                internal const string OwnerPassword = "ownerPassword";
+                internal const string Algorithm = "algorithm";
+                internal const string Permissions = "permissions";
+
+                // set-metadata: the eight fields Gotenberg 9 writes
+                internal const string Title = "title";
+                internal const string Author = "author";
+                internal const string Subject = "subject";
+                internal const string Keywords = "keywords";
+                internal const string Creator = "creator";
+                internal const string Producer = "producer";
+                internal const string CreationDate = "creationDate";
+                internal const string ModDate = "modDate";
+
+                // set-bookmarks: a list of bookmarks, each with a title, a page and its children
+                internal const string Bookmarks = "bookmarks";
+                internal const string PageNumber = "pageNumber";
+                internal const string Children = "children";
+
+                // attach: an uploaded file, named by its file name
+                internal const string File = "file";
+                internal const string MimeType = "mimeType";
+                internal const string Relationship = "relationship";
+            }
+
+            internal static class Profiles
+            {
+                internal const string PdfUa1 = "PDF/UA-1";
+            }
+
+            // encrypt: the keys of "permissions", each true or false
+            internal static class PermissionKeys
+            {
+                internal const string Print = "print";
+                internal const string PrintHighQuality = "printHighQuality";
+                internal const string ModifyContent = "modifyContent";
+                internal const string ExtractText = "extractText";
+                internal const string ModifyAnnotations = "modifyAnnotations";
+                internal const string FillForms = "fillForms";
+                internal const string Assemble = "assemble";
+            }
         }
 
         /// <summary>
@@ -226,6 +345,30 @@ public static class Constants
                 public const string Password = "password";
                 public const string Merge = "merge";
             }
+
+            /// <summary>
+            ///     The form fields of Gotenberg 9 that replace one of <see cref="Options" /> and
+            ///     <see cref="Routes.Convert.PageRanges" /> under another name.
+            /// </summary>
+            public static class Gotenberg9
+            {
+                public const string PageRanges = CrossCutting.PageRangesGotenberg9;
+
+                public const string SinglePage = "singlePage";
+
+                public const string ExportBookmarks = "nativeBookmarks";
+
+                // Image compression
+                public const string LosslessImageCompression = "nativeLosslessImageCompression";
+                public const string Quality = "nativeQuality";
+                public const string ReduceImageResolution = "nativeReduceImageResolution";
+                public const string MaxImageResolution = "nativeMaxImageResolution";
+
+                // Native watermark: the color is "#rrggbb" and the rotation is in degrees
+                public const string NativeWatermarkFontSize = "nativeWatermarkFontSize";
+                public const string NativeWatermarkRotation = "nativeWatermarkRotation";
+                public const string NativeWatermarkFont = "nativeWatermarkFont";
+            }
         }
 
         /// <summary>
@@ -264,9 +407,28 @@ public static class Constants
                 public const string WriteBookmarks = $"{Root}/bookmarks/write";
             }
 
+            /// <summary>
+            ///     The routes of Gotenberg 9, which replaced those of <see cref="ApiPaths" />: every write
+            ///     operation is a stage of the pipe, the two read operations have a route of their own.
+            /// </summary>
+            public static class Gotenberg9
+            {
+                private const string Root = "forms/pdf";
+
+                public const string Pipe = $"{Root}/pipe";
+
+                public const string ReadMetadata = $"{Root}/metadata";
+
+                public const string ReadBookmarks = $"{Root}/bookmarks";
+            }
+
             public static class FormFieldNames
             {
                 public const string Bookmarks = "bookmarks";
+
+                public const string Embeds = "embeds";
+
+                public const string EmbedsMetadata = "embedsMetadata";
             }
 
             public static class Routes
@@ -308,6 +470,8 @@ public static class Constants
 
             public const string ErrorHttpMethod = "Gotenberg-Webhook-Error-Method";
 
+            public const string EventsUrl = "Gotenberg-Webhook-Events-Url";
+
             public const string ExtraHeaders = "Gotenberg-Webhook-Extra-Http-Headers";
         }
 
@@ -331,6 +495,16 @@ public static class Constants
                 public const string ScreenshotHtml = $"{Root}/screenshot/html";
 
                 public const string ScreenshotMarkdown = $"{Root}/screenshot/markdown";
+            }
+
+            /// <summary>
+            ///     The form fields of Gotenberg 9 that replace one of <see cref="Shared.PageProperties" /> under another name.
+            /// </summary>
+            public static class Gotenberg9
+            {
+                public const string PageRanges = CrossCutting.PageRangesGotenberg9;
+
+                public const string GenerateDocumentOutline = "nativeBookmarks";
             }
 
             public static class Screenshot
