@@ -15,8 +15,6 @@
 
 using Gotenberg.Sharp.API.Client.Domain.Authentication;
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 
 /// <summary>
@@ -73,7 +71,7 @@ public class PdfOutputOptions : FacetBase
     /// <see cref="ArgumentException" />, before the request is sent to Gotenberg 9.
     /// </remarks>
     [MultiFormHeader(Constants.Gotenberg.PdfOutput.MetaData)]
-    public JObject? MetaData { get; set; }
+    public IDictionary<string, object>? MetaData { get; set; }
 
     /// <summary>
     /// The password required to open the PDF.

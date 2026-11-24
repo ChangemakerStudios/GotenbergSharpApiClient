@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 using Gotenberg.Sharp.API.Client.Domain.Shared;
@@ -29,6 +30,15 @@ internal static class LegacyContentOverrides
 {
     private const string MethodName = "ToHttpContent";
 
+    /// <summary>
+    /// The members this class reflects over, which <see cref="FacetBase" /> and
+    /// <see cref="BuildRequestBase" /> keep for every class derived from them when the assembly is trimmed.
+    /// </summary>
+    internal const DynamicallyAccessedMemberTypes ReflectedMembers =
+        DynamicallyAccessedMemberTypes.PublicProperties
+        | DynamicallyAccessedMemberTypes.PublicMethods
+        | DynamicallyAccessedMemberTypes.NonPublicMethods;
+
     private static readonly ConcurrentDictionary<Type, bool> Cache = new();
 
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> FacetProperties = new();
@@ -38,7 +48,9 @@ internal static class LegacyContentOverrides
     /// a class that overrides only <c>ToHttpContent()</c> is rendered as before for Gotenberg 7 and 8
     /// and cannot be rendered for Gotenberg 9.
     /// </summary>
-    internal static InvalidOperationException? FindRefusal(Type type, GotenbergApiVersion api) =>
+    internal static InvalidOperationException? FindRefusal(
+        [DynamicallyAccessedMembers(ReflectedMembers)] Type type,
+        GotenbergApiVersion api) =>
         api == GotenbergApiVersion.V8 || !OverridesOnlyLegacy(type)
             ? null
             : new InvalidOperationException(
@@ -60,37 +72,51 @@ internal static class LegacyContentOverrides
 
         if (refusal != null) return refusal;
 
-        foreach (var property in FacetProperties.GetOrAdd(request.GetType(), FindFacetProperties))
-            if (property.GetValue(request) is FacetBase facet && FindRefusal(facet.GetType(), api) is { } facetRefusal)
+        foreach (var property in FindFacetProperties(request.GetType()))
+            if (property.GetValue(request) is FacetBase facet && FindRefusal(facet, api) is { } facetRefusal)
                 return facetRefusal;
 
         return null;
     }
 
-    private static PropertyInfo[] FindFacetProperties(Type requestType) =>
-        requestType
-            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(p => p.DeclaringType != typeof(BuildRequestBase)
-                        && p.CanRead
-                        && p.GetIndexParameters().Length == 0
-                        && typeof(FacetBase).IsAssignableFrom(p.PropertyType))
-            .ToArray();
+    // A parameter, not a local: the trimming analysis sees the annotation of FacetBase on its GetType()
+    // only there.
+    private static InvalidOperationException? FindRefusal(FacetBase facet, GotenbergApiVersion api) =>
+        FindRefusal(facet.GetType(), api);
+
+    // Not GetOrAdd(type, factory) here or below: a delegate would drop the trimming annotation.
+    private static PropertyInfo[] FindFacetProperties(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type requestType)
+    {
+        if (FacetProperties.TryGetValue(requestType, out var cached)) return cached;
+
+        return FacetProperties.GetOrAdd(
+            requestType,
+            requestType
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p => p.DeclaringType != typeof(BuildRequestBase)
+                            && p.CanRead
+                            && p.GetIndexParameters().Length == 0
+                            && typeof(FacetBase).IsAssignableFrom(p.PropertyType))
+                .ToArray());
+    }
 
     /// <summary>
     /// True when the most derived override of the parameterless <c>ToHttpContent()</c> is declared
     /// below the most derived override of <c>ToHttpContent(GotenbergApiVersion)</c>: the parts it
     /// adds are then unknown to the versioned chain.
     /// </summary>
-    internal static bool OverridesOnlyLegacy(Type type) =>
-        Cache.GetOrAdd(
-            type,
-            t =>
-            {
-                const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+    internal static bool OverridesOnlyLegacy(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
+        Type type)
+    {
+        if (Cache.TryGetValue(type, out var cached)) return cached;
 
-                var legacy = t.GetMethod(MethodName, flags, null, Type.EmptyTypes, null)!;
-                var versioned = t.GetMethod(MethodName, flags, null, [typeof(GotenbergApiVersion)], null)!;
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-                return legacy.DeclaringType!.IsSubclassOf(versioned.DeclaringType!);
-            });
+        var legacy = type.GetMethod(MethodName, flags, null, Type.EmptyTypes, null)!;
+        var versioned = type.GetMethod(MethodName, flags, null, [typeof(GotenbergApiVersion)], null)!;
+
+        return Cache.GetOrAdd(type, legacy.DeclaringType!.IsSubclassOf(versioned.DeclaringType!));
+    }
 }

@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
+
 using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Requests.ApiRequests;
@@ -23,6 +25,9 @@ using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+// LegacyContentOverrides looks up the facet properties and ToHttpContent overrides of the concrete
+// type; the annotation keeps them when the assembly is trimmed.
+[DynamicallyAccessedMembers(LegacyContentOverrides.ReflectedMembers)]
 public abstract class BuildRequestBase
 {
     internal RequestConfig? Config { get; set; }

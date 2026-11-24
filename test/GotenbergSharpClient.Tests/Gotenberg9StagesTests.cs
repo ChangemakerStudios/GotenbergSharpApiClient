@@ -23,7 +23,7 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -52,17 +52,17 @@ public class Gotenberg9StagesTests
     private static MergeOfficeBuilder Office() => new MergeOfficeBuilder()
         .WithAssets(a => a.AddItem("one.docx", new byte[] { 1, 2, 3 }));
 
-    internal static JArray Stages(RenderedRequest rendered) => JArray.Parse(rendered.Part(StagesField).Value);
+    internal static JsonArray Stages(RenderedRequest rendered) => TestJson.ParseArray(rendered.Part(StagesField).Value);
 
     internal static void ShouldHaveStages(RenderedRequest rendered, string expectedJson)
     {
         rendered.PartNames.Count(n => n == StagesField).Should().Be(1, "a request sends all its stages in one field");
 
         var actual = Stages(rendered);
-        var expected = JArray.Parse(expectedJson);
+        var expected = TestJson.ParseArray(expectedJson);
 
-        JToken.DeepEquals(actual, expected).Should().BeTrue(
-            $"the stages must be {expected.ToString(Newtonsoft.Json.Formatting.None)} but were {actual.ToString(Newtonsoft.Json.Formatting.None)}");
+        JsonNode.DeepEquals(actual, expected).Should().BeTrue(
+            $"the stages must be {expected.ToJsonString()} but were {actual.ToJsonString()}");
     }
 
     #region The mapping, one option at a time
@@ -127,7 +127,7 @@ public class Gotenberg9StagesTests
         yield return Row(
             "metadata",
             b => b.SetPdfOutputOptions(o => o.SetMetadata(new Dictionary<string, object> { ["Title"] = "T" })),
-            [("metadata", "{\n  \"Title\": \"T\"\n}")],
+            [("metadata", """{"Title":"T"}""")],
             """[{"op":"set-metadata","title":"T"}]""");
 
         yield return Row(
@@ -335,10 +335,10 @@ public class Gotenberg9StagesTests
 
     #region Metadata
 
-    private static RenderedRequest WithMetadata(JObject metadata) =>
+    private static RenderedRequest WithMetadata(JsonObject metadata) =>
         Html().SetPdfOutputOptions(o => o.SetMetadata(metadata)).Build().RenderFor(GotenbergApiVersion.V9);
 
-    private static JObject MetadataStage(JObject metadata) => (JObject)Stages(WithMetadata(metadata)).Single();
+    private static JsonObject MetadataStage(JsonObject metadata) => Stages(WithMetadata(metadata)).Single()!.AsObject();
 
     [TestCase("Title", "title")]
     [TestCase("Author", "author")]
@@ -350,9 +350,9 @@ public class Gotenberg9StagesTests
     [TestCase("AUTHOR", "author")]
     public void MetadataTextKey_MapsToItsField(string key, string field)
     {
-        var stage = MetadataStage(new JObject { [key] = "value" });
+        var stage = MetadataStage(new JsonObject { [key] = "value" });
 
-        JToken.DeepEquals(stage, new JObject { ["op"] = "set-metadata", [field] = "value" }).Should().BeTrue(stage.ToString());
+        JsonNode.DeepEquals(stage, new JsonObject { ["op"] = "set-metadata", [field] = "value" }).Should().BeTrue(stage.ToString());
     }
 
     [TestCase("CreationDate", "creationDate")]
@@ -363,21 +363,21 @@ public class Gotenberg9StagesTests
     [TestCase("MODIFYDATE", "modDate")]
     public void MetadataDateKey_MapsToItsField(string key, string field)
     {
-        var stage = MetadataStage(new JObject { [key] = "D:20060918162750Z" });
+        var stage = MetadataStage(new JsonObject { [key] = "D:20060918162750Z" });
 
-        stage[field]!.Value<string>().Should().Be("D:20060918162750Z");
+        stage[field]!.GetValue<string>().Should().Be("D:20060918162750Z");
     }
 
     [Test]
     public void AllEightFields_GoInOneStage()
     {
-        var stage = MetadataStage(new JObject
+        var stage = MetadataStage(new JsonObject
         {
             ["Title"] = "T", ["Author"] = "A", ["Subject"] = "S", ["Keywords"] = "K", ["Creator"] = "C",
             ["Producer"] = "P", ["CreateDate"] = "2006-09-18", ["ModifyDate"] = "2006-09-19"
         });
 
-        stage.Properties().Select(p => p.Name).Should().Equal(
+        stage.Select(p => p.Key).Should().Equal(
             "op", "title", "author", "subject", "keywords", "creator", "producer", "creationDate", "modDate");
     }
 
@@ -385,15 +385,15 @@ public class Gotenberg9StagesTests
     public void KeywordList_IsJoinedWithACommaAndASpace()
     {
         // Gotenberg 8 wrote each item to the keyword list, which PDF readers show as "first, second".
-        var stage = MetadataStage(new JObject { ["Keywords"] = new JArray("first", "second") });
+        var stage = MetadataStage(new JsonObject { ["Keywords"] = new JsonArray("first", "second") });
 
-        stage["keywords"]!.Value<string>().Should().Be("first, second");
+        stage["keywords"]!.GetValue<string>().Should().Be("first, second");
     }
 
     [Test]
     public void KeywordList_WithSomethingElseThanText_IsRefused()
     {
-        var act = () => WithMetadata(new JObject { ["Keywords"] = new JArray("first", 2) });
+        var act = () => WithMetadata(new JsonObject { ["Keywords"] = new JsonArray("first", 2) });
 
         act.Should().ThrowExactly<ArgumentException>().WithMessage("*'Keywords'*");
     }
@@ -401,7 +401,7 @@ public class Gotenberg9StagesTests
     [Test]
     public void ListForAnotherField_IsRefused()
     {
-        var act = () => WithMetadata(new JObject { ["Author"] = new JArray("a", "b") });
+        var act = () => WithMetadata(new JsonObject { ["Author"] = new JsonArray("a", "b") });
 
         act.Should().ThrowExactly<ArgumentException>().WithMessage("*'Author'*one text value*");
     }
@@ -409,38 +409,38 @@ public class Gotenberg9StagesTests
     [Test]
     public void NumbersAndBooleans_AreSentAsInvariantText()
     {
-        var stage = MetadataStage(new JObject { ["Title"] = 1.5, ["Subject"] = true, ["Creator"] = 42 });
+        var stage = MetadataStage(new JsonObject { ["Title"] = 1.5, ["Subject"] = true, ["Creator"] = 42 });
 
-        stage["title"]!.Value<string>().Should().Be("1.5");
-        stage["subject"]!.Value<string>().Should().Be("true");
-        stage["creator"]!.Value<string>().Should().Be("42");
+        stage["title"]!.GetValue<string>().Should().Be("1.5");
+        stage["subject"]!.GetValue<string>().Should().Be("true");
+        stage["creator"]!.GetValue<string>().Should().Be("42");
     }
 
     [Test]
     public void NullValue_IsLeftOut()
     {
-        var stage = MetadataStage(new JObject { ["Title"] = "T", ["Author"] = null });
+        var stage = MetadataStage(new JsonObject { ["Title"] = "T", ["Author"] = null });
 
-        stage.Properties().Select(p => p.Name).Should().Equal("op", "title");
+        stage.Select(p => p.Key).Should().Equal("op", "title");
     }
 
     [Test]
     public void OnlyNullValues_SendNoMetadataStage()
     {
-        WithMetadata(new JObject { ["Title"] = null }).PartNames.Should().NotContain(StagesField);
+        WithMetadata(new JsonObject { ["Title"] = null }).PartNames.Should().NotContain(StagesField);
     }
 
     [Test]
     public void TwoKeysForOneField_AreRefused()
     {
-        var act = () => WithMetadata(new JObject { ["CreationDate"] = "2006-09-18", ["CreateDate"] = "2006-09-19" });
+        var act = () => WithMetadata(new JsonObject { ["CreationDate"] = "2006-09-18", ["CreateDate"] = "2006-09-19" });
 
         act.Should().ThrowExactly<ArgumentException>().WithMessage("*'CreationDate'*'CreateDate'*");
     }
 
     public static IEnumerable<TestCaseData> Dates()
     {
-        TestCaseData Row(string name, JToken value, string expected) =>
+        TestCaseData Row(string name, JsonNode value, string expected) =>
             new TestCaseData(value, expected).SetArgDisplayNames(name);
 
         yield return Row("UTC DateTime", new DateTime(2006, 9, 18, 16, 27, 50, DateTimeKind.Utc), "D:20060918162750Z");
@@ -463,11 +463,11 @@ public class Gotenberg9StagesTests
     }
 
     [TestCaseSource(nameof(Dates))]
-    public void Date_IsSentAsAPdfDate(JToken value, string expected)
+    public void Date_IsSentAsAPdfDate(JsonNode value, string expected)
     {
-        var stage = MetadataStage(new JObject { ["CreationDate"] = value });
+        var stage = MetadataStage(new JsonObject { ["CreationDate"] = value });
 
-        stage["creationDate"]!.Value<string>().Should().Be(expected);
+        stage["creationDate"]!.GetValue<string>().Should().Be(expected);
     }
 
     [Test]
@@ -495,7 +495,7 @@ public class Gotenberg9StagesTests
     [TestCase("D:2006-09-18")]
     public void UnreadableDate_IsRefusedNamingTheKey(string value)
     {
-        var act = () => WithMetadata(new JObject { ["ModifyDate"] = value });
+        var act = () => WithMetadata(new JsonObject { ["ModifyDate"] = value });
 
         act.Should().ThrowExactly<ArgumentException>().WithMessage("*'ModifyDate'*");
     }
@@ -503,7 +503,7 @@ public class Gotenberg9StagesTests
     [Test]
     public void DateThatIsANumber_IsRefusedNamingTheKey()
     {
-        var act = () => WithMetadata(new JObject { ["CreationDate"] = 20060918 });
+        var act = () => WithMetadata(new JsonObject { ["CreationDate"] = 20060918 });
 
         act.Should().ThrowExactly<ArgumentException>().WithMessage("*'CreationDate'*");
     }
@@ -524,7 +524,7 @@ public class Gotenberg9StagesTests
 
         yield return Row(
             "stamp with free-form options",
-            b => b.SetStampOptions(s => s.SetTextStamp("STAMP").SetOptions(new JObject { ["opacity"] = 0.5 })),
+            b => b.SetStampOptions(s => s.SetTextStamp("STAMP").SetOptions(new JsonObject { ["opacity"] = 0.5 })),
             "*typed options of its stamp-text*");
 
         yield return Row(
@@ -534,7 +534,7 @@ public class Gotenberg9StagesTests
 
         yield return Row(
             "PDF stamp with free-form options",
-            b => b.SetStampOptions(s => s.SetPdfStamp("annex.pdf", new byte[] { 1 }).SetOptions(new JObject { ["opacity"] = 0.5 })),
+            b => b.SetStampOptions(s => s.SetPdfStamp("annex.pdf", new byte[] { 1 }).SetOptions(new JsonObject { ["opacity"] = 0.5 })),
             "*typed options of its stamp-text*");
 
         yield return Row(

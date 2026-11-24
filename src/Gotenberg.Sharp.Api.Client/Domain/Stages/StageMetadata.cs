@@ -13,11 +13,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Collections;
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-
-using Newtonsoft.Json.Linq;
 
 using StageOptions = Gotenberg.Sharp.API.Client.Infrastructure.Constants.Gotenberg.Stages.Options;
 
@@ -67,8 +68,8 @@ internal static class StageMetadata
     /// <summary>
     /// The first key of <paramref name="metadata" /> that is not one of the eight fields, or null.
     /// </summary>
-    internal static string? FindUnknownKey(JObject metadata) =>
-        metadata.Properties().Select(p => p.Name).FirstOrDefault(name => !Fields.ContainsKey(name));
+    internal static string? FindUnknownKey(IDictionary<string, object> metadata) =>
+        metadata.Keys.FirstOrDefault(name => !Fields.ContainsKey(name));
 
     /// <summary>
     /// The <c>set-metadata</c> options of <paramref name="metadata" />, whose keys are all known: text
@@ -76,74 +77,115 @@ internal static class StageMetadata
     /// wrote each as an item of the keyword list), dates as PDF dates. Null values are left out.
     /// </summary>
     /// <exception cref="ArgumentException">Thrown when a value cannot be written as its field, naming the key.</exception>
-    internal static List<(string Name, object? Value)> ToStageOptions(JObject metadata)
+    internal static List<(string Name, object? Value)> ToStageOptions(IDictionary<string, object> metadata)
     {
         var options = new List<(string Name, object? Value)>();
         var keyOfField = new Dictionary<string, string>();
 
-        foreach (var property in metadata.Properties())
+        foreach (var property in metadata)
         {
-            var field = Fields[property.Name];
+            var field = Fields[property.Key];
+            var plain = Plain(property.Value);
 
             var value = field is StageOptions.CreationDate or StageOptions.ModDate
-                ? ToPdfDate(property)
-                : ToText(property, field == StageOptions.Keywords);
+                ? ToPdfDate(property.Key, plain)
+                : ToText(property.Key, plain, field == StageOptions.Keywords);
 
             if (value == null) continue;
 
             if (keyOfField.TryGetValue(field, out var other))
                 throw new ArgumentException(
-                    $"The metadata keys '{other}' and '{property.Name}' both set the {field} field on Gotenberg 9: keep one of them.",
+                    $"The metadata keys '{other}' and '{property.Key}' both set the {field} field on Gotenberg 9: keep one of them.",
                     nameof(PdfOutput.PdfOutputOptions.MetaData));
 
-            keyOfField[field] = property.Name;
+            keyOfField[field] = property.Key;
             options.Add((field, value));
         }
 
         return options;
     }
 
-    private static string? ToText(JProperty property, bool isKeywords)
+    // A JSON value as the .NET value it holds: text, a boolean, a number, a list of such values, or
+    // null. A JSON object stays a JsonElement, which no field takes. Other values are returned as given.
+    private static object? Plain(object? value)
     {
-        var token = property.Value;
-
-        switch (token.Type)
+        switch (value)
         {
-            case JTokenType.Null or JTokenType.Undefined:
-                return null;
+            case JsonNode node:
+                using (var document = JsonDocument.Parse(node.ToJsonString()))
+                    return Plain(document.RootElement.Clone());
 
-            case JTokenType.Array when isKeywords:
-                if (token.Children().Any(item => item.Type != JTokenType.String))
-                    throw Unwritable(property, "a list of keywords holds text only");
+            case JsonDocument document:
+                return Plain(document.RootElement);
 
-                return string.Join(", ", token.Children().Select(item => (string)item!));
-
-            case JTokenType.Boolean:
-                return (bool)token ? "true" : "false";
-
-            case JTokenType.String or JTokenType.Integer or JTokenType.Float or JTokenType.Date or JTokenType.Guid or JTokenType.Uri:
-                return ((JValue)token).ToString(CultureInfo.InvariantCulture);
+            case JsonElement element:
+                return element.ValueKind switch
+                {
+                    JsonValueKind.Null or JsonValueKind.Undefined => null,
+                    JsonValueKind.String => element.GetString(),
+                    JsonValueKind.True => true,
+                    JsonValueKind.False => false,
+                    JsonValueKind.Number when element.TryGetInt64(out var whole) => whole,
+                    JsonValueKind.Number when element.TryGetDecimal(out var number) => number,
+                    JsonValueKind.Number => element.GetDouble(),
+                    JsonValueKind.Array => element.EnumerateArray().Select(item => Plain(item)).ToList(),
+                    _ => element.Clone()
+                };
 
             default:
-                throw Unwritable(property, "Gotenberg 9 takes one text value for it");
+                return value;
         }
     }
 
-    private static string? ToPdfDate(JProperty property)
+    private static string? ToText(string key, object? value, bool isKeywords)
     {
-        var token = property.Value;
-
-        switch (token.Type)
+        switch (value)
         {
-            case JTokenType.Null or JTokenType.Undefined:
+            case null:
                 return null;
 
-            case JTokenType.Date when ((JValue)token).Value is DateTimeOffset offsetDate:
+            case string text:
+                return text;
+
+            case IEnumerable items and not IDictionary and not byte[] when isKeywords:
+                var keywords = items.Cast<object?>().Select(Plain).ToList();
+
+                if (keywords.Any(item => item is not string))
+                    throw Unwritable(key, "a list of keywords holds text only");
+
+                return string.Join(", ", keywords.Cast<string>());
+
+            case bool flag:
+                return flag ? "true" : "false";
+
+            case Enum enumValue:
+                return Convert.ToString(
+                    Convert.ChangeType(enumValue, Enum.GetUnderlyingType(enumValue.GetType()), CultureInfo.InvariantCulture),
+                    CultureInfo.InvariantCulture);
+
+            case char or Uri:
+                return value.ToString();
+
+            case byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal
+                or DateTime or DateTimeOffset or Guid:
+                return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+
+            default:
+                throw Unwritable(key, "Gotenberg 9 takes one text value for it");
+        }
+    }
+
+    private static string? ToPdfDate(string key, object? value)
+    {
+        switch (value)
+        {
+            case null:
+                return null;
+
+            case DateTimeOffset offsetDate:
                 return FormatPdfDate(offsetDate.DateTime, offsetDate.Offset);
 
-            case JTokenType.Date:
-                var date = (DateTime)token;
-
+            case DateTime date:
                 return date.Kind switch
                 {
                     DateTimeKind.Utc => FormatPdfDate(date, TimeSpan.Zero),
@@ -151,27 +193,27 @@ internal static class StageMetadata
                     _ => FormatPdfDate(date, null)
                 };
 
-            case JTokenType.String:
-                return ParseTextDate(property, ((string)token!).Trim());
+            case string text:
+                return ParseTextDate(key, text.Trim());
 
             default:
-                throw Unwritable(property, "a date is a date, or text such as 2006-09-18T16:27:50-04:00, 2006:09:18 16:27:50 or D:20060918162750-04'00'");
+                throw Unwritable(key, "a date is a date, or text such as 2006-09-18T16:27:50-04:00, 2006:09:18 16:27:50 or D:20060918162750-04'00'");
         }
     }
 
-    private static string ParseTextDate(JProperty property, string text)
+    private static string ParseTextDate(string key, string text)
     {
         if (text.StartsWith("D:", StringComparison.Ordinal))
         {
             if (PdfDate.IsMatch(text)) return text;
 
-            throw Unwritable(property, $"'{text}' is not a PDF date such as D:20060918162750-04'00'");
+            throw Unwritable(key, $"'{text}' is not a PDF date such as D:20060918162750-04'00'");
         }
 
         var match = TextDate.Match(text);
 
         if (!match.Success)
-            throw Unwritable(property, $"'{text}' is not a date such as 2006-09-18T16:27:50-04:00, 2006:09:18 16:27:50 or D:20060918162750-04'00'");
+            throw Unwritable(key, $"'{text}' is not a date such as 2006-09-18T16:27:50-04:00, 2006:09:18 16:27:50 or D:20060918162750-04'00'");
 
         int Part(string name) =>
             match.Groups[name].Success ? int.Parse(match.Groups[name].Value, CultureInfo.InvariantCulture) : 0;
@@ -186,7 +228,7 @@ internal static class StageMetadata
         }
         catch (ArgumentOutOfRangeException)
         {
-            throw Unwritable(property, $"'{text}' is not a valid date");
+            throw Unwritable(key, $"'{text}' is not a valid date");
         }
     }
 
@@ -235,8 +277,8 @@ internal static class StageMetadata
         return text.ToString();
     }
 
-    private static ArgumentException Unwritable(JProperty property, string reason) =>
+    private static ArgumentException Unwritable(string key, string reason) =>
         new(
-            $"The metadata value of '{property.Name}' cannot be sent to Gotenberg 9: {reason}.",
+            $"The metadata value of '{key}' cannot be sent to Gotenberg 9: {reason}.",
             nameof(PdfOutput.PdfOutputOptions.MetaData));
 }

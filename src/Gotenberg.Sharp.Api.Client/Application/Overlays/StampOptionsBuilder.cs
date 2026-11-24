@@ -17,7 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Gotenberg.Sharp.API.Client.Application.Overlays;
 
@@ -65,10 +65,15 @@ public sealed class StampOptionsBuilder
         return SetPages(PageRanges.Create(pages));
     }
 
-    public StampOptionsBuilder SetOptions(JObject options)
+    public StampOptionsBuilder SetOptions(IDictionary<string, object> options)
     {
-        _options.Options = options ?? throw new ArgumentNullException(nameof(options));
+        _options.Options = JsonObjectWriter.Snapshot(options ?? throw new ArgumentNullException(nameof(options)));
         return this;
+    }
+
+    public StampOptionsBuilder SetOptions(JsonObject options)
+    {
+        return SetOptions(JsonObjectWriter.ToDictionary(options, nameof(options)));
     }
 
     /// <summary>

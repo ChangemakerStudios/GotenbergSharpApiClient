@@ -13,7 +13,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Newtonsoft.Json.Linq;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
@@ -30,7 +29,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
     protected override string GetApiPath(GotenbergApiVersion api) =>
         api == GotenbergApiVersion.V9 ? Constants.Gotenberg.PdfEngines.Gotenberg9.Pipe : this.ApiPath;
 
-    public JObject? Metadata { get; set; }
+    public IDictionary<string, object>? Metadata { get; set; }
 
     protected override void Validate()
     {
@@ -54,7 +53,7 @@ public sealed class WriteMetadataRequest : PdfEngineRequest
     {
         if (api == GotenbergApiVersion.V8)
         {
-            var metadataContent = new StringContent(this.Metadata!.ToString());
+            var metadataContent = new StringContent(JsonObjectWriter.ToJson(this.Metadata!));
             metadataContent.Headers.ContentType = new MediaTypeHeaderValue(Constants.HttpContent.MediaTypes.ApplicationJson);
             metadataContent.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(Constants.HttpContent.Disposition.Types.FormData)

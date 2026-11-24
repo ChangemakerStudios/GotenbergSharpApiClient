@@ -19,7 +19,7 @@ using Gotenberg.Sharp.API.Client.Domain.Overlays;
 using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 using Ops = Gotenberg.Sharp.API.Client.Infrastructure.Constants.Gotenberg.Stages.Ops;
 using StageOptions = Gotenberg.Sharp.API.Client.Infrastructure.Constants.Gotenberg.Stages.Options;
@@ -28,7 +28,7 @@ namespace Gotenberg.Sharp.API.Client.Application.Stages;
 
 /// <summary>
 /// Lists the post-processing of a request as Gotenberg 9 stages: the operations of its one
-/// <c>stages</c> form field. Typed methods cover the common operations; <see cref="Add(string, object)" />
+/// <c>stages</c> form field. Typed methods cover the common operations; <see cref="Add(string, IDictionary{string, object})" />
 /// reaches every other one, and <see cref="AddFile(string, ContentItem)" /> uploads a file such a stage reads.
 /// </summary>
 /// <remarks>
@@ -374,12 +374,14 @@ public sealed class StagesBuilder
     /// </summary>
     /// <param name="op">The operation, as Gotenberg names it, such as <c>sign</c>.</param>
     /// <param name="options">
-    /// Its options in camelCase, as an anonymous object (<c>new { timestampUrl = "https://tsa.example" }</c>),
-    /// a dictionary or a <see cref="JObject" />, serialized with Newtonsoft.Json; none when null. Null
-    /// options are left out.
+    /// Its options in camelCase (<c>new Dictionary&lt;string, object&gt; { ["timestampUrl"] = "https://tsa.example" }</c>),
+    /// copied when the stage is added; none when null. Null options are left out. Values are written as
+    /// the other dictionaries of the client are: strings, numbers, booleans, dates, dictionaries,
+    /// collections, or a <c>System.Text.Json</c> <see cref="JsonNode" /> or <see cref="System.Text.Json.JsonElement" />.
     /// </param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="op" /> is null or empty, or <paramref name="options" /> is not an object with named options or sets <c>op</c>.</exception>
-    public StagesBuilder Add(string op, object? options = null)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="op" /> is null or empty, or <paramref name="options" /> sets <c>op</c>.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value of <paramref name="options" /> cannot be written as JSON.</exception>
+    public StagesBuilder Add(string op, IDictionary<string, object>? options = null)
     {
         StageArguments.Text(op, nameof(op));
 
@@ -388,12 +390,25 @@ public sealed class StagesBuilder
         return this;
     }
 
-    /// <inheritdoc cref="Add(string, object)" />
-    public StagesBuilder Add(string op, JObject options) =>
-        this.Add(op, (object)(options ?? throw new ArgumentNullException(nameof(options))));
+    /// <summary>
+    /// Adds any operation of Gotenberg 9 with the options of <paramref name="options" />; see
+    /// <see cref="Add(string, IDictionary{string, object})" />.
+    /// </summary>
+    /// <param name="op">The operation, as Gotenberg names it, such as <c>sign</c>.</param>
+    /// <param name="options">Its options in camelCase, copied when the stage is added. Null options are left out.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="op" /> is null or empty, or <paramref name="options" /> sets <c>op</c>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="options" /> is null.</exception>
+    public StagesBuilder Add(string op, JsonObject options)
+    {
+        StageArguments.Text(op, nameof(op));
+
+        this._stages.Add(StageList.CreateRawStage(op, options ?? throw new ArgumentNullException(nameof(options))));
+
+        return this;
+    }
 
     /// <summary>
-    /// Uploads a file that a stage added with <see cref="Add(string, object)" /> reads, such as the
+    /// Uploads a file that a stage added with <see cref="Add(string, IDictionary{string, object})" /> reads, such as the
     /// certificate of a <c>sign</c> stage, under <c>files</c> as <paramref name="fileName" />.
     /// </summary>
     /// <param name="fileName">The name the stage gives the file, such as <c>cert.p12</c>.</param>

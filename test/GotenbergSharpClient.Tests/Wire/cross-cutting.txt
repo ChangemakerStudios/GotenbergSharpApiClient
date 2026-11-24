@@ -15,9 +15,7 @@ part name=flatten type=text/html
 part name=generateTaggedPdf type=text/html
     True
 part name=metadata type=text/html
-    {
-      "Title": "T"
-    }
+    {"Title":"T"}
 part name=userPassword type=text/html
     user
 part name=ownerPassword type=text/html

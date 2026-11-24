@@ -2,7 +2,8 @@ using Gotenberg.Sharp.API.Client.Application.Builders;
 using Gotenberg.Sharp.API.Client.Domain.Bookmarks;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 
-using Newtonsoft.Json.Linq;
+using Gotenberg.Sharp.API.Client.Infrastructure.Json;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -235,12 +236,12 @@ public class BookmarkTests
 
         var json = await GetBookmarksFormField(request);
 
-        var parsed = JArray.Parse(json);
+        var parsed = JsonNode.Parse(json)!.AsArray();
         parsed.Should().HaveCount(2);
-        parsed[0]["title"]!.Value<string>().Should().Be("Introduction");
-        parsed[0]["page"]!.Value<int>().Should().Be(1);
-        parsed[0]["children"].Should().NotBeNull();
-        parsed[1]["children"]![0]!["title"]!.Value<string>().Should().Be("Section 1.1");
+        parsed[0]!["title"]!.GetValue<string>().Should().Be("Introduction");
+        parsed[0]!["page"]!.GetValue<int>().Should().Be(1);
+        parsed[0]!["children"].Should().NotBeNull();
+        parsed[1]!["children"]![0]!["title"]!.GetValue<string>().Should().Be("Section 1.1");
     }
 
     [Test]
@@ -256,9 +257,9 @@ public class BookmarkTests
 
         var json = await GetBookmarksFormField(request);
 
-        var parsed = JObject.Parse(json);
-        parsed["first.pdf"]![0]!["title"]!.Value<string>().Should().Be("Summary");
-        parsed["second.pdf"]![0]!["page"]!.Value<int>().Should().Be(4);
+        var parsed = JsonNode.Parse(json)!.AsObject();
+        parsed["first.pdf"]![0]!["title"]!.GetValue<string>().Should().Be("Summary");
+        parsed["second.pdf"]![0]!["page"]!.GetValue<int>().Should().Be(4);
     }
 
     [Test]
@@ -291,8 +292,9 @@ public class BookmarkTests
                                 }
                                 """;
 
-        var parsed = Newtonsoft.Json.JsonConvert
-            .DeserializeObject<Dictionary<string, List<Bookmark>>>(response)!;
+        var parsed = System.Text.Json.JsonSerializer.Deserialize(
+            response,
+            GotenbergJsonContext.Instance.BookmarksReadResponse)!;
 
         parsed["empty.pdf"].Should().BeEmpty();
         parsed["doc.pdf"].Should().HaveCount(2);
@@ -305,8 +307,9 @@ public class BookmarkTests
     {
         const string response = """{ "doc.pdf": [ { "title": "Only", "page": 1, "children": null } ] }""";
 
-        var parsed = Newtonsoft.Json.JsonConvert
-            .DeserializeObject<Dictionary<string, List<Bookmark>>>(response)!;
+        var parsed = System.Text.Json.JsonSerializer.Deserialize(
+            response,
+            GotenbergJsonContext.Instance.BookmarksReadResponse)!;
 
         parsed["doc.pdf"].Single().Children.Should().NotBeNull().And.BeEmpty();
     }

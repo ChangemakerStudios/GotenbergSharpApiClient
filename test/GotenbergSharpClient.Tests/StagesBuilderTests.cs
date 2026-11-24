@@ -27,7 +27,7 @@ using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Stages;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 using static GotenbergSharpClient.Tests.Gotenberg9StagesTests;
 
@@ -53,7 +53,7 @@ public class StagesBuilderTests
     private static RenderedRequest RenderStages(Action<StagesBuilder> stages) =>
         Html().WithStages(stages).Build().RenderFor(GotenbergApiVersion.V9);
 
-    private static JObject OnlyStage(Action<StagesBuilder> stages) => (JObject)Stages(RenderStages(stages)).Single();
+    private static JsonObject OnlyStage(Action<StagesBuilder> stages) => Stages(RenderStages(stages)).Single()!.AsObject();
 
     #region The JSON of each typed method
 
@@ -190,7 +190,7 @@ public class StagesBuilderTests
     [TestCase(StampPosition.Bottom, "bottom")]
     [TestCase(StampPosition.BottomRight, "bottom-right")]
     public void Position_IsSentAsGotenbergNamesIt(StampPosition position, string expected) =>
-        OnlyStage(s => s.StampText("X", o => o.SetPosition(position)))["position"]!.Value<string>().Should().Be(expected);
+        OnlyStage(s => s.StampText("X", o => o.SetPosition(position)))["position"]!.GetValue<string>().Should().Be(expected);
 
     [TestCase(StampFont.Helvetica, "Helvetica")]
     [TestCase(StampFont.HelveticaBold, "Helvetica-Bold")]
@@ -207,7 +207,7 @@ public class StagesBuilderTests
     [TestCase(StampFont.Symbol, "Symbol")]
     [TestCase(StampFont.ZapfDingbats, "ZapfDingbats")]
     public void Font_IsSentAsGotenbergNamesIt(StampFont font, string expected) =>
-        OnlyStage(s => s.StampText("X", o => o.SetFont(font)))["font"]!.Value<string>().Should().Be(expected);
+        OnlyStage(s => s.StampText("X", o => o.SetFont(font)))["font"]!.GetValue<string>().Should().Be(expected);
 
     [TestCase(PdfProfile.A1a, "PDF/A-1a")]
     [TestCase(PdfProfile.A1b, "PDF/A-1b")]
@@ -223,14 +223,14 @@ public class StagesBuilderTests
     [TestCase(PdfProfile.Ua1, "PDF/UA-1")]
     [TestCase(PdfProfile.Ua2, "PDF/UA-2")]
     public void Profile_IsSentAsGotenbergNamesIt(PdfProfile profile, string expected) =>
-        OnlyStage(s => s.Remediate(profile))["profile"]!.Value<string>().Should().Be(expected);
+        OnlyStage(s => s.Remediate(profile))["profile"]!.GetValue<string>().Should().Be(expected);
 
     [TestCase(PdfEncryptionAlgorithm.Aes256, "aes256")]
     [TestCase(PdfEncryptionAlgorithm.Aes128, "aes128")]
     [TestCase(PdfEncryptionAlgorithm.Rc4_128, "rc4-128")]
     [TestCase(PdfEncryptionAlgorithm.Rc4_40, "rc4-40")]
     public void Algorithm_IsSentAsGotenbergNamesIt(PdfEncryptionAlgorithm algorithm, string expected) =>
-        OnlyStage(s => s.Encrypt("user", options: o => o.SetAlgorithm(algorithm)))["algorithm"]!.Value<string>().Should().Be(expected);
+        OnlyStage(s => s.Encrypt("user", options: o => o.SetAlgorithm(algorithm)))["algorithm"]!.GetValue<string>().Should().Be(expected);
 
     #endregion
 
@@ -287,10 +287,9 @@ public class StagesBuilderTests
         yield return Row("encrypt with an unknown permission", s => s.Encrypt("user", options: o => o.SetPermissions((PdfPermissions)1024)), outOfRange, "allowed");
         yield return Row("encrypt with an undefined algorithm", s => s.Encrypt("user", options: o => o.SetAlgorithm((PdfEncryptionAlgorithm)99)), outOfRange, "algorithm");
         yield return Row("add without an operation", s => s.Add(" "), invalid, "op");
-        yield return Row("add text as options", s => s.Add("optimize", "dedup"), invalid, "options");
-        yield return Row("add a list as options", s => s.Add("optimize", new[] { 1, 2 }), invalid, "options");
-        yield return Row("add options that set op", s => s.Add("optimize", new { op = "merge" }), invalid, "options");
-        yield return Row("add a null JObject", s => s.Add("optimize", (JObject)null!), typeof(ArgumentNullException), "options");
+        yield return Row("add options that set op", s => s.Add("optimize", new Dictionary<string, object> { ["op"] = "merge" }), invalid, "options");
+        yield return Row("add a JsonObject that sets op", s => s.Add("optimize", new JsonObject { ["op"] = "merge" }), invalid, "options");
+        yield return Row("add a null JsonObject", s => s.Add("optimize", (JsonObject)null!), typeof(ArgumentNullException), "options");
         yield return Row("add a file without extension", s => s.AddFile("cert", Pdf), invalid, "fileName");
         yield return Row("add a file twice", s => s.AddFile("cert.p12", Pdf).AddFile("cert.p12", Pdf), invalid, "fileName");
         yield return Row("stamp a file added before", s => s.AddFile("logo.png", Png).StampImage("logo.png", Png), invalid, "fileName");
@@ -403,19 +402,17 @@ public class StagesBuilderTests
     {
         TestCaseData Row(string name, Action<StagesBuilder> stages) => new TestCaseData(stages).SetArgDisplayNames(name);
 
-        yield return Row("anonymous object", s => s.Add("sign", new { certificate = "cert.p12", pades = true, reason = (string?)null, nested = new { level = 2 } }));
-
-        yield return Row("dictionary", s => s.Add("sign", new Dictionary<string, object?>
+        yield return Row("dictionary", s => s.Add("sign", new Dictionary<string, object>
         {
-            ["certificate"] = "cert.p12", ["pades"] = true, ["reason"] = null, ["nested"] = new Dictionary<string, int> { ["level"] = 2 }
+            ["certificate"] = "cert.p12", ["pades"] = true, ["reason"] = null!, ["nested"] = new Dictionary<string, int> { ["level"] = 2 }
         }));
 
-        yield return Row("JObject", s => s.Add("sign", new JObject
+        yield return Row("JsonObject", s => s.Add("sign", new JsonObject
         {
-            ["certificate"] = "cert.p12", ["pades"] = true, ["reason"] = null, ["nested"] = new JObject { ["level"] = 2 }
+            ["certificate"] = "cert.p12", ["pades"] = true, ["reason"] = null, ["nested"] = new JsonObject { ["level"] = 2 }
         }));
 
-        yield return Row("JObject as an object", s => s.Add("sign", (object)JObject.Parse("""{"certificate":"cert.p12","pades":true,"reason":null,"nested":{"level":2}}""")));
+        yield return Row("parsed JsonObject", s => s.Add("sign", TestJson.ParseObject("""{"certificate":"cert.p12","pades":true,"reason":null,"nested":{"level":2}}""")));
     }
 
     [TestCaseSource(nameof(RawOptions))]
@@ -427,9 +424,9 @@ public class StagesBuilderTests
         ShouldHaveStages(RenderStages(s => s.Add("autotag")), """[{"op":"autotag"}]""");
 
     [Test]
-    public void RawStage_IsACopyOfTheJObjectGiven()
+    public void RawStage_IsACopyOfTheJsonObjectGiven()
     {
-        var options = new JObject { ["dpi"] = 72 };
+        var options = new JsonObject { ["dpi"] = 72 };
 
         var request = Html().WithStages(s => s.Add("render", options)).Build();
 
@@ -439,9 +436,23 @@ public class StagesBuilderTests
     }
 
     [Test]
+    public void RawStage_IsACopyOfTheDictionaryGiven()
+    {
+        var nested = new Dictionary<string, object> { ["level"] = 1 };
+        var options = new Dictionary<string, object> { ["dpi"] = 72, ["nested"] = nested };
+
+        var request = Html().WithStages(s => s.Add("render", options)).Build();
+
+        options["dpi"] = 300;
+        nested["level"] = 2;
+
+        ShouldHaveStages(request.RenderFor(GotenbergApiVersion.V9), """[{"op":"render","dpi":72,"nested":{"level":1}}]""");
+    }
+
+    [Test]
     public void RawStage_ComesAtItsPlace()
     {
-        var rendered = RenderStages(s => s.StampText("X").Add("render", new { pages = "1", dpi = 72 }));
+        var rendered = RenderStages(s => s.StampText("X").Add("render", new Dictionary<string, object> { ["pages"] = "1", ["dpi"] = 72 }));
 
         ShouldHaveStages(rendered, """[{"op":"stamp-text","text":"X"},{"op":"render","pages":"1","dpi":72}]""");
     }
@@ -461,7 +472,7 @@ public class StagesBuilderTests
                 .StampPdf("letterhead.pdf", Pdf)
                 .Attach("data.xml", "<x/>"u8.ToArray())
                 .AddFile("cert.p12", new byte[] { 1, 2 })
-                .Add("sign", new { certificate = "cert.p12" }))
+                .Add("sign", new Dictionary<string, object> { ["certificate"] = "cert.p12" }))
             .Build()
             .RenderFor(GotenbergApiVersion.V9);
 
@@ -796,7 +807,7 @@ public class StagesBuilderTests
     public void FreeFormStampHint_PointsToTheTypedStampOptions()
     {
         var act = () => Html()
-            .SetStampOptions(s => s.SetTextStamp("STAMP").SetOptions(new JObject { ["opacity"] = 0.5 }))
+            .SetStampOptions(s => s.SetTextStamp("STAMP").SetOptions(new JsonObject { ["opacity"] = 0.5 }))
             .Build()
             .RenderFor(GotenbergApiVersion.V9);
 
@@ -886,10 +897,10 @@ public class StagesBuilderTests
 
         ShouldBeAPdf(result);
 
-        var metadata = JObject.Parse(await client.ReadPdfMetadataAsync(
+        var metadata = TestJson.ParseObject(await client.ReadPdfMetadataAsync(
             PdfEngineBuilders.ReadMetadata().WithPdfs(a => a.AddItem("piped.pdf", result))));
 
-        metadata["piped.pdf"]!["title"]!.Value<string>().Should().Be("Piped");
+        metadata["piped.pdf"]!["title"]!.GetValue<string>().Should().Be("Piped");
     }
 
     [GotenbergTest("9.0.0")]
@@ -911,7 +922,7 @@ public class StagesBuilderTests
         var pdf = await ThreePagePdf(client);
 
         var result = await ReadAll(await client.ExecutePdfEngineAsync(PdfEngineBuilders
-            .Pipe(s => s.Add("optimize", new { dedup = true, recompressImages = false }))
+            .Pipe(s => s.Add("optimize", new Dictionary<string, object> { ["dedup"] = true, ["recompressImages"] = false }))
             .WithPdfs(a => a.AddItem("in.pdf", pdf))));
 
         ShouldBeAPdf(result);

@@ -6,7 +6,7 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using MimeMapping;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -92,7 +92,7 @@ public class PdfEngineOperationsTests
         var request = builder.Build();
 
         var writeRequest = (WriteMetadataRequest)request;
-        writeRequest.Metadata!["Author"]!.Value<string>().Should().Be("Test");
+        writeRequest.Metadata!["Author"].Should().Be("Test");
     }
 
     [Test]
@@ -218,16 +218,16 @@ public class PdfEngineOperationsTests
         var json = await client.ReadPdfMetadataAsync(builder);
 
         json.Should().NotBeNullOrEmpty();
-        var parsed = JObject.Parse(json);
+        var parsed = JsonNode.Parse(json)!.AsObject();
         parsed.Should().NotBeEmpty();
 
-        var metadata = parsed["test.pdf"].Should().BeOfType<JObject>().Subject;
+        var metadata = parsed["test.pdf"].Should().BeOfType<JsonObject>().Subject;
 
         if (gotenberg.Version.Major >= 9)
         {
             // Eight camelCase fields of the document information, those the document has.
             metadata.Should().ContainKey("producer");
-            metadata.Properties().Select(p => p.Name).Should().BeSubsetOf(
+            metadata.Select(p => p.Key).Should().BeSubsetOf(
                 ["title", "author", "subject", "keywords", "creator", "producer", "creationDate", "modDate"]);
         }
         else
@@ -329,7 +329,7 @@ public class PdfEngineOperationsTests
                 .WithPdfs(a => a.AddItem("plain.pdf", pdfBytes)));
 
         json.Should().NotBeNullOrEmpty();
-        JObject.Parse(json).Should().ContainKey("plain.pdf");
+        JsonNode.Parse(json)!.AsObject().Should().ContainKey("plain.pdf");
     }
 
     [GotenbergTest(GotenbergVersions.Bookmarks)]
@@ -351,12 +351,12 @@ public class PdfEngineOperationsTests
         // Gotenberg 9 renamed the page of a bookmark, in its answers as in its requests.
         var (name, other) = gotenberg.Version.Major >= 9 ? ("pageNumber", "page") : ("page", "pageNumber");
 
-        var chapter = (JObject)JObject.Parse(json)["bookmarked.pdf"]!.Single();
+        var chapter = TestJson.ParseObject(json)["bookmarked.pdf"]!.AsArray().Single()!.AsObject();
 
-        chapter["title"]!.Value<string>().Should().Be("Chapter");
-        chapter[name]!.Value<int>().Should().Be(2);
+        chapter["title"]!.GetValue<string>().Should().Be("Chapter");
+        chapter[name]!.GetValue<int>().Should().Be(2);
         chapter.ContainsKey(other).Should().BeFalse();
-        chapter["children"]!.Single()[name]!.Value<int>().Should().Be(3);
+        chapter["children"]!.AsArray().Single()![name]!.GetValue<int>().Should().Be(3);
     }
 
     [GotenbergTest(GotenbergVersions.Bookmarks, until: "9.0.0")] // 9 takes one outline for all the PDFs of a request

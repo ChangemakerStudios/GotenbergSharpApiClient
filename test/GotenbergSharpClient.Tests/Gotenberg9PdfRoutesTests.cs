@@ -23,9 +23,10 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 using Gotenberg.Sharp.API.Client.Infrastructure;
+using Gotenberg.Sharp.API.Client.Infrastructure.Json;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 using static GotenbergSharpClient.Tests.Gotenberg9StagesTests;
 
@@ -563,17 +564,17 @@ public class Gotenberg9PdfRoutesTests
     {
         var request = PdfEngineBuilders.WriteBookmarks(Outline()).WithPdfs(a => a.AddItem("in.pdf", Pdf)).Build();
 
-        var v8 = JArray.Parse(request.RenderFor(GotenbergApiVersion.V8).Part("bookmarks").Value);
+        var v8 = TestJson.ParseArray(request.RenderFor(GotenbergApiVersion.V8).Part("bookmarks").Value);
 
-        v8[0]["page"]!.Value<int>().Should().Be(1);
-        v8[0]["children"]![0]!["children"]![0]!["page"]!.Value<int>().Should().Be(3);
-        v8.SelectTokens("..pageNumber").Should().BeEmpty();
+        v8[0]!["page"]!.GetValue<int>().Should().Be(1);
+        v8[0]!["children"]![0]!["children"]![0]!["page"]!.GetValue<int>().Should().Be(3);
+        v8.ToJsonString().Should().NotContain("\"pageNumber\"");
 
-        var v9 = Stages(request.RenderFor(GotenbergApiVersion.V9))[0]["bookmarks"]!;
+        var v9 = Stages(request.RenderFor(GotenbergApiVersion.V9))[0]!["bookmarks"]!;
 
-        v9[0]!["pageNumber"]!.Value<int>().Should().Be(1);
-        v9[0]!["children"]![0]!["children"]![0]!["pageNumber"]!.Value<int>().Should().Be(3);
-        v9.SelectTokens("..page").Should().BeEmpty();
+        v9[0]!["pageNumber"]!.GetValue<int>().Should().Be(1);
+        v9[0]!["children"]![0]!["children"]![0]!["pageNumber"]!.GetValue<int>().Should().Be(3);
+        v9.ToJsonString().Should().NotContain("\"page\"");
     }
 
     [TestCase("page")]
@@ -586,7 +587,7 @@ public class Gotenberg9PdfRoutesTests
               {"title":"Two","{{pageKey}}":4}]}
             """;
 
-        var outline = JsonConvert.DeserializeObject<Dictionary<string, List<Bookmark>>>(json)!["doc.pdf"];
+        var outline = JsonSerializer.Deserialize(json, GotenbergJsonContext.Default.BookmarksReadResponse)!["doc.pdf"];
 
         outline.Should().HaveCount(2);
         outline[0].Title.Should().Be("One");
@@ -599,9 +600,9 @@ public class Gotenberg9PdfRoutesTests
     [Test]
     public void Bookmark_IsStillWrittenWithThePageNameOfGotenberg8()
     {
-        var json = JObject.Parse(JsonConvert.SerializeObject(new Bookmark("One", 5)));
+        var json = TestJson.ParseObject(JsonSerializer.Serialize(new Bookmark("One", 5), GotenbergJsonContext.Default.Bookmark));
 
-        json["page"]!.Value<int>().Should().Be(5);
+        json["page"]!.GetValue<int>().Should().Be(5);
         json.ContainsKey("pageNumber").Should().BeFalse();
     }
 
@@ -714,7 +715,7 @@ public class Gotenberg9PdfRoutesTests
             .WithPdfs(a => a.AddItem("in.pdf", Pdf))
             .Build();
 
-        Stages(request.RenderFor(GotenbergApiVersion.V9))[0]["relationship"]!.Value<string>().Should().Be(relationship);
+        Stages(request.RenderFor(GotenbergApiVersion.V9))[0]!["relationship"]!.GetValue<string>().Should().Be(relationship);
     }
 
     [TestCase("data", "Data")]
@@ -726,11 +727,11 @@ public class Gotenberg9PdfRoutesTests
             .WithPdfs(a => a.AddItem("in.pdf", Pdf))
             .Build();
 
-        Stages(request.RenderFor(GotenbergApiVersion.V9))[0]["relationship"]!.Value<string>().Should().Be(sent);
+        Stages(request.RenderFor(GotenbergApiVersion.V9))[0]!["relationship"]!.GetValue<string>().Should().Be(sent);
 
         // Gotenberg 8 wrote it as given.
-        JObject.Parse(request.RenderFor(GotenbergApiVersion.V8).Part("embedsMetadata").Value)["data.xml"]!["Relationship"]!
-            .Value<string>().Should().Be(given);
+        TestJson.ParseObject(request.RenderFor(GotenbergApiVersion.V8).Part("embedsMetadata").Value)["data.xml"]!["Relationship"]!
+            .GetValue<string>().Should().Be(given);
     }
 
     [Test]
@@ -764,8 +765,8 @@ public class Gotenberg9PdfRoutesTests
         var eight = new GotenbergVersionTests.StubVersionClient("8.40.0");
 
         (await eight.SupportsAsync(request)).Should().BeTrue();
-        JObject.Parse(request.RenderFor(GotenbergApiVersion.V8).Part("embedsMetadata").Value)["data.xml"]!["Relationship"]!
-            .Value<string>().Should().Be("Other");
+        TestJson.ParseObject(request.RenderFor(GotenbergApiVersion.V8).Part("embedsMetadata").Value)["data.xml"]!["Relationship"]!
+            .GetValue<string>().Should().Be("Other");
     }
 
     #endregion
@@ -823,7 +824,7 @@ public class Gotenberg9PdfRoutesTests
 
         var info = await client.ReadPdfMetadataAsync(PdfEngineBuilders.ReadMetadata().WithPdfs(a => a.AddItem("merged.pdf", result)));
 
-        JObject.Parse(info).Should().ContainKey("merged.pdf");
+        TestJson.ParseObject(info).Should().ContainKey("merged.pdf");
     }
 
     [GotenbergTest("9.0.0")]
@@ -869,10 +870,10 @@ public class Gotenberg9PdfRoutesTests
         form.Add(file, "files", "embedded.pdf");
 
         using var response = await http.PostAsync("forms/pdf/attachments", form);
-        var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+        var json = TestJson.ParseObject(await response.Content.ReadAsStringAsync());
 
         response.IsSuccessStatusCode.Should().BeTrue(json.ToString());
-        json["embedded.pdf"]!.Select(a => a["name"]!.Value<string>()).Should().BeEquivalentTo("first.xml", "second.xml");
+        json["embedded.pdf"]!.AsArray().Select(a => a!["name"]!.GetValue<string>()).Should().BeEquivalentTo("first.xml", "second.xml");
     }
 
     // .NET writes a file name outside ASCII as an RFC 2047 encoded word, and a stage names its file: the name must arrive as written.
@@ -911,11 +912,11 @@ public class Gotenberg9PdfRoutesTests
         form.Add(file, "files", "attached.pdf");
 
         using var response = await http.PostAsync("forms/pdf/attachments", form);
-        var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+        var json = TestJson.ParseObject(await response.Content.ReadAsStringAsync());
 
         response.IsSuccessStatusCode.Should().BeTrue(json.ToString());
 
-        return json["attached.pdf"]!.Select(a => a["name"]!.Value<string>()!).ToArray();
+        return json["attached.pdf"]!.AsArray().Select(a => a!["name"]!.GetValue<string>()).ToArray();
     }
 
     [GotenbergTest("9.0.0")]

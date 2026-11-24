@@ -21,7 +21,7 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 using static GotenbergSharpClient.Tests.Gotenberg9StagesTests;
 
@@ -263,8 +263,8 @@ public class OverlayFileTests
             ? """{"op":"stamp-image","image":"logo.png","pages":"1-2"}"""
             : """{"op":"stamp-pdf","source":"letterhead.pdf","pages":"1-2"}""";
 
-        Stages(rendered).Should().ContainSingle(s => ((string)s["op"]!).StartsWith("stamp-"))
-            .Which.Should().Match<JToken>(s => JToken.DeepEquals(s, JObject.Parse(stage)));
+        Stages(rendered).Should().ContainSingle(s => ((string)s!["op"]!).StartsWith("stamp-"))
+            .Which.Should().Match<JsonNode>(s => JsonNode.DeepEquals(s, TestJson.ParseObject(stage)));
 
         var file = FileParts(rendered).Single(p => p.FileName == overlay.FileName);
 
@@ -471,7 +471,7 @@ public class OverlayFileTests
         request.StampOptions = new StampOptions
         {
             Source = OverlaySource.Image,
-            Options = new JObject { ["opacity"] = 0.5 },
+            Options = new Dictionary<string, object> { ["opacity"] = 0.5 },
             FileName = withFile ? "logo.png" : null,
             FileContent = withFile ? new ContentItem(Png) : null
         };
@@ -513,7 +513,7 @@ public class OverlayFileTests
 
         var stamped = Html().SetStampOptions(s => s.SetImageStamp("logo.png", Png)).Build();
         var watermarked = Html().SetWatermarkOptions(w => w.SetImageWatermark("logo.png", Png)).Build();
-        var withOptions = Html().SetStampOptions(s => s.SetImageStamp("logo.png", Png).SetOptions(new JObject { ["opacity"] = 0.5 })).Build();
+        var withOptions = Html().SetStampOptions(s => s.SetImageStamp("logo.png", Png).SetOptions(new JsonObject { ["opacity"] = 0.5 })).Build();
 
         (await nine.SupportsAsync(stamped)).Should().BeTrue();
         (await nine.SupportsAsync(watermarked)).Should().BeFalse();

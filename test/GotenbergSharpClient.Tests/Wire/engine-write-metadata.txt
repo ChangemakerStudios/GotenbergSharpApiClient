@@ -1,8 +1,5 @@
 POST forms/pdfengines/metadata/write
 part name=metadata type=application/json
-    {
-      "Author": "me",
-      "Title": "T"
-    }
+    {"Author":"me","Title":"T"}
 part name=files filename=in.pdf type=application/pdf
     %PDF-1.4 fake

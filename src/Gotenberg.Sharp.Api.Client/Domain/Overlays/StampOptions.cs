@@ -16,8 +16,6 @@
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
-
 namespace Gotenberg.Sharp.API.Client.Domain.Overlays;
 
 /// <summary>
@@ -59,7 +57,7 @@ public class StampOptions : FacetBase
     public PageRanges? Pages { get; set; }
 
     [MultiFormHeader(Constants.Gotenberg.CrossCuttingOptions.StampOptionsJson)]
-    public JObject? Options { get; set; }
+    public IDictionary<string, object>? Options { get; set; }
 
     /// <summary>
     /// The name of the file of an image or PDF stamp, such as <c>logo.png</c>; its extension gives the

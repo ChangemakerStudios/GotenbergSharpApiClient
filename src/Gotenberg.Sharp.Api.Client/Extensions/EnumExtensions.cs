@@ -13,10 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.ComponentModel;
-using System.Globalization;
-using System.Reflection;
-
+using Gotenberg.Sharp.API.Client.Domain.Dimensions;
 using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 
@@ -41,11 +38,20 @@ internal static class EnumExtensions
         return format == default ? "None" : $"PDF/A-{format.ToString().Substring(1, 2)}";
     }
 
-    public static string GetDescription(this Enum value)
+    /// <summary>
+    /// The CSS unit suffix Gotenberg expects; mirrors the [Description] on each member.
+    /// </summary>
+    internal static string ToUnitSuffix(this DimensionUnitType unitType)
     {
-        FieldInfo field = value.GetType().GetField(value.ToString())!;
-        DescriptionAttribute? attribute = field.GetCustomAttribute<DescriptionAttribute>();
-
-        return attribute?.Description ?? value.ToString();
+        return unitType switch
+        {
+            DimensionUnitType.Points => "pt",
+            DimensionUnitType.Pixels => "px",
+            DimensionUnitType.Inches => "in",
+            DimensionUnitType.Millimeters => "mm",
+            DimensionUnitType.Centimeters => "cm",
+            DimensionUnitType.Picas => "pc",
+            _ => unitType.ToString()
+        };
     }
 }

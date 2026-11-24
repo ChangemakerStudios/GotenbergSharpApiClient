@@ -38,7 +38,7 @@ public sealed class Bookmark
     /// <summary>
     /// The text shown in the reader's outline pane.
     /// </summary>
-    [JsonProperty("title")]
+    [JsonPropertyName("title")]
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
@@ -48,21 +48,36 @@ public sealed class Bookmark
     /// Read from <c>page</c>, the name Gotenberg 7 and 8 use, and from <c>pageNumber</c>, the name of
     /// Gotenberg 9. Written as <c>page</c>; a request for Gotenberg 9 writes <c>pageNumber</c> itself.
     /// </remarks>
-    [JsonProperty("page")]
+    [JsonPropertyName("page")]
     public int Page { get; set; }
 
-    // The name Gotenberg 9 gives the page when it answers; the reading side of Page.
-    [JsonProperty("pageNumber")]
-    private int PageNumber
+    // The name Gotenberg 9 gives the page when it answers; the reading side of Page. Internal, not
+    // private, so the source generator can reach it; never written, as its getter is always null.
+    [JsonInclude]
+    [JsonPropertyName("pageNumber")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal int? PageNumber
     {
-        set => this.Page = value;
+        get => null;
+        set
+        {
+            if (value.HasValue) this.Page = value.Value;
+        }
     }
 
     /// <summary>
     /// Nested bookmarks. Empty when the bookmark is a leaf.
     /// </summary>
-    [JsonProperty("children", NullValueHandling = NullValueHandling.Ignore)]
-    public IList<Bookmark> Children { get; set; } = new List<Bookmark>();
+    /// <remarks>Never null: assigning null, as Gotenberg's JSON may, leaves an empty list.</remarks>
+    [JsonPropertyName("children")]
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public IList<Bookmark> Children
+    {
+        get => this._children;
+        set => this._children = value ?? new List<Bookmark>();
+    }
+
+    private IList<Bookmark> _children = new List<Bookmark>();
 
     internal void Validate() =>
         this.Validate(new HashSet<Bookmark>(BookmarkReferenceComparer.Instance));

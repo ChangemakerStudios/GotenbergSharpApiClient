@@ -65,13 +65,17 @@ at most 1: Gotenberg reads 0 as "not set", which is opaque.
 
 ## Any other operation
 
-`Add(op, options)` sends any operation with the options you give, as an anonymous object, a dictionary
-or a `JObject`; null options are left out. `AddFile` uploads a file such a stage names:
+`Add(op, options)` sends any operation with the options you give, as an `IDictionary<string, object>`
+or a `System.Text.Json.Nodes.JsonObject`, copied when the stage is added; null options are left out.
+`AddFile` uploads a file such a stage names:
 
 ```csharp
 .WithStages(s => s
     .AddFile("cert.p12", certificate)
-    .Add("sign", new { certificate = "cert.p12", certificatePassword = "secret", reason = "Approved" }))
+    .Add("sign", new Dictionary<string, object>
+    {
+        ["certificate"] = "cert.p12", ["certificatePassword"] = "secret", ["reason"] = "Approved"
+    }))
 ```
 
 Every file a stage reads (stamps, attachments, `AddFile`) is uploaded under `files` with its name. A

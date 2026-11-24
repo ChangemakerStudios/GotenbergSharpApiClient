@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 using Gotenberg.Sharp.API.Client.Domain.Shared;
@@ -46,14 +47,19 @@ internal class MultiFormPropertyItem(
     public string NameFor(GotenbergApiVersion api) =>
         api == GotenbergApiVersion.V9 ? this.Gotenberg9Name ?? this.Attribute.Name : this.Attribute.Name;
 
-    internal static IEnumerable<MultiFormPropertyItem> FromType(Type instanceType)
+    internal static IEnumerable<MultiFormPropertyItem> FromType(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type instanceType)
     {
         if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
 
-        return _itemsByType.GetOrAdd(instanceType, ReadType);
+        if (_itemsByType.TryGetValue(instanceType, out var items)) return items;
+
+        // Not GetOrAdd(instanceType, ReadType): a delegate would drop the trimming annotation.
+        return _itemsByType.GetOrAdd(instanceType, ReadType(instanceType));
     }
 
-    private static MultiFormPropertyItem[] ReadType(Type instanceType)
+    private static MultiFormPropertyItem[] ReadType(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type instanceType)
     {
         var propertyInfos = instanceType.GetProperties()
             .Where(prop => System.Attribute.IsDefined(prop, _attributeType)).ToList();

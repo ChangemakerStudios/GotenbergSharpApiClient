@@ -107,5 +107,7 @@ public sealed class BookmarkSet
     /// shared outline, an object keyed by file name otherwise.
     /// </summary>
     internal string ToJson() =>
-        JsonConvert.SerializeObject(this.IsPerFile ? (object)this.PerFile! : this.ForAllFiles!);
+        this.IsPerFile
+            ? JsonSerializer.Serialize(this.PerFile!, GotenbergJsonContext.Instance.BookmarksPerFile)
+            : JsonSerializer.Serialize(this.ForAllFiles!, GotenbergJsonContext.Instance.Bookmarks);
 }

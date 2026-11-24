@@ -30,9 +30,7 @@ part name=waitDelay type=text/html
 part name=userAgent type=text/html
     agent/1.0
 part name=extraHttpHeaders type=text/html
-    {
-      "X-Extra": "1"
-    }
+    {"X-Extra":"1"}
 part name=cookies type=text/html
     [{"name":"session","value":"abc","domain":"example.com"}]
 part name=failOnConsoleExceptions type=text/html

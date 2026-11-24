@@ -29,7 +29,7 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 using Client = Gotenberg.Sharp.API.Client.GotenbergSharpClient;
 
@@ -625,7 +625,7 @@ public class GotenbergApiVersionTests
     public async Task MetadataWithoutAValue_IsRefusedAlikeBySupportsEnsureAndTheSend()
     {
         // Gotenberg 9 answers 400 (stages is required) to the empty list this gives.
-        var request = PdfEngineBuilders.WriteMetadata(new JObject { ["Title"] = null })
+        var request = PdfEngineBuilders.WriteMetadata(new JsonObject { ["Title"] = null })
             .WithPdfs(a => a.AddItem("in.pdf", Pdf))
             .Build();
 
@@ -661,7 +661,7 @@ public class GotenbergApiVersionTests
     [Test]
     public async Task RequestWithAStage_IsNotRefusedForTheStagesItHas()
     {
-        var request = PdfEngineBuilders.WriteMetadata(new JObject { ["Title"] = "T" })
+        var request = PdfEngineBuilders.WriteMetadata(new JsonObject { ["Title"] = "T" })
             .WithPdfs(a => a.AddItem("in.pdf", Pdf))
             .Build();
 

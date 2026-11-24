@@ -22,7 +22,9 @@ using Gotenberg.Sharp.API.Client.Domain.Rotation;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
+
+using Gotenberg.Sharp.API.Client.Infrastructure.Json;
 
 using Ops = Gotenberg.Sharp.API.Client.Infrastructure.Constants.Gotenberg.Stages.Ops;
 using StageOptions = Gotenberg.Sharp.API.Client.Infrastructure.Constants.Gotenberg.Stages.Options;
@@ -38,7 +40,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Stages;
 /// </summary>
 /// <remarks>
 /// The only place the stages are written as JSON (<see cref="ToJson" />) and the options of a stage
-/// the caller describes are read (<see cref="CreateRawStage" />), so that a change of JSON library
+/// the caller describes are read (<see cref="CreateRawStage(string, IDictionary{string, object})" />), so that a change of JSON library
 /// touches this class alone.
 /// </remarks>
 internal sealed class StageList
@@ -140,81 +142,64 @@ internal sealed class StageList
         new(op, options.Where(o => o.Value != null).Select(o => (o.Name, o.Value!)).ToList());
 
     /// <summary>
-    /// The operation <paramref name="op" /> with the options the caller describes: the properties of a
-    /// <see cref="JObject" />, the entries of a dictionary or the properties of any other object, such
-    /// as an anonymous one, as Newtonsoft.Json serializes them. Null options are left out.
+    /// The operation <paramref name="op" /> with the options the caller describes, the entries of a
+    /// dictionary, copied so that later changes to it do not reach the request. Null options are left out.
     /// </summary>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="options" /> is not an object with named options, or names an option <c>op</c>.</exception>
-    internal static Stage CreateRawStage(string op, object? options)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="options" /> names an option <c>op</c>.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
+    internal static Stage CreateRawStage(string op, IDictionary<string, object>? options)
     {
-        var json = options switch
-        {
-            null => new JObject(),
-            JObject given => (JObject)given.DeepClone(),
-            _ => JToken.FromObject(options) as JObject
-        };
+        var copy = options == null ? new Dictionary<string, object>() : JsonObjectWriter.Snapshot(options);
 
-        if (json == null)
-            throw new ArgumentException(
-                $"The options of the '{op}' stage must be an object with named options (an anonymous object, a dictionary or a JObject), not {options!.GetType().Name}.",
-                nameof(options));
-
-        if (json.Property(Constants.Gotenberg.Stages.Op) != null)
+        if (copy.ContainsKey(Constants.Gotenberg.Stages.Op))
             throw new ArgumentException(
                 $"The options of the '{op}' stage must not set 'op': the operation is the first argument.",
                 nameof(options));
 
         return new Stage(
             op,
-            json.Properties()
-                .Where(p => p.Value.Type is not (JTokenType.Null or JTokenType.Undefined))
-                .Select(p => (p.Name, (object)p.Value))
-                .ToList());
+            copy.Where(p => p.Value != null).Select(p => (p.Key, p.Value)).ToList());
     }
+
+    /// <inheritdoc cref="CreateRawStage(string, IDictionary{string, object})" />
+    internal static Stage CreateRawStage(string op, JsonObject options) =>
+        CreateRawStage(op, JsonObjectWriter.ToDictionary(options, nameof(options)));
 
     /// <summary>
     /// The value of the <c>stages</c> form field: a JSON array of one object per stage, its <c>op</c>
     /// first and then its options.
     /// </summary>
-    internal string ToJson()
-    {
-        var array = new JArray();
-
-        foreach (var stage in this._stages)
-        {
-            var item = new JObject { [Constants.Gotenberg.Stages.Op] = stage.Op };
-
-            foreach (var (name, value) in stage.Options) item[name] = ToJsonValue(value);
-
-            array.Add(item);
-        }
-
-        return array.ToString(Formatting.None);
-    }
+    internal string ToJson() =>
+        JsonObjectWriter.ToJsonArray(
+            this._stages.Select(stage =>
+                (IEnumerable<KeyValuePair<string, object>>)
+                [
+                    new(Constants.Gotenberg.Stages.Op, stage.Op),
+                    .. stage.Options.Select(o => new KeyValuePair<string, object>(o.Name, ToJsonValue(o.Value)))
+                ]));
 
     // Gotenberg 9 names the page of a bookmark pageNumber where Gotenberg 8 named it page.
-    private static JToken ToJsonValue(object value) => value switch
+    private static object ToJsonValue(object value) => value switch
     {
-        JToken json => json.DeepClone(),
         IEnumerable<Bookmark> bookmarks => ToJsonArray(bookmarks),
-        _ => JToken.FromObject(value)
+        _ => value
     };
 
-    private static JArray ToJsonArray(IEnumerable<Bookmark> bookmarks)
+    private static List<List<KeyValuePair<string, object>>> ToJsonArray(IEnumerable<Bookmark> bookmarks)
     {
-        var array = new JArray();
+        var array = new List<List<KeyValuePair<string, object>>>();
 
         foreach (var bookmark in bookmarks)
         {
-            var item = new JObject
+            var item = new List<KeyValuePair<string, object>>
             {
-                [StageOptions.Title] = bookmark.Title,
-                [StageOptions.PageNumber] = bookmark.Page
+                new(StageOptions.Title, bookmark.Title),
+                new(StageOptions.PageNumber, bookmark.Page)
             };
 
             var children = bookmark.Children.IfNullEmpty().ToList();
 
-            if (children.Count > 0) item[StageOptions.Children] = ToJsonArray(children);
+            if (children.Count > 0) item.Add(new(StageOptions.Children, ToJsonArray(children)));
 
             array.Add(item);
         }
@@ -497,7 +482,7 @@ internal sealed class StageList
         this.Add(Ops.Rotate, (StageOptions.Angle, rotation.RotateAngle.Value), (StageOptions.Pages, rotation.RotatePages?.Value));
     }
 
-    private void AddMetadata(JObject? metadata)
+    private void AddMetadata(IDictionary<string, object>? metadata)
     {
         if (metadata == null) return;
 
@@ -559,7 +544,7 @@ internal sealed class StageList
 /// <summary>
 /// One operation of a <see cref="StageList" />: its name and its options, in camelCase, each a
 /// string, a number, a boolean, an array of strings, a dictionary, a list of bookmarks, or JSON the
-/// caller described (<see cref="StageList.CreateRawStage" />).
+/// caller described (<see cref="StageList.CreateRawStage(string, IDictionary{string, object})" />).
 /// </summary>
 internal sealed class Stage(string op, IReadOnlyList<(string Name, object Value)> options)
 {
