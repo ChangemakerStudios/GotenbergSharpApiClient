@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!--
+		Runs the timeout tests against the netstandard2.0 build of the client, the build .NET Framework uses, on the
+		runtime of the SDK. It checks the code that only the .NET Standard builds compile, such as the backfill of
+		HttpContent.CopyToAsync(Stream, CancellationToken), which GotenbergSharpClient.Tests cannot load. It does not
+		check the transport of .NET Framework itself.
+	-->
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AwesomeAssertions" Version="9.2.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+		<PackageReference Include="NUnit" Version="4.4.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
+		<!-- A dependency of the netstandard2.0 build alone, which the reference below does not bring. -->
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Gotenberg.Sharp.Api.Client\Gotenberg.Sharp.Api.Client.csproj" SetTargetFramework="TargetFramework=netstandard2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\GotenbergSharpClient.Tests\TimeOutTests.cs" Link="TimeOutTests.cs" />
+		<Compile Include="..\GotenbergSharpClient.Tests\SlowBody.cs" Link="SlowBody.cs" />
+		<Using Include="AwesomeAssertions" />
+		<Using Include="NUnit.Framework" />
+	</ItemGroup>
+
+</Project>
