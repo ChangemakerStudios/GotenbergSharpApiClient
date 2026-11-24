@@ -13,7 +13,7 @@ This directory contains console application examples demonstrating various featu
 
    That starts Gotenberg 9. `WatermarkAndRotate` reads the version of the service: it draws a watermark on Gotenberg 7 and 8 and a stamp on Gotenberg 9, which has no watermarks. See [Gotenberg 9](../docs/gotenberg-9.md).
 
-2. **.NET 8.0 SDK**: All examples target .NET 8.0.
+2. **.NET 10 SDK**: All examples target .NET 10.
 
 ## Configuration
 
