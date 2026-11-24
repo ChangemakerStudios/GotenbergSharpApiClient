@@ -213,7 +213,7 @@ static void ExpectJsonField(IReadOnlyDictionary<string, string> fields, string n
     Expect(compact == expected, $"form field '{name}' was '{compact}', expected '{expected}'");
 }
 
-// Resolved through DI so the typed-client registration and the Polly pipeline are exercised too.
+// Resolved through DI so the typed-client registration and its handler pipeline are exercised too.
 static (GotenbergSharpClient Client, StubHandler Stub) CreateStubbedClient()
 {
     var stub = new StubHandler();

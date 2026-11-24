@@ -18,6 +18,7 @@ namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 /// <summary>
 /// <see cref="StreamContent" /> over a stream that cannot seek. Once it has been sent the stream is
 /// consumed, and sending the same message again throws <see cref="InvalidOperationException" />
-/// instead of repeating the request. The retry policy looks for this type to skip such requests.
+/// instead of repeating the request. <see cref="Infrastructure.Pipeline.GotenbergResiliencePredicates.CanResend" />
+/// looks for this type so that a retry strategy skips such requests.
 /// </summary>
 internal sealed class NonReplayableStreamContent(Stream stream) : StreamContent(stream);

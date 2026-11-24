@@ -15,7 +15,7 @@
 - **PDF/A & PDF/UA** — Archive-ready and accessible PDF output
 - **Metadata & Bookmarks** — Read and write PDF metadata and document outlines
 - **Webhooks** — Async PDF generation with callback support
-- **DI-Ready** — Built for dependency injection with Polly retry policies
+- **DI-Ready** — Built for dependency injection; add retries with Microsoft.Extensions.Http.Resilience (see [Retries and Timeouts](resilience.md))
 
 ## Quick Start
 

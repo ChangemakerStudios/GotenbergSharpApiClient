@@ -6,8 +6,11 @@ using Gotenberg.Sharp.API.Client.Infrastructure;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Polly;
+
 namespace GotenbergSharpClient.Tests;
 
+/// <summary>What the retry pipeline of docs/resilience.md repeats, end to end through the typed client.</summary>
 [TestFixture]
 public class RetryPredicateTests
 {
@@ -68,13 +71,10 @@ public class RetryPredicateTests
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(o =>
-            {
-                o.ServiceUrl = new Uri("http://gotenberg.invalid");
-                o.RetryPolicy = new RetryOptions { Enabled = true, RetryCount = RetryCount, BackoffPower = 0 };
-            });
+            .Configure(o => o.ServiceUrl = new Uri("http://gotenberg.invalid"));
         services.AddGotenbergSharpClient()
-            .ConfigurePrimaryHttpMessageHandler(() => handler);
+            .ConfigurePrimaryHttpMessageHandler(() => handler)
+            .AddResilienceHandler("gotenberg", pipeline => pipeline.AddRetry(ResilienceRecipes.Retry(RetryCount)));
 
         return services.BuildServiceProvider()
             .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();

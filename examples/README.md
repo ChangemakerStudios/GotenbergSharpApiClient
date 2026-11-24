@@ -13,7 +13,7 @@ This directory contains console application examples demonstrating various featu
 
    That starts Gotenberg 9. `WatermarkAndRotate` reads the version of the service: it draws a watermark on Gotenberg 7 and 8 and a stamp on Gotenberg 9, which has no watermarks. See [Gotenberg 9](../docs/gotenberg-9.md).
 
-2. **.NET 8.0 SDK**: All examples target .NET 8.0.
+2. **.NET 10 SDK**: All examples target .NET 10.
 
 ## Configuration
 
@@ -22,7 +22,6 @@ All examples share a common configuration file: `appsettings.json`
 The default configuration includes:
 - **Service URL**: `http://localhost:3000`
 - **Basic Auth**: Username `testuser`, Password `testpass` (matching docker-compose-basic-auth.yml)
-- **Retry Policy**: Enabled with 4 retries and exponential backoff
 
 You can modify these settings in `appsettings.json` or update the credentials directly in the example code.
 
@@ -37,7 +36,7 @@ dotnet run [output-directory]
 ```
 
 ### DIExample
-Demonstrates dependency injection setup with logging and Polly retry policy.
+Demonstrates dependency injection setup with logging, and a retry through Microsoft.Extensions.Http.Resilience (see [Retries and Timeouts](../docs/resilience.md)).
 
 ```bash
 cd DIExample

@@ -26,6 +26,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Settings;
 /// </remarks>
 public class GotenbergSharpClientOptions
 {
+    internal const string RetryRemovedMessage =
+        "The client has no built-in retry since 4.0, and RetryPolicy.Enabled = true fails options validation. " +
+        "Add a resilience handler to the IHttpClientBuilder that AddGotenbergSharpClient() returns, for example with " +
+        "Microsoft.Extensions.Http.Resilience: https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/";
+
     /// <summary>
     /// HTTP timeout for requests to Gotenberg. Default: 3 minutes.
     /// Increase this for large documents or complex conversions that may take longer to process.
@@ -45,9 +50,11 @@ public class GotenbergSharpClientOptions
     public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/health");
 
     /// <summary>
-    /// Retry policy configuration for handling transient failures. Default: Disabled with 3 retries when enabled.
-    /// Configure retry count, exponential backoff, and logging options.
+    /// The settings of the built-in retry that the client had before 4.0. Nothing reads them, and
+    /// <see cref="RetryOptions.Enabled" /> set to <see langword="true" /> fails options validation. Add a resilience
+    /// handler to the builder that <c>AddGotenbergSharpClient()</c> returns instead.
     /// </summary>
+    [Obsolete(RetryRemovedMessage)]
     public RetryOptions RetryPolicy { get; set; } = new RetryOptions();
 
     /// <summary>

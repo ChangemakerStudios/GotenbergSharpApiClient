@@ -5,8 +5,11 @@ using Gotenberg.Sharp.API.Client.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Polly;
+
 namespace GotenbergSharpClient.Tests;
 
+/// <summary>Which request bodies the retry pipeline of docs/resilience.md sends again.</summary>
 [TestFixture]
 public class RetryReplayableBodyTests
 {
@@ -20,7 +23,7 @@ public class RetryReplayableBodyTests
 
         var act = () => client.HtmlToPdfAsync(CreateRequest(new OneWayStream(new byte[] { 1, 2, 3, 4 })));
 
-        // Without the fix the second attempt fails with "The stream was already read from",
+        // Sent again, the request would fail with "The stream was already consumed",
         // an InvalidOperationException that hides the real connection failure.
         await act.Should().ThrowAsync<HttpRequestException>();
         handler.BodyLengths.Should().HaveCount(1);
@@ -67,12 +70,12 @@ public class RetryReplayableBodyTests
             .Configure(o =>
             {
                 o.ServiceUrl = new Uri("http://gotenberg.invalid");
-                o.RetryPolicy = new RetryOptions { Enabled = true, RetryCount = RetryCount, BackoffPower = 0 };
                 // An explicit API sends no /version lookup, so the handler sees only the conversion.
                 o.ApiVersion = GotenbergApiVersion.V8;
             });
         services.AddGotenbergSharpClient()
-            .ConfigurePrimaryHttpMessageHandler(() => handler);
+            .ConfigurePrimaryHttpMessageHandler(() => handler)
+            .AddResilienceHandler("gotenberg", pipeline => pipeline.AddRetry(ResilienceRecipes.Retry(RetryCount)));
 
         return services.BuildServiceProvider()
             .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
