@@ -39,7 +39,8 @@ public class GotenbergSharpClientOptions
     /// process, or set <see cref="Timeout.InfiniteTimeSpan" /> when a resilience handler limits the whole request.
     /// For a call that returns a document, this limit and those of a resilience handler end when the response
     /// headers arrive. Reading the document after them is limited only by the cancellation token of the call, so
-    /// pass a token with a deadline to limit the whole call.
+    /// pass a token with a deadline to limit the whole call. The .NET Standard builds read the document without
+    /// that token.
     /// </summary>
     public TimeSpan TimeOut { get; set; } = TimeSpan.FromMinutes(3);
 

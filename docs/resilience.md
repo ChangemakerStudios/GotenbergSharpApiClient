@@ -74,6 +74,8 @@ using var deadline = new CancellationTokenSource(TimeSpan.FromMinutes(12));
 var pdf = await sharpClient.HtmlToPdfAsync(builder, deadline.Token);
 ```
 
+The token reaches the reading of the document only in the builds of the client for .NET 8 and newer. The builds for .NET Standard, which .NET Framework and .NET before 8 use, read the document without it, so there a deadline stops a call only until the headers arrive.
+
 The handler lifetime is the default of `IHttpClientFactory`, 2 minutes. Call `SetHandlerLifetime` on the builder that `AddGotenbergSharpClient()` returns to change it. It is not a time limit: a handler that expires still completes the requests it is sending.
 
 ## The standard resilience handler
