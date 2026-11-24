@@ -39,6 +39,8 @@ services.AddGotenbergSharpClient()
 
 This retries up to 3 times, about 2, 4 and 8 seconds apart: the defaults of `HttpRetryStrategyOptions`, which `MaxRetryAttempts`, `Delay` and `BackoffType` change. Each retry is logged through the application's logging.
 
+`GetRequestMessage()`, and `DisableForUnsafeHttpMethods()` further down, are marked experimental by the package (`EXTEXP0001`), so they may change in a later release. Called as extension methods, as on this page, they compile without that diagnostic. Called through their class, for example `HttpResilienceContextExtensions.GetRequestMessage(context)`, they fail the build unless `EXTEXP0001` is suppressed.
+
 ## Timeouts
 
 Two time limits apply to a request of the client registered with `AddGotenbergSharpClient()`:
