@@ -43,12 +43,9 @@ This retries up to 3 times, about 2, 4 and 8 seconds apart: the defaults of `Htt
 
 ## Timeouts
 
-Two time limits apply to a request of the client registered with `AddGotenbergSharpClient()`:
+`GotenbergSharpClientOptions.TimeOut`, 3 minutes by default, is the `HttpClient.Timeout` of the client registered with `AddGotenbergSharpClient()`, and the only time limit the client sets. It covers the whole request: every attempt and the waits between them. A request that outlasts it throws `TaskCanceledException`. Without a retry, a request has one attempt, and `TimeOut` limits it.
 
-- `GotenbergSharpClientOptions.TimeOut`, 3 minutes by default, is the `HttpClient.Timeout`. It covers all attempts and the waits between them together.
-- Each attempt is cut off after 5 minutes by the client's own handler, which throws `TimeoutException`.
-
-With a retry, raise `TimeOut` so that it covers every attempt and wait, or set it to `Timeout.InfiniteTimeSpan` and start the pipeline with a total timeout:
+With a retry, raise `TimeOut` so that it covers every attempt and wait, or set it to `Timeout.InfiniteTimeSpan` and start the pipeline with a timeout for the whole request. A timeout added after the retry limits each attempt:
 
 ```csharp
 services.AddOptions<GotenbergSharpClientOptions>()
@@ -63,8 +60,13 @@ services.AddGotenbergSharpClient()
             ShouldHandle = args => ValueTask.FromResult(
                 GotenbergResiliencePredicates.IsTransientFailure(args.Outcome.Result, args.Outcome.Exception)
                 && GotenbergResiliencePredicates.CanResend(args.Context.GetRequestMessage()))
-        }));
+        })
+        .AddTimeout(TimeSpan.FromMinutes(3)));
 ```
+
+Here the request gets 10 minutes and each attempt 3. A timeout of the pipeline throws `TimeoutRejectedException`, which `IsTransientFailure` does not retry.
+
+The handler lifetime is the default of `IHttpClientFactory`, 2 minutes. Call `SetHandlerLifetime` on the builder that `AddGotenbergSharpClient()` returns to change it. It is not a time limit: a handler that expires still completes the requests it is sending.
 
 ## The standard resilience handler
 
@@ -92,7 +94,7 @@ services.AddGotenbergSharpClient()
     });
 ```
 
-Set `TimeOut` to `Timeout.InfiniteTimeSpan` with it, as above, so that the total timeout of the handler is the one that applies.
+Set `TimeOut` to `Timeout.InfiniteTimeSpan` with it, as above, so that the timeouts of the handler are the ones that apply: its total timeout to the whole request, and its attempt timeout to each attempt.
 
 ## Webhooks and conversions sent twice
 

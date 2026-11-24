@@ -32,8 +32,11 @@ public class GotenbergSharpClientOptions
         "Microsoft.Extensions.Http.Resilience: https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/";
 
     /// <summary>
-    /// HTTP timeout for requests to Gotenberg. Default: 3 minutes.
-    /// Increase this for large documents or complex conversions that may take longer to process.
+    /// Time limit of a request to Gotenberg, which <c>AddGotenbergSharpClient()</c> sets as the
+    /// <see cref="HttpClient.Timeout" />. Default: 3 minutes. It is the only time limit the client sets, and it covers
+    /// every attempt of a resilience handler added to the builder and the waits between them, so a limit per attempt
+    /// goes in that handler. Increase this for large documents or complex conversions that may take longer to
+    /// process, or set <see cref="Timeout.InfiniteTimeSpan" /> when a resilience handler limits the whole request.
     /// </summary>
     public TimeSpan TimeOut { get; set; } = TimeSpan.FromMinutes(3);
 

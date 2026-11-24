@@ -132,7 +132,7 @@ public static class TypedClientServiceCollectionExtensions
     /// <remarks>
     ///     <para>
     ///         This overload allows full control over HttpClient configuration while still using the options
-    ///         for basic authentication. The client is configured with automatic decompression and timeout handling.
+    ///         for basic authentication. The client is configured with automatic decompression.
     ///     </para>
     ///     <para>
     ///         The client does not retry failed requests. To retry them, add a resilience handler to the returned
@@ -183,7 +183,7 @@ public static class TypedClientServiceCollectionExtensions
     /// <remarks>
     ///     <para>
     ///         This overload allows full control over HttpClient configuration while still using the options
-    ///         for basic authentication. The client is configured with automatic decompression and timeout handling.
+    ///         for basic authentication. The client is configured with automatic decompression.
     ///     </para>
     ///     <para>
     ///         The client does not retry failed requests. To retry them, add a resilience handler to the returned
@@ -238,12 +238,7 @@ public static class TypedClientServiceCollectionExtensions
             {
                 ApiVersion = sp.GetRequiredService<IOptions<TOptions>>().Value.ApiVersion
             })
-            .ConfigurePrimaryHttpMessageHandler(() => new TimeoutHandler(
-                new HttpClientHandler
-                {
-                    AutomaticDecompression = DecompressionMethods.GZip
-                                             | DecompressionMethods.Deflate
-                }))
+            .ConfigurePrimaryHttpMessageHandler((handler, _) => AcceptCompressedResponses(handler))
             .AddHttpMessageHandler(sp =>
             {
                 var ops = sp.GetRequiredService<IOptions<TOptions>>().Value;
@@ -266,9 +261,27 @@ public static class TypedClientServiceCollectionExtensions
 
                 // Return a pass-through handler if no auth is configured
                 return new PassThroughHandler();
-            })
-            .SetHandlerLifetime(TimeSpan.FromMinutes(6));
+            });
 
         return builder;
+    }
+
+    // Configures the primary handler of the factory rather than replacing it: from .NET 9 that is a
+    // SocketsHttpHandler whose connections are renewed with the handler lifetime.
+    private static void AcceptCompressedResponses(HttpMessageHandler primaryHandler)
+    {
+        const DecompressionMethods methods = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
+        switch (primaryHandler)
+        {
+            case HttpClientHandler handler:
+                handler.AutomaticDecompression = methods;
+                break;
+#if NET5_0_OR_GREATER
+            case SocketsHttpHandler handler:
+                handler.AutomaticDecompression = methods;
+                break;
+#endif
+        }
     }
 }
