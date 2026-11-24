@@ -56,9 +56,10 @@ git push origin master --tags
 
 This push triggers the GitHub Actions workflow which will:
 1. Build and test. The integration tests start their own Gotenberg 7, 8 and 9 containers through Testcontainers.
-2. Calculate the package version via GitVersion.
-3. Pack the NuGet package (with symbols).
-4. Publish to nuget.org.
+2. Publish the Native AOT smoke test and run it against a Gotenberg 8 container.
+3. Calculate the package version via GitVersion.
+4. Pack the NuGet package (with symbols).
+5. Publish to nuget.org.
 
 ### 5. Merge release branch back into `develop`
 
@@ -110,4 +111,4 @@ git branch -d hotfix/X.Y.Z+1
 - **Triggers**: All pushes and pull requests (build + test). NuGet publish only on push to `master`.
 - **Versioning**: GitVersion with `ContinuousDelivery` mode (`GitVersion.yml`).
 - **NuGet authentication**: [Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing). The `NuGet/login` step exchanges a GitHub OIDC token for a short-lived API key, matched against a policy on nuget.org (owner `ChangemakerStudios`, repository `GotenbergSharpApiClient`, workflow `deploy.yml`). No API key is stored in the repository.
-- **Test infrastructure**: The integration tests start Gotenberg 7, 8 and 9 containers through Testcontainers, so the runner needs Docker. The workflow does not start a Gotenberg server itself.
+- **Test infrastructure**: The integration tests start Gotenberg 7, 8 and 9 containers through Testcontainers, so the runner needs Docker. The AOT smoke test (`test/GotenbergSharpClient.AotSmokeTest`) is a native binary that needs a server already running, so the workflow starts a `gotenberg/gotenberg:8` container with basic auth (`testuser`/`testpass`) on port 3000 just for it. Publishing it also fails the build on any trim or AOT warning.
