@@ -32,7 +32,7 @@ The client now supports Gotenberg 9 next to 7 and 8. It reads the version of the
   - The solution holds every project under `examples/`, so `dotnet build` and CI compile them. Six were missing from it, and five of those had not compiled since the namespaces changed in 3.0
 - **Docs:**
   - New pages [Gotenberg 9](docs/gotenberg-9.md) and [Stages](docs/stages.md). The quick starts and `docker/docker-compose-basic-auth.yml` pin `gotenberg/gotenberg:9`
-  - New page [Retries and Timeouts](docs/resilience.md): a retry with Microsoft.Extensions.Http.Resilience, a timeout for the whole request and one for each attempt, the standard resilience handler with timeouts that fit conversions, webhooks sent twice, the client without DI, and how the `RetryPolicy` settings map. The DIExample retries that way
+  - New page [Retries and Timeouts](docs/resilience.md): a retry with Microsoft.Extensions.Http.Resilience, a timeout for the whole request and one for each attempt, a deadline that also covers reading the response, the standard resilience handler with timeouts that fit conversions, webhooks sent twice, the client without DI, and how the `RetryPolicy` settings map. The DIExample retries that way
 - **Native AOT and Trimming Support:**
   - The package is marked `IsAotCompatible` for .NET 8 and newer and builds without trim or AOT warnings
   - JSON is now written and read with source-generated `System.Text.Json`; the `Newtonsoft.Json` dependency is removed
