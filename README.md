@@ -8,7 +8,7 @@
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/Jaben?logo=githubsponsors&label=sponsors)](https://github.com/sponsors/Jaben)
 [![GitHub stars](https://img.shields.io/github/stars/ChangemakerStudios/GotenbergSharpApiClient?style=flat&logo=github&label=stars)](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)
 
-.NET C# client for [Gotenberg](https://gotenberg.dev/) v7, v8 & v9 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. Includes a configurable [Polly](http://www.thepollyproject.org/) retry policy with exponential backoff.
+.NET C# client for [Gotenberg](https://gotenberg.dev/) v7, v8 & v9 — a Docker-powered stateless API for converting & merging HTML, Markdown, and Office documents to PDF. It registers as a typed `HttpClient`, so retries can be added with [Microsoft.Extensions.Http.Resilience](https://learn.microsoft.com/dotnet/core/resilience/http-resilience).
 
 **If this library saves you time, please [⭐ star it on GitHub](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)** — stars are how other developers find it — **and consider [sponsoring](https://github.com/sponsors/Jaben)** to keep it maintained.
 
@@ -22,7 +22,7 @@
 - **PDF Manipulation** — merge, flatten, rotate, split, encrypt, watermark, stamp, embed files
 - **PDF/A & PDF/UA** compliance, metadata & bookmark read/write
 - **Webhooks** for async PDF generation
-- **DI-Ready** with Polly retry policies
+- **DI-Ready** typed `HttpClient`; add retries with Microsoft.Extensions.Http.Resilience ([Retries and Timeouts](https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/))
 
 ## Quick Start
 

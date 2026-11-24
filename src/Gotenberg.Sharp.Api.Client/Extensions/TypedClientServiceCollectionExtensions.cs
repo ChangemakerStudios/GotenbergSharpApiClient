@@ -37,8 +37,13 @@ public static class TypedClientServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">Thrown when services is null.</exception>
     /// <remarks>
     ///     <para>
-    ///         This method registers the GotenbergSharpClient with automatic compression, retry policies,
-    ///         and basic authentication if credentials are provided in the options.
+    ///         This method registers the GotenbergSharpClient with automatic decompression and, when
+    ///         credentials are provided in the options, basic authentication.
+    ///     </para>
+    ///     <para>
+    ///         The client does not retry failed requests. To retry them, add a resilience handler to the returned
+    ///         builder, for example with Microsoft.Extensions.Http.Resilience, and decide what to retry with
+    ///         <see cref="GotenbergResiliencePredicates" />.
     ///     </para>
     ///     <para>
     ///         Options must be registered before calling this method using
@@ -74,8 +79,13 @@ public static class TypedClientServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">Thrown when services is null.</exception>
     /// <remarks>
     ///     <para>
-    ///         This method registers the GotenbergSharpClient with automatic compression, retry policies,
-    ///         and basic authentication if credentials are provided in the options.
+    ///         This method registers the GotenbergSharpClient with automatic decompression and, when
+    ///         credentials are provided in the options, basic authentication.
+    ///     </para>
+    ///     <para>
+    ///         The client does not retry failed requests. To retry them, add a resilience handler to the returned
+    ///         builder, for example with Microsoft.Extensions.Http.Resilience, and decide what to retry with
+    ///         <see cref="GotenbergResiliencePredicates" />.
     ///     </para>
     ///     <para>
     ///         Options must be registered before calling this method using
@@ -122,8 +132,12 @@ public static class TypedClientServiceCollectionExtensions
     /// <remarks>
     ///     <para>
     ///         This overload allows full control over HttpClient configuration while still using the options
-    ///         for basic authentication and retry policies. The client is configured with automatic compression,
-    ///         timeout handling, and exponential backoff retry policies based on the registered options.
+    ///         for basic authentication. The client is configured with automatic decompression and timeout handling.
+    ///     </para>
+    ///     <para>
+    ///         The client does not retry failed requests. To retry them, add a resilience handler to the returned
+    ///         builder, for example with Microsoft.Extensions.Http.Resilience, and decide what to retry with
+    ///         <see cref="GotenbergResiliencePredicates" />.
     ///     </para>
     ///     <para>
     ///         Options must be registered before calling this method using
@@ -169,8 +183,12 @@ public static class TypedClientServiceCollectionExtensions
     /// <remarks>
     ///     <para>
     ///         This overload allows full control over HttpClient configuration while still using the options
-    ///         for basic authentication and retry policies. The client is configured with automatic compression,
-    ///         timeout handling, and exponential backoff retry policies based on the registered options.
+    ///         for basic authentication. The client is configured with automatic decompression and timeout handling.
+    ///     </para>
+    ///     <para>
+    ///         The client does not retry failed requests. To retry them, add a resilience handler to the returned
+    ///         builder, for example with Microsoft.Extensions.Http.Resilience, and decide what to retry with
+    ///         <see cref="GotenbergResiliencePredicates" />.
     ///     </para>
     ///     <para>
     ///         Options must be registered before calling this method using
@@ -249,7 +267,6 @@ public static class TypedClientServiceCollectionExtensions
                 // Return a pass-through handler if no auth is configured
                 return new PassThroughHandler();
             })
-            .AddPolicyHandler(PolicyFactory.CreatePolicyFromSettings<TOptions>)
             .SetHandlerLifetime(TimeSpan.FromMinutes(6));
 
         return builder;

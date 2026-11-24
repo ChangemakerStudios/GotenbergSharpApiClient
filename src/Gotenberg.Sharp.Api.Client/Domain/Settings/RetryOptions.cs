@@ -16,32 +16,32 @@
 namespace Gotenberg.Sharp.API.Client.Domain.Settings;
 
 /// <summary>
-/// Configuration options for retry behavior when requests to Gotenberg fail due to transient errors.
+/// The settings of the built-in retry that the client had before 4.0. Nothing reads them any more:
+/// <see cref="Enabled" /> set to <see langword="true" /> fails options validation, so that a configuration that turned
+/// retry on is noticed instead of silently losing it. Add a resilience handler to the <c>IHttpClientBuilder</c> that
+/// <c>AddGotenbergSharpClient()</c> returns instead, with
+/// <see cref="Infrastructure.Pipeline.GotenbergResiliencePredicates" /> deciding what to retry.
 /// </summary>
+[Obsolete(GotenbergSharpClientOptions.RetryRemovedMessage)]
 public class RetryOptions
 {
     /// <summary>
-    /// Enables or disables retry behavior. Default: false (disabled).
-    /// When enabled, failed requests will be retried with exponential backoff.
+    /// Turned the built-in retry on. <see langword="true" /> now fails options validation.
     /// </summary>
     public bool Enabled { get; set; }
 
     /// <summary>
-    /// Number of retry attempts for failed requests. Default: 3.
-    /// Only applies when Enabled is true.
+    /// Not used. The number of retries is <c>MaxRetryAttempts</c> of a resilience retry strategy.
     /// </summary>
     public int RetryCount { get; set; } = 3;
 
     /// <summary>
-    /// Exponential backoff power for calculating sleep duration between retries. Default: 1.5.
-    /// Sleep duration is calculated as: TimeSpan.FromSeconds(Math.Pow(BackoffPower, retryAttempt)).
-    /// Higher values result in longer waits between retries.
+    /// Not used. The delay between retries is set on a resilience retry strategy.
     /// </summary>
     public double BackoffPower { get; set; } = 1.5;
 
     /// <summary>
-    /// Enables or disables logging of retry attempts. Default: true.
-    /// When enabled, retry attempts and failures are logged for debugging.
+    /// Not used. A resilience pipeline logs its retries through the application's logging.
     /// </summary>
     public bool LoggingEnabled { get; set; } = true;
 }

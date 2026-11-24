@@ -22,7 +22,6 @@ All examples share a common configuration file: `appsettings.json`
 The default configuration includes:
 - **Service URL**: `http://localhost:3000`
 - **Basic Auth**: Username `testuser`, Password `testpass` (matching docker-compose-basic-auth.yml)
-- **Retry Policy**: Enabled with 4 retries and exponential backoff
 
 You can modify these settings in `appsettings.json` or update the credentials directly in the example code.
 
@@ -37,7 +36,7 @@ dotnet run [output-directory]
 ```
 
 ### DIExample
-Demonstrates dependency injection setup with logging and Polly retry policy.
+Demonstrates dependency injection setup with logging, and a retry through Microsoft.Extensions.Http.Resilience (see [Retries and Timeouts](../docs/resilience.md)).
 
 ```bash
 cd DIExample
