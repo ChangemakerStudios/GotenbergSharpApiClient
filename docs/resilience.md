@@ -43,18 +43,19 @@ This retries up to 3 times, about 2, 4 and 8 seconds apart: the defaults of `Htt
 
 ## Timeouts
 
-`GotenbergSharpClientOptions.TimeOut`, 3 minutes by default, is the `HttpClient.Timeout` of the client registered with `AddGotenbergSharpClient()`, and the only time limit the client sets. It covers every attempt and the waits between them. A request that outlasts it throws `TaskCanceledException`. Without a retry, a request has one attempt, and `TimeOut` limits it.
+`GotenbergSharpClientOptions.TimeOut`, 3 minutes by default, is the `HttpClient.Timeout` of the client registered with `AddGotenbergSharpClient()`, and the only time limit the client sets. The client counts it from the start of a call to the end of the response: the version lookup the call may make first, every attempt and the waits between them, and the reading of the document or text Gotenberg returns. A call that outlasts it throws `TaskCanceledException` with a `TimeoutException` inside it, on every build of the client. A client you create yourself counts the `Timeout` of its `HttpClient` the same way.
 
-With a retry, raise `TimeOut` so that it covers every attempt and wait, or set it to `Timeout.InfiniteTimeSpan` and start the pipeline with a timeout for the whole request. A timeout added after the retry limits each attempt:
+Gotenberg sends the response headers once the document is ready, and the client reads the document after them, so the time a document takes to arrive counts as well. Raise `TimeOut` for large documents on slow links.
+
+With a retry, raise `TimeOut` so that it covers every attempt and wait. A timeout added to the pipeline after the retry limits each attempt:
 
 ```csharp
 services.AddOptions<GotenbergSharpClientOptions>()
     .Bind(Configuration.GetSection("GotenbergSharpClient"))
-    .PostConfigure(options => options.TimeOut = Timeout.InfiniteTimeSpan);
+    .PostConfigure(options => options.TimeOut = TimeSpan.FromMinutes(10));
 
 services.AddGotenbergSharpClient()
     .AddResilienceHandler("gotenberg", pipeline => pipeline
-        .AddTimeout(TimeSpan.FromMinutes(10))
         .AddRetry(new HttpRetryStrategyOptions
         {
             ShouldHandle = args => ValueTask.FromResult(
@@ -64,17 +65,15 @@ services.AddGotenbergSharpClient()
         .AddTimeout(TimeSpan.FromMinutes(3)));
 ```
 
-Here the request gets 10 minutes and each attempt 3. A timeout of the pipeline throws `TimeoutRejectedException`, which `IsTransientFailure` does not retry.
+Here the call gets 10 minutes and each attempt 3. The timeout of an attempt throws `TimeoutRejectedException`, which `IsTransientFailure` does not retry.
 
-These timeouts end when the response headers arrive. Gotenberg sends them once the document is ready, and a call that returns a document, such as a conversion, a merge or a screenshot, reads the document after them. `TimeOut` also ends at the headers of such a call. Only for a call that returns text, such as the version lookup or `ReadPdfMetadataAsync`, does `TimeOut` cover the whole response. With `TimeOut` set to `Timeout.InfiniteTimeSpan`, nothing limits the reading of a response but the cancellation token of the call. To limit a whole call, reading the response included, pass a token with a deadline:
+The timeouts of a pipeline end when the response headers arrive, because the client reads the document after the pipeline has returned. So keep `TimeOut` as the limit of the whole call: set to `Timeout.InfiniteTimeSpan`, it leaves the reading of a document to the cancellation token of the call. A token with a deadline limits a call too, and the call ends at whichever comes first. When the token fires, the call throws an `OperationCanceledException` for that token, without a `TimeoutException`:
 
 ```csharp
 using var deadline = new CancellationTokenSource(TimeSpan.FromMinutes(12));
 
 var pdf = await sharpClient.HtmlToPdfAsync(builder, deadline.Token);
 ```
-
-The token reaches the reading of the document only in the builds of the client for .NET 8 and newer. The builds for .NET Standard, which .NET Framework and .NET before 8 use, read the document without it, so there a deadline stops a call only until the headers arrive.
 
 The handler lifetime is the default of `IHttpClientFactory`, 2 minutes. Call `SetHandlerLifetime` on the builder that `AddGotenbergSharpClient()` returns to change it. It is not a time limit: a handler that expires still completes the requests it is sending.
 
@@ -104,7 +103,7 @@ services.AddGotenbergSharpClient()
     });
 ```
 
-Set `TimeOut` to `Timeout.InfiniteTimeSpan` with it, as above, so that the timeouts of the handler are the ones that apply: its total timeout to the whole request, and its attempt timeout to each attempt. Like the timeouts above, they end at the response headers.
+Its timeouts end at the response headers, like those of the pipeline above, so set `TimeOut` longer than its total timeout, for example 12 minutes. The total timeout of the handler then limits the request, its attempt timeout each attempt, and `TimeOut` the whole call with the reading of the document.
 
 ## Webhooks and conversions sent twice
 
