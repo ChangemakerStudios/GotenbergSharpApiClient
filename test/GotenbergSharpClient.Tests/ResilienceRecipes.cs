@@ -33,6 +33,17 @@ internal static class ResilienceRecipes
         ShouldHandle = ShouldRetry
     };
 
+    /// <summary>The pipeline of the page with a timeout for the whole request and one for each attempt.</summary>
+    internal static ResiliencePipelineBuilder<HttpResponseMessage> RetryWithTimeouts(
+        ResiliencePipelineBuilder<HttpResponseMessage> pipeline,
+        TimeSpan request,
+        TimeSpan attempt,
+        int maxRetryAttempts) =>
+        pipeline
+            .AddTimeout(request)
+            .AddRetry(Retry(maxRetryAttempts))
+            .AddTimeout(attempt);
+
     /// <summary>The retry of the page that sends no POST twice.</summary>
     internal static HttpRetryStrategyOptions RetryWithoutResendingPosts(int maxRetryAttempts)
     {

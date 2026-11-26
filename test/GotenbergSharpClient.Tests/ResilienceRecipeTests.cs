@@ -11,6 +11,7 @@ using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
 
 using Polly;
+using Polly.Timeout;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -60,6 +61,49 @@ public class ResilienceRecipeTests
 
         await act.Should().ThrowAsync<GotenbergApiException>();
         handler.Calls.Should().Be(expectedCalls, "the standard handler's own predicate would retry the 500 too");
+    }
+
+    [Test]
+    public async Task Timeouts_CutOffEachAttempt_AndDoNotRetryIt()
+    {
+        var attemptTimeout = TimeSpan.FromMilliseconds(200);
+        var attempts = 0;
+        var handler = new StubHandler(async cancellationToken =>
+        {
+            if (attempts++ == 0)
+            {
+                return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) { Content = new StringContent("busy") };
+            }
+
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+
+            return Version();
+        });
+
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddOptions<GotenbergSharpClientOptions>()
+            .Configure(o =>
+            {
+                o.ServiceUrl = new Uri("http://gotenberg.invalid");
+                o.TimeOut = Timeout.InfiniteTimeSpan;
+            });
+        services.AddGotenbergSharpClient()
+            .ConfigurePrimaryHttpMessageHandler(() => handler)
+            .AddResilienceHandler("gotenberg", pipeline => ResilienceRecipes.RetryWithTimeouts(
+                pipeline,
+                request: TimeSpan.FromSeconds(10),
+                attempt: attemptTimeout,
+                maxRetryAttempts: 2));
+
+        var client = services.BuildServiceProvider()
+            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
+
+        var act = () => client.GetVersion();
+
+        (await act.Should().ThrowAsync<TimeoutRejectedException>())
+            .Which.Timeout.Should().Be(attemptTimeout, "the timeout of the attempt, not of the request, cut it off");
+        handler.Calls.Should().Be(2, "the 503 is retried, and the attempt that ran out of time is not");
     }
 
     [Test]
@@ -161,8 +205,13 @@ public class ResilienceRecipeTests
     }
 
     /// <summary>Reads the request body, as a real transport does, then answers.</summary>
-    private sealed class StubHandler(Func<HttpResponseMessage> respond) : HttpMessageHandler
+    private sealed class StubHandler(Func<CancellationToken, Task<HttpResponseMessage>> respond) : HttpMessageHandler
     {
+        public StubHandler(Func<HttpResponseMessage> respond)
+            : this(_ => Task.FromResult(respond()))
+        {
+        }
+
         public int Calls { get; private set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(
@@ -176,7 +225,7 @@ public class ResilienceRecipeTests
                 await request.Content.CopyToAsync(Stream.Null, cancellationToken);
             }
 
-            return respond();
+            return await respond(cancellationToken);
         }
     }
 

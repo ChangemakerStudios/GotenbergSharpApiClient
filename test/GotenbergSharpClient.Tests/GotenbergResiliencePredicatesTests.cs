@@ -3,6 +3,8 @@ using System.Net;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Infrastructure.Pipeline;
 
+using Polly.Timeout;
+
 namespace GotenbergSharpClient.Tests;
 
 [TestFixture]
@@ -28,9 +30,17 @@ public class GotenbergResiliencePredicatesTests
         GotenbergResiliencePredicates.IsTransientFailure(null, new HttpRequestException("connection refused"))
             .Should().BeTrue();
 
-    [Test]
-    public void Timeout_IsNotTransient() =>
-        GotenbergResiliencePredicates.IsTransientFailure(null, new TimeoutException("Request Timeout"))
+    private static IEnumerable<TestCaseData> Timeouts()
+    {
+        yield return new TestCaseData(new TaskCanceledException("HttpClient.Timeout", new TimeoutException()))
+            .SetName("TimeOut running out is not transient");
+        yield return new TestCaseData(new TimeoutRejectedException())
+            .SetName("A timeout of the resilience pipeline is not transient");
+    }
+
+    [TestCaseSource(nameof(Timeouts))]
+    public void Timeout_IsNotTransient(Exception timeout) =>
+        GotenbergResiliencePredicates.IsTransientFailure(null, timeout)
             .Should().BeFalse("a conversion that ran out of time once is likely to do so again");
 
     [Test]
