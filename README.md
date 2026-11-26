@@ -12,7 +12,7 @@
 
 **If this library saves you time, please [⭐ star it on GitHub](https://github.com/ChangemakerStudios/GotenbergSharpApiClient)** — stars are how other developers find it — **and consider [sponsoring](https://github.com/sponsors/Jaben)** to keep it maintained.
 
-> **v3.3.0** — Standalone encrypt and rotate check the Gotenberg version first, so older servers get a clear error instead of a 404. v3.2.1 brought more reliable retries, exact A-series paper sizes, `Gotenberg-Trace` on API errors and options validation. See [CHANGES.MD](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/blob/master/CHANGES.MD) for details.
+> **v4.0.0** — Gotenberg 9 support alongside 7 and 8, Native AOT and trimming support, and `System.Text.Json` in place of Newtonsoft.Json. This is a breaking release: the built-in Polly retry is gone (see [Retries and Timeouts](https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/)), `JObject` APIs now take `IDictionary<string, object>` or `JsonObject`, and `TimeOut` covers the whole call. See [CHANGES.MD](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/blob/master/CHANGES.MD) for the full list.
 
 ## Features
 

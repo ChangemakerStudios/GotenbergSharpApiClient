@@ -1,6 +1,9 @@
 # Release History
 
-## Unreleased
+## v4.0.0
+Thank you to [@lahma](https://github.com/lahma) (PRs #95, #96, #97 and #98) and [@chrisbbe](https://github.com/chrisbbe) (PR #82) for this release.
+
+This is a major release. Read **Breaking Changes** below before upgrading: the built-in retry and the Polly and Newtonsoft.Json dependencies are gone, `JObject` is replaced by `IDictionary<string, object>` and `JsonObject`, and `TimeOut` now covers the whole call.
 
 The client now supports Gotenberg 9 next to 7 and 8. It reads the version of the service and sends each request in the form that API takes, so most code needs no change. Gotenberg 9 refuses a few options of Gotenberg 8, and some behave differently; [Gotenberg 9](docs/gotenberg-9.md) lists them and says what to do. Requests to Gotenberg 7 and 8 are unchanged except for the entries under **Changed** and **Fixed**.
 
