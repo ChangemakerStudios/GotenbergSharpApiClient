@@ -16,6 +16,8 @@
 using Gotenberg.Sharp.API.Client.Domain.ContentTypes;
 using Gotenberg.Sharp.API.Client.Domain.LibreOffice;
 using Gotenberg.Sharp.API.Client.Infrastructure.ContentTypes;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+using Gotenberg.Sharp.API.Client.Domain.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
@@ -44,7 +46,12 @@ public class MergeOfficeRequest : PdfRequestBase
     /// </summary>
     public LibreOfficeOptions? LibreOfficeOptions { get; set; }
 
-    protected override IEnumerable<HttpContent> ToHttpContent()
+    internal override bool ReadsNativeTaggedPdf => true;
+
+    // Gotenberg 9 merges with a stage, which must come before those of the cross-cutting options.
+    internal override void AddRouteStages(StageList stages) => stages.Add(Constants.Gotenberg.Stages.Ops.Merge);
+
+    protected override IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         var validItems = (this.Assets?.FindValidOfficeMergeItems(this._resolver)).IfNullEmpty().ToList();
 
@@ -54,23 +61,38 @@ public class MergeOfficeRequest : PdfRequestBase
                     ", ",
                     MergeOfficeConstants.AllowedExtensions)}");
 
-        yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
+        if (api == GotenbergApiVersion.V8)
+            yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Merge);
 
         foreach (var item in validItems.ToHttpContent())
             yield return item;
 
-        foreach (var item in this.Config.IfNullEmptyContent())
+        var configItems = this.Config.IfNullEmptyContent(api).ToList();
+
+        foreach (var item in configItems)
             yield return item;
 
         if (this.PrintAsLandscape)
             yield return CreateFormDataItem("true", Constants.Gotenberg.LibreOffice.Routes.Convert.Landscape);
 
-        if (this.PageRanges.IsSet())
-            yield return CreateFormDataItem(this.PageRanges, Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges);
+        // Gotenberg reads only the first value of a repeated field, so the first one sent wins:
+        // the hard-coded merge (a field on 8, a stage on 9) over LibreOfficeOptions.Merge,
+        // Config.PageRanges over PageRanges.
+        var pageRangesField = api == GotenbergApiVersion.V9
+            ? Constants.Gotenberg.LibreOffice.Gotenberg9.PageRanges
+            : Constants.Gotenberg.LibreOffice.Routes.Convert.PageRanges;
 
-        foreach (var item in this.LibreOfficeOptions.IfNullEmptyContent())
-            yield return item;
+        var rangesSent = configItems.Any(i => FieldName(i) == pageRangesField);
 
-        foreach (var content in base.ToHttpContent()) yield return content;
+        if (!rangesSent && this.PageRanges.IsSet())
+            yield return CreateFormDataItem(this.PageRanges, pageRangesField);
+
+        foreach (var item in this.LibreOfficeOptions.IfNullEmptyContent(api))
+            if (FieldName(item) != Constants.Gotenberg.LibreOffice.Routes.Convert.Merge)
+                yield return item;
+
+        foreach (var content in base.ToHttpContent(api)) yield return content;
     }
+
+    private static string? FieldName(HttpContent content) => content.Headers.ContentDisposition?.Name?.Trim('"');
 }

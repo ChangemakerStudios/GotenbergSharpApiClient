@@ -25,13 +25,13 @@ public sealed record EmulatedMediaFeature
     /// <summary>
     /// The CSS media feature name (e.g., "prefers-color-scheme", "prefers-reduced-motion").
     /// </summary>
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public string Name { get; }
 
     /// <summary>
     /// The value to set for the CSS media feature (e.g., "dark", "reduce").
     /// </summary>
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public string Value { get; }
 
     private EmulatedMediaFeature(string name, string value)

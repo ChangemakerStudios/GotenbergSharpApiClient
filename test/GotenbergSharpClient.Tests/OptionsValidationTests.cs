@@ -1,4 +1,5 @@
 using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Domain.Shared;
 using Gotenberg.Sharp.API.Client.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -30,18 +31,42 @@ public class OptionsValidationTests
         Read<GotenbergSharpClientOptions>(o => o.TimeOut = Timeout.InfiniteTimeSpan)
             .TimeOut.Should().Be(Timeout.InfiniteTimeSpan);
 
+#pragma warning disable CS0618 // These tests check what happens to the obsolete retry settings.
     [Test]
-    public void NegativeRetryCount_IsRejectedWhenRetryIsEnabled() =>
-        AssertRejected(o => o.RetryPolicy = new RetryOptions { Enabled = true, RetryCount = -1 }, nameof(RetryOptions.RetryCount));
+    public void EnabledRetry_IsRejected_WithAPointerToTheResilienceDocs() =>
+        AssertRejected(o => o.RetryPolicy = new RetryOptions { Enabled = true }, "/resilience/");
 
     [Test]
-    public void NegativeBackoff_IsRejectedWhenRetryIsEnabled() =>
-        AssertRejected(o => o.RetryPolicy = new RetryOptions { Enabled = true, BackoffPower = -1 }, nameof(RetryOptions.BackoffPower));
+    public void EnabledRetryFromConfiguration_IsRejected()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["GotenbergSharpClient:ServiceUrl"] = "http://gotenberg:3000",
+                ["GotenbergSharpClient:RetryPolicy:Enabled"] = "true",
+                ["GotenbergSharpClient:RetryPolicy:RetryCount"] = "4"
+            })
+            .Build();
+
+        var services = new ServiceCollection();
+        services.AddOptions<GotenbergSharpClientOptions>().Bind(configuration.GetSection("GotenbergSharpClient"));
+        services.AddGotenbergSharpClient();
+
+        var act = () => services.BuildServiceProvider().GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
+
+        act.Should().Throw<OptionsValidationException>()
+            .WithMessage($"*{nameof(GotenbergSharpClientOptions.RetryPolicy)}.{nameof(RetryOptions.Enabled)} is not supported*");
+    }
 
     [Test]
-    public void NegativeRetryCount_IsIgnoredWhenRetryIsDisabled() =>
+    public void DisabledRetry_IsAccepted() =>
         Read<GotenbergSharpClientOptions>(o => o.RetryPolicy = new RetryOptions { Enabled = false, RetryCount = -1 })
-            .RetryPolicy.RetryCount.Should().Be(-1);
+            .RetryPolicy.RetryCount.Should().Be(-1, "nothing reads the retry settings any more");
+#pragma warning restore CS0618
+
+    [Test]
+    public void UndefinedApiVersion_IsRejected() =>
+        AssertRejected(o => o.ApiVersion = (GotenbergApiVersion)7, nameof(GotenbergSharpClientOptions.ApiVersion));
 
     [Test]
     public void OptionsSubclass_IsValidated()

@@ -18,6 +18,11 @@ namespace Gotenberg.Sharp.API.Client.Domain.Split;
 /// <summary>
 /// Cross-cutting split options. When splitting returns multiple files, Gotenberg returns a ZIP.
 /// </summary>
+/// <remarks>
+/// On Gotenberg 9: intervals are a <c>split</c> stage of that many pages; pages with unify a
+/// <c>select</c> stage; pages without unify a <c>select</c> stage then a <c>split</c> of one page each,
+/// as Gotenberg 8 wrote one PDF per selected page.
+/// </remarks>
 public class SplitOptions : FacetBase
 {
     [MultiFormHeader(Constants.Gotenberg.CrossCuttingOptions.SplitMode)]

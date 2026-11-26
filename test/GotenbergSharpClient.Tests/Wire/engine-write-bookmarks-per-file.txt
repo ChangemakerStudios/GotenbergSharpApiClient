@@ -1,0 +1,7 @@
+POST forms/pdfengines/bookmarks/write
+part name=bookmarks type=application/json
+    {"a.pdf":[{"title":"A","page":1,"children":[]}],"b.pdf":[{"title":"B","page":1,"children":[]}]}
+part name=files filename=a.pdf type=application/pdf
+    %PDF-1.4 fake
+part name=files filename=b.pdf type=application/pdf
+    %PDF-1.4 fake

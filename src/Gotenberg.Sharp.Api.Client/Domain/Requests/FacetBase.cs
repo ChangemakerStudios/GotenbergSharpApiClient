@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Gotenberg.Sharp.API.Client.Domain.Authentication;
@@ -27,16 +28,58 @@ using Gotenberg.Sharp.API.Client.Domain.Split;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
 
+// Form fields are discovered by reflecting over the [MultiFormHeader] properties of the concrete type,
+// and LegacyContentOverrides looks up its ToHttpContent overrides; the annotation keeps those properties
+// and methods when the assembly is trimmed.
+[DynamicallyAccessedMembers(LegacyContentOverrides.ReflectedMembers)]
 public abstract class FacetBase : IConvertToHttpContent
 {
-    public virtual IEnumerable<HttpContent> ToHttpContent()
+    /// <summary>
+    /// The form parts of this facet for Gotenberg 7 and 8.
+    /// </summary>
+    /// <remarks>
+    /// Kept for facets written before requests were rendered per Gotenberg API. It returns the
+    /// properties of the facet only, whatever <see cref="ToHttpContent(GotenbergApiVersion)" /> an
+    /// override adds, so that the two methods can call each other's base without recursing. A facet
+    /// that overrides only this method is still sent to Gotenberg 7 and 8 as before, but cannot be
+    /// sent to Gotenberg 9: override <see cref="ToHttpContent(GotenbergApiVersion)" /> instead.
+    /// </remarks>
+    public virtual IEnumerable<HttpContent> ToHttpContent() => this.RenderProperties(GotenbergApiVersion.V8);
+
+    /// <summary>
+    /// The form parts of this facet for <paramref name="api" />: one per property declared with
+    /// <see cref="MultiFormHeaderAttribute" /> that is not null, named by its
+    /// <see cref="Gotenberg9FieldAttribute" /> on Gotenberg 9 when it has one. An override returns
+    /// its own parts together with <c>base.ToHttpContent(api)</c>.
+    /// </summary>
+    public virtual IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api) => this.RenderProperties(api);
+
+    internal IEnumerable<HttpContent> RenderHttpContent(GotenbergApiVersion api)
+    {
+        if (!LegacyContentOverrides.OverridesOnlyLegacy(this.GetType())) return this.ToHttpContent(api);
+
+        // A facet written against the parameterless method: on 7 and 8 it is called exactly as before.
+        // The request that holds it has refused it for Gotenberg 9 already (BuildRequestBase.FindUnrenderableOn).
+        return LegacyContentOverrides.FindRefusal(this.GetType(), api) is { } refusal
+            ? throw refusal
+            : this.ToHttpContent();
+    }
+
+    private IEnumerable<HttpContent> RenderProperties(GotenbergApiVersion api)
     {
         return MultiFormPropertyItem.FromType(GetType())
-            .Select(GetHttpContentFromProperty)
+            .Select(item => GetHttpContentFromProperty(item, api))
             .WhereNotNull();
     }
 
-    internal virtual HttpContent? GetHttpContentFromProperty(MultiFormPropertyItem item)
+    /// <summary>
+    /// The value to send for a property on <paramref name="api" />, before it is written as text. A
+    /// facet whose value has another format on Gotenberg 9 overrides it and returns the converted
+    /// value; the default returns <paramref name="value" /> unchanged.
+    /// </summary>
+    internal virtual object GetValueForApi(MultiFormPropertyItem item, object value, GotenbergApiVersion api) => value;
+
+    internal virtual HttpContent? GetHttpContentFromProperty(MultiFormPropertyItem item, GotenbergApiVersion api)
     {
         var value = item.Property.GetValue(this);
 
@@ -53,7 +96,7 @@ public abstract class FacetBase : IConvertToHttpContent
         }
         else
         {
-            var convertedValue = GetValueAsInvariantCultureString(value);
+            var convertedValue = GetValueAsInvariantCultureString(this.GetValueForApi(item, value, api));
 
             if (convertedValue == null)
             {
@@ -67,7 +110,7 @@ public abstract class FacetBase : IConvertToHttpContent
         httpContent.Headers.ContentDisposition =
             new ContentDispositionHeaderValue(item.Attribute.ContentDisposition)
             {
-                Name = item.Attribute.Name, FileName = item.Attribute.FileName
+                Name = item.NameFor(api), FileName = item.Attribute.FileName
             };
 
         return httpContent;
@@ -88,12 +131,18 @@ public abstract class FacetBase : IConvertToHttpContent
             LibrePdfFormats format => format.ToFormDataValue(),
             ConversionPdfFormats format => format.ToFormDataValue(),
             PdfPassword password => password.Value,
-            List<Cookie> cookies => JsonConvert.SerializeObject(cookies),
+            List<Cookie> cookies => JsonSerializer.Serialize(cookies, GotenbergJsonContext.Instance.Cookies),
             ScreenshotFormat screenshotFormat => screenshotFormat.ToFormValue(),
-            List<EmulatedMediaFeature> features => JsonConvert.SerializeObject(
-                features.ToDictionary(f => f.Name, f => f.Value)),
-            List<GotenbergStatusCode> codes => JsonConvert.SerializeObject(codes.Select(c => c.Value)),
-            List<DomainName> domains => JsonConvert.SerializeObject(domains.Select(d => d.Value)),
+            List<EmulatedMediaFeature> features => JsonSerializer.Serialize(
+                features.ToDictionary(f => f.Name, f => f.Value),
+                GotenbergJsonContext.Instance.StringMap),
+            List<GotenbergStatusCode> codes => JsonSerializer.Serialize(
+                codes.Select(c => c.Value).ToList(),
+                GotenbergJsonContext.Instance.Integers),
+            List<DomainName> domains => JsonSerializer.Serialize(
+                domains.Select(d => d.Value).ToList(),
+                GotenbergJsonContext.Instance.Strings),
+            IDictionary<string, object> json => JsonObjectWriter.ToJson(json!),
             CssSelector selector => selector.Value,
             OverlaySource overlaySource => overlaySource.ToFormValue(),
             SplitMode splitMode => splitMode.ToFormValue(),

@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 using Microsoft.Extensions.Options;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Settings;
@@ -39,18 +41,21 @@ internal sealed class GotenbergSharpClientOptionsValidator<TOptions> : IValidate
             failures.Add($"{nameof(options.TimeOut)} must be positive, or Timeout.InfiniteTimeSpan.");
         }
 
-        if (options.RetryPolicy is { Enabled: true } retry)
+        if (!Enum.IsDefined(typeof(GotenbergApiVersion), options.ApiVersion))
         {
-            if (retry.RetryCount < 0)
-            {
-                failures.Add($"{nameof(options.RetryPolicy)}.{nameof(retry.RetryCount)} must not be negative.");
-            }
-
-            if (retry.BackoffPower < 0)
-            {
-                failures.Add($"{nameof(options.RetryPolicy)}.{nameof(retry.BackoffPower)} must not be negative.");
-            }
+            failures.Add($"{nameof(options.ApiVersion)} must be Auto, V8 or V9.");
         }
+
+#pragma warning disable CS0618 // RetryPolicy is read only to reject the retry the client no longer has.
+        if (options.RetryPolicy is { Enabled: true })
+        {
+            failures.Add(
+                $"{nameof(options.RetryPolicy)}.{nameof(RetryOptions.Enabled)} is not supported: the client has no built-in retry since 4.0. " +
+                $"Remove {nameof(options.RetryPolicy)} from the options and add a resilience handler to the IHttpClientBuilder " +
+                "that AddGotenbergSharpClient() returns, for example with Microsoft.Extensions.Http.Resilience: " +
+                "https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/");
+        }
+#pragma warning restore CS0618
 
         return failures.Count == 0
             ? ValidateOptionsResult.Success

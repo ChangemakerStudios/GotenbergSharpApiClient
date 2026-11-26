@@ -3,7 +3,7 @@ using Gotenberg.Sharp.API.Client.Domain.HtmlBehavior;
 using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Shared;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -177,11 +177,11 @@ public class ChromiumMissingFieldsTests
 
         content.Should().NotBeNull();
         var json = await content!.ReadAsStringAsync();
-        var jObject = JObject.Parse(json);
+        var jObject = JsonNode.Parse(json)!.AsObject();
 
         jObject.Should().HaveCount(2);
-        jObject["prefers-color-scheme"]!.Value<string>().Should().Be("dark");
-        jObject["prefers-reduced-motion"]!.Value<string>().Should().Be("reduce");
+        jObject["prefers-color-scheme"]!.GetValue<string>().Should().Be("dark");
+        jObject["prefers-reduced-motion"]!.GetValue<string>().Should().Be("reduce");
     }
 
     [Test]
@@ -202,11 +202,11 @@ public class ChromiumMissingFieldsTests
 
         content.Should().NotBeNull();
         var json = await content!.ReadAsStringAsync();
-        var jArray = JArray.Parse(json);
+        var jArray = JsonNode.Parse(json)!.AsArray();
 
         jArray.Should().HaveCount(2);
-        jArray[0].Value<int>().Should().Be(499);
-        jArray[1].Value<int>().Should().Be(599);
+        jArray[0]!.GetValue<int>().Should().Be(499);
+        jArray[1]!.GetValue<int>().Should().Be(599);
     }
 
     [Test]
@@ -227,11 +227,11 @@ public class ChromiumMissingFieldsTests
 
         content.Should().NotBeNull();
         var json = await content!.ReadAsStringAsync();
-        var jArray = JArray.Parse(json);
+        var jArray = JsonNode.Parse(json)!.AsArray();
 
         jArray.Should().HaveCount(2);
-        jArray[0].Value<int>().Should().Be(400);
-        jArray[1].Value<int>().Should().Be(500);
+        jArray[0]!.GetValue<int>().Should().Be(400);
+        jArray[1]!.GetValue<int>().Should().Be(500);
     }
 
     [Test]
@@ -252,11 +252,11 @@ public class ChromiumMissingFieldsTests
 
         content.Should().NotBeNull();
         var json = await content!.ReadAsStringAsync();
-        var jArray = JArray.Parse(json);
+        var jArray = JsonNode.Parse(json)!.AsArray();
 
         jArray.Should().HaveCount(2);
-        jArray[0].Value<string>().Should().Be("cdn.example.com");
-        jArray[1].Value<string>().Should().Be("fonts.googleapis.com");
+        jArray[0]!.GetValue<string>().Should().Be("cdn.example.com");
+        jArray[1]!.GetValue<string>().Should().Be("fonts.googleapis.com");
     }
 
     [Test]

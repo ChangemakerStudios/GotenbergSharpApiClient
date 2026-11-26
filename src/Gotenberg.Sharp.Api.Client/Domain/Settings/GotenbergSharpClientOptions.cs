@@ -13,6 +13,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Gotenberg.Sharp.API.Client.Domain.Shared;
+
 namespace Gotenberg.Sharp.API.Client.Domain.Settings;
 
 /// <summary>
@@ -24,9 +26,20 @@ namespace Gotenberg.Sharp.API.Client.Domain.Settings;
 /// </remarks>
 public class GotenbergSharpClientOptions
 {
+    internal const string RetryRemovedMessage =
+        "The client has no built-in retry since 4.0, and RetryPolicy.Enabled = true fails options validation. " +
+        "Add a resilience handler to the IHttpClientBuilder that AddGotenbergSharpClient() returns, for example with " +
+        "Microsoft.Extensions.Http.Resilience: https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/";
+
     /// <summary>
-    /// HTTP timeout for requests to Gotenberg. Default: 3 minutes.
-    /// Increase this for large documents or complex conversions that may take longer to process.
+    /// Time limit of a call to Gotenberg, which <c>AddGotenbergSharpClient()</c> sets as the
+    /// <see cref="HttpClient.Timeout" />. Default: 3 minutes. It is the only time limit the client sets. The client
+    /// counts it from the start of a call to the end of the response: the version lookup the call may make first,
+    /// every attempt of a resilience handler added to the builder and the waits between them, and the reading of the
+    /// document or text Gotenberg returns. A call that outlasts it throws <see cref="TaskCanceledException" /> with a
+    /// <see cref="TimeoutException" /> inside it. A limit per attempt goes in the resilience handler, whose timeouts
+    /// end when the response headers arrive. Increase this for large documents, slow conversions or slow links. With
+    /// <see cref="Timeout.InfiniteTimeSpan" />, only the cancellation token of a call limits the reading of a document.
     /// </summary>
     public TimeSpan TimeOut { get; set; } = TimeSpan.FromMinutes(3);
 
@@ -43,9 +56,11 @@ public class GotenbergSharpClientOptions
     public Uri HealthCheckUrl { get; set; } = new Uri("http://localhost:3000/health");
 
     /// <summary>
-    /// Retry policy configuration for handling transient failures. Default: Disabled with 3 retries when enabled.
-    /// Configure retry count, exponential backoff, and logging options.
+    /// The settings of the built-in retry that the client had before 4.0. Nothing reads them, and
+    /// <see cref="RetryOptions.Enabled" /> set to <see langword="true" /> fails options validation. Add a resilience
+    /// handler to the builder that <c>AddGotenbergSharpClient()</c> returns instead.
     /// </summary>
+    [Obsolete(RetryRemovedMessage)]
     public RetryOptions RetryPolicy { get; set; } = new RetryOptions();
 
     /// <summary>
@@ -61,4 +76,12 @@ public class GotenbergSharpClientOptions
     /// an Authorization header with basic auth credentials in all requests.
     /// </summary>
     public string? BasicAuthPassword { get; set; }
+
+    /// <summary>
+    /// The Gotenberg API requests are rendered for. Default: <see cref="GotenbergApiVersion.Auto" />,
+    /// which reads the version of the service once per application and service address.
+    /// Set <see cref="GotenbergApiVersion.V8" /> or <see cref="GotenbergApiVersion.V9" /> to skip that
+    /// lookup, for instance when a proxy hides the <c>/version</c> route.
+    /// </summary>
+    public GotenbergApiVersion ApiVersion { get; set; } = GotenbergApiVersion.Auto;
 }

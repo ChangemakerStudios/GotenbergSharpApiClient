@@ -27,6 +27,42 @@ var builder = new UrlRequestBuilder()
 await sharpClient.FireWebhookAndForgetAsync(builder);
 ```
 
+### Events URL and Gotenberg 9
+
+`SetEventsUrl` sets the URL that receives a JSON event for each outcome of the webhook: `webhook.success` once the file is delivered and `webhook.error` when the conversion or the delivery fails.
+
+| Gotenberg | Error URL (`SetErrorUrl`) | Events URL (`SetEventsUrl`) |
+|-----------|---------------------------|-----------------------------|
+| 7 and 8 before 8.29.0 | Required: receives the error as the raw body of the failure | Not read |
+| 8.29.0 and newer | Optional if there is an events URL | Optional if there is an error URL; both can be set |
+| 9 | Removed: never sent | Required |
+
+A webhook needs an error URL or an events URL. The client does not check the release of Gotenberg 7 or 8 for the events URL.
+
+Gotenberg 9 has no error URL, so a webhook with only `SetErrorUrl` throws `GotenbergVersionNotSupportedException` before anything is sent to it (`SupportsAsync` answers `false`). The error URL is not sent as the events URL: it received the raw error, the events URL receives JSON events of both outcomes. To run on every release, set both URLs: Gotenberg 7 and 8 get the error URL (and the events URL from 8.29.0), Gotenberg 9 gets the events URL only.
+
+```csharp
+hook.SetUrl("http://host.docker.internal:5000/api/webhook/pdf")
+    .SetErrorUrl("http://host.docker.internal:5000/api/webhook/error")
+    .SetEventsUrl("http://host.docker.internal:5000/api/webhook/events");
+```
+
+A failed conversion reaches the events URL as a `webhook.error` event; the `status` and `message` are those of the error:
+
+```json
+{
+  "event": "webhook.error",
+  "correlationId": "…",
+  "timestamp": "2026-11-16T10:15:30.123456789Z",
+  "error": {
+    "status": 400,
+    "message": "…"
+  }
+}
+```
+
+A `webhook.success` event has the same `event`, `correlationId` and `timestamp` fields and no `error`. Gotenberg 9 refuses a webhook on a route that answers JSON, such as reading metadata, with a 400.
+
 ## PDF Output Options
 
 Available on all request types via `SetPdfOutputOptions()`:
@@ -129,8 +165,10 @@ await sharpClient.ExecutePdfEngineAsync(
 //   address reports 8.20.0. Upgrade Gotenberg to use this feature.
 ```
 
-The version is fetched from `/version` once per client instance and cached. Routes available in
-every supported release are never checked, so most requests cost no extra round-trip.
+The version is fetched from `/version` once per service address and cached; the clients created by
+`AddGotenbergSharpClient()` share that cache, and a client constructed directly keeps its own. Routes
+available in every supported release have no minimum to check. Which Gotenberg API the client renders
+requests for, and when the lookup runs, is described in [Gotenberg 9](gotenberg-9.md#how-the-client-picks-the-api).
 
 Currently gated:
 
@@ -173,6 +211,10 @@ the check off:
 ```csharp
 sharpClient.EnforceMinimumVersion = false;
 ```
+
+With `ApiVersion = V9` the check passes without reading the version, as every gated route predates
+Gotenberg 9. When `/version` answers with an error other than a 404, the request throws a
+`GotenbergApiException` that says so and names the setting to change.
 
 ### Declaring a minimum on your own requests
 

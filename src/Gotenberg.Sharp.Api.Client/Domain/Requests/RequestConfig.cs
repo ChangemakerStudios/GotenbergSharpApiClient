@@ -13,7 +13,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Globalization;
+using System.Text;
 using Gotenberg.Sharp.API.Client.Domain.Pages;
+using GotenbergApiVersion = Gotenberg.Sharp.API.Client.Domain.Shared.GotenbergApiVersion;
 using Gotenberg.Sharp.API.Client.Domain.Webhooks;
 
 namespace Gotenberg.Sharp.API.Client.Domain.Requests;
@@ -29,17 +32,19 @@ public sealed class RequestConfig : IConvertToHttpContent
     ///     Converts the instance to a collection of http content items
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<HttpContent> ToHttpContent()
+    public IEnumerable<HttpContent> ToHttpContent() => this.ToHttpContent(GotenbergApiVersion.V8);
+
+    /// <summary>
+    ///     Converts the instance to a collection of http content items for <paramref name="api" />.
+    /// </summary>
+    internal IEnumerable<HttpContent> ToHttpContent(GotenbergApiVersion api)
     {
         if (this.PageRanges?.Pages.Any() ?? false)
             yield return BuildRequestBase.CreateFormDataItem(
                 this.PageRanges,
-                Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
-
-        if (this.ResultFileName.IsSet())
-            yield return BuildRequestBase.CreateFormDataItem(
-                this.ResultFileName,
-                Constants.Gotenberg.SharedFormFieldNames.OutputFileName);
+                api == GotenbergApiVersion.V9
+                    ? Constants.Gotenberg.Chromium.Gotenberg9.PageRanges
+                    : Constants.Gotenberg.Chromium.Shared.PageProperties.PageRanges);
     }
 
     #endregion
@@ -49,12 +54,109 @@ public sealed class RequestConfig : IConvertToHttpContent
         this.Webhook?.Validate();
     }
 
-    public IEnumerable<(string Name, string? Value)> GetHeaders()
+    public IEnumerable<(string Name, string? Value)> GetHeaders() => this.GetHeaders(GotenbergApiVersion.V8);
+
+    /// <summary>
+    ///     The request headers for <paramref name="api" />.
+    /// </summary>
+    internal IEnumerable<(string Name, string? Value)> GetHeaders(GotenbergApiVersion api)
     {
         if (this.Trace.IsSet())
             yield return (Constants.Gotenberg.All.Trace, this.Trace);
 
-        foreach (var header in (this.Webhook?.GetHeaders()).IfNullEmpty()) yield return header;
+        if (this.ResultFileName.IsSet())
+            yield return (Constants.Gotenberg.SharedFormFieldNames.OutputFileName, ToHeaderValue(this.ResultFileName!));
+
+        foreach (var header in (this.Webhook?.GetHeaders(api)).IfNullEmpty()) yield return header;
+    }
+
+    /// <summary>
+    ///     Makes a result file name fit an HTTP header value: accents are stripped (Müller becomes Muller), and
+    ///     every other character outside printable ASCII (0x20-0x7E), line breaks included, becomes <c>_</c>.
+    ///     A character outside the Basic Multilingual Plane, such as an emoji, gives one <c>_</c>.
+    /// </summary>
+    /// <remarks>
+    ///     HttpClient refuses line breaks outright and rejects or mangles non-ASCII values, depending on the runtime.
+    /// </remarks>
+    internal static string ToHeaderValue(string name)
+    {
+        var result = new StringBuilder(name.Length);
+
+        for (var i = 0; i < name.Length; i++)
+        {
+            var c = name[i];
+
+            if (c >= ' ' && c <= '~')
+            {
+                result.Append(c);
+                continue;
+            }
+
+            // A surrogate pair is one character; a lone surrogate cannot be normalized.
+            if (char.IsSurrogate(c))
+            {
+                if (char.IsHighSurrogate(c) && i + 1 < name.Length && char.IsLowSurrogate(name[i + 1])) i++;
+                result.Append('_');
+                continue;
+            }
+
+            // One character at a time, so that a character that decomposes into several (a Hangul
+            // syllable into its jamo) still gives one '_'.
+            var decomposed = Decompose(c);
+
+            // Not decomposable, and not ASCII: it gives '_' like any other character left over.
+            if (decomposed == null)
+            {
+                result.Append('_');
+                continue;
+            }
+
+            var letters = new StringBuilder(decomposed.Length);
+
+            foreach (var d in decomposed)
+            {
+                var category = CharUnicodeInfo.GetUnicodeCategory(d);
+
+                if (category is UnicodeCategory.NonSpacingMark
+                    or UnicodeCategory.SpacingCombiningMark
+                    or UnicodeCategory.EnclosingMark)
+                    continue;
+
+                letters.Append(d);
+            }
+
+            // Nothing left: the character was a combining mark by itself.
+            if (letters.Length == 0) continue;
+
+            result.Append(letters.ToString().All(l => l >= ' ' && l <= '~') ? letters.ToString() : "_");
+        }
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    ///     The canonical decomposition of <paramref name="c" />, or null when it has none to give: a noncharacter
+    ///     or a code point Unicode has not assigned.
+    /// </summary>
+    /// <remarks>
+    ///     .NET Framework throws <see cref="ArgumentException" /> ("Invalid Unicode code point found") from
+    ///     <see cref="string.Normalize(NormalizationForm)" /> for noncharacters (U+FFFF, U+FFFE, U+FDD0) and some
+    ///     unassigned code points, where .NET 5 and later return them unchanged. Skipping the category
+    ///     <see cref="UnicodeCategory.OtherNotAssigned" /> covers those; the <c>catch</c> is for any other
+    ///     code point of that kind, as the list of them depends on the Unicode version of the runtime.
+    /// </remarks>
+    private static string? Decompose(char c)
+    {
+        if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.OtherNotAssigned) return null;
+
+        try
+        {
+            return c.ToString().Normalize(NormalizationForm.FormD);
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
     }
 
     #region Basic settings
@@ -64,13 +166,16 @@ public sealed class RequestConfig : IConvertToHttpContent
     /// </summary>
     /// <remarks>
     ///     The format is the same as the one from the print options of Google Chrome, e.g. 1-5,8,11-13.
+    ///     Not sent on screenshot requests: no screenshot route accepts it.
     ///     This may move...
     /// </remarks>
     public PageRanges? PageRanges { get; set; }
 
     /// <summary>
     ///     If provided, the API will return the resulting PDF file with the given filename. Otherwise a random filename is
-    ///     used.
+    ///     used. Sent as the <c>Gotenberg-Output-Filename</c> request header, with accents stripped
+    ///     (<c>Müller</c> is sent as <c>Muller</c>) and every other character outside printable ASCII, line breaks
+    ///     included, replaced by <c>_</c>. This property keeps the name as set.
     /// </summary>
     /// <remarks>
     ///     Attention: this feature does not work if the form field webHookURL is given.

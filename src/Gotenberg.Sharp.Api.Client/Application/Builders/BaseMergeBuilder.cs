@@ -14,6 +14,7 @@
 //  limitations under the License.
 
 using Gotenberg.Sharp.API.Client.Application.Requests;
+using Gotenberg.Sharp.API.Client.Application.Stages;
 
 namespace Gotenberg.Sharp.API.Client.Application.Builders;
 
@@ -51,6 +52,24 @@ public abstract class BaseMergeBuilder<TRequest, TBuilder>(TRequest request) : B
         if (asyncAction == null) throw new ArgumentNullException(nameof(asyncAction));
 
         this.BuildTasks.Add(asyncAction(new AssetBuilder(this.Request.Assets ??= new AssetDictionary())));
+
+        return (TBuilder)this;
+    }
+
+    /// <summary>
+    /// Lists the post-processing of the merged PDF as Gotenberg 9 stages. The merge stays the first
+    /// stage, and the stages listed follow it in the order given. Calling it again adds stages after
+    /// those already listed.
+    /// </summary>
+    /// <remarks>
+    /// Needs Gotenberg 9, and replaces the cross-cutting options the client would send as stages, which
+    /// must not be set as well: see <see cref="StagesBuilder" />.
+    /// </remarks>
+    /// <param name="stages">Configuration action for the stages.</param>
+    /// <returns>The builder instance for method chaining.</returns>
+    public TBuilder WithStages(Action<StagesBuilder> stages)
+    {
+        this.AddStages(stages);
 
         return (TBuilder)this;
     }

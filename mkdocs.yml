@@ -44,6 +44,9 @@ nav:
     - Screenshots: screenshots.md
     - Office Conversion: office-conversion.md
     - PDF Manipulation: pdf-manipulation.md
+    - Gotenberg 9: gotenberg-9.md
+    - Stages (Gotenberg 9): stages.md
+    - Retries and Timeouts: resilience.md
   - Advanced Features: advanced-features.md
 
 markdown_extensions:

@@ -17,7 +17,7 @@ using Gotenberg.Sharp.API.Client.Domain.Authentication;
 using Gotenberg.Sharp.API.Client.Domain.PdfFormat;
 using Gotenberg.Sharp.API.Client.Domain.PdfOutput;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace Gotenberg.Sharp.API.Client.Application.PdfOutput;
 
@@ -92,29 +92,34 @@ public sealed class PdfOutputOptionsBuilder
     /// Not all metadata are writable. Consider taking a look at https://exiftool.org/TagNames/XMP.html#pdf
     /// for an (exhaustive?) list of available metadata.
     /// </summary>
-    /// <param name="metadata">Metadata as a dictionary.</param>
+    /// <param name="metadata">Metadata as a dictionary. It is copied, so later changes to it are not sent.</param>
     /// <returns>The builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when metadata is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
     public PdfOutputOptionsBuilder SetMetadata(IDictionary<string, object> metadata)
     {
-        return SetMetadata(JObject.FromObject(metadata));
+        if (metadata == null) throw new ArgumentNullException(nameof(metadata));
+
+        _options.MetaData = JsonObjectWriter.Snapshot(metadata);
+
+        return this;
     }
 
     /// <summary>
     /// Sets the document metadata.
     /// </summary>
-    /// <param name="metadata">Metadata as a JObject.</param>
+    /// <param name="metadata">Metadata as a <see cref="JsonObject" />.</param>
     /// <returns>The builder instance for method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown when metadata is null.</exception>
-    public PdfOutputOptionsBuilder SetMetadata(JObject metadata)
+    /// <exception cref="NotSupportedException">Thrown when a value cannot be written as JSON.</exception>
+    public PdfOutputOptionsBuilder SetMetadata(JsonObject metadata)
     {
         if (metadata == null)
         {
             throw new InvalidOperationException("metadata is null");
         }
 
-        _options.MetaData = metadata;
-
-        return this;
+        return SetMetadata(JsonObjectWriter.ToDictionary(metadata, nameof(metadata)));
     }
 
     /// <summary>

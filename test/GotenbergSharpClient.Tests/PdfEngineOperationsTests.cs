@@ -6,7 +6,7 @@ using Gotenberg.Sharp.API.Client.Domain.Requests;
 using Gotenberg.Sharp.API.Client.Domain.Split;
 using Gotenberg.Sharp.API.Client.Infrastructure;
 using MimeMapping;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace GotenbergSharpClient.Tests;
 
@@ -92,7 +92,7 @@ public class PdfEngineOperationsTests
         var request = builder.Build();
 
         var writeRequest = (WriteMetadataRequest)request;
-        writeRequest.Metadata!["Author"]!.Value<string>().Should().Be("Test");
+        writeRequest.Metadata!["Author"].Should().Be("Test");
     }
 
     [Test]
@@ -218,8 +218,23 @@ public class PdfEngineOperationsTests
         var json = await client.ReadPdfMetadataAsync(builder);
 
         json.Should().NotBeNullOrEmpty();
-        var parsed = JObject.Parse(json);
+        var parsed = JsonNode.Parse(json)!.AsObject();
         parsed.Should().NotBeEmpty();
+
+        var metadata = parsed["test.pdf"].Should().BeOfType<JsonObject>().Subject;
+
+        if (gotenberg.Version.Major >= 9)
+        {
+            // Eight camelCase fields of the document information, those the document has.
+            metadata.Should().ContainKey("producer");
+            metadata.Select(p => p.Key).Should().BeSubsetOf(
+                ["title", "author", "subject", "keywords", "creator", "producer", "creationDate", "modDate"]);
+        }
+        else
+        {
+            // ExifTool tags.
+            metadata.Should().ContainKey("PDFVersion");
+        }
     }
 
     [GotenbergTest(GotenbergVersions.Embed)]
@@ -314,10 +329,37 @@ public class PdfEngineOperationsTests
                 .WithPdfs(a => a.AddItem("plain.pdf", pdfBytes)));
 
         json.Should().NotBeNullOrEmpty();
-        JObject.Parse(json).Should().ContainKey("plain.pdf");
+        JsonNode.Parse(json)!.AsObject().Should().ContainKey("plain.pdf");
     }
 
     [GotenbergTest(GotenbergVersions.Bookmarks)]
+    public async Task ReadBookmarks_RawJsonNamesThePageAsTheVersionDoes(GotenbergServer gotenberg)
+    {
+        var client = await gotenberg.CreateClientAsync();
+        var pdfBytes = await GenerateMultiPageTestPdf(client);
+
+        await using var written = await client.ExecutePdfEngineAsync(
+            PdfEngineBuilders.WriteBookmarks(b => b.Add("Chapter", 2, c => c.Add("Section", 3)))
+                .WithPdfs(a => a.AddItem("test.pdf", pdfBytes)));
+
+        using var ms = new MemoryStream();
+        await written.CopyToAsync(ms);
+
+        var json = await client.ReadPdfBookmarksJsonAsync(
+            PdfEngineBuilders.ReadBookmarks().WithPdfs(a => a.AddItem("bookmarked.pdf", ms.ToArray())));
+
+        // Gotenberg 9 renamed the page of a bookmark, in its answers as in its requests.
+        var (name, other) = gotenberg.Version.Major >= 9 ? ("pageNumber", "page") : ("page", "pageNumber");
+
+        var chapter = TestJson.ParseObject(json)["bookmarked.pdf"]!.AsArray().Single()!.AsObject();
+
+        chapter["title"]!.GetValue<string>().Should().Be("Chapter");
+        chapter[name]!.GetValue<int>().Should().Be(2);
+        chapter.ContainsKey(other).Should().BeFalse();
+        chapter["children"]!.AsArray().Single()![name]!.GetValue<int>().Should().Be(3);
+    }
+
+    [GotenbergTest(GotenbergVersions.Bookmarks, until: "9.0.0")] // 9 takes one outline for all the PDFs of a request
     public async Task WriteBookmarksPerFile_AppliesADistinctOutlineToEachPdf(GotenbergServer gotenberg)
     {
         var client = await gotenberg.CreateClientAsync();

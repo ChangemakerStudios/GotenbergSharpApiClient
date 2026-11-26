@@ -42,9 +42,10 @@ public sealed class ExtraHttpHeaders
 
     internal string ToJson()
     {
-        return JsonConvert.SerializeObject(
+        return JsonSerializer.Serialize(
             this._headers.ToDictionary(
                 entry => entry.Key,
-                entry => string.Join(",", entry.Value)));
+                entry => string.Join(",", entry.Value)),
+            GotenbergJsonContext.Instance.StringMap);
     }
 }

@@ -64,6 +64,8 @@ public sealed class ConfigBuilder
     /// <summary>
     /// Sets the suggested filename for the resulting PDF when Gotenberg returns it.
     /// Useful when using webhooks to identify which request generated which PDF.
+    /// The name is sent as an HTTP header: accents are stripped (<c>Müller</c> is sent as <c>Muller</c>) and every
+    /// other character outside printable ASCII, line breaks included, is replaced by <c>_</c>.
     /// </summary>
     /// <param name="resultFileName">Desired filename for the PDF result.</param>
     /// <returns>The builder instance for method chaining.</returns>

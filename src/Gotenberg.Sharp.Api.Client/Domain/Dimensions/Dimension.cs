@@ -121,9 +121,13 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
 
     private static bool TryParseUnit(string unitStr, out DimensionUnitType unitType)
     {
+#if NET5_0_OR_GREATER
+        foreach (var type in Enum.GetValues<DimensionUnitType>())
+#else
         foreach (DimensionUnitType type in Enum.GetValues(typeof(DimensionUnitType)))
+#endif
         {
-            if (type.GetDescription() == unitStr)
+            if (type.ToUnitSuffix() == unitStr)
             {
                 unitType = type;
                 return true;
@@ -168,7 +172,7 @@ public sealed class Dimension(double value, DimensionUnitType unitType) : IEquat
     public override string ToString()
     {
         // if it's inches, don't supply anything.
-        var unitType = UnitType == DimensionUnitType.Inches ? "" : UnitType.GetDescription();
+        var unitType = UnitType == DimensionUnitType.Inches ? "" : UnitType.ToUnitSuffix();
 
         return $"{Value.ToString("G", CultureInfo.InvariantCulture)}{unitType}";
     }

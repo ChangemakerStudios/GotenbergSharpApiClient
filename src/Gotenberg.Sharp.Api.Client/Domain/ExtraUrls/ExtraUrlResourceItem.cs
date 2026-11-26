@@ -73,8 +73,8 @@ public class ExtraUrlResourceItem
 
     internal string ToJson()
     {
-        return ItemType == ExtraUrlResourceType.ScriptTag
-            ? JsonConvert.SerializeObject(new { src = this.Url.ToString() })
-            : JsonConvert.SerializeObject(new { href = this.Url.ToString() });
+        var attributeName = ItemType == ExtraUrlResourceType.ScriptTag ? "src" : "href";
+
+        return JsonObjectWriter.ToJson(new Dictionary<string, object> { [attributeName] = this.Url.ToString() });
     }
 }

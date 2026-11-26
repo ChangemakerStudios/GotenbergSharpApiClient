@@ -183,7 +183,9 @@ using var result = await sharpClient.ExecutePdfEngineAsync(
 ```
 
 `Constants.Gotenberg.PdfEngines.EmbedRelation` provides the valid relationship values: `Source`,
-`Data`, `Alternative`, `Supplement`, and `Unspecified`.
+`Data`, `Alternative`, `Supplement`, and `Unspecified`. Gotenberg 8 wrote any other value as it was given;
+Gotenberg 9 answers 400 to it, so the client refuses it there before sending (`GotenbergVersionNotSupportedException`).
+A value that differs only in case, such as `data`, is sent as `Data`.
 
 ## Cross-Cutting Options
 
@@ -210,6 +212,37 @@ Add a foreground overlay (same API as watermark):
 ```csharp
 builder.SetStampOptions(s => s.SetTextStamp("APPROVED", "1"));
 ```
+
+### Image and PDF Overlays
+
+A watermark or a stamp can also draw an image or a page of a PDF. Give the file's name and its content
+(bytes, a stream or a `ContentItem`), and optionally the pages:
+
+```csharp
+var logo = await File.ReadAllBytesAsync("logo.png");
+var letterhead = await File.ReadAllBytesAsync("letterhead.pdf");
+
+builder
+    .SetWatermarkOptions(w => w.SetImageWatermark("logo.png", logo))          // behind the page
+    .SetStampOptions(s => s.SetPdfStamp("letterhead.pdf", letterhead, "1"));  // over page 1
+```
+
+`SetImageWatermark`, `SetPdfWatermark`, `SetImageStamp` and `SetPdfStamp` take the file name first: a
+relative name with an extension, which gives the media type the file is sent with.
+
+!!! note "Requires Gotenberg 8.28.0 or newer"
+    Image and PDF watermarks and stamps need Gotenberg 8.28.0, the release that added watermarks and
+    stamps. From 8.32.0 Gotenberg answers `400` to an image or PDF source sent without its file, so
+    `SetSource(OverlaySource.Image)` alone no longer works: use the methods above.
+
+On **Gotenberg 9** only stamps exist: it never draws behind the page, so any watermark throws
+`GotenbergVersionNotSupportedException`. An image or PDF stamp is sent as a `stamp-image` or `stamp-pdf`
+stage, drawn with the defaults of Gotenberg 9, and its file is uploaded with the other files of the
+request: its name must differ from theirs (an asset, a PDF to process, `index.html`, `header.html`,
+`footer.html`, an embedded file), or an `ArgumentException` names the clash. A stamp with free-form
+`SetOptions` is not available on Gotenberg 9, and an image or PDF stamp set with `SetSource` alone,
+without its file, throws an `ArgumentException` that names the method to use. To place, size, fade or
+turn a stamp on Gotenberg 9, list it with `WithStages` instead: see [Stages](stages.md).
 
 ### Rotation
 

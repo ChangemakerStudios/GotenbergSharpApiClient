@@ -1,11 +1,11 @@
 # Getting Started
 
 !!! example "Working Example"
-    [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample) — Full DI setup with logging and Polly retry
+    [DIExample](https://github.com/ChangemakerStudios/GotenbergSharpApiClient/tree/develop/examples/DIExample) — Full DI setup with logging and a retry
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/) for running Gotenberg
+- [Docker](https://www.docker.com/) for running Gotenberg 7, 8 or 9. The client reads the version of the service and sends each request in the form that version takes; see [Gotenberg 9](gotenberg-9.md)
 - [.NET 8.0+](https://dotnet.microsoft.com/), or any runtime that supports .NET Standard 2.0 or 2.1 (the package also targets .NET 9 and 10)
 
 ## Running Gotenberg
@@ -13,8 +13,8 @@
 ### Docker Run
 
 ```bash
-docker pull gotenberg/gotenberg:8
-docker run --name gotenberg --rm -p 3000:3000 gotenberg/gotenberg:8 gotenberg --api-timeout=1800s --log-level=debug
+docker pull gotenberg/gotenberg:9
+docker run --name gotenberg --rm -p 3000:3000 gotenberg/gotenberg:9 gotenberg --api-timeout=1800s --log-level=debug
 ```
 
 ### Docker Compose (with Basic Auth)
@@ -39,13 +39,7 @@ dotnet add package Gotenberg.Sharp.Api.Client
 {
   "GotenbergSharpClient": {
     "ServiceUrl": "http://localhost:3000",
-    "HealthCheckUrl": "http://localhost:3000/health",
-    "RetryPolicy": {
-      "Enabled": true,
-      "RetryCount": 4,
-      "BackoffPower": 1.5,
-      "LoggingEnabled": true
-    }
+    "HealthCheckUrl": "http://localhost:3000/health"
   }
 }
 ```
@@ -81,13 +75,6 @@ services.AddOptions<GotenbergSharpClientOptions>()
         options.TimeOut = TimeSpan.FromMinutes(5);
         options.BasicAuthUsername = "username";
         options.BasicAuthPassword = "password";
-        options.RetryPolicy = new RetryOptions
-        {
-            Enabled = true,
-            RetryCount = 4,
-            BackoffPower = 1.5,
-            LoggingEnabled = true
-        };
     });
 services.AddGotenbergSharpClient();
 ```
@@ -105,17 +92,9 @@ services.AddOptions<GotenbergSharpClientOptions>()
 services.AddGotenbergSharpClient();
 ```
 
-### Retry Behavior
+### Retries
 
-Retry is off by default. When `RetryPolicy.Enabled` is `true`, a request is sent again after:
-
-- a connection failure
-- `429` — Gotenberg's queue is full
-- `502` or `503` — usually a proxy that could not reach Gotenberg, for example during a container restart
-
-Other responses are not retried, including `500`, which Gotenberg returns for a conversion that would fail the same way again.
-
-A request with a non-seekable `Stream` asset is sent only once, because the stream cannot be read a second time. Use a seekable stream or a `byte[]` if you want those requests retried.
+The client sends each request once. To retry failed requests, add a resilience handler to the builder that `AddGotenbergSharpClient()` returns; [Retries and Timeouts](resilience.md) shows how, and which failures are worth retrying.
 
 ### Options Validation
 
@@ -123,7 +102,7 @@ Settings that could never work throw an `OptionsValidationException` when the op
 
 - `ServiceUrl` must be an absolute `http` or `https` URL
 - `TimeOut` must be positive, or `Timeout.InfiniteTimeSpan`
-- `RetryCount` and `BackoffPower` must not be negative when retry is enabled
+- `RetryPolicy.Enabled` must not be `true`: the client has no built-in retry since 4.0 (see [Retries and Timeouts](resilience.md))
 
 Add `ValidateOnStart()` to fail at application start-up instead of on the first conversion:
 
@@ -138,10 +117,9 @@ services.AddGotenbergSharpClient();
 
 ```csharp
 using Gotenberg.Sharp.API.Client;
-using Gotenberg.Sharp.API.Client.Domain.Builders;
-using Gotenberg.Sharp.API.Client.Domain.Builders.Faceted;
-using Gotenberg.Sharp.API.Client.Domain.Requests.Facets;
-using Gotenberg.Sharp.API.Client.Domain.ValueObjects;
+using Gotenberg.Sharp.API.Client.Application.Builders;
+using Gotenberg.Sharp.API.Client.Domain.Settings;
+using Gotenberg.Sharp.API.Client.Extensions;
 ```
 
 ## Your First PDF

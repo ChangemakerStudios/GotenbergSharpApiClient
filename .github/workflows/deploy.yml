@@ -20,6 +20,7 @@ jobs:
       with:
         dotnet-version: |
           8.x
+          9.x
           10.x
 
     - name: Install GitVersion
@@ -41,6 +42,23 @@ jobs:
 
     - name: Run tests
       run: dotnet test --no-build -c Release --verbosity normal
+
+    # The project treats trim and AOT warnings as errors, so the publish fails if the client regresses.
+    - name: Publish AOT smoke test
+      run: dotnet publish test/GotenbergSharpClient.AotSmokeTest -c Release -r linux-x64 -o aot-smoke-test
+
+    # The integration tests start their own containers; the native smoke test needs one running.
+    - name: Start Gotenberg for AOT smoke test
+      run: |
+        docker run -d --name gotenberg-aot -p 3000:3000           -e GOTENBERG_API_BASIC_AUTH_USERNAME=testuser           -e GOTENBERG_API_BASIC_AUTH_PASSWORD=testpass           gotenberg/gotenberg:8 gotenberg --api-enable-basic-auth
+        curl --silent --fail --retry 30 --retry-delay 2 --retry-all-errors http://localhost:3000/health > /dev/null
+
+    - name: Run AOT smoke test
+      run: ./aot-smoke-test/GotenbergSharpClient.AotSmokeTest
+      env:
+        GOTENBERG_URL: http://localhost:3000
+        GOTENBERG_USERNAME: testuser
+        GOTENBERG_PASSWORD: testpass
 
     - name: Pack
       run: dotnet pack src/Gotenberg.Sharp.Api.Client/Gotenberg.Sharp.Api.Client.csproj -c Release -p:PackageVersion=${{ steps.gitversion.outputs.FullSemVer }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
