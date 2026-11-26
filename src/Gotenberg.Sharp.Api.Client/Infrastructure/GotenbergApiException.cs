@@ -125,12 +125,7 @@ namespace Gotenberg.Sharp.API.Client.Infrastructure
         {
             using (response)
             {
-#if NET5_0_OR_GREATER
                 var message = await response.Content.ReadAsStringAsync(cancelToken).ConfigureAwait(false);
-#else
-                cancelToken.ThrowIfCancellationRequested();
-                var message = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-#endif
                 return new GotenbergApiException(message, request, response);
             }
         }

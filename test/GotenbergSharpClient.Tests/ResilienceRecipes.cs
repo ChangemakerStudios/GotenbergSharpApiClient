@@ -33,14 +33,12 @@ internal static class ResilienceRecipes
         ShouldHandle = ShouldRetry
     };
 
-    /// <summary>The pipeline of the page with a timeout for the whole request and one for each attempt.</summary>
-    internal static ResiliencePipelineBuilder<HttpResponseMessage> RetryWithTimeouts(
+    /// <summary>The pipeline of the page with a timeout for each attempt; <c>TimeOut</c> limits the whole call.</summary>
+    internal static ResiliencePipelineBuilder<HttpResponseMessage> RetryWithAttemptTimeout(
         ResiliencePipelineBuilder<HttpResponseMessage> pipeline,
-        TimeSpan request,
         TimeSpan attempt,
         int maxRetryAttempts) =>
         pipeline
-            .AddTimeout(request)
             .AddRetry(Retry(maxRetryAttempts))
             .AddTimeout(attempt);
 
@@ -52,6 +50,9 @@ internal static class ResilienceRecipes
 
         return retry;
     }
+
+    /// <summary>The <c>TimeOut</c> the page sets with the standard resilience handler: longer than its total timeout.</summary>
+    internal static readonly TimeSpan TimeOutWithStandardHandler = TimeSpan.FromMinutes(12);
 
     /// <summary>The settings the page gives the standard resilience handler.</summary>
     internal static void ConfigureStandardHandler(HttpStandardResilienceOptions options)

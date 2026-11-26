@@ -685,18 +685,19 @@ public class GotenbergSharpClient
     {
         var request = new GetApiRequestImpl(Constants.Gotenberg.All.ApiPaths.Version);
 
-        var response = await SendRequestAsync(request, HttpCompletionOption.ResponseContentRead, token);
+        return await this.WithinTimeOutAsync<string?>(
+            async deadline =>
+            {
+                using var response = await this.SendRequestAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    deadline).ConfigureAwait(false);
 
-        if (response.IsSuccessStatusCode)
-        {
-#if NET5_0_OR_GREATER
-            return await response.Content.ReadAsStringAsync(token);
-#else
-            return await response.Content.ReadAsStringAsync();
-#endif
-        }
-
-        return null;
+                return response.IsSuccessStatusCode
+                    ? await response.Content.ReadAsStringAsync(deadline).ConfigureAwait(false)
+                    : null;
+            },
+            token).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -767,10 +768,9 @@ public class GotenbergSharpClient
             throw new InvalidOperationException(
                 "Only call this for webhook configured requests");
 
-        using var response = await this.SendRequestAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancelToken);
+        using var response = await this.WithinTimeOutAsync(
+            deadline => this.SendRequestAsync(request, HttpCompletionOption.ResponseHeadersRead, deadline),
+            cancelToken).ConfigureAwait(false);
     }
 
     protected virtual async Task<Stream> ExecuteRequestAsync(
@@ -779,22 +779,63 @@ public class GotenbergSharpClient
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
 
-        using var response = await this.SendRequestAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancelToken);
+        return await this.WithinTimeOutAsync<Stream>(
+            async deadline =>
+            {
+                using var response = await this.SendRequestAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    deadline).ConfigureAwait(false);
 
-        var ms = new MemoryStream();
+                var ms = new MemoryStream();
 
-#if NET5_0_OR_GREATER
-        await response.Content.CopyToAsync(ms, cancelToken);
-#else
-        await response.Content.CopyToAsync(ms).ConfigureAwait(false);
-#endif
+                await response.Content.CopyToAsync(ms, deadline).ConfigureAwait(false);
 
-        ms.Position = 0;
+                ms.Position = 0;
 
-        return ms;
+                return ms;
+            },
+            cancelToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Runs <paramref name="call" /> under one deadline: <paramref name="cancelToken" /> and the
+    ///     <see cref="System.Net.Http.HttpClient.Timeout" /> counted from now. <c>HttpClient</c> counts its timeout
+    ///     for each request it sends, and only until the response headers arrive; this one also covers the version
+    ///     lookup the call may make first and the reading of the response.
+    /// </summary>
+    /// <exception cref="TaskCanceledException">
+    ///     Thrown when the time runs out, with a <see cref="TimeoutException" /> inside it, as <c>HttpClient</c> throws
+    ///     it on .NET 5 and newer; and for <paramref name="cancelToken" /> when that token fires.
+    /// </exception>
+    private async Task<T> WithinTimeOutAsync<T>(
+        Func<CancellationToken, Task<T>> call,
+        CancellationToken cancelToken)
+    {
+        var timeOut = this.HttpClient.Timeout;
+
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+
+        // Started before HttpClient starts the timer of any request the call sends, so it fires first.
+        if (timeOut != Timeout.InfiniteTimeSpan) deadline.CancelAfter(timeOut);
+
+        try
+        {
+            return await call(deadline.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException ex) when (cancelToken.IsCancellationRequested
+                                                    && ex.CancellationToken != cancelToken)
+        {
+            throw CanceledExceptions.For(cancelToken, ex);
+        }
+        catch (OperationCanceledException ex) when (!cancelToken.IsCancellationRequested
+                                                    && deadline.IsCancellationRequested
+                                                    && ex.InnerException is not TimeoutException)
+        {
+            throw new TaskCanceledException(
+                $"The request was canceled due to the configured HttpClient.Timeout of {timeOut.TotalSeconds} seconds elapsing.",
+                new TimeoutException(ex.Message, ex));
+        }
     }
 
     /// <summary>
@@ -823,7 +864,11 @@ public class GotenbergSharpClient
 
         this.RefreshCachedVersion(response);
 
-        cancelToken.ThrowIfCancellationRequested();
+        if (cancelToken.IsCancellationRequested)
+        {
+            response.Dispose();
+            cancelToken.ThrowIfCancellationRequested();
+        }
 
         if (response.IsSuccessStatusCode)
             return response;
@@ -865,19 +910,18 @@ public class GotenbergSharpClient
         this.VersionCacheEntry.Refresh(reported!);
     }
 
-    private async Task<string> ReadResponseAsStringAsync(
+    private Task<string> ReadResponseAsStringAsync(
         IApiRequest request,
-        CancellationToken cancelToken)
-    {
-        using var response = await this.SendRequestAsync(
-            request,
-            HttpCompletionOption.ResponseContentRead,
-            cancelToken).ConfigureAwait(false);
+        CancellationToken cancelToken) =>
+        this.WithinTimeOutAsync(
+            async deadline =>
+            {
+                using var response = await this.SendRequestAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    deadline).ConfigureAwait(false);
 
-#if NET5_0_OR_GREATER
-        return await response.Content.ReadAsStringAsync(cancelToken).ConfigureAwait(false);
-#else
-        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-#endif
-    }
+                return await response.Content.ReadAsStringAsync(deadline).ConfigureAwait(false);
+            },
+            cancelToken);
 }

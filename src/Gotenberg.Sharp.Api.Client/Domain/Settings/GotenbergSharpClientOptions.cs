@@ -32,15 +32,14 @@ public class GotenbergSharpClientOptions
         "Microsoft.Extensions.Http.Resilience: https://changemakerstudios.github.io/GotenbergSharpApiClient/resilience/";
 
     /// <summary>
-    /// Time limit of a request to Gotenberg, which <c>AddGotenbergSharpClient()</c> sets as the
-    /// <see cref="HttpClient.Timeout" />. Default: 3 minutes. It is the only time limit the client sets, and it covers
-    /// every attempt of a resilience handler added to the builder and the waits between them, so a limit per attempt
-    /// goes in that handler. Increase this for large documents or complex conversions that may take longer to
-    /// process, or set <see cref="Timeout.InfiniteTimeSpan" /> when a resilience handler limits the whole request.
-    /// For a call that returns a document, this limit and those of a resilience handler end when the response
-    /// headers arrive. Reading the document after them is limited only by the cancellation token of the call, so
-    /// pass a token with a deadline to limit the whole call. The .NET Standard builds read the document without
-    /// that token.
+    /// Time limit of a call to Gotenberg, which <c>AddGotenbergSharpClient()</c> sets as the
+    /// <see cref="HttpClient.Timeout" />. Default: 3 minutes. It is the only time limit the client sets. The client
+    /// counts it from the start of a call to the end of the response: the version lookup the call may make first,
+    /// every attempt of a resilience handler added to the builder and the waits between them, and the reading of the
+    /// document or text Gotenberg returns. A call that outlasts it throws <see cref="TaskCanceledException" /> with a
+    /// <see cref="TimeoutException" /> inside it. A limit per attempt goes in the resilience handler, whose timeouts
+    /// end when the response headers arrive. Increase this for large documents, slow conversions or slow links. With
+    /// <see cref="Timeout.InfiniteTimeSpan" />, only the cancellation token of a call limits the reading of a document.
     /// </summary>
     public TimeSpan TimeOut { get; set; } = TimeSpan.FromMinutes(3);
 

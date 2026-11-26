@@ -80,30 +80,35 @@ public class ResilienceRecipeTests
             return Version();
         });
 
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddOptions<GotenbergSharpClientOptions>()
-            .Configure(o =>
-            {
-                o.ServiceUrl = new Uri("http://gotenberg.invalid");
-                o.TimeOut = Timeout.InfiniteTimeSpan;
-            });
-        services.AddGotenbergSharpClient()
-            .ConfigurePrimaryHttpMessageHandler(() => handler)
-            .AddResilienceHandler("gotenberg", pipeline => ResilienceRecipes.RetryWithTimeouts(
-                pipeline,
-                request: TimeSpan.FromSeconds(10),
-                attempt: attemptTimeout,
-                maxRetryAttempts: 2));
-
-        var client = services.BuildServiceProvider()
-            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
+        var client = CreateClientWithAttemptTimeout(handler, timeOut: TimeSpan.FromSeconds(10), attemptTimeout);
 
         var act = () => client.GetVersion();
 
         (await act.Should().ThrowAsync<TimeoutRejectedException>())
-            .Which.Timeout.Should().Be(attemptTimeout, "the timeout of the attempt, not of the request, cut it off");
+            .Which.Timeout.Should().Be(attemptTimeout, "the timeout of the attempt, not TimeOut, cut it off");
         handler.Calls.Should().Be(2, "the 503 is retried, and the attempt that ran out of time is not");
+    }
+
+    [Test]
+    public async Task Timeouts_TimeOutLimitsTheReadingOfTheDocument_WhichTheAttemptTimeoutDoesNot()
+    {
+        var handler = new StubHandler(() => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StreamContent(new SlowBody(chunks: 2, pause: Timeout.InfiniteTimeSpan))
+        });
+
+        var client = CreateClientWithAttemptTimeout(
+            handler,
+            timeOut: TimeSpan.FromMilliseconds(300),
+            attemptTimeout: TimeSpan.FromSeconds(10));
+
+        var act = () => client.HtmlToPdfAsync(new HtmlRequestBuilder()
+                .AddDocument(doc => doc.SetBody("<html><body>hi</body></html>")))
+            .WaitAsync(TimeSpan.FromSeconds(10));
+
+        (await act.Should().ThrowAsync<TaskCanceledException>())
+            .WithInnerException<TimeoutException>();
+        handler.Calls.Should().Be(1, "the headers arrived, so the attempt succeeded and nothing was retried");
     }
 
     [Test]
@@ -169,6 +174,32 @@ public class ResilienceRecipeTests
     private static HttpResponseMessage Version() =>
         new(HttpStatusCode.OK) { Content = new StringContent("8.40.0") };
 
+    /// <summary>The client of the Timeouts section: <c>TimeOut</c> for the whole call, the pipeline for each attempt.</summary>
+    private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateClientWithAttemptTimeout(
+        HttpMessageHandler handler,
+        TimeSpan timeOut,
+        TimeSpan attemptTimeout)
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddOptions<GotenbergSharpClientOptions>()
+            .Configure(o =>
+            {
+                o.ServiceUrl = new Uri("http://gotenberg.invalid");
+                o.TimeOut = timeOut;
+                o.ApiVersion = GotenbergApiVersion.V8;
+            });
+        services.AddGotenbergSharpClient()
+            .ConfigurePrimaryHttpMessageHandler(() => handler)
+            .AddResilienceHandler("gotenberg", pipeline => ResilienceRecipes.RetryWithAttemptTimeout(
+                pipeline,
+                attemptTimeout,
+                maxRetryAttempts: 2));
+
+        return services.BuildServiceProvider()
+            .GetRequiredService<Gotenberg.Sharp.API.Client.GotenbergSharpClient>();
+    }
+
     private static Gotenberg.Sharp.API.Client.GotenbergSharpClient CreateClient(
         HttpMessageHandler handler,
         Action<HttpStandardResilienceOptions> configure)
@@ -179,7 +210,7 @@ public class ResilienceRecipeTests
             .Configure(o =>
             {
                 o.ServiceUrl = new Uri("http://gotenberg.invalid");
-                o.TimeOut = Timeout.InfiniteTimeSpan;
+                o.TimeOut = ResilienceRecipes.TimeOutWithStandardHandler;
             });
         services.AddGotenbergSharpClient()
             .ConfigurePrimaryHttpMessageHandler(() => handler)
